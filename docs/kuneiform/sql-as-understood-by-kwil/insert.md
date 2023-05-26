@@ -9,5 +9,6 @@ slug: /insert-syntax
 
 ![insert-stmt](<./svg/insert-stmt.svg>)
 
-[expr](./expr.md)
-[upsert-clause](./upsert.md)
+- [expr](./expr.md)
+- [upsert-clause](./upsert.md)
+- [returning-clause](./returning-clause.md)
