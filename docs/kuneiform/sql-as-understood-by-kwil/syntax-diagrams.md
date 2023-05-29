@@ -6,6 +6,12 @@ title: Syntax Diagrams
 description: Syntax Diagrams
 slug: /syntax-diagrams
 ---
+<a name="sql-stmt" ></a>
+
+## sql-stmt
+![column-name-list](../sql-as-understood-by-kwil/svg/sql-stmt.svg)
+
+References: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 
 <a name="column-name-list" ></a>
 
@@ -35,7 +41,7 @@ Used By: [select-stmt](#select-stmt)
 ### delete-stmt
 ![delete-stmt](../sql-as-understood-by-kwil/svg/delete-stmt.svg)
 
-Used By: [common-table-expression](#common-table-expression)
+Used By: [sql-stmt](#sql-stmt)
 
 Referances: [common-table-expression](#common-table-expression) [expr](#expr) [qualified-table-name](#qualified-table-name) [returning-clause](#returning-clause)
 
@@ -71,7 +77,7 @@ References: [expr](#expr)
 ### insert-stmt
 ![expr](../sql-as-understood-by-kwil/svg/insert-stmt.svg)
 
-Used After: [common-table-expression](#common-table-expression)
+Used By: [sql-stmt](#sql-stmt)
 
 References: [common-table-expression](#common-table-expression) [expr](#expr) [returning-clause](#returning-clause) [select-stmt](#select-stmt) [upsert-clause](#upsert-clause)
 
@@ -146,9 +152,7 @@ References: [expr](#expr)
 ### select-stmt
 ![expr](../sql-as-understood-by-kwil/svg/select-stmt.svg)
 
-Used After: [common-table-expression](#common-table-expression)
-
-Used By: [common-table-expression](#common-table-expression) [expr](#expr) [insert-stmt](#insert-stmt) [table-or-subquery](#table-or-subquery)
+Used By: [common-table-expression](#common-table-expression) [expr](#expr) [insert-stmt](#insert-stmt) [sql-stmt](#sql-stmt) [table-or-subquery](#table-or-subquery)
 
 References: [common-table-expression](#common-table-expression) [compound-operator](#compound-operator) [expr](#expr) [join-clause](#join-clause) [ordering-term](#ordering-term) [result-column](#result-column) [table-or-subquery](#table-or-subquery)
 
@@ -166,7 +170,7 @@ References: [expr](#expr) [join-clause](#join-clause) [select-stmt](#select-stmt
 ### update-stmt
 ![expr](../sql-as-understood-by-kwil/svg/update-stmt.svg)
 
-Used After: [common-table-expression](#common-table-expression)
+Used By: [sql-stmt](#sql-stmt)
 
 References: [column-name-list](#column-name-list) [common-table-expression](#common-table-expression) [expr](#expr) [join-clause](#join-clause) [qualified-table-name](#qualified-table-name) [returning-clause](#returning-clause) [table-or-subquery](#table-or-subquery)
 
