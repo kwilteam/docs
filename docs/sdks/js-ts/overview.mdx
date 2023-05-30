@@ -1,0 +1,108 @@
+---
+id: js-ts-overview
+title: Kwil JS
+description: Using the Kwil JS SDK
+slug: /sdks/js-ts/overview
+---
+import {InitTabs} from './code_tabs.jsx'
+
+Below is a quick overview of how to use the Kwil JS SDK.  For more detailed information, see the [API Reference](<../api-reference>). **TODO:** migrate this from the old docs.
+
+## Installation
+
+The Kwil JS SDK can be installed using npm.
+
+```bash
+npm install kwil
+```
+
+## Initialize
+
+Kwil has different initialization logic for Web and NodeJS
+
+<InitTabs />
+
+## Fund an Account
+
+**To get testnet tokens, go to the Kwil [testnet faucet](<https://faucet.kwil.com>).**  To deposit funds, you will first need to approve the tokens to be spent by the deposit smart contract.  Then you can deposit the tokens.
+Once deposited, it will take 12 block confirmations before the Kwil network will recognize the deposit.
+
+```js
+const funder = await kwil.getFunder(provider)
+
+let res = await funder.approve("1000000000000000000") 
+// wait a few seconds for the ERC20 approval to be mined
+
+res = await funder.deposit("1000000000000000000")
+// wait for 12 block confirmations
+```
+
+## Reading A Deployed Database Schema
+
+```js
+const schema = await kwil.getSchema(dbid)
+
+// list the tables in the schema
+for (const table of schema.data.tables) {
+    console.log(table.name)
+}
+
+// list the available actions
+for (const action of schema.data.actions) {
+   if action.public {
+       console.log(action.name)
+   }
+}
+```
+
+## Executing Actions
+
+You can chain action methods execute insert/update/delete/read operations on a database.
+``` javascript
+// begin constructing the values for the action
+const input = new Utils.ActionInput()
+    .put("$username", "satoshi")
+    .put("$age", "42")
+
+// construct and sign action transaction
+const tx = await kwil
+    .actionBuilder()
+    .dbid(dbid)
+    .name("create_user")
+    .concat(input)
+    .signer(await provider.getSigner()) // can use wallet if NodeJS
+    .buildTx()
+
+// broadcast transaction to kwil network
+let res = await kwil.broadcast(actionTx)
+
+// if the action returns data, it will be in res.data.body
+//
+//    res.data = {
+//        txHash: "0xhash",
+//        fee: "some_spent_fee",
+//        body: [
+//            {
+//            ...
+//            }
+//        ]
+//    }
+```
+
+## Executing Ad-Hoc Select Queries
+
+``` javascript
+const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
+// res.data = [
+//    {
+//        username: "satoshi",
+//        age: 42,
+//        ...
+//    },
+//    {
+//        username: "vitalik",
+//        age: 27,
+//        ...
+//    }
+// ]
+```
