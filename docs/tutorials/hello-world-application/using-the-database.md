@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 sidebar_label: "Using The Database"
 id: hello-world-using-the-database
 title: Using The Database

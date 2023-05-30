@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 sidebar_label: "Next Steps"
 id: hello-world-next-steps
 title: Next Steps
