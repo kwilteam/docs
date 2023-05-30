@@ -1,19 +1,15 @@
 ---
 sidebar_position: 2
-sidebar_label: "Scalar Funcitons"
-id: scalar-funcitons
-title: Scalar Funcitons
-description: Scalar Funcitons
-slug: /scalar-funcitons
+sidebar_label: "Scalar Functions"
+id: scalar-functions
+title: Scalar Functions
+description: Scalar Functions
+slug: /scalar-functions
 ---
-### Supported Functions
-##### abs(X)
+
+### abs(_X_)
+
 The abs(X) function returns the absolute value of the numeric argument X. Abs(X) returns NULL if X is NULL. Abs(X) returns 0.0 if X is a string or blob that cannot be converted to a numeric value. If X is the integer -9223372036854775808 then abs(X) throws an integer overflow error since there is no equivalent positive 64-bit two complement value.
->	FunctionABS = ScalarFunction{AnySQLFunction{
-		FunctionName: "abs",
-		Min:          1,
-		Max:          1,
-	}}
 
 ##### coalesce(X,Y,...)
 The coalesce() function returns a copy of its first non-NULL argument, or NULL if all arguments are NULL. Coalesce() must have at least 2 arguments.

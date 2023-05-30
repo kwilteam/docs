@@ -1,0 +1,38 @@
+---
+sidebar_position: 1
+sidebar_label: "Creating The Database"
+id: hello-world-creating-the-database
+title: Creating The Database
+description: Creating a database for the hello world application!
+slug: /tutorials/hello-world/creating-the-database
+---
+In this tutorial, we will walk through creating a very simple "Hello World" application with Kwil. This tutorial will introduce you to the basics of Kwil, including creating a database and executing actions through the SDK.
+
+## Prerequisites & Setup
+
+Before using Kwil, you will need to submit a small amount of Kwil testnet tokens into the public Kwil funding pool. The funding pool is used to pay for the gas costs of your transactions. In the future, dApp developers will be able to choose the token that they use to pay for gas costs.
+
+In order to get started, you will need 3 things:
+
+- An Ethereum Wallet
+- A small amount of gEth ([faucet](https://faucet.quicknode.com/drip))
+- A small amount of Kwil testnet tokens ([faucet](https://faucet.kwil.com))
+
+### Funding
+
+The quickest way to fund your database is in the [Kuneiform IDE](https://ide.kwil.com). You can also use the [Kwil CLI](/docs/cli/installation.md).
+
+In the Kuneiform IDE, first set the token approval for your Kwil Testnet Tokens. This will take about 30 seconds to confirm.
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+  <img src={require("./assets/approve-funds.png").default} alt="Token Approval" />
+</div>
+<br />
+
+Next, deposit the approved testnet tokens into the Kwil Funding Pool. This will take 12 Goerli block confirmations (~3 minutes) before the balance updates. You can continue to the next step while waiting for the balance to update.
+
+<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+  <img src={require("./assets/deposit-funds.png").default} alt="Token Approval" />
+</div>
+
+## Creating a Database

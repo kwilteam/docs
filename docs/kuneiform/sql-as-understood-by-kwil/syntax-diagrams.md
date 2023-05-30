@@ -8,7 +8,7 @@ slug: /syntax-diagrams
 ---
 <a name="sql-stmt" ></a>
 
-## sql-stmt
+### sql-stmt
 ![column-name-list](../sql-as-understood-by-kwil/svg/sql-stmt.svg)
 
 References: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
