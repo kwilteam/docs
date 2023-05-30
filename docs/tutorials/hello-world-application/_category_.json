@@ -1,0 +1,9 @@
+{
+    "label": "Example 1: Hello World 🌎",
+    "position": 1,
+    "link": {
+      "type": "generated-index",
+      "description": "A very basic database example",
+    },
+    "collapsed": true
+}
