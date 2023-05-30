@@ -5,7 +5,9 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 /** @type {import('@docusaurus/types').Config} */
-const config = {
+
+
+module.exports = {
   title: 'My Site',
   tagline: 'Dinosaurs are cool',
   favicon: 'img/favicon.ico',
@@ -61,24 +63,22 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      colorMode: {
+        defaultMode: 'light',
+        disableSwitch: true,
+      },
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'My Site',
+        title: 'Kwil Docs',
         logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
+          alt: 'Kwil White Feather Logo',
+          src: 'img/kwil_icon_logo_white.png',
         },
         items: [
+          { to: 'https://discord.com/invite/HzRPZ59Kay/', label: 'Need Help?', position: 'right' },
           {
-            type: 'docSidebar',
-            sidebarId: 'tutorialSidebar',
-            position: 'left',
-            label: 'Tutorial',
-          },
-          {to: '/blog', label: 'Blog', position: 'left'},
-          {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/kwilteam',
             label: 'GitHub',
             position: 'right',
           },
@@ -88,11 +88,15 @@ const config = {
         style: 'dark',
         links: [
           {
-            title: 'Docs',
+            title: 'Build',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'Kwil.com',
+                href: 'https://www.kwil.com/',
+              },
+              {
+                label: 'Kwil IDE',
+                href: 'https://ide.kwil.com/',
               },
             ],
           },
@@ -100,34 +104,30 @@ const config = {
             title: 'Community',
             items: [
               {
-                label: 'Stack Overflow',
-                href: 'https://stackoverflow.com/questions/tagged/docusaurus',
+                label: 'Twitter',
+                href: 'https://twitter.com/KwilTeam',
               },
               {
                 label: 'Discord',
-                href: 'https://discordapp.com/invite/docusaurus',
-              },
-              {
-                label: 'Twitter',
-                href: 'https://twitter.com/docusaurus',
+                href: 'https://discord.com/invite/HzRPZ59Kay',
               },
             ],
           },
           {
-            title: 'More',
+            title: 'Learn',
             items: [
               {
-                label: 'Blog',
-                to: '/blog',
+                label: 'Tutorials',
+                href: 'https://www.youtube.com/channel/UC7byhahd6AZ0zPSjFX5NTlQ/featured',
               },
               {
-                label: 'GitHub',
-                href: 'https://github.com/facebook/docusaurus',
+                label: 'Medium',
+                href: 'https://medium.com/kwildb',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Kwil`,
       },
       prism: {
         theme: lightCodeTheme,
@@ -135,5 +135,3 @@ const config = {
       },
     }),
 };
-
-module.exports = config;
