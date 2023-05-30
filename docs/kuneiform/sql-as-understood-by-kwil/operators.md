@@ -8,6 +8,7 @@ slug: /operators
 ---
 
 ### Supported Arithmetic Operators
+
 |Operator|	Description |	Example |
 |:-------:|:------------:|:------------:|
 |+ (Addition)|	Adds values on either side of the operator|	a + b will give 30|
@@ -17,6 +18,7 @@ slug: /operators
 |% (Modulus)|	Divides the left hand operand by the right hand operand and returns the remainder|	b % a will give 0|
 
 ### Supported Comparison Operator
+
 |Operator|	Description |	Example |
 |:-------:|:------------:|:------------:|
 | == | Checks if the values of two operands are equal or not, if yes then the condition becomes true. | (a == b) is not true. |
@@ -31,6 +33,7 @@ slug: /operators
 | !> | Checks if the value of the left operand is not greater than the value of the right operand, if yes then the condition becomes true. | (a !> b) is true. |
 
 ### Supported Logical Operators
+
 |Operator|Description|
 |:--------:|:----------:|
 | AND | The AND operator allows the existence of multiple conditions in an SQL statement's WHERE clause. |
