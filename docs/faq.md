@@ -17,7 +17,7 @@ No.
 
 ## Why I am getting an "Account Not Found" error in the example?
 
-Usually, an "Account Not Found" error meAns that the network has not detected that you have deposited any funds.  Ensure that you have claimed **and deposited** testnet tokens from the [faucet](<https://faucet.kwil.com>).
+Usually, an "Account Not Found" error means that the network has not detected that you have deposited any funds.  Ensure that you have claimed **and deposited** testnet tokens from the [faucet](<https://faucet.kwil.com>).
 
 ## Can I run a Kwil node?
 
