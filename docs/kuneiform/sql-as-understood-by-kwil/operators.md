@@ -9,6 +9,8 @@ slug: /operators
 
 ## Supported Arithmetic Operators
 
+<table class="custom-table">
+
 |Operator|Description|
 |:------:|:---------:|
 | + (Addition) | Adds values on either side of the operator | 
@@ -17,6 +19,7 @@ slug: /operators
 | / (Division) | Divides the left hand operand by the right hand operand | 
 | % (Modulus) | Divides the left hand operand by the right hand operand and returns the remainder | 
 
+</table>
 
 ## Supported Comparison Operator
 
