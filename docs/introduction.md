@@ -7,6 +7,8 @@ description: Introduction to Kwil
 slug: /introduction
 ---
 
+![kwil-banner](../docs/kwil-banner.svg)
+
 ## The permissionless SQL database for Web3-enabled applications
 
 Kwil is the first permissionless database that enables structured data storage across a decentralized network. Kwil extends the functionality of traditional relational databases by providing a layer on-top of existing engines that enforce rules necessary for building secure, permissionless data stores.
