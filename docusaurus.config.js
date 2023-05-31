@@ -75,6 +75,7 @@ module.exports = {
           alt: 'Kwil White Feather Logo',
           src: 'img/kwil_icon_logo_white.png',
         },
+
         items: [
           { to: 'https://discord.com/invite/HzRPZ59Kay/', label: 'Need Help?', position: 'right' },
           {
