@@ -11,7 +11,7 @@ slug: /syntax-diagrams
 
 ![sql-stmt](../sql-as-understood-by-kwil/svg/sql-stmt.svg)
 
-References: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
+References: [common-table-expression](#common-table-expression) [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 
 ### column-name-list
 
@@ -23,7 +23,7 @@ Used By: [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
 
 ![common-table-expression](../sql-as-understood-by-kwil/svg/common-table-expression.svg)
 
-Used By: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
+Used By: [sql-stmt](#sql-stmt) 
 
 References: [select-stmt](#select-stmt)
 

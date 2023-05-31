@@ -33,14 +33,10 @@ slug: /operators
 | < | Checks if the values of the left operand is less than the value of the right operand, if yes then the condition becomes true. | 
 | >= | Checks if the value of the left operand is greater than or equal to the value of the right operand, if yes then the condition becomes true. | 
 | <= | Checks if the value of the left operand is less than or equal to the value of the right operand, if yes then the condition becomes true. | 
-| !< | Checks if the value of the left operand is not less than the value of the right operand, if yes then the condition becomes true. | 
-| !> | Checks if the value of the left operand is not greater than the value of the right operand, if yes then the condition becomes true. | 
 | IS | The IS operator is used in SQL to compare a value against NULL. It is used with the NULL keyword to check if a value is NULL. For example, column_name IS NULL would return true if the value in column_name is NULL. |
 | IS NOT | The IS NOT operator is used to check if a value is not NULL. For example, column_name IS NOT NULL would return true if the value in column_name is not NULL. |
 | IN | The IN operator is used to check if a value matches any value in a list or a subquery. For example, column_name IN (value1, value2, ...) |
 | NOT IN | The NOT IN operator is used to check if a value does not match any value in a list or subquery. For example, column_name NOT IN (value1, value2, ...). |
-| BETWEEN | The BETWEEN operator is used to check if a value is within a specified range. For example, column_name BETWEEN value1 AND value2 would return true if the value in column_name is between value1 and value2, inclusive. |
-| NOT BETWEEN | The NOT BETWEEN operator used to check if a value is not within a specified range. For example, column_name NOT BETWEEN value1 AND value2 would return true if the value in column_name is not between value1 and value2. |
 
 ## Supported Logical Operators
 

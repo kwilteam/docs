@@ -7,7 +7,7 @@ description: Introduction to Kwil
 slug: /introduction
 ---
 
-![kwil-banner](../docs/kwil-banner.svg)
+![kwil-banner](../docs/kwil-banner.png)
 
 ## The permissionless SQL database for Web3-enabled applications
 
