@@ -1,0 +1,31 @@
+---
+sidebar_position: 4
+sidebar_label: "Supported Features"
+id: kuneiform-supported-features
+title: Supported features in Kuneiform
+slug: /kuneiform/supported-features
+---
+
+## Data Types
+
+Kwil supports a restricted set of data types compared to other relational databases.  If there is a data type your application would like to see added, please let us know!  Below is a list of currently supported data types:
+
+| Data Type | Description |
+| --------- | ----------- |
+| `int` | A 64-bit integer |
+| `text` | A string of text |
+
+## Attributes
+
+Attributes refer to a the properties and constraints of a column.  A column can have multiple attributes.  Some attributes require values to be defined with them.  Below is a list of supported attributes:
+
+| Attribute | Description |
+| --------- | ----------- |
+| `primary_key` | The column is the primary key of the table.  A table can only have one primary key. |
+| `unique` | The column must have a unique value for each row. |
+| `not_null` | The column cannot be null. |
+| `default` | The column will have a default value if no value is provided. |
+| `min` | The column must be greater than or equal to the value provided. |
+| `max` | The column must be less than or equal to the value provided. |
+| `min_length` | The column must have a text length greater than or equal to the value provided. |
+| `max_length` | The column must have a text length less than or equal to the value provided. |
