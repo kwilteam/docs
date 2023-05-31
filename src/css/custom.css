@@ -17,8 +17,20 @@
   color: white;
 }
 
+.navbar__link:hover {
+  color: black;
+}
+
+.navbar__brand:hover {
+  color: black;
+}
+
 .footer {
   background-color: #418e9d;
+}
+
+.footer a:hover {
+  color: black;
 }
 
 :root {
