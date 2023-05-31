@@ -1,0 +1,75 @@
+---
+id: python-overview
+title: Python SDK
+description: Documentation on Kwil's Python SDK usage.
+slug: /sdks/python/overview
+---
+
+Below is a quick overview of how to use the Python SDK.
+
+## Installation
+
+Kwil Py supports installation with Pip.
+
+```bash
+pip install kwil
+```
+
+### Supported Python Versions:
+
+- 3.9
+- 3.10
+
+## Initialization
+
+To initialize the Kwil Python client, you will need a [gRPC](../../links.md) provider and a private key.
+
+```python
+from kwil import Kwil
+
+client = Kwil(Kwil.GRPCProvider("localhost:50051"),
+              Kwil.load_wallet("YOUR_ETH_PRIVATE_KEY"))
+```
+
+## Reading Deployed Database Schemas
+
+To read a database schema:
+
+```python
+# the second input (database deployer) is optional
+# if not provided, it will default to the configured wallet
+schema = client.get_schema('database_name', '0xdatabase_deployer')
+```
+
+To list deployed schemas:
+
+```python
+# the input is optional
+# if not provided, it will default to the configured wallet
+deployed_databases = client.list_databases('0xdatabase_deployer')
+```
+
+## Executing Actions
+
+```python
+dbid = Kwil.generate_dbi("0x_deployer_address", "testdb")
+action = "create_user"
+tx_receipt = client.execute_action(
+    dbid,
+    action,
+    {
+        "$id": 100,
+        "$name": "John Doe",
+        "$age": 30,
+    }
+)
+```
+
+## Querying Data
+
+Ad-hoc SELECT queries can be executed using the `query` method.
+
+```python
+dbid = Kwil.generate_dbi("0x_deployer_address", "testdb")
+queryResult = kwil.query(dbid, "SELECT * FROM users WHERE age > 20")
+```
