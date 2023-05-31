@@ -30,7 +30,7 @@ import UpsertClause from '../sql-as-understood-by-kwil/svg/upsert-clause.svg';
 
 ## sql-stmt
 
-<SqlStmt />;
+<SqlStmt />
 
 References: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 

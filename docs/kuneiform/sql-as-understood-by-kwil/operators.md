@@ -9,13 +9,13 @@ slug: /operators
 
 ### Supported Arithmetic Operators
 
-|Operator|Description|Example|
-|:------:|:---------:|:-----:|
-| + (Addition) | Adds values on either side of the operator | a + b will give 30 |
-| - (Subtraction) | Subtracts the right hand operand from the left hand operand | a - b will give -10 |
-| * (Multiplication) | Multiplies values on either side of the operator | a * b will give 200 |
-| / (Division) | Divides the left hand operand by the right hand operand | b / a will give 2 |
-| % (Modulus) | Divides the left hand operand by the right hand operand and returns the remainder | b % a will give 0 |
+|Operator|Description|
+|:------:|:---------:|
+| + (Addition) | Adds values on either side of the operator | 
+| - (Subtraction) | Subtracts the right hand operand from the left hand operand |
+| * (Multiplication) | Multiplies values on either side of the operator | 
+| / (Division) | Divides the left hand operand by the right hand operand | 
+| % (Modulus) | Divides the left hand operand by the right hand operand and returns the remainder | 
 
 ### Supported Comparison Operator
 
