@@ -30,3 +30,7 @@ Kwil network data is replicated across a sufficient number of nodes to guarantee
 ### Access Control
 
 The Kwil network offers a unique method of writer access-control for applications.  While it is common for user authentication to be part of the application layer in the centralized stack, Kwil provides a suite of tools to enable developers to bake access-control directly into their application's data.  By making access configurable at the protocol level, Kwil solves for many of the security and privacy concerns plaguing typical distributed storage networks.
+
+### Embedding Value Within Data
+
+Smart contract platforms enabled developers to code with programmable money.  In a Kwil database, developers are able to atomically tie and capture the value of data to the same primitives that exist within smart contracts.  By combining tokens with valuable data, builders are able to create new business models and value capture mechanisms that couldn't exist previously.
