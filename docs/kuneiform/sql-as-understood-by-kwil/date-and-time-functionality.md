@@ -35,36 +35,41 @@ The unixepoch() function returns a unix timestamp - the number of seconds since 
 ### strftime(_format, time-value, modifier, modifier, ..._)
 
 The strftime() routine returns the date formatted according to the format string specified as the first argument. The following is a complete list of valid strftime() substitutions:
->	%d		day of month: 00
-	%H		hour: 00-24
-	%j		day of year: 001-366
-	%m		month: 01-12
-	%M		minute: 00-59
-	%S		seconds: 00-59
-	%w		day of week 0-6 with Sunday==0
-	%W		week of year: 00-53
-	%Y		year: 0000-9999
-	%%		%
+```
+%d		day of month: 00
+%H		hour: 00-24
+%j		day of year: 001-366
+%m		month: 01-12
+%M		minute: 00-59
+%S		seconds: 00-59
+%w		day of week 0-6 with Sunday==0
+%W		week of year: 00-53
+%Y		year: 0000-9999
+%%		%
+```
 
 
 ### Supported Modifiers
-    NNN days
-    NNN hours
-    NNN minutes
-    NNN months
-    NNN years
-    start of month
-    start of year
-    start of day
-    weekday N
-    unixepoch
+```
+NNN days
+NNN hours
+NNN minutes
+NNN months
+NNN years
+start of month
+start of year
+start of day
+weekday N
+unixepoch
+```
 
 ### Supported Time Strings
-    YYYY-MM-DD
-    YYYY-MM-DD HH:MM
-    YYYY-MM-DD HH:MM:SS
-    YYYY-MM-DDTHH:MM
-    YYYY-MM-DDTHH:MM:SS
-    HH:MM
-    HH:MM:SS
-
+```
+YYYY-MM-DD
+YYYY-MM-DD HH:MM
+YYYY-MM-DD HH:MM:SS
+YYYY-MM-DDTHH:MM
+YYYY-MM-DDTHH:MM:SS
+HH:MM
+HH:MM:SS
+```
