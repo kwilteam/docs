@@ -18,11 +18,13 @@
 }
 
 .navbar__link:hover {
-  color: black;
+  color: white;
+  opacity: 0.5;
 }
 
 .navbar__brand:hover {
-  color: black;
+  color: white;
+  opacity: 0.5;
 }
 
 .footer {
@@ -30,7 +32,8 @@
 }
 
 .footer a:hover {
-  color: black;
+  color: white;
+  opacity: 0.5;
 }
 
 :root {

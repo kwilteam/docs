@@ -7,42 +7,21 @@ description: Syntax Diagrams
 slug: /syntax-diagrams
 ---
 
-import SqlStmt from '../sql-as-understood-by-kwil/svg/sql-stmt.svg';
-import ColumnNameList from '../sql-as-understood-by-kwil/svg/column-name-list.svg';
-import CommonTableExpression from '../sql-as-understood-by-kwil/svg/common-table-expression.svg';
-import CompoundOperator from '../sql-as-understood-by-kwil/svg/compound-operator.svg';
-import DeleteStmt from '../sql-as-understood-by-kwil/svg/delete-stmt.svg';
-import Expr from '../sql-as-understood-by-kwil/svg/expr.svg';
-import FilterClause from '../sql-as-understood-by-kwil/svg/filter-clause.svg';
-import IndexedColumn from '../sql-as-understood-by-kwil/svg/indexed-column.svg';
-import InsertStmt from '../sql-as-understood-by-kwil/svg/insert-stmt.svg';
-import JoinClause from '../sql-as-understood-by-kwil/svg/join-clause.svg';
-import JoinConstraint from '../sql-as-understood-by-kwil/svg/join-constraint.svg';
-import JoinOperator from '../sql-as-understood-by-kwil/svg/join-operator.svg';
-import LiteralValue from '../sql-as-understood-by-kwil/svg/literal-value.svg';
-import QualifiedTableName from '../sql-as-understood-by-kwil/svg/qualified-table-name.svg';
-import ResultColumn from '../sql-as-understood-by-kwil/svg/result-column.svg';
-import ReturningClause from '../sql-as-understood-by-kwil/svg/returning-clause.svg';
-import SelectStmt from '../sql-as-understood-by-kwil/svg/select-stmt.svg';
-import TableOrSubquery from '../sql-as-understood-by-kwil/svg/table-or-subquery.svg';
-import UpdateStmt from '../sql-as-understood-by-kwil/svg/update-stmt.svg';
-import UpsertClause from '../sql-as-understood-by-kwil/svg/upsert-clause.svg';
-
 ## sql-stmt
 
-<SqlStmt />
+![sql-stmt](../sql-as-understood-by-kwil/svg/sql-stmt.svg)
 
 References: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 
 ### column-name-list
 
-<ColumnNameList />
+![column-name-list](../sql-as-understood-by-kwil/svg/column-name-list.svg)
 
 Used By: [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
 
 ### common-table-expression
 
-<CommonTableExpression />
+![common-table-expression](../sql-as-understood-by-kwil/svg/common-table-expression.svg)
 
 Used By: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 
@@ -50,13 +29,13 @@ References: [select-stmt](#select-stmt)
 
 ### compound-operator
 
-<CompoundOperator />
+![compound-operator](../sql-as-understood-by-kwil/svg/compound-operator.svg)
 
 Used By: [select-stmt](#select-stmt)
 
 ### delete-stmt
 
-<DeleteStmt />
+![delete-stmt](../sql-as-understood-by-kwil/svg/delete-stmt.svg)
 
 Used By: [sql-stmt](#sql-stmt)
 
@@ -64,23 +43,15 @@ Referances: [common-table-expression](#common-table-expression) [expr](#expr) [q
 
 ### expr
 
-<Expr />
+![expr](../sql-as-understood-by-kwil/svg/expr.svg)
 
 Used By: [delete-stmt](#delete-stmt) [indexed-column](#indexed-column) [insert-stmt](#insert-stmt) [join-constraint](#join-constraint) [ordering-term](#ordering-term) [result-column](#result-column) [returning-clause](#returning-clause) [select-stmt](#select-stmt) [table-or-subquery](#table-or-subquery) [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
 
 References: [filter-clause](#filter-clause) [literal-value](#literal-value) [select-stmt](#select-stmt)
 
-### filter-clause
-
-<FilterClause />
-
-Used By: [expr](#expr)
-
-References: [expr](#expr)
-
 ### indexed-column
 
-<IndexedColumn />
+![indexed-column](../sql-as-understood-by-kwil/svg/indexed-column.svg)
 
 Used By: [upsert-clause](#upsert-clause)
 
@@ -88,7 +59,7 @@ References: [expr](#expr)
 
 ### insert-stmt
 
-<InsertStmt />
+![insert-stmt](../sql-as-understood-by-kwil/svg/insert-stmt.svg)
 
 Used By: [sql-stmt](#sql-stmt)
 
@@ -96,7 +67,7 @@ References: [common-table-expression](#common-table-expression) [expr](#expr) [r
 
 ### join-clause
 
-<JoinClause />
+![join-clause](../sql-as-understood-by-kwil/svg/join-clause.svg)
 
 Used By: [select-stmt](#select-stmt) [table-or-subquery](#table-or-subquery) [update-stmt](#update-stmt)
 
@@ -104,7 +75,7 @@ References: [join-constraint](#join-constraint) [join-operator](#join-operator) 
 
 ### join-constraint
 
-<JoinConstraint />
+![join-constraint](../sql-as-understood-by-kwil/svg/join-constraint.svg)
 
 Used By: [join-clause](#join-clause)
 
@@ -112,19 +83,19 @@ References: [expr](#expr)
 
 ### join-operator
 
-<JoinOperator />
+![join-operator](../sql-as-understood-by-kwil/svg/join-operator.svg)
 
 Used By: [join-clause](#join-clause)
 
 ### literal-value
 
-![expr](../sql-as-understood-by-kwil/svg/literal-value.svg)
+![literal-value](../sql-as-understood-by-kwil/svg/literal-value.svg)
 
 Used By: [expr](#expr)
 
 ### ordering-term
 
-<LiteralValue />
+![ordering-term](../sql-as-understood-by-kwil/svg/ordering-term.svg)
 
 Used By: [select-stmt](#delete-stmt) 
 
@@ -132,13 +103,13 @@ References: [expr](#expr)
 
 ### qualified-table-name
 
-<QualifiedTableName />
+![qualified-table-name](../sql-as-understood-by-kwil/svg/qualified-table-name.svg)
 
 Used By: [delete-stmt](#delete-stmt) [update-stmt](#update-stmt)
 
 ### result-column
 
-<ResultColumn />
+![result-column](../sql-as-understood-by-kwil/svg/result-column.svg)
 
 Used By: [select-stmt](#delete-stmt) 
 
@@ -146,7 +117,7 @@ References: [expr](#expr)
 
 ### returning-clause
 
-<ReturningClause />
+![returning-clause](../sql-as-understood-by-kwil/svg/returning-clause.svg)
 
 Used By: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [update-stmt](#update-stmt) 
 
@@ -154,7 +125,7 @@ References: [expr](#expr)
 
 ### select-stmt
 
-<SelectStmt />
+![select-stmt](../sql-as-understood-by-kwil/svg/select-stmt.svg)
 
 Used By: [common-table-expression](#common-table-expression) [expr](#expr) [insert-stmt](#insert-stmt) [sql-stmt](#sql-stmt) [table-or-subquery](#table-or-subquery)
 
@@ -162,7 +133,7 @@ References: [common-table-expression](#common-table-expression) [compound-operat
 
 ### table-or-subquery
 
-<TableOrSubquery />
+![table-or-subquery](../sql-as-understood-by-kwil/svg/table-or-subquery.svg)
 
 Used By: [join-clause](#join-clause) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
 
@@ -170,7 +141,7 @@ References: [expr](#expr) [join-clause](#join-clause) [select-stmt](#select-stmt
 
 ### update-stmt
 
-<UpdateStmt />
+![update-stmt](../sql-as-understood-by-kwil/svg/update-stmt.svg)
 
 Used By: [sql-stmt](#sql-stmt)
 
@@ -178,7 +149,7 @@ References: [column-name-list](#column-name-list) [common-table-expression](#com
 
 ### upsert-clause
 
-<UpsertClause />
+![upsert-clause](../sql-as-understood-by-kwil/svg/upsert-clause.svg)
 
 Used By: [insert-stmt](#insert-stmt)
 
