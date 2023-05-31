@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-sidebar_label: "Creating The Database"
+sidebar_label: "Step 1. Creating The Database"
 id: hello-world-creating-the-database
 title: Creating The Database
 description: Creating a database for the hello world application!
@@ -8,15 +8,13 @@ slug: /tutorials/hello-world/creating-the-database
 ---
 In this tutorial, we will walk through creating a very simple "Hello World" application with Kwil. This tutorial will introduce you to the basics of Kwil, including creating a database and executing actions through the SDK.
 
-## Prerequisites & Setup
+## Prerequisites
 
-Before using Kwil, you will need to submit a small amount of Kwil testnet tokens into the public Kwil funding pool. The funding pool is used to pay for the gas costs of your transactions. In the future, dApp developers will be able to choose the token that they use to pay for gas costs.
+Before you begin, ensure that you have the prerequisites outlined in ["Getting Started"](../../getting-started.md). The Kwil testnet tokens received from the [faucet](https://faucet.kwil.com) will be used to fund the database.
 
-In order to get started, you will need 3 things:
+## Setup
 
-- An Ethereum Wallet
-- A small amount of gEth ([faucet](https://faucet.quicknode.com/drip))
-- A small amount of Kwil testnet tokens ([faucet](https://faucet.kwil.com))
+To use the public Kwil network, you must to submit a small amount of Kwil testnet tokens into the public funding pool. The funding pool is an escrow smart contract used to pay for the gas costs of your transactions. In the future, dApp developers will be able to choose the token that they use to pay for gas costs.
 
 ### Funding
 
@@ -24,15 +22,88 @@ The quickest way to fund your database is in the [Kuneiform IDE](https://ide.kwi
 
 In the Kuneiform IDE, first set the token approval for your Kwil Testnet Tokens. This will take about 30 seconds to confirm.
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+<div style={{ display: "flex", justifyContent: "center" }}>
   <img src={require("./assets/approve-funds.png").default} alt="Token Approval" />
 </div>
 <br />
 
-Next, deposit the approved testnet tokens into the Kwil Funding Pool. This will take 12 Goerli block confirmations (~3 minutes) before the balance updates. You can continue to the next step while waiting for the balance to update.
+Next, deposit the approved Kwil Testnet tokens into the funding pool. This will take 12 Goerli block confirmations (~3 minutes) before the balance updates. You can continue to the next step while waiting for the balance to update.
 
-<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-  <img src={require("./assets/deposit-funds.png").default} alt="Token Approval" />
+<div style={{ display: "flex", justifyContent: "center"  }}>
+  <img src={require("./assets/deposit-funds.png").default} alt="Token Deposit" />
 </div>
 
-## Creating a Database
+## Create Database
+
+The best practice for deploying a database is with the [Kuneiform in-browser IDE](<https://ide.kwil.com>).  The IDE makes it very easy to build, deploy, and use databases on any Kwil network.
+
+#### 1. Declare Database
+In the Kuneiform IDE, create a new file called `hello-world.kf`. This file will contain the database declaration, tables, and actions that can be executed on the database. Note that the database declaration must the first line of the file and must be in the format `database <database-name>;`.
+
+```typescript title="hello-world.kf"
+database hello_world;
+```
+
+#### 2. Declare Tables
+Next, declare the tables that will be used in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. The table name must be unique within the database. The column name must be unique within the table, and column declarations are separated by a comma. The column type must be one of the supported types: `text`, `int`. Column attributes must be one of the supported types: `primary`, `unique`, `notnull`, `default`, `minlen(<length-amount>)`, `maxlen(<length-amount>)`, `min(<length-amount>)`, `max(<length-amount>)`. See the [supported features](/) section for more information.
+
+TODO: Add link to column attributes
+
+You can also add an index to one or more columns by calling `#<index-name> <index-type>(<index-columns>)` in the table declaration. Below, we create a B-Tree index on the `wallet` column.
+
+```typescript title="hello-world.kf"
+database hello_world;
+
+table greetings {
+  id int primary notnull,
+  message text notnull minlen(1) maxlen(100),
+  wallet text notnull,
+  #wallet_index index(wallet)
+}
+```
+
+#### 3. Declare Actions
+Lastly, declare the actions that will be used in the database. Actions are predefined SQL statements that can be executed on the database. Actions are declared in the format `action <action-name> ($<action-paramater>) <private/public> { <sql-statement> };`. The action name must be unique within the database. The action statement must be a valid SQL statement with valid modifiers. More information on on the supported Kwil SQL syntax can be found [here](/docs/category/sql-as-understood-by-kwil). More information on the supported modifiers can be found [here](/).
+
+Below are four actions for executing select, insert, update, and delete queries on the database.
+
+```typescript title="hello-world.kf"
+database hello_world;
+
+table greetings {
+  id int primary notnull,
+  message text notnull minlen(1) maxlen(100),
+  wallet text notnull,
+  #wallet_index index(wallet)
+}
+
+action select_greetings () public {
+  SELECT * FROM greetings;
+}
+
+action insert_greeting ($id, $message) public {
+  INSERT INTO greetings
+  VALUES ($id, $message, @caller);
+}
+
+action update_greeting ($id, $message) public {
+  UPDATE greetings 
+  SET message = $message 
+  WHERE id = $id AND wallet = @caller;
+}
+
+action delete_greeting ($id) public {
+  DELETE FROM greetings 
+  WHERE id = $id AND wallet = @caller;
+}
+```
+
+## Deploy Database
+Once the Kuneiform file is complete, toggle to the third tab in the IDE and select the `hello-world.kf` file from the dropdown. Then, click the `Compile` and `Deploy` buttons to deploy the database to the Kwil network. You will receive a confirmation message once the database is deployed.
+
+<div style={{ display: "flex", justifyContent: "center", width: "75%", margin: "auto" }}>
+  <img src={require("./assets/deploy-successful.png").default} alt="Token Approval" />
+</div>
+<br />
+
+And that is it! You have successfully created a database on the Kwil network. In step 2, we will walk through using the database with the Kwil SDK.

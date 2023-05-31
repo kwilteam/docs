@@ -12,6 +12,7 @@ In order to begin using Kwil, you will need the following:
 - An Ethereum-compatible Wallet
 - A Kwil database endpoint (see the [links page](./links.md) for a list of public endpoints)
 - Testnet tokens from the [Kwil Faucet](<https://faucet.kwil.com>) (if you are using a public Kwil network)
+- A small amount of gEth ([faucet](https://faucet.quicknode.com/drip))
 
 ## Next Steps
 
