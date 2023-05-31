@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+sidebar_label: "Kuneiform Intro"
+id: kuneiform-intro
+title: Kuneiform Introduction
+description: An introduction to the Kuneiform schema language.
+slug: /kuneiform/introduction
+---
+
+Kuneiform is a language for defining databases on Kwil.  While we typically refer to entire an entire schema file as a "Kuneiform" file, schema files are technically made of two distinct languages:
+
+- **Kuneiform (DDL):** The Kuneiform language is specifically a Data Defintion Language (DDL) for Kwil databases.  DDL's typically manage structuring metadata; a common example is the `CREATE TABLE ...` statement in typical SQL databases.  Kuneiform is a more "modern" version of this, featuring a C-like syntax, as well as new features.
+
+- **SQL (DML):** In Kwil, regular SQL is used as the Data Manipulation Language (DML).  SQL is written within a Kuneiform file to store, update, or retrieve data.  While Kwil uses it's own SQL standard for security purposes, it is most similar to the SQL-92 standard.  For most users, it can be thought of as a slightly restrictive version of SQLite's syntax.
+
+```typescript
+database social_network;
+
+// table for storing users
+// each wallet can have a user
+table users {
+    id int primary notnull,
+    username text notnull unique minlen(5) maxlen(32),
+    age int notnull max(150),
+    address text notnull unique // wallet address
+}
+
+// a public action for creating a user
+action create_user ($id, $username, $age) public {
+    INSERT INTO users
+    VALUES ($id, $username, $age, @caller);
+}
+
+// a public action for updating a user's own mutable data
+action update_user ($username, $age) public {
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+```
+
+## Read More
+
+To learn more about Kuneiform and its features, see the section on **[DDL](./ddl.md)**, which outlines the language features.
+
+To learn more on the supported SQL syntax, read the **[DML](./dml.md)** page, or check out the [full syntax tree](./sql-as-understood-by-kwil/syntax-diagrams.md).
