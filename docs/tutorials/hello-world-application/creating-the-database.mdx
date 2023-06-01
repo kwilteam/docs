@@ -10,13 +10,13 @@ In this tutorial, we will walk through creating a very simple "Hello World" appl
 
 ## Prerequisites
 
-Before you begin, ensure that you have the prerequisites outlined in ["Prerequisites"](../../prerequisites.md). The Kwil testnet tokens received from the [faucet](https://faucet.kwil.com) will be used to fund the database.
+Before you begin, ensure that you have the prerequisites outlined in the ["Prerequisites"](../../prerequisites.md) section. The Kwil testnet tokens received from the [faucet](https://faucet.kwil.com) will be used to fund the database.
 
 This tutorial also assumes a basic understanding of SQL.
 
 ## Setup
 
-To use the public Kwil network, you must to submit a small amount of Kwil testnet tokens into the public funding pool. The funding pool is an escrow smart contract used to pay for the gas costs of your transactions. In the future, dApp developers will be able to choose the token that they use to pay for gas costs.
+To use the public Kwil network, you must to submit a small amount of Kwil testnet tokens into the public funding pool. The funding pool is an escrow smart contract used to pay for the gas costs of your transactions.
 
 ### Funding
 
@@ -29,7 +29,7 @@ In the Kuneiform IDE, first set the token approval for your Kwil Testnet Tokens.
 </div>
 <br />
 
-Next, deposit the approved Kwil Testnet tokens into the funding pool. This will take 12 Goerli block confirmations (~3 minutes) before the balance updates. You can continue to the next step while waiting for the balance to update.
+Next, deposit the approved Kwil Testnet tokens into the funding pool. This will take 12 Goerli block confirmations (~144 seconds) before the balance updates. You can continue to the next step while waiting for the balance to update.
 
 <div style={{ display: "flex", justifyContent: "center"  }}>
   <img src={require("./assets/deposit-funds.png").default} alt="Token Deposit" />
@@ -47,7 +47,7 @@ database hello_world;
 ```
 
 #### 2. Declare Tables
-Next, declare the tables that will be used in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. The table name must be unique within the database. The column name must be unique within the table, and column declarations are separated by a comma. The column type must be one of the supported types: `text`, `int`. Column attributes must be one of the supported types: `primary`, `unique`, `notnull`, `default`, `minlen(<length-amount>)`, `maxlen(<length-amount>)`, `min(<length-amount>)`, `max(<length-amount>)`. See the [supported features](../../kuneiform/supported-features) section for more information.
+Next, declare the tables that will exist in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. For information on support data types, attributes, and other features, visit the [supported features](../../kuneiform/supported-features) section.
 
 You can also add an index to one or more columns by calling `#<index-name> <index-type>(<index-columns>)` in the table declaration. Below, we create a B-Tree index on the `wallet` column.
 
@@ -63,7 +63,7 @@ table greetings {
 ```
 
 #### 3. Declare Actions
-Lastly, declare the actions that will be used in the database. Actions are predefined SQL statements that can be executed on the database. Actions are declared in the format `action <action-name> ($<action-paramater>) <private/public> { <sql-statement> };`. The action name must be unique within the database. The action statement must be a valid SQL statement with valid modifiers. More information on on the supported Kwil SQL syntax can be found [here](/docs/category/sql-as-understood-by-kwil). More information on the supported modifiers can be found [here](/).
+Lastly, declare the actions that will be used in the database. Actions are predefined SQL statements that can be executed on the database. Actions are declared in the format `action <action-name> ($<action-paramater>) <private/public> { <sql-statement> };`. More information on on the supported Kwil SQL syntax can be found [here](/docs/category/sql-as-understood-by-kwil). More information on the supported environment variables can be found [here](../../kuneiform/dml#using-contextual-variables-in-actions).
 
 Below are four actions for executing select, insert, update, and delete queries on the database.
 
