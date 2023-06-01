@@ -1,0 +1,64 @@
+---
+sidebar_position: 2
+sidebar_label: "Step 2. SQL Syntax"
+id: social-network-sql
+title: Advanced SQL Syntax
+description: Exploring Advanced SQL Syntax in Kwil
+slug: /tutorials/social-network/advanced-sql
+---
+Now that we have covered some of the more advanced features offered by Kuneiform, we can begin exploring some of the advanced SQL syntax Kwil supports.
+
+You can view the full syntax tree supported by Kwil in the [SQL section](/docs/category/sql-as-understood-by-kwil).
+
+## Prerequisites
+
+This section assumes prior familiarity and understanding of SQL.
+
+## Syntax Features
+
+### Subqueries
+
+Kwil supports nesting subqueries within a query to retrieve a value from another table. In the example below, we use a subquery to retrieve a user's identifier based on their wallet address.
+
+```typescript title="social_network.kf"
+action like_post($post_id) public {
+    INSERT INTO likes (user_id, post_id)
+    VALUES ((
+        SELECT id
+        FROM users
+        WHERE address = @caller
+    ),
+    $post_id);
+}
+```
+
+### Joins
+
+Another feature supported in Kwil are joins, allowing developers to join tables for executing unique or complex queries.
+
+In the `get_feed` action below, we use two `INNER JOIN`s to return a result of posts that match when the id of a user matches the id of an account they follow. The action also takes an offset to specify from which record the data should be returned.
+
+```typescript title="social_network.kf"
+// get_feed gets the 20 most recent posts from accounts a user follows, and takes an offset to specify where the counting should begin
+action get_feed($username, $offset) public {
+    SELECT p.id, p.title, p.content, p.post_date, u.username
+    FROM posts AS p
+    INNER JOIN followers AS f ON p.author_id = f.followed_id
+    INNER JOIN users AS u ON u.id = f.followed_id
+    WHERE f.follower_id = (
+        SELECT id
+        FROM users
+        WHERE username = $username
+    )
+    ORDER BY date(u.post_date) DESC NULLS LAST
+    LIMIT 20 OFFSET $offset
+}
+```
+
+Note that join statements are not allowed in `DELETE` queries. As an alternative to using a JOIN, you can use a subquery to retrieve the desired data.
+
+### Common Table Expressions
+
+
+
+## Next Steps

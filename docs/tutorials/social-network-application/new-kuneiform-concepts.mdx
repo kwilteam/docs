@@ -1,0 +1,108 @@
+---
+sidebar_position: 1
+sidebar_label: "Step 1. New Kuneiform Concepts"
+id: social-network-kuneiform
+title: New Kuneiform Concepts
+description: Exploring Advanced Functions in Kuneiform
+slug: /tutorials/social-network/new-kuneiform
+---
+In this tutorial, we will expand on the functionality introduced in the [Hello World Tutorial](/docs/tutorials/hello-world/creating-the-database) to showcase some of the advanced functionality provided in Kuneiform and Kwil's supported SQL syntax.
+
+## Prerequisites
+
+This tutorial assumes that you are familiar with the concepts introduced in the [Hello World Tutorial](docs/tutorials/hello-world/creating-the-database), including:
+- How to fund your database
+- Basic Kuneiform Syntax for database decelarations, tables, and actions.
+- How to interact with your database via the Kwil JS/TS SDK.
+- How to execution actions and read-only queries on your database.
+
+If any of these concepts are not familiar to you, we strongly recommend returning to the [Hello World Tutorial](docs/tutorials/hello-world/creating-the-database) and then come back to this tutorial.
+
+## Setup
+This tutorial references the `social_network.kf` file that comes loaded in the [Kuneiform IDE](https://ide.kwil.com/). You can find this file under the `sample_databases` folder.
+
+If the file is not in your IDE, simply clear all browsing history for https://ide.kwil.com and reload the page.
+
+:::warning
+
+Clearing your browser history will remove any created or saved files in the IDE.
+
+:::
+
+## Schema Overview
+The schema contains five tables: `users`, `posts`, `likes`, and `followers`.
+
+The schema contains 13 actions that could be called within a social media application to execute some database CRUD operations: `create_user`, `update_users`, `create_posts`, `delete_post`, `like_post`, `unlike_post`, `follow`, `unfollow`, `get_user_by_username`, `get_users_by_wallet`, `get_feed`, and `celebrity_get_feed`.
+
+## Concepts
+
+### Public & Private Actions
+
+Public / Private actions are a very simple way to bifurcate action access and usage. In Kwil, public actions mean that any wallet address can execute the actions. Private actions mean that only the database creator can execute the actions.
+
+```typescript tite="social_network.kf"
+action set_admin($address, $access) private {
+    INSERT INTO admin
+    VALUES ($address, $access)
+}
+```
+
+In the example file, we have a private action that allows the database owner to add wallet addresses to an admin list. This would be helpful for permissioning in our application certain permissions, such as a private settings page.
+
+Private functions are useful for seeding databases. Because Kwil does not yet have the ability to add in seed data at database generation, private methods are a useful alternative.
+
+In the future, developers will be able to apply much more advanced access control mechanisms to their access, including the ability to gatekeep access by nearly any on-chain asset or transaction. This will dramatically expand the use cases for how applications can token-gate their data, enabling projects and protocols to accrue the value of their data to a native token.
+
+### Modifiers
+
+Kuneiform syntax contains the concept of modifiers. Modifiers control the value passed to the SQL query for a particular value. Modifiers can be called with a `@` and the desired modifier name.
+
+```typescript title="social_network.kf"
+action create_user ($id, $username, $age) public {
+    INSERT INTO users
+    VALUES ($id, $username, $age, @caller);
+}
+```
+
+In the example above, we use the caller modifier to automatically retrieve a users wallet address and pass it as a value to the SQL query. When the action is executed, it will only require the `$id`, `username`, and `age` parameters. The wallet address will be automatically passed when the transaction is signed.
+
+In the future, there will be new modifiers for retrieving the block height of the blockchain, allowing for a deterministic timestamping functionality.
+
+### Date-Time Functions
+Kwil allows certain deterministic date-time functions in its SQL syntax. This is useful for executing comparison operations with date information.
+
+Operations in a decentralized system must be deterministic. Because most traditional SQL time functions such as `Time.Now()` are not allowed. Thus, users must provide their own date-time string when executing an action.
+
+```typescript title="social_network.kf"
+// date value is YYYY-MM-DD
+action create_post ($id, $title, $content, $date_string) public {
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, (
+        SELECT id
+        FROM users
+        WHERE address=@caller
+    ), $date_string);
+}
+```
+
+Once the date-time string is set, we can call date-time functions in our queries.
+
+```typescript title="social_network.kf"
+action get_feed($username, $offset) public {
+    SELECT p.id, p.title, p.content, p.post_date, u.username
+    FROM posts AS p
+    INNER JOIN followers AS f ON p.author_id = f.followed_id
+    INNER JOIN users AS u ON u.id = f.followed_id
+    WHERE f.follower_id = (
+        SELECT id
+        FROM users
+        WHERE username = $username
+    )
+    ORDER BY date(u.post_date) DESC NULLS LAST
+    LIMIT 20 OFFSET $offset
+}
+```
+
+In the query above, we are able to use the `date()` function to order the posts in a user's feed by their timestamp.
+
+That is all for step 1 of the social network tutorial! In step 2, we will walk through some of the more advanced SQL syntax Kwil supports and showcase how it enables unique functionality in our application.
