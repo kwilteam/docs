@@ -6,6 +6,7 @@ title: Using The Database
 description: Using the database for the hello world application!
 slug: /tutorials/hello-world/using-the-database
 ---
+
 Now that the database has been deployed, we can begin interacting with it through the Kwil Javascript / Typescript SDK.
 
 ## Prerequisites
@@ -20,7 +21,7 @@ npm i kwil
 
 Before we can interact with our database, we must first initialize a Kwil client. Note the slight difference between the NodeJS and Browser clients.
 
-We will also declare the database ID (DBID) and signer wallet as variables that can be used within the rest of the application.  A DBID is a unique identifier for a database generated from the wallet deployer address and database name.  **Make sure you set the walletAddress variable to the address you deployed the schema with, as well as use your own private key for the signer**.
+We will also declare the database ID (DBID) and signer wallet as variables that can be used within the rest of the application. A DBID is a unique identifier for a database generated from the wallet deployer address and database name. **Make sure you set the walletAddress variable to the address you deployed the schema with, as well as use your own private key for the signer**.
 
 :::tip
 
@@ -28,8 +29,8 @@ You can find a list of public Kwil providers [here](../../links).
 
 :::
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 <Tabs
     defaultValue="node"
@@ -42,64 +43,67 @@ import TabItem from '@theme/TabItem';
 <TabItem value="node">
 
 ```js title="index.js"
-const { NodeKwil } = require('kwil');
-const { Wallet } = require('ethers');
+const { NodeKwil } = require("kwil");
+const { Wallet } = require("ethers");
 
 const kwil = new NodeKwil({
-    kwilProvider: "http://<kwil-provider-url>",
-})
+  kwilProvider: "http://<kwil-provider-url>",
+});
 
-const walletAddress = '<your-wallet-address>'; // Use your own address here
-const databaseName = 'hello_world';
+const walletAddress = "<your-wallet-address>"; // Use your own address here
+const databaseName = "hello_world";
 
 const dbid = Utils.generateDBID(walletAddress, databaseName);
 
-const signer = new Wallet('<ethereum-private-key>'); // Use your own private key here
+const signer = new Wallet("<ethereum-private-key>"); // Use your own private key here
 
 module.exports = {
-    kwil,
-    dbid,
-    signer
-}
+  kwil,
+  dbid,
+  signer,
+};
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="index.js"
-import { WebKwil, Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { WebKwil, Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
 export const kwil = new WebKwil({
-    kwilProvider: "https://provider.kwil.com",
-})
+  kwilProvider: "https://provider.kwil.com",
+});
 
-const walletAddress = '<your-wallet-address>'; // Use your own address here
-const databaseName = 'hello_world';
+const walletAddress = "<your-wallet-address>"; // Use your own address here
+const databaseName = "hello_world";
 
 export const dbid = Utils.generateDBID(walletAddress, databaseName);
 
 const provider = new BrowserProvider(window.ethereum);
 export const signer = await provider.getSigner();
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="index.ts"
-import { WebKwil } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
+import { WebKwil } from "kwil";
+import { BrowserProvider, Signer } from "ethers";
 
 export const kwil: WebKwil = new WebKwil({
-    kwilProvider: "http://<kwil-provider-url>",
-})
+  kwilProvider: "http://<kwil-provider-url>",
+});
 
-const walletAddress = '<your-wallet-address>'; // Use your own address here
-const databaseName = 'hello_world';
+const walletAddress = "<your-wallet-address>"; // Use your own address here
+const databaseName = "hello_world";
 
 export const dbid: string = Utils.generateDBID(walletAddress, databaseName);
 
 const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-export const signer: Signer = new Wallet('<ethereum-private-key>'); // Use your own private key here
+export const signer: Signer = new Wallet("<ethereum-private-key>"); // Use your own private key here
 ```
+
 </TabItem>
 </Tabs>
 
@@ -128,46 +132,48 @@ The signer used to sign the transaction is an Ethereum signer. In this example, 
 <TabItem value="node">
 
 ```js title="insert_greeting.js"
-const { kwil, dbid, signer } = require('./index');
-const { Utils } = require('kwil');
-const { Wallet } = require('ethers');
+const { kwil, dbid, signer } = require("./index");
+const { Utils } = require("kwil");
+const { Wallet } = require("ethers");
 
 const inputs = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello World!');
+  .put("$id", 1)
+  .put("$message", "Hello World!");
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('insert_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("insert_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="insert_greeting.js"
-import { kwil, dbid, signer } from './index';
-import { Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { kwil, dbid, signer } from "./index";
+import { Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
 const inputs = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello World!');
+  .put("$id", 1)
+  .put("$message", "Hello World!");
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('insert_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("insert_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="ts">
 
@@ -190,6 +196,7 @@ const actionTx: Types.Transaction = await kwil
 
 const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 </Tabs>
 
@@ -197,13 +204,14 @@ Once this action has been executed, the database will contain the following data
 
 ```json
 {
-    "id": 1,
-    "message": "Hello World!",
-    "wallet": "<your-wallet-address>"
+  "id": 1,
+  "message": "Hello World!",
+  "wallet": "<your-wallet-address>"
 }
 ```
 
 ### select_greetings
+
 To retrieve data from the database, we can call the `select_greetings` action. As defined, this action will return all data in the greetings table.
 
 This action follows the same process as the previous action. The only difference is that we are not passing any inputs to the action and thus do not need to construct an `ActionInput` object.
@@ -219,16 +227,16 @@ This action follows the same process as the previous action. The only difference
 <TabItem value="node">
 
 ```js title="select_greetings.js"
-const { kwil, dbid, signer } = require('./index');
-const { Utils } = require('kwil');
-const { Wallet } = require('ethers');
+const { kwil, dbid, signer } = require("./index");
+const { Utils } = require("kwil");
+const { Wallet } = require("ethers");
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('select_greetings')
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("select_greetings")
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 /*
@@ -242,20 +250,21 @@ const receipt = await kwil.broadcast(actionTx);
     }
 */
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="select_greetings.js"
-import { kwil, dbid, signer } from './index';
-import { Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { kwil, dbid, signer } from "./index";
+import { Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('select_greetings')
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("select_greetings")
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 /*
@@ -269,6 +278,7 @@ const receipt = await kwil.broadcast(actionTx);
     }
 */
 ```
+
 </TabItem>
 <TabItem value="ts">
 
@@ -296,10 +306,12 @@ const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(a
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
 ### update_greeting
+
 To update data in the database, we can call the `update_greeting` action. As defined, this action will update the message field of the greetings table.
 
 This action follows the same process as the `insert_greeting` [action](#insert_greeting), requiring us to construct an `ActionInput` object and pass it to the action.
@@ -315,46 +327,48 @@ This action follows the same process as the `insert_greeting` [action](#insert_g
 <TabItem value="node">
 
 ```js title="update_greeting.js"
-const { kwil, dbid, signer } = require('./index');
-const { Utils } = require('kwil');
-const { Wallet } = require('ethers');
+const { kwil, dbid, signer } = require("./index");
+const { Utils } = require("kwil");
+const { Wallet } = require("ethers");
 
 const inputs = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello Kwil!');
+  .put("$id", 1)
+  .put("$message", "Hello Kwil!");
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('update_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("update_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="update_greeting.js"
-import { kwil, dbid, signer } from './index';
-import { Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { kwil, dbid, signer } from "./index";
+import { Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
 const inputs = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello Kwil!');
+  .put("$id", 1)
+  .put("$message", "Hello Kwil!");
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('update_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("update_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="ts">
 
@@ -377,6 +391,7 @@ const actionTx: Types.Transaction = await kwil
 
 const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 </Tabs>
 
@@ -384,13 +399,14 @@ Once this transaction is executed, the database will be updated with the new mes
 
 ```json
 {
-    "id": 1,
-    "message": "Hello Kwil!",
-    "wallet": "<your-wallet-address>"
+  "id": 1,
+  "message": "Hello Kwil!",
+  "wallet": "<your-wallet-address>"
 }
 ```
 
 ### delete_greeting
+
 To delete record in the database, we can call the `delete_greeting` action. As defined, this action will delete the record for a specific id and wallet address.
 
 Again, this action follows the same process as the `insert_greeting` [action](#insert_greeting) and `update_greeting` [action](#update_greeting)
@@ -407,68 +423,54 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 
 ```js title="delete_greeting.js"
 //TODO: start here
-const { kwil } = require('./index');
-const { Utils } = require('kwil');
-const { Wallet } = require('ethers');
+const { kwil, dbid, signer } = require("./index");
+const { Utils } = require("kwil");
+const { Wallet } = require("ethers");
 
-const inputs = new Utils.ActionInput()
-    .put('$id', 1);
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const signer = new Wallet('<ethereum-private-key>');
+const inputs = new Utils.ActionInput().put("$id", 1);
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('delete_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("delete_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="delete_greeting.js"
-import { kwil } from './index';
-import { Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { kwil, dbid, signer } from "./index";
+import { Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
-const inputs = new Utils.ActionInput()
-    .put('$id', 1);
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
+const inputs = new Utils.ActionInput().put("$id", 1);
 
 const actionTx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('delete_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+  .actionBuilder()
+  .dbid(dbid)
+  .name("delete_greeting")
+  .concat(inputs)
+  .signer(signer)
+  .buildTx();
 
 const receipt = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="delete_greeting.ts"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
 const inputs: Utils.ActionInput = new Utils.ActionInput()
     .put('$id', 1);
-
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const signer: Signer = await provider.getSigner();
 
 const actionTx: Types.Transaction = await kwil
     .actionBuilder()
@@ -480,6 +482,7 @@ const actionTx: Types.Transaction = await kwil
 
 const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
+
 </TabItem>
 </Tabs>
 
@@ -491,7 +494,7 @@ In addition to using actions to read data from the database, we can also use rea
 
 In the future, the ability to execute read-only queries will be configurable at the database level. For now, all databases are configured to allow read-only queries.
 
-To execute a read-only query, we can use the `selectQuery` method on the `kwil` object. This method takes in a `dbid` and a `query` as parameters. The `query` parameter is a string that contains a valid SQL SELECT query. 
+To execute a read-only query, we can use the `selectQuery` method on the `kwil` object. This method takes in a `dbid` and a `query` as parameters. The `query` parameter is a string that contains a valid SQL SELECT query.
 
 For example, to read all records by a user's wallet address, we can use the following:
 
@@ -506,15 +509,14 @@ For example, to read all records by a user's wallet address, we can use the foll
 <TabItem value="node">
 
 ```js title="selectQuery.js"
-const { kwil } = require('./index');
-const { Utils } = require('kwil');
-const { Wallet } = require('ethers');
+const { kwil, dbid, signer } = require("./index");
+const { Utils } = require("kwil");
+const { Wallet } = require("ethers");
 
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const signer = new Wallet('<ethereum-private-key>');
-
-const result = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${signer.address}`);
+const result = await kwil.selectQuery(
+  dbid,
+  `SELECT * FROM greetings WHERE wallet = ${signer.address}`
+);
 /* 
     result = {
         status: 200,
@@ -528,21 +530,21 @@ const result = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE walle
     }
 */
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="selectQuery.js"
-import { kwil } from './index';
-import { Utils } from 'kwil';
-import { BrowserProvider } from 'ethers';
+import { kwil, dbid, signer } from "./index";
+import { Utils } from "kwil";
+import { BrowserProvider } from "ethers";
 
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
 const address = await signer.getAddress();
 
-const result = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
+const result = await kwil.selectQuery(
+  dbid,
+  `SELECT * FROM greetings WHERE wallet = ${address}`
+);
 /* 
     result = {
         status: 200,
@@ -556,22 +558,19 @@ const result = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE walle
     }
 */
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="selectQuery.ts"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const signer: Signer = await provider.getSigner();
 const address: string = await signer.getAddress();
 
 const result: <Types.GenericResponse<Types.SelectReceipt>> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
-/* 
+/*
     result = {
         status: 200,
         data: [
@@ -584,6 +583,7 @@ const result: <Types.GenericResponse<Types.SelectReceipt>> = await kwil.selectQu
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
@@ -603,10 +603,8 @@ Note that there is no difference between NodeJs and Browser usage for this metho
 <TabItem value="js">
 
 ```js title="getSchema.js"
-const { kwil } = require('./index');
-const { Utils } = require('kwil');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
+const { kwil, dbid } = require("./index");
+const { Utils } = require("kwil");
 
 const schema = await kwil.getSchema(dbid);
 /*
@@ -621,14 +619,13 @@ const schema = await kwil.getSchema(dbid);
     }
 */
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="getSchema.ts"
-import { kwil } from './index';
+import { kwil, dbid } from './index';
 import { Utils, Types } from 'kwil';
-
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
 
 const schema: <Types.GenericResponse<Types.Database<string>>> = await kwil.getSchema(dbid);
 /*
@@ -643,13 +640,16 @@ const schema: <Types.GenericResponse<Types.Database<string>>> = await kwil.getSc
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
 You can also use the Kwil SDK to query other metadata related to database owners and accounts. A list of the full SDK functionality can be found in the [JavaScript/TypeScript SDK](/docs/sdks/js-ts/overview) section.
 
 ## Next Steps
+
 You have now reached the end of the Hello World tutorial! From here, you can jump into any of the following guides to continue learning:
+
 - [Example 2: Building a Social Media Application with Kwil](/docs/category/example-2-social-app)
 - [Kuneiform Language Reference](/docs/kuneiform/introduction)
 - [Kwil Supported SQL Syntax](/docs/category/sql-as-understood-by-kwil)
