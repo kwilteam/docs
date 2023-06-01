@@ -36,6 +36,15 @@
   opacity: 0.5;
 }
 
+.exponent-references {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.custom-table {
+  margin-bottom: 20px;
+}
+
 :root {
   --ifm-color-primary: #418e9d;
   --ifm-color-primary-dark: #2b1d0e;
