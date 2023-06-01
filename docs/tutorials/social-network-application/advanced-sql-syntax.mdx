@@ -1,0 +1,120 @@
+---
+sidebar_position: 2
+sidebar_label: "Step 2. SQL Syntax"
+id: social-network-sql
+title: Advanced SQL Syntax
+description: Exploring Advanced SQL Syntax in Kwil
+slug: /tutorials/social-network/advanced-sql
+---
+Now that we have covered some of the more advanced features offered by Kuneiform, we can begin exploring some of the advanced SQL syntax Kwil supports.
+
+You can view the full syntax tree supported by Kwil in the [SQL section](/docs/category/sql-as-understood-by-kwil).
+
+## Prerequisites
+
+This section assumes prior familiarity and understanding of SQL.
+
+## Syntax Features
+
+### Subqueries
+
+Kwil supports nesting subqueries within a query to retrieve a value from another table. In the example below, we use a subquery to retrieve a user's identifier based on their wallet address.
+
+```typescript title="social_network.kf"
+action like_post($post_id) public {
+    INSERT INTO likes (user_id, post_id)
+    VALUES ((
+        SELECT id
+        FROM users
+        WHERE address = @caller
+    ),
+    $post_id);
+}
+```
+
+### Joins
+
+Another feature supported in Kwil are joins, allowing developers to join tables for executing unique or complex queries.
+
+In the `get_feed` action below, we use two `INNER JOIN`s to return a result of posts that match when the id of a user matches the id of an account they follow. The action also takes an offset to specify from which record the data should be returned.
+
+```typescript title="social_network.kf"
+// get_feed gets the 20 most recent posts from accounts a user follows, and takes an offset to specify where the counting should begin
+action get_feed($username, $offset) public {
+    SELECT p.id, p.title, p.content, p.post_date, u.username
+    FROM posts AS p
+    INNER JOIN followers AS f ON p.author_id = f.followed_id
+    INNER JOIN users AS u ON u.id = f.followed_id
+    WHERE f.follower_id = (
+        SELECT id
+        FROM users
+        WHERE username = $username
+    )
+    ORDER BY date(u.post_date) DESC NULLS LAST
+    LIMIT 20 OFFSET $offset
+}
+```
+
+Note that join statements are not allowed in `DELETE` queries. As an alternative to using a JOIN, you can use a subquery to retrieve the desired data.
+
+For example, in the `delete_post` action, we can all a subquery to retrieve the auther id from the users table.
+
+```typescript title="social_network.kf"
+
+action delete_post ($id) public {
+    DELETE FROM posts
+    WHERE id=$id
+    AND author_id = (
+        SELECT id
+        FROM users
+        WHERE address=@caller
+    );
+}
+```
+
+### Common Table Expressions
+
+Kwil also allows you to define Common Table Expressions (CTE) that can be referenced in your queries.
+
+In the `get_celebrity_feed` action, we create a Common Table Expression to reference all of the accounts with over 50,000 followers. With this CTE, we execute a similar query to the one in the `get_feed` action. This common table expression allows us to retrieve the posts for the accounts that a user follows with over 50,000 followers.
+
+```typescript title="social_network.kf"
+action get_celebrity_feed($username, $offset) public {
+// using a CTE containing popular users
+    WITH popular_users AS (
+        SELECT followers.followed_id AS id, users.username AS username
+        FROM followers
+        INNER JOIN users ON users.id = followers.followed_id
+        GROUP BY followers.followed_id
+        HAVING count(followers.follower_id) >= 50000
+    )
+    SELECT p.id, p.title, p.content, p.post_date, pu.username
+    FROM posts AS p
+    INNER JOIN popular_users AS pu ON pu.id = p.author_id
+    WHERE p.author_id IN (
+        SELECT followed_id
+        FROM followers
+        WHERE follower_id = (
+            SELECT id
+            FROM users
+            WHERE username = $username
+        )
+    )
+    ORDER BY date(p.post_date) DESC NULLS LAST
+    LIMIT 20 OFFSET $offset;
+}
+```
+
+You can go through the other actions in the `social_network.kf` file to see the variety of ways we can apply subqueries, joins, and CTEs to create unique CRUD functionality for our social media application.
+
+## Next Steps
+
+This tutorial showcased some advanced Kuneiform and SQL syntax functionality that Kwil provides.
+
+From here, you can proceed to any of the following guides to keep learning:
+
+- [Kuneiform Language Reference](/docs/kuneiform/introduction)
+- [Kwil Supported SQL Syntax](/docs/category/sql-as-understood-by-kwil)
+- [JavaScript/TypeScript SDK](/docs/sdks/js-ts/overview)
+- [Python SDK](/docs/sdks/python/overview)
+- [Kwil CLI Overview](/docs/category/cli)

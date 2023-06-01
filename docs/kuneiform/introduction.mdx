@@ -13,6 +13,12 @@ Kuneiform is a language for defining databases on Kwil.  While we typically refe
 
 - **SQL (DML):** In Kwil, regular SQL is used as the Data Manipulation Language (DML).  SQL is written within a Kuneiform file to store, update, or retrieve data.  While Kwil uses it's own SQL standard for security purposes, it is most similar to the SQL-92 standard.  For most users, it can be thought of as a slightly restrictive version of SQLite's syntax.
 
+:::tip
+
+You can write, compile, and deploy Kuneiform, as well as view sample Kuneiform files, online at https://ide.kwil.com.
+
+:::
+
 ```typescript
 database social_network;
 
@@ -38,6 +44,12 @@ action update_user ($username, $age) public {
     WHERE address=@caller;
 }
 ```
+
+## Kuneiform Video
+
+Check out the Kuneiform Tutorial below for a helpful overview of the language and how to deploy your database through the IDE.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/iEy2iVV4A5Q" title="Kuneiform IDE Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ## Read More
 

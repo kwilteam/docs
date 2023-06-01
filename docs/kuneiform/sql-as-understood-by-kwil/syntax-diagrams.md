@@ -47,7 +47,7 @@ Referances: [common-table-expression](#common-table-expression) [expr](#expr) [q
 
 Used By: [delete-stmt](#delete-stmt) [indexed-column](#indexed-column) [insert-stmt](#insert-stmt) [join-constraint](#join-constraint) [ordering-term](#ordering-term) [result-column](#result-column) [returning-clause](#returning-clause) [select-stmt](#select-stmt) [table-or-subquery](#table-or-subquery) [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
 
-References: [filter-clause](#filter-clause) [literal-value](#literal-value) [select-stmt](#select-stmt)
+References: [literal-value](#literal-value) [select-stmt](#select-stmt)
 
 ### indexed-column
 

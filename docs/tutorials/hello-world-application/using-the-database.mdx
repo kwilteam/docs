@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 sidebar_label: "Step 2. Using The Database"
 id: hello-world-using-the-database
 title: Using The Database
@@ -172,7 +172,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.NetworkResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
 </TabItem>
 </Tabs>
@@ -283,7 +283,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.NetworkResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 /*
     receipt = {
         status: 200,
@@ -388,7 +388,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.NetworkResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
 </TabItem>
 </Tabs>
@@ -490,7 +490,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.NetworkResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
 ```
 </TabItem>
 </Tabs>
@@ -582,7 +582,7 @@ const provider: BrowserProvider = new BrowserProvider(window.ethereum);
 const signer: Signer = await provider.getSigner();
 const address: string = await signer.getAddress();
 
-const result: <Types.NetworkResponse<Types.SelectReceipt>> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
+const result: <Types.GenericResponse<Types.SelectReceipt>> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
 /* 
     result = {
         status: 200,
@@ -642,7 +642,7 @@ import { Utils, Types } from 'kwil';
 
 const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
 
-const schema: <Types.NetworkResponse<Types.Database<string>>> = await kwil.getSchema(dbid);
+const schema: <Types.GenericResponse<Types.Database<string>>> = await kwil.getSchema(dbid);
 /*
     schema = {
         status: 200,
@@ -662,8 +662,8 @@ You can also use the Kwil SDK to query other metadata related to database owners
 
 ## Next Steps
 You have now reached the end of the Hello World tutorial! From here, you can jump into any of the following guides to continue learning:
-- [Example 2: Building a Social Media Application with Kwil](/docs/tutorials/example-2)
+- [Example 2: Building a Social Media Application with Kwil](/docs/category/example-2-social-app)
 - [Kuneiform Language Reference](/docs/kuneiform/introduction)
 - [Kwil Supported SQL Syntax](/docs/category/sql-as-understood-by-kwil)
 - [JavaScript/TypeScript SDK](/docs/sdks/js-ts/overview)
-- [Python SDK](/docs/sdks/python)
+- [Python SDK](/docs/sdks/python/overview)

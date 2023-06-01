@@ -10,7 +10,9 @@ In this tutorial, we will walk through creating a very simple "Hello World" appl
 
 ## Prerequisites
 
-Before you begin, ensure that you have the prerequisites outlined in ["Getting Started"](../../getting-started.md). The Kwil testnet tokens received from the [faucet](https://faucet.kwil.com) will be used to fund the database.
+Before you begin, ensure that you have the prerequisites outlined in ["Prerequisites"](../../prerequisites.md). The Kwil testnet tokens received from the [faucet](https://faucet.kwil.com) will be used to fund the database.
+
+This tutorial also assumes a basic understanding of SQL.
 
 ## Setup
 
@@ -45,9 +47,7 @@ database hello_world;
 ```
 
 #### 2. Declare Tables
-Next, declare the tables that will be used in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. The table name must be unique within the database. The column name must be unique within the table, and column declarations are separated by a comma. The column type must be one of the supported types: `text`, `int`. Column attributes must be one of the supported types: `primary`, `unique`, `notnull`, `default`, `minlen(<length-amount>)`, `maxlen(<length-amount>)`, `min(<length-amount>)`, `max(<length-amount>)`. See the [supported features](/) section for more information.
-
-TODO: Add link to column attributes
+Next, declare the tables that will be used in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. The table name must be unique within the database. The column name must be unique within the table, and column declarations are separated by a comma. The column type must be one of the supported types: `text`, `int`. Column attributes must be one of the supported types: `primary`, `unique`, `notnull`, `default`, `minlen(<length-amount>)`, `maxlen(<length-amount>)`, `min(<length-amount>)`, `max(<length-amount>)`. See the [supported features](../../kuneiform/supported-features) section for more information.
 
 You can also add an index to one or more columns by calling `#<index-name> <index-type>(<index-columns>)` in the table declaration. Below, we create a B-Tree index on the `wallet` column.
 

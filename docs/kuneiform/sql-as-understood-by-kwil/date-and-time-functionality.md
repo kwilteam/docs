@@ -9,8 +9,9 @@ slug: /date-and-time-functionality
 
 ## Supported Functions
 
-Time-value always needs to be specified because the Kwil system does not allow for a machine's local time to be inserted. 
-If they take no time-value arguments, they will use the machine's local time, which should not be allowed in our case. This is with the exception of STRFTIME, which will use the local time unless the second argument (time-value) is specified. We need to make sure that the first argument is always specified, and that the second argument is specified for STRFTIME. We also cannot allow julianday, since it will return a float, which we cannot guarantee precision for.
+While Kwil allows for most datetime functionalities, it requires users to specify time, and does not allow for the use of the local machine’s time.  This is due to local machine times not being deterministic.
+
+To enforce this, all datetime functions require at least 1 input (which is the timestamp that should be used).  This is with the exception of `strftime`, which requires two inputs (the first being the format, and the second being the timestamp).
 
 ### date(_time-value, modifier, modifier, ..._)
 
