@@ -29,3 +29,12 @@ Attributes refer to a the properties and constraints of a column.  A column can 
 | `max` | The column must be less than or equal to the value provided. |
 | `min_length` | The column must have a text length greater than or equal to the value provided. |
 | `max_length` | The column must have a text length less than or equal to the value provided. |
+
+## Indexes
+
+Kwil supports the following index types defined at the `table` level:
+
+| Index Declaration | Description |
+| ----------------- | ----------- |
+| index(`<column-name-1>`, `<coloumn-name-2>`, ...) | Standard binary tree index |
+| unique(`<column-name-1>`, `<coloumn-name-2>`, ...) | Creates a binary tree index while enforcing the unique attribute on the specified columns |
