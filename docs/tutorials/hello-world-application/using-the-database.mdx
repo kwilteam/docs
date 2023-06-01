@@ -20,6 +20,8 @@ npm i kwil
 
 Before we can interact with our database, we must first initialize a Kwil client. Note the slight difference between the NodeJS and Browser clients.
 
+We will also declare the database ID (DBID) and signer wallet as variables that can be used within the rest of the application.  A DBID is a unique identifier for a database generated from the wallet deployer address and database name.  **Make sure you set the walletAddress variable to the address you deployed the schema with, as well as use your own private key for the signer**.
+
 :::tip
 
 You can find a list of public Kwil providers [here](../../links).
@@ -41,34 +43,62 @@ import TabItem from '@theme/TabItem';
 
 ```js title="index.js"
 const { NodeKwil } = require('kwil');
+const { Wallet } = require('ethers');
 
 const kwil = new NodeKwil({
     kwilProvider: "http://<kwil-provider-url>",
 })
 
+const walletAddress = '<your-wallet-address>'; // Use your own address here
+const databaseName = 'hello_world';
+
+const dbid = Utils.generateDBID(walletAddress, databaseName);
+
+const signer = new Wallet('<ethereum-private-key>'); // Use your own private key here
+
 module.exports = {
-    kwil
+    kwil,
+    dbid,
+    signer
 }
 ```
 </TabItem>
 <TabItem value="browser">
 
 ```js title="index.js"
-import { WebKwil } from 'kwil';
+import { WebKwil, Utils } from 'kwil';
+import { BrowserProvider } from 'ethers';
 
 export const kwil = new WebKwil({
-    kwilProvider: "http://<kwil-provider-url>",
+    kwilProvider: "https://provider.kwil.com",
 })
+
+const walletAddress = '<your-wallet-address>'; // Use your own address here
+const databaseName = 'hello_world';
+
+export const dbid = Utils.generateDBID(walletAddress, databaseName);
+
+const provider = new BrowserProvider(window.ethereum);
+export const signer = await provider.getSigner();
 ```
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="index.ts"
 import { WebKwil } from 'kwil';
+import { BrowserProvider, Signer } from 'ethers';
 
 export const kwil: WebKwil = new WebKwil({
     kwilProvider: "http://<kwil-provider-url>",
 })
+
+const walletAddress = '<your-wallet-address>'; // Use your own address here
+const databaseName = 'hello_world';
+
+export const dbid: string = Utils.generateDBID(walletAddress, databaseName);
+
+const provider: BrowserProvider = new BrowserProvider(window.ethereum);
+export const signer: Signer = new Wallet('<ethereum-private-key>'); // Use your own private key here
 ```
 </TabItem>
 </Tabs>
@@ -98,17 +128,13 @@ The signer used to sign the transaction is an Ethereum signer. In this example, 
 <TabItem value="node">
 
 ```js title="insert_greeting.js"
-const { kwil } = require('./index');
+const { kwil, dbid, signer } = require('./index');
 const { Utils } = require('kwil');
 const { Wallet } = require('ethers');
 
 const inputs = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello World!');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const signer = new Wallet('<ethereum-private-key>');
 
 const actionTx = await kwil
     .actionBuilder()
@@ -124,18 +150,13 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="browser">
 
 ```js title="insert_greeting.js"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils } from 'kwil';
 import { BrowserProvider } from 'ethers';
 
 const inputs = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello World!');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
 
 const actionTx = await kwil
     .actionBuilder()
@@ -151,18 +172,13 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="ts">
 
 ```ts title="insert_greeting.ts"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
 const inputs: Types.ActionInput = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello World!');
-
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const signer: Signer = await provider.getSigner();
 
 const actionTx: Types.Transaction = await kwil
     .actionBuilder()
@@ -203,13 +219,9 @@ This action follows the same process as the previous action. The only difference
 <TabItem value="node">
 
 ```js title="select_greetings.js"
-const { kwil } = require('./index');
+const { kwil, dbid, signer } = require('./index');
 const { Utils } = require('kwil');
 const { Wallet } = require('ethers');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const signer = new Wallet('<ethereum-private-key>');
 
 const actionTx = await kwil
     .actionBuilder()
@@ -234,14 +246,9 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="browser">
 
 ```js title="select_greetings.js"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils } from 'kwil';
 import { BrowserProvider } from 'ethers';
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
 
 const actionTx = await kwil
     .actionBuilder()
@@ -266,15 +273,9 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="ts">
 
 ```ts title="select_greetings.ts"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
-
-
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const signer: Signer = await provider.getSigner();
 
 const actionTx: Types.Transaction = await kwil
     .actionBuilder()
@@ -314,17 +315,13 @@ This action follows the same process as the `insert_greeting` [action](#insert_g
 <TabItem value="node">
 
 ```js title="update_greeting.js"
-const { kwil } = require('./index');
+const { kwil, dbid, signer } = require('./index');
 const { Utils } = require('kwil');
 const { Wallet } = require('ethers');
 
 const inputs = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello Kwil!');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const signer = new Wallet('<ethereum-private-key>');
 
 const actionTx = await kwil
     .actionBuilder()
@@ -340,18 +337,13 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="browser">
 
 ```js title="update_greeting.js"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils } from 'kwil';
 import { BrowserProvider } from 'ethers';
 
 const inputs = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello Kwil!');
-
-const dbid = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner();
 
 const actionTx = await kwil
     .actionBuilder()
@@ -367,18 +359,13 @@ const receipt = await kwil.broadcast(actionTx);
 <TabItem value="ts">
 
 ```ts title="update_greeting.ts"
-import { kwil } from './index';
+import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
 const inputs: Utils.ActionInput = new Utils.ActionInput()
     .put('$id', 1)
     .put('$message', 'Hello Kwil!');
-
-const dbid: string = Utils.generateDBID('<database-owner-wallet-address>', '<hello_world>');
-
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const signer: Signer = await provider.getSigner();
 
 const actionTx: Types.Transaction = await kwil
     .actionBuilder()
@@ -419,6 +406,7 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 <TabItem value="node">
 
 ```js title="delete_greeting.js"
+//TODO: start here
 const { kwil } = require('./index');
 const { Utils } = require('kwil');
 const { Wallet } = require('ethers');
