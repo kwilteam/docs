@@ -68,3 +68,12 @@ slug: /operators
 | ~ | Not |
 | << | Left Shift |
 | >> | Right Shift |
+
+## Supported Unary Operators
+
+|Operator|Description|
+|:------:|:---------:|
+| + (Unary Plus) | The unary plus operator simply returns the value of the operand as is. |
+| - (Unary Minus) | The unary minus operator negates the value of the operand. |
+| ~ (Bitwise NOT) | The bitwise NOT operator performs a bitwise negation on the operand, flipping each bit. |
+| NOT (Logical NOT) | The logical NOT operator returns the boolean opposite of the operand. It is used to negate a boolean value. |
