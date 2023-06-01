@@ -13,7 +13,7 @@ Currently, there is no incentivized Kwil testnet.  We will release information r
 
 ## Is there a Kwil token?
 
-No.
+There is not currently a Kwil token, and the team does not have plans to release a token in the near term. All payment for Kwil is done through a Testnet token.
 
 ## Why I am getting an "Account Not Found" error in the example?
 
