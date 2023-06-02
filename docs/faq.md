@@ -15,9 +15,11 @@ Currently, there is no incentivized Kwil testnet.  We will release information r
 
 There is not currently a Kwil token, and the team does not have plans to release a token in the near term. All payment for Kwil is done through a Testnet token.
 
-## Why I am getting an "Account Not Found" error in the example?
+## Why I am getting an "Account Not Found" error?
 
 Usually, an "Account Not Found" error means that the network has not detected that you have deposited any funds.  Ensure that you have claimed **and deposited** testnet tokens from the [faucet](<https://faucet.kwil.com>).
+
+**It can take up to 3 minutes for the Kwil network to recognize funds deposited from Ethereum.**
 
 ## Can I run a Kwil node?
 

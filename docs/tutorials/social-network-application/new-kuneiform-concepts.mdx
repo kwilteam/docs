@@ -51,11 +51,9 @@ In the example file, we have a private action that allows the database owner to 
 
 Private functions are useful for seeding databases. Because Kwil does not yet have the ability to add in seed data at database generation, private methods are a useful alternative.
 
-In the future, developers will be able to apply much more advanced access control mechanisms to their access, including the ability to gatekeep access by nearly any on-chain asset or transaction. This will dramatically expand the use cases for how applications can token-gate their data, enabling projects and protocols to accrue the value of their data to a native token.
+### Contextual Variables
 
-### Modifiers
-
-Kuneiform syntax contains the concept of modifiers. Modifiers control the value passed to the SQL query for a particular value. Modifiers can be called with a `@` and the desired modifier name.
+Kuneiform syntax contains the concept of contextual variables. Contextual variables contain values that are based on the current execution of an action.  They are denoted by an `@` prefix, followed by the variable name. An example is `@caller`, which injects the wallet address of the action caller.  See the [contextual variables section](../../kuneiform/dml#using-contextual-variables-in-actions) for more information.
 
 ```typescript title="social_network.kf"
 action create_user ($id, $username, $age) public {
@@ -64,14 +62,12 @@ action create_user ($id, $username, $age) public {
 }
 ```
 
-In the example above, we use the caller modifier to automatically retrieve a users wallet address and pass it as a value to the SQL query. When the action is executed, it will only require the `$id`, `username`, and `age` parameters. The wallet address will be automatically passed when the transaction is signed.
-
-In the future, there will be new modifiers for retrieving the block height of the blockchain, allowing for a deterministic timestamping functionality.
+In the example above, we use the caller variable to automatically retrieve a users wallet address and pass it as a value to the SQL query. When the action is executed, it will only require the `$id`, `username`, and `age` parameters. The wallet address will be automatically passed when the transaction is signed.
 
 ### Date-Time Functions
 Kwil allows certain deterministic date-time functions in its SQL syntax. This is useful for executing comparison operations with date information.
 
-Operations in a decentralized system must be deterministic. Because most traditional SQL time functions such as `Time.Now()` are not allowed. Thus, users must provide their own date-time string when executing an action.
+Operations in a decentralized system must be deterministic; this means that we can not use local machine time for timestamping. Thus, users must provide their own date-time string when executing an action.
 
 ```typescript title="social_network.kf"
 // date value is YYYY-MM-DD

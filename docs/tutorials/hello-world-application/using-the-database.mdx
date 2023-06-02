@@ -422,7 +422,6 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 <TabItem value="node">
 
 ```js title="delete_greeting.js"
-//TODO: start here
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
 const { Wallet } = require("ethers");
@@ -491,8 +490,6 @@ Once this transaction is executed, the record will be deleted from the database.
 ## Read-Only Queries
 
 In addition to using actions to read data from the database, we can also use read-only queries. These queries are executed on a single node and do not require a transaction to be broadcasted to the network. This is useful for reading data from the database without incurring any gas fees.
-
-In the future, the ability to execute read-only queries will be configurable at the database level. For now, all databases are configured to allow read-only queries.
 
 To execute a read-only query, we can use the `selectQuery` method on the `kwil` object. This method takes in a `dbid` and a `query` as parameters. The `query` parameter is a string that contains a valid SQL SELECT query.
 

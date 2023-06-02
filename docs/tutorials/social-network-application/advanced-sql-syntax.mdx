@@ -36,7 +36,7 @@ action like_post($post_id) public {
 
 Another feature supported in Kwil are joins, allowing developers to join tables for executing unique or complex queries.
 
-In the `get_feed` action below, we use two `INNER JOIN`s to return a result of posts that match when the id of a user matches the id of an account they follow. The action also takes an offset to specify from which record the data should be returned.
+In the `get_feed` action below, we use two `INNER JOIN`s to return a result of posts that match when the id of a user matches the id of an account they follow. The action only returns the 20 most recent posts, so it also contains an optional `OFFSET` to allow users to retrieve posts 1-20, 21-40, etc.
 
 ```typescript title="social_network.kf"
 // get_feed gets the 20 most recent posts from accounts a user follows, and takes an offset to specify where the counting should begin
@@ -77,6 +77,12 @@ action delete_post ($id) public {
 Kwil also allows you to define Common Table Expressions (CTE) that can be referenced in your queries.
 
 In the `get_celebrity_feed` action, we create a Common Table Expression to reference all of the accounts with over 50,000 followers. With this CTE, we execute a similar query to the one in the `get_feed` action. This common table expression allows us to retrieve the posts for the accounts that a user follows with over 50,000 followers.
+
+:::note
+
+This action is made purely to display CTE's in an understandable way. It is not necessarily the most efficient way to perform the desired query.
+
+:::
 
 ```typescript title="social_network.kf"
 action get_celebrity_feed($username, $offset) public {
