@@ -42,12 +42,12 @@ Public / Private actions are a very simple way to bifurcate action access and us
 
 ```typescript tite="social_network.kf"
 action set_admin($address, $access) private {
-    INSERT INTO admin
+    INSERT INTO admin_table
     VALUES ($address, $access)
 }
 ```
 
-In the example file, we have a private action that allows the database owner to add wallet addresses to an admin list. This would be helpful for permissioning in our application certain permissions, such as a private settings page.
+In the example file, we have a private action that allows the database owner to add wallet addresses to an admin table. This would be helpful for permissioning in our application certain permissions, such as a private settings page.
 
 Private functions are useful for seeding databases. Because Kwil does not yet have the ability to add in seed data at database generation, private methods are a useful alternative.
 
@@ -98,7 +98,7 @@ action get_feed($username, $offset) public {
         FROM users
         WHERE username = $username
     )
-    ORDER BY date(u.post_date) DESC NULLS LAST
+    ORDER BY date(p.post_date) DESC NULLS LAST
     LIMIT 20 OFFSET $offset
 }
 ```

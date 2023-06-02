@@ -50,7 +50,7 @@ action get_feed($username, $offset) public {
         FROM users
         WHERE username = $username
     )
-    ORDER BY date(u.post_date) DESC NULLS LAST
+    ORDER BY date(p.post_date) DESC NULLS LAST
     LIMIT 20 OFFSET $offset
 }
 ```
