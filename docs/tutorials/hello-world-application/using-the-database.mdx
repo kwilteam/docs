@@ -194,7 +194,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
 ```
 
 </TabItem>
@@ -294,7 +294,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
 /*
     receipt = {
         status: 200,
@@ -389,7 +389,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
 ```
 
 </TabItem>
@@ -479,7 +479,7 @@ const actionTx: Types.Transaction = await kwil
     .signer(signer)
     .buildTx();
 
-const receipt: <Types.GenericResponse<Types.TxReceipt>> = await kwil.broadcast(actionTx);
+const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
 ```
 
 </TabItem>
@@ -566,7 +566,7 @@ import { BrowserProvider, Signer } from 'ethers';
 
 const address: string = await signer.getAddress();
 
-const result: <Types.GenericResponse<Types.SelectReceipt>> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
+const result: Types.GenericResponse<Types.SelectReceipt> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
 /*
     result = {
         status: 200,
@@ -624,7 +624,7 @@ const schema = await kwil.getSchema(dbid);
 import { kwil, dbid } from './index';
 import { Utils, Types } from 'kwil';
 
-const schema: <Types.GenericResponse<Types.Database<string>>> = await kwil.getSchema(dbid);
+const schema: Types.GenericResponse<Types.Database<string>> = await kwil.getSchema(dbid);
 /*
     schema = {
         status: 200,
