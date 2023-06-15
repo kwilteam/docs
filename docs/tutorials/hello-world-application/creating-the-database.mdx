@@ -56,7 +56,7 @@ database hello_world;
 
 table greetings {
   id int primary notnull,
-  message text notnull minlen(1) maxlen(100),
+  message text notnull maxlen(100),
   wallet text notnull,
   #wallet_index index(wallet)
 }
@@ -72,7 +72,7 @@ database hello_world;
 
 table greetings {
   id int primary notnull,
-  message text notnull minlen(1) maxlen(100),
+  message text notnull maxlen(100),
   wallet text notnull,
   #wallet_index index(wallet)
 }

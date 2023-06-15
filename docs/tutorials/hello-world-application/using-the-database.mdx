@@ -47,7 +47,7 @@ const { NodeKwil } = require("kwil");
 const { Wallet } = require("ethers");
 
 const kwil = new NodeKwil({
-  kwilProvider: "http://<kwil-provider-url>",
+  kwilProvider: "https://<kwil-provider-url>",
 });
 
 const walletAddress = "<your-wallet-address>"; // Use your own address here
@@ -92,7 +92,7 @@ import { WebKwil } from "kwil";
 import { BrowserProvider, Signer } from "ethers";
 
 export const kwil: WebKwil = new WebKwil({
-  kwilProvider: "http://<kwil-provider-url>",
+  kwilProvider: "https://<kwil-provider-url>",
 });
 
 const walletAddress = "<your-wallet-address>"; // Use your own address here
@@ -106,6 +106,12 @@ export const signer: Signer = new Wallet("<ethereum-private-key>"); // Use your 
 
 </TabItem>
 </Tabs>
+
+:::tip
+
+The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Ethers v6](https://docs.ethers.org/v6/).
+
+:::
 
 ## Execute Actions
 
@@ -134,21 +140,24 @@ The signer used to sign the transaction is an Ethereum signer. In this example, 
 ```js title="insert_greeting.js"
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
-const { Wallet } = require("ethers");
 
-const inputs = new Utils.ActionInput()
-  .put("$id", 1)
-  .put("$message", "Hello World!");
+async function addGreeting(id, msg) {
+    const inputs = new Utils.ActionInput()
+        .put("$id", id)
+        .put("$message", msg);
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("insert_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("insert_greeting")
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+addGreeting(1, "Hello World!")
 ```
 
 </TabItem>
@@ -157,21 +166,24 @@ const receipt = await kwil.broadcast(actionTx);
 ```js title="insert_greeting.js"
 import { kwil, dbid, signer } from "./index";
 import { Utils } from "kwil";
-import { BrowserProvider } from "ethers";
 
-const inputs = new Utils.ActionInput()
-  .put("$id", 1)
-  .put("$message", "Hello World!");
+async function addGreeting(id, msg) {
+    const inputs = new Utils.ActionInput()
+        .put("$id", id)
+        .put("$message", msg);
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("insert_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("insert_greeting")
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+addGreeting(1, "Hello World!")
 ```
 
 </TabItem>
@@ -180,21 +192,24 @@ const receipt = await kwil.broadcast(actionTx);
 ```ts title="insert_greeting.ts"
 import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
 
-const inputs: Types.ActionInput = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello World!');
+async function executeInsery(id, msg): Promise<Types.GenericResponse<Types.TxReceipt>> {
+    const inputs: Types.ActionInput = new Utils.ActionInput()
+        .put('$id', 1)
+        .put('$message', 'Hello World!');
 
-const actionTx: Types.Transaction = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('insert_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+    const actionTx: Types.Transaction = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name('insert_greeting')
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
 
-const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+addGreeting(1, "Hello World!")
 ```
 
 </TabItem>
@@ -229,18 +244,21 @@ This action follows the same process as the previous action. The only difference
 ```js title="select_greetings.js"
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
-const { Wallet } = require("ethers");
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("select_greetings")
-  .signer(signer)
-  .buildTx();
+async function readGreetings() {
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("select_greetings")
+        .signer(signer)
+        .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+readGreetings();
 /*
-    receipt = {
+    {
         status: 200,
         data: {
             txHash: 'some_hash',
@@ -257,18 +275,21 @@ const receipt = await kwil.broadcast(actionTx);
 ```js title="select_greetings.js"
 import { kwil, dbid, signer } from "./index";
 import { Utils } from "kwil";
-import { BrowserProvider } from "ethers";
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("select_greetings")
-  .signer(signer)
-  .buildTx();
+async function readGreetings() {
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("select_greetings")
+        .signer(signer)
+        .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+readGreetings();
 /*
-    receipt = {
+    {
         status: 200,
         data: {
             txHash: 'some_hash',
@@ -285,18 +306,21 @@ const receipt = await kwil.broadcast(actionTx);
 ```ts title="select_greetings.ts"
 import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
 
-const actionTx: Types.Transaction = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('insert_greeting')
-    .signer(signer)
-    .buildTx();
+async function readGreetings(): Promise<Types.GenericResponse<Types.TxReceipt>> {
+    const actionTx: Types.Transaction = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name('select_greetings')
+        .signer(signer)
+        .buildTx();
 
-const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+readGreetings();
 /*
-    receipt = {
+    {
         status: 200,
         data: {
             txHash: 'some_hash',
@@ -306,7 +330,6 @@ const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(act
     }
 */
 ```
-
 </TabItem>
 </Tabs>
 
@@ -329,21 +352,24 @@ This action follows the same process as the `insert_greeting` [action](#insert_g
 ```js title="update_greeting.js"
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
-const { Wallet } = require("ethers");
 
-const inputs = new Utils.ActionInput()
-  .put("$id", 1)
-  .put("$message", "Hello Kwil!");
+async function updateGreeting(id, msg) {
+  const inputs = new Utils.ActionInput()
+    .put("$id", id)
+    .put("$message", msg);
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("update_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
+  const actionTx = await kwil
+    .actionBuilder()
+    .dbid(dbid)
+    .name("update_greeting")
+    .concat(inputs)
+    .signer(signer)
+    .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+  return await kwil.broadcast(actionTx);
+}
+
+updateGreeting(1, "Hello Kwil!");
 ```
 
 </TabItem>
@@ -352,21 +378,24 @@ const receipt = await kwil.broadcast(actionTx);
 ```js title="update_greeting.js"
 import { kwil, dbid, signer } from "./index";
 import { Utils } from "kwil";
-import { BrowserProvider } from "ethers";
 
-const inputs = new Utils.ActionInput()
-  .put("$id", 1)
-  .put("$message", "Hello Kwil!");
+async function updateGreeting(id, msg) {
+  const inputs = new Utils.ActionInput()
+    .put("$id", id)
+    .put("$message", msg);
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("update_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
+  const actionTx = await kwil
+    .actionBuilder()
+    .dbid(dbid)
+    .name("update_greeting")
+    .concat(inputs)
+    .signer(signer)
+    .buildTx();
 
-const receipt = await kwil.broadcast(actionTx);
+  return await kwil.broadcast(actionTx);
+}
+
+updateGreeting(1, "Hello Kwil!");
 ```
 
 </TabItem>
@@ -375,21 +404,24 @@ const receipt = await kwil.broadcast(actionTx);
 ```ts title="update_greeting.ts"
 import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
 
-const inputs: Utils.ActionInput = new Utils.ActionInput()
-    .put('$id', 1)
-    .put('$message', 'Hello Kwil!');
+async function updateGreeting(id: number, msg: string): Promise<Types.GenericResponse<Types.TxReceipt>> {
+    const inputs: Utils.ActionInput = new Utils.ActionInput()
+        .put('$id', id)
+        .put('$message', msg);
 
-const actionTx: Types.Transaction = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('update_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+    const actionTx: Types.Transaction = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name('update_greeting')
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
 
-const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+updateGreeting(1, 'Hello Kwil!');
 ```
 
 </TabItem>
@@ -424,19 +456,22 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 ```js title="delete_greeting.js"
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
-const { Wallet } = require("ethers");
 
-const inputs = new Utils.ActionInput().put("$id", 1);
+async function deleteGreeting(id) {
+    const inputs = new Utils.ActionInput().put("$id", id);
+    
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("delete_greeting")
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
+    
+    return await kwil.broadcast(actionTx);
+}
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("delete_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
-
-const receipt = await kwil.broadcast(actionTx);
+deleteGreeting(1);
 ```
 
 </TabItem>
@@ -445,19 +480,22 @@ const receipt = await kwil.broadcast(actionTx);
 ```js title="delete_greeting.js"
 import { kwil, dbid, signer } from "./index";
 import { Utils } from "kwil";
-import { BrowserProvider } from "ethers";
 
-const inputs = new Utils.ActionInput().put("$id", 1);
+async function deleteGreeting(id) {
+    const inputs = new Utils.ActionInput().put("$id", id);
+    
+    const actionTx = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name("delete_greeting")
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
+    
+    return await kwil.broadcast(actionTx);
+}
 
-const actionTx = await kwil
-  .actionBuilder()
-  .dbid(dbid)
-  .name("delete_greeting")
-  .concat(inputs)
-  .signer(signer)
-  .buildTx();
-
-const receipt = await kwil.broadcast(actionTx);
+deleteGreeting(1);
 ```
 
 </TabItem>
@@ -468,18 +506,22 @@ import { kwil, dbid, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
-const inputs: Utils.ActionInput = new Utils.ActionInput()
-    .put('$id', 1);
+async function deleteGreeting(id): Promise<Types.GenericResponse<Types.TxReceipt>> {
+    const inputs: Utils.ActionInput = new Utils.ActionInput()
+        .put('$id', id);
 
-const actionTx: Types.Transaction = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('delete_greeting')
-    .concat(inputs)
-    .signer(signer)
-    .buildTx();
+    const actionTx: Types.Transaction = await kwil
+        .actionBuilder()
+        .dbid(dbid)
+        .name('delete_greeting')
+        .concat(inputs)
+        .signer(signer)
+        .buildTx();
 
-const receipt: Types.GenericResponse<Types.TxReceipt> = await kwil.broadcast(actionTx);
+    return await kwil.broadcast(actionTx);
+}
+
+deleteGreeting(1);
 ```
 
 </TabItem>
@@ -508,14 +550,14 @@ For example, to read all records by a user's wallet address, we can use the foll
 ```js title="selectQuery.js"
 const { kwil, dbid, signer } = require("./index");
 const { Utils } = require("kwil");
-const { Wallet } = require("ethers");
 
-const result = await kwil.selectQuery(
-  dbid,
-  `SELECT * FROM greetings WHERE wallet = ${signer.address}`
-);
+async function selectQuery(id, query) {
+    return await kwil.selectQuery(id, query);
+}
+
+selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${signer.address}`);
 /* 
-    result = {
+    {
         status: 200,
         data: [
             {
@@ -534,16 +576,16 @@ const result = await kwil.selectQuery(
 ```js title="selectQuery.js"
 import { kwil, dbid, signer } from "./index";
 import { Utils } from "kwil";
-import { BrowserProvider } from "ethers";
 
 const address = await signer.getAddress();
 
-const result = await kwil.selectQuery(
-  dbid,
-  `SELECT * FROM greetings WHERE wallet = ${address}`
-);
+async fuynction selectQuery(id, query) {
+    return await kwil.selectQuery(id, query);
+}
+
+selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
 /* 
-    result = {
+    {
         status: 200,
         data: [
             {
@@ -566,9 +608,13 @@ import { BrowserProvider, Signer } from 'ethers';
 
 const address: string = await signer.getAddress();
 
-const result: Types.GenericResponse<Types.SelectReceipt> = await kwil.selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
+async function selectQuery(id, query): Promise<Types.GenericResponse<Types.SelectReceipt>> {
+    return await kwil.selectQuery(id, query);
+}
+
+selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${address}`);
 /*
-    result = {
+    {
         status: 200,
         data: [
             {
@@ -580,7 +626,6 @@ const result: Types.GenericResponse<Types.SelectReceipt> = await kwil.selectQuer
     }
 */
 ```
-
 </TabItem>
 </Tabs>
 
@@ -603,9 +648,13 @@ Note that there is no difference between NodeJs and Browser usage for this metho
 const { kwil, dbid } = require("./index");
 const { Utils } = require("kwil");
 
-const schema = await kwil.getSchema(dbid);
+async function getSchema(id) {
+    return await kwil.getSchema(id);
+}
+
+getSchema(dbid);
 /*
-    schema = {
+    {
         status: 200,
         data: {
             owner: <your-wallet-address>,
@@ -624,9 +673,13 @@ const schema = await kwil.getSchema(dbid);
 import { kwil, dbid } from './index';
 import { Utils, Types } from 'kwil';
 
-const schema: Types.GenericResponse<Types.Database<string>> = await kwil.getSchema(dbid);
+async function getSchema(id): Promise<Types.GenericResponse<Types.Database<string>>> {
+    return await kwil.getSchema(id);
+}
+
+getSchema(dbid);
 /*
-    schema = {
+    {
         status: 200,
         data: {
             owner: <your-wallet-address>,
