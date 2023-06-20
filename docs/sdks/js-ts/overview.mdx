@@ -71,7 +71,7 @@ const input = new Utils.ActionInput()
     .put("$age", "42")
 
 // construct and sign action transaction
-const tx = await kwil
+const actionTx = await kwil
     .actionBuilder()
     .dbid(dbid)
     .name("create_user")
