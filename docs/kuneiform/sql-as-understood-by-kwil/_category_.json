@@ -1,6 +1,6 @@
 {
     "label": "SQL As Understood By Kwil",
-    "position": 4,
+    "position": 5,
     "link": {
       "type": "generated-index",
       "description": "A full featured SQL syntax tree for SQL on Kwil"

@@ -16,7 +16,7 @@ In Kuneiform, you can define specific SQL queries to execute against your databa
 ```typescript
 action add_user($id, $name, $username) public {
     INSERT INTO users (id, name, username, wallet)
-    VALUES ($id, $name, $username, @caller)
+    VALUES ($id, $name, $username, @caller);
 }
 ```
 
@@ -33,7 +33,7 @@ action <your_desired_name>() <privacy> {}
 Action parameters represent user inputs provided when the action is called. These parameters should be prefixed with a $ symbol, which subsequently maps to the values passed to the SQL query:
 
 ```typescript
-action add_user($id, $name, $username) <public/private> {}
+action add_user($id, $name, $username) <public | private> {}
 ```
 
 ## Setting Query Privacy
@@ -46,7 +46,7 @@ action add_user($id, $name, $username) public {}
 
 ## Defining SQL Queries in an Action
 
-The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with $.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing.  If queries return results, the final query statement will be returned to the client.
+The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with $.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing. All query statements **must** end with a semicolon. If queries return results, the final query statement will be returned to the client.
 
 ```typescript
 // the following queries will be executed transactionally.
@@ -55,6 +55,23 @@ action add_user($id, $name, $username) public {
     VALUES ($id, $name, $username, @caller);
 
     INSERT INTO ... // some other query
+}
+```
+
+## Raising Errors in a SQL Query
+
+In a SQL query, you can use ```ERROR()``` function to raise an error and stop the execution of an action. This is useful for enforcing conditional logic in a query.
+
+```typescript
+// a sample action to check a user's balance before revealing data.
+action read_date($id) public {
+    SELECT username,
+        CASE
+            WHEN balance < 10 THEN ERROR('insufficient balance')
+            ELSE null
+        END
+    FROM balances WHERE id = $id;
+    SELECT * FROM some_table;
 }
 ```
 
