@@ -15,6 +15,10 @@ The abs(X) function returns the absolute value of the numeric argument X. Abs(X)
 
 The coalesce() function returns a copy of its first non-NULL argument, or NULL if all arguments are NULL. Coalesce() must have at least 2 arguments.
 
+### error(_statement_)
+
+The error function raises an exception, and causes the SQL statement to fail.  It takes a string that will be returned to the user in the query result.
+
 ### format(_FORMAT,..._)
 
 The format(FORMAT,...) SQL function works like the sqlite3_mprintf() C-language function and the printf() function from the standard C library. The first argument is a format string that specifies how to construct the output string using values taken from subsequent arguments. If the FORMAT argument is missing or NULL then the result is NULL. The %n format is silently ignored and does not consume an argument. The %p format is an alias for %X. The %z format is interchangeable with %s. If there are too few arguments in the argument list, missing arguments are assumed to have a NULL value, which is translated into 0 or 0.0 for numeric formats or an empty string for %s. See the built-in printf() documentation for additional information.

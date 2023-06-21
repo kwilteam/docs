@@ -56,7 +56,7 @@ table users {
 Within your table declaration, you can add foreign key declaration to link a column in your declared table to a column in another table. You can also optionally set an operation to be executed when the linked column is updated or deleted. A reference column must be unique. The syntax for a foreign key declaration looks like:
 
 ```typescript
-foreign_key (<column-name>) references <table-name>(<reference-column-name>) on_update | on_delete <some-action>
+foreign_key (<column-name>) references <table-name>(<reference-column-name>) on_update | on_delete <foreign-key-operation>
 ```
 
 In a table, a foreign key declaration would look like:
@@ -84,7 +84,7 @@ Below are a list of operations that available for the foreign key declaration:
 - ```restrict``` the column cannot be updated.
 - ```set_null``` the column is set to null.
 - ```set_default``` the column is set to the columns default value (if specified in the table declaration).
-- ```cascade``` the change in the reference column cascades to the specified column.
+- ```cascade``` the change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
 
 ## Indexing in Tables
 

@@ -58,14 +58,14 @@ action add_user($id, $name, $username) public {
 }
 ```
 
-## Raising Errors in a SQL Query
+## Raising Errors in Kwil
 
-In a SQL query, you can use ```ERROR()``` function to raise an error and stop the execution of an action. This is useful for enforcing conditional logic in a query.
+In a SQL query on Kwil, you can use the ```ERROR()``` function to raise an error and stop the execution of an action. This is useful for enforcing conditional logic in a query / action.
 
 ```typescript
 // a sample action to check a user's balance before revealing data.
 action read_date($id) public {
-    SELECT username,
+    SELECT
         CASE
             WHEN balance < 10 THEN ERROR('insufficient balance')
             ELSE null
