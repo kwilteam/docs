@@ -19,7 +19,7 @@ database mydb;
 
 ## Table Declaration
 
-Kuneiform Language allows you to establish your own tables, along with defining the corresponding columns and indexes. For every column, you must specify a [data type](/supported-features#data-types) and have the option to set an [attribute type](/supported-features#attributes). Here is an example:
+Kuneiform Language allows you to establish your own tables, along with defining the corresponding columns and indexes. For every column, you must specify a [data type](/docs/kuneiform/supported-features#data-types) and have the option to set an [attribute type](/docs/kuneiform/supported-features#attributes). Here is an example:
 
 ```typescript
 table users {
