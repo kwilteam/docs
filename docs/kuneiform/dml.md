@@ -64,7 +64,7 @@ In a SQL query on Kwil, you can use the ```ERROR()``` function to raise an error
 
 ```typescript
 // a sample action to check a user's balance before revealing data.
-action read_date($id) public {
+action read_data($id) public {
     SELECT
         CASE
             WHEN balance < 10 THEN ERROR('insufficient balance')
