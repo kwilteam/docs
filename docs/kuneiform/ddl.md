@@ -9,9 +9,17 @@ slug: /kuneiform/ddl
 
 DDL in Kuneiform is comprised of "Tables" that contain the structure of data.
 
-## Table Declaration in Kuneiform Language
+## Database Declaration in Kuneiform Language
 
-Kuneiform Language allows you to establish your own tables, along with defining the corresponding columns and indexes. For every column, you have the option to specify the variable type. Here's an example:
+At the top of every Kuneiform file is the database declaration. Note that the database name **must** be followed by semi-colon, otherwise you will get an error when the the file is compiled.
+
+```typescript
+database mydb;
+```
+
+## Table Declaration
+
+Kuneiform Language allows you to establish your own tables, along with defining the corresponding columns and indexes. For every column, you must specify a [data type](/docs/kuneiform/supported-features#data-types) and have the option to set an [attribute type](/docs/kuneiform/supported-features#attributes). Here is an example:
 
 ```typescript
 table users {
@@ -42,6 +50,41 @@ table users {
     ...other columns
 }
 ```
+
+## Foreign Key
+
+Within your table declaration, you can add foreign key declaration to link a column in your declared table to a column in another table. You can also optionally set an operation to be executed when the linked column is updated or deleted. A reference column must be unique. The syntax for a foreign key declaration looks like:
+
+```typescript
+foreign_key (<column-name>) references <table-name>(<reference-column-name>) on_update | on_delete <foreign-key-operation>
+```
+
+In a table, a foreign key declaration would look like:
+
+```typescript
+table users {
+    id int primary,
+    name text unique,
+    ...other columns
+}
+
+table posts {
+    id int primary,
+    userid int notnull,
+    username text notnull,
+    content text notnull,
+    foreign_key (userid) references users(id) on_delete cascade
+    foreign_key (username) references users(name) on_update cascade
+}
+```
+
+Below are a list of operations that available for the foreign key declaration:
+
+- ```no_action``` no operation is triggered.
+- ```restrict``` the column cannot be updated.
+- ```set_null``` the column is set to null.
+- ```set_default``` the column is set to the columns default value (if specified in the table declaration).
+- ```cascade``` the change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
 
 ## Indexing in Tables
 
