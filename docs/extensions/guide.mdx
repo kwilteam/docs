@@ -24,12 +24,32 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 <Tabs>
-<TabItem value="typescript" label="TypeScript" default>
-    //TODO: Add TypeScript example
-</TabItem>
-<TabItem value="javascript" label="JavaScript">   
+<TabItem value="typescript" label="TypeScript / JavaScript" default>
 
-// add js
+To build an extension server in TypeScript/JavaScript, we will be referencing the example found [here](./packages/javascript.mdx).
+
+### Initalize Repository
+
+Create a new repository and install the `@kwil/extensions` package:
+
+```bash
+npm init -y
+npm install @kwil/extensions
+npm install -D ts-node
+```
+
+### Implementing the Extension
+
+To create a valid extension server:
+
+1. Create a file called `index.js` or `index.ts`
+2. Paste the example code from the [JavaScript Extension Example](.packages/js-ts#example-of-building-an-extenstion) into the file, or write your own extension.
+
+To test that it is working properly, run:
+
+```bash
+ts-node index.ts
+```
 
 </TabItem>
 <TabItem value="golang" label="Golang">
@@ -49,7 +69,7 @@ go mod init github.com/<your_github_username>/<repository_name>
 To create a valid extension server:
 
 1. Create a file called `main.go`
-2. Paste the example code from the [Golang Extension Example](./packages/golang.mdx#example-of-building-an-extension) into the file, or use your write your own extension.
+2. Paste the example code from the [Golang Extension Example](./packages/golang.mdx#example-of-building-an-extension) into the file, or write your own extension.
 
 To test that it is working properly, run:
 
@@ -68,13 +88,33 @@ depending on whether you are using TypeScript/JavaScript or Golang.
 In the root directory of your application, create a file called `Dockerfile` and paste the following:
 
 <Tabs>
-<TabItem value="typescript" label="TypeScript" default>
-    //TODO: Add TypeScript example
-</TabItem>
-<TabItem value="javascript" label="JavaScript">   
+<TabItem value="typescript" label="TypeScript / JavaScript" default>
 
-// add js
+```dockerfile title="Dockerfile"
+# First stage: build the application
+FROM node:14
 
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the source from the current directory to the working directory inside the container
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Expose port
+EXPOSE 50051
+
+# Command to run the application
+CMD ["node", "dist/index.js"]
+```
 </TabItem>
 <TabItem value="golang" label="Golang">
 
