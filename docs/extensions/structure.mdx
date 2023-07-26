@@ -13,7 +13,23 @@ Very simply, extensions are gRPC servers that have 4 rpc methods (not to be conf
 - `Execute` - Executes a method on the extension.  This is called from within a Kuneiform action.
 - `Initialize` - Initializes a new instance of the extension.  This occurs once each time a Kuneiform schema using the extension is deployed (or when the Kwil daemon is rebooted).
 
-The gRPC interface for Kwil extensions can be found [here](<https://github.com/kwilteam/kwil-extensions/blob/main/proto/extension.proto>).
+The protobuf interface for Kwil extensions can be found [here](<https://github.com/kwilteam/kwil-extensions/blob/main/proto/extension.proto>):
+
+```javascript
+service ExtensionService {
+    // Name is used to get the name of the extension.
+    rpc Name(NameRequest) returns (NameResponse) {}
+
+    // ListMethods is used to list the methods which the extension provides.
+    rpc ListMethods(ListMethodsRequest) returns (ListMethodsResponse) {}
+
+    // Execute is used to execute a method provided by the extension.
+    rpc Execute(ExecuteRequest) returns (ExecuteResponse) {}
+
+    // Initialize is used to create a new extension instance
+    rpc Initialize(InitializeRequest) returns (InitializeResponse) {}
+}
+```
 
 ## When extensions can be used
 
@@ -52,7 +68,7 @@ the token name, symbol, and decimals.
 
 The returned map is then included in every subsequent request made by the Kuneiform schema to the extension.
 
-## Executing Methods
+## Methods
 
 When an action using an extension is executed, the `Execute` method is called on the extension.  The `Execute` method takes the map of variables returned from the `Initialize` function, an array of scalar values (either strings or integers), and returns an array of scalar values.
 **Methods should be case insensitive**.
