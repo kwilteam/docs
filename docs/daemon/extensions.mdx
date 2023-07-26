@@ -1,0 +1,22 @@
+---
+sidebar_position: 3
+sidebar_label: "Extensions"
+id: daemon-extensions
+title: Extensions
+description: Running extensions with Kwild
+slug: /daemon/extensions
+---
+
+[Extensions](../extensions/introduction.mdx) can be run as separate processes that contain arbitrary business logic.  The Kwil daemon interacts with extensions over a
+predefined [gRPC interface](<https://github.com/kwilteam/kwil-extensions/blob/main/proto/extension.proto>). Any gRPC server (written in any language) that implements this
+interface can be run as a Kwil extension.
+
+While extensions can be run as distributed infrastructure, **it is recommended to run them as containerized sidecars**. Running them as sidecars helps prevent
+a lot of transient errors that can occur when running them as distributed infrastructure.  Containerization forces them to run with sandboxed resources, preventing
+them from crashing the daemon (which can cause database corruption).
+
+## Quickstart
+
+The quickest way to run an extension is to use the Kwil [extension Docker Compose template](<https://github.com/kwilteam/extension-deployment-template>).
+This template utilizes docker-compose to bring up the containers in the correct order.
+It also contains the simplest configuration possible for running a local Kwil daemon.

@@ -1,0 +1,46 @@
+---
+sidebar_label: "Extensions Guide"
+id: extensions-guide
+title: Extensions Introduction
+description: A step-by-step guide to creating and using extensions.
+slug: /extensions/guide
+---
+
+This page contains a step-by-step guide for creating and using your first Kwil extension.  It will walk through the following steps:
+
+1. Creating a valid Kwil Extension
+2. Containerizing the extension
+3. Using Docker Compose to run the extension with Kwil
+
+## Creating a valid Kwil Extension
+
+Kwil currently supports libraries for building extensions in both TypeScript/JavaScript and Golang.
+
+We will use either of these libraries to create a gRPC server that can be used as a Kwil extension.
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+    <TabItem value="TypeScript" label="TypeScript" default>
+        //TODO: Add TypeScript example
+    </TabItem>
+    <TabItem value="JavaScript" label="JavaScript">
+        //TODO: Add JavaScript example
+    </TabItem>
+    <TabItem value="Golang" label="Golang">
+
+    To build an extension server in Golang, we will be referencing the example found [here](./packages/golang.mdx)
+
+    ### Creating the go.mod
+
+    Run the following command to create a new go.mod file:
+
+    ```bash
+    go mod init github.com/<your_github_username>/<repository_name>
+    ```
+
+    ### Creating the Extensions
+
+    </TabItem>
+</Tabs>

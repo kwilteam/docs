@@ -1,0 +1,9 @@
+{
+    "label": "Extension packages",
+    "position": 5,
+    "link": {
+      "type": "generated-index",
+      "description": "Packages for building extensions in different languages"
+    },
+    "collapsed": true
+}
