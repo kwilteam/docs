@@ -2,8 +2,8 @@
     "label": "JavaScript/TypeScript",
     "position": 1,
     "link": {
-      "type": "doc",
-      "id": "js-ts-overview"
+      "type": "generated-index",
+      "description": "Kwil TypeScript/JavaScript SDK"
     },
     "collapsed": true
 }

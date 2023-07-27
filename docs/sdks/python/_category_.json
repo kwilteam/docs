@@ -2,8 +2,8 @@
     "label": "Python",
     "position": 2,
     "link": {
-      "type": "doc",
-      "id": "python-overview"
+      "type": "generated-index",
+      "description": "Kwil Python SDK"
     },
     "collapsed": true
 }
