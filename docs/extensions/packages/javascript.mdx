@@ -25,7 +25,7 @@ Below are the full list of methods that on the ExtensionBuilder class:
 
 `named(string)`: This required method specifies the name of the extension. Extension names must be a single word or separated by an underscore.
 
-`withInitializer(initializeFunction)`: This optional method takes a function that will be called each time a Kuneiform schema referencing the extension is deployed. It is usually used to set metadata for the extension methods to reference.
+`withInitializer(initializeFunction)`: This optional method takes a function that will be called each time a Kuneiform schema referencing the extension is deployed. It is usually used to set a map containing metadata which is included in each method call in the extension.
 
 `withMethods(Record<string, methodFunction>)`: This required method provides the methods that can be executed by the extension. Each method name is associated with a function. **Method names are case insensitive.**
 
