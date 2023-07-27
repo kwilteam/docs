@@ -38,3 +38,6 @@ Kwil utilizes environment variables for configuration.  The following environmen
 - `WITHOUT_ACCOUNT_STORE`: This variable indicates whether the daemon should operate without the account store. It is a boolean value, defaulting to false.
 
 - `WITHOUT_CHAIN_SYNCER`: This variable indicates whether the daemon should operate without the chain synchronizer. It is a boolean value, defaulting to false.
+
+- `ARWEAVE_BUNDLR_URL`: This variable sets the endpoint for the Bundlr node that transactions should be written to.  If no value is provided, transactions will not be written to the Arweave network.
+At this time, Kwil only supports paying Bundlr using `matic`.
