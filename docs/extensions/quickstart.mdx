@@ -13,11 +13,11 @@ This page contains a step-by-step guide for creating and using your first Kwil e
 2. Creating a Docker Image for the Extension
 3. Using Docker Compose to run the extension with Kwil
 
-**You will need [Docker](<https://www.docker.com/products/docker-desktop/>) installed to complete this guide.**
+**You will need to install [Docker](<https://www.docker.com/products/docker-desktop/>) and [log in](<https://docs.docker.com/engine/reference/commandline/login/>) to complete this guide.**
 
 ## Creating a valid Kwil Extension
 
-Kwil currently supports libraries for building extensions in both TypeScript/JavaScript and Golang.
+Kwil currently supports libraries for building extensions in both [TypeScript/JavaScript](./packages/javascript.mdx) and [Golang](./packages/golang.mdx).
 
 We will use either of these libraries to create a gRPC server that can be used as a Kwil extension.
 
@@ -167,7 +167,7 @@ docker build -t my-extension-name .
 
 Now that you have built your extension as a Docker image, you can run it with Kwil using Docker Compose.
 
-To do this, we will be using the Kwil extension deployment template:
+To do this, we will be using the [Kwil extension deployment template](<https://github.com/kwilteam/extension-deployment-template>):
 
 ```bash
 git clone https://github.com/kwilteam/extension-deployment-template.git
@@ -196,4 +196,4 @@ make download-and-run
 ## Next Steps
 
 To get started using the extension within Kuneiform, check out the [Kuneiform Guide for extensions](./kuneiform.mdx).  Or, if you're curious to learn how to build more
-comlex extensions, check out the guide to the structure of extensions [here](./structure.mdx).
+complex extensions, check out the guide to the structure of extensions [here](./implementation.mdx).

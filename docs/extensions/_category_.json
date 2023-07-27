@@ -2,8 +2,8 @@
     "label": "Extensions",
     "position": 5,
     "link": {
-      "type": "doc",
-      "id": "extensions-intro"
+      "type": "generated-index",
+      "description": "How to build and use extensions for Kwil"
     },
     "collapsed": true
 }

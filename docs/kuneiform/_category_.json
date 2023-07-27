@@ -2,8 +2,8 @@
     "label": "Kuneiform",
     "position": 4,
     "link": {
-      "type": "doc",
-      "id": "kuneiform-intro"
+       "type": "generated-index",
+        "description": "How to use the Kuneiform schema language"
     },
     "collapsed": true
 }

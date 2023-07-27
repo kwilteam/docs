@@ -7,7 +7,8 @@ description: How to configure the Kwil Daemon
 slug: /daemon/config
 ---
 
-Kwil utilizes environment variables for configuration.  The following environment variables are available:
+Kwil utilizes environment variables for configuration.  All environment variables should be prepended with `KWILD_`.  For example, to use a private key,
+it should be set as the `KWILD_PRIVATE_KEY` variable.  The following environment variables are available:
 
 - `PRIVATE_KEY`: This variable is used to store a cryptographic private key. If no private key is provided, a new one will be generated. A hexadecimal string should be provided, which will be converted to an ECDSA private key.
 

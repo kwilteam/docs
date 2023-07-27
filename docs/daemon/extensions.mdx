@@ -20,3 +20,42 @@ them from crashing the daemon (which can cause database corruption).
 The quickest way to run an extension is to use the Kwil [extension Docker Compose template](<https://github.com/kwilteam/extension-deployment-template>).
 This template utilizes docker-compose to bring up the containers in the correct order.
 It also contains the simplest configuration possible for running a local Kwil daemon.
+
+## Configuration
+
+You can use the `KWILD_EXTENSION_ENDPOINTS` environment variable to register gRPC servers as extensions.  To do this, simply set the environment variable
+to a comma-separated list of gRPC endpoints:
+
+```bash
+export KWILD_EXTENSION_ENDPOINTS="localhost:50051,localhost:50052"
+```
+
+### In Docker Compose
+
+The recommended way to use extensions is with Docker Compose.  The same environment variable as shown above is applicable to Docker Compose, except it must be
+called from within your Docker Network:
+
+```yaml title="docker-compose.yaml"
+version: '3'
+services:
+  extension-1:
+    image: <your_image_here>
+    ports:
+      - 50055:50051
+    restart: on-failure
+
+  kwil:
+    image: kwildb/kwil:latest
+    ports:
+      - 50051:50051
+      - 8080:8080
+    env_file:
+      - ./config/kwil.env
+    environment:
+      - KWILD_EXTENSION_ENDPOINTS=extension-1:50051
+    depends_on:
+      - extension-1
+    restart: on-failure
+```
+
+In this example, despite the fact that we map the public port 50055 to the containers internal port 50051, we still use the internal port in the `KWILD_EXTENSION_ENDPOINTS`.

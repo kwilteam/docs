@@ -8,17 +8,17 @@ slug: /extensions/kuneiform
 ---
 
 To use an extension in Kuneiform, the Kwil network you are using must be running the extension.  To learn how to run your own extension,
-see the [Extensions section of the daemon documentation](../daemon/extensions.mdx).
+see the [extensions section of the daemon documentation](../daemon/extensions.mdx), or check out the [deployment quickstart](<./quickstart.mdx>).
 
 ## Example
 
-As an example, we will be referring to a hypothetical ERC20 extension on this page. This extensions only function is to
+As an example, we will be referring to a hypothetical ERC20 extension on this page. This extension's only function is to
 read token balances for some ERC20 smart contract on Ethereum.  It has one function, `balanceOf(address)`, which returns
 the balance of the given address.
 
 ## Importing The Extension
 
-To import an extension in a Kuneiform schema, you need to use its declared name.  With this, you can pass any initialization values, as well
+To import an extension in a Kuneiform schema, you need to use its declared name (which is defined in the extension itself).  With this, you can pass any initialization values, as well
 as an alias for this instance of the extension.
 
 ```typescript
@@ -41,8 +41,7 @@ use erc20 {
 
 ## Calling Methods
 
-To call a method on an extension, you need to use the alias you gave it when importing it.  You can then call the method
-you want to use, and pass any arguments it requires:
+To call a method on an extension, you need to use the alias you gave it when importing it.  You can then call the desired method, and pass any arguments it requires:
 
 ```typescript
 action use_caller_balance () public {
@@ -74,9 +73,9 @@ use erc20 {
 
 table nft {
     id int primary,
-    owner_address string,
+    owner_address text,
     token_id int,
-    token_address string
+    token_address text
 }
 
 action read_nft() public {
