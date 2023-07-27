@@ -12,7 +12,7 @@ Kwil offers an easy-to-use SDK for building extensions in JavaScript or TypeScri
 ## Installation
 
 ```bash
-npm install @kwil/extensions
+npm install kwil-extensions
 ```
 
 ## Creating Extension
@@ -101,7 +101,7 @@ const logger: logFn = (log: string) => {
 Below is an example of how to build a fully functional extension called `math` that provides a method called `divide` that divides two numbers:
 
 ```typescript
-import { ExtensionBuilder, MethodFn, InitializeFn, logFn } from "@kwil/extensions";
+import { ExtensionBuilder, MethodFn, InitializeFn, logFn } from "kwil-extensions";
 import * as fs from 'fs';
 
 const initialize: InitializeFn = async (metadata: Record<string, string>): Promise<Record<string, string>> => {
