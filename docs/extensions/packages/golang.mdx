@@ -23,8 +23,8 @@ go get github.com/kwilteam/kwil-extensions/types
 
 ### Building Extensions
 
-This package provides an interface, `ExtensionBuilder`, for creating and managing extensions on a server. Extensions are primarily built by associating
-them with specific methods that they should provide, and an initializer function that creates a new instance of an extension. It's also possible to
+This package provides an interface, ExtensionBuilder, for creating and managing extensions on a server. Extensions are primarily built by associating
+them with specific methods that they should provide, and an initializer function that is called every time a new Kuneiform schema using the extension is deployed. It's also possible to
 specify the name of the extension, and what should occur when a log is emitted from the server.
 
 Below are the ExtensionBuilder interface's methods:
@@ -83,7 +83,7 @@ Using `WithInputsCheck` and `WithOutputsCheck` is a good practice to avoid and b
 ### InitializeFunc
 
 An InitializeFunc is a function that creates a new instance of an extension.  This is called each time a new Kuneiform schema containing the extension is deployed.
-It will also be called once for each Kuneiform schema that exists on a node when the node starts up.
+If a schema initializes an extension multiple times, it will be called each time.  It will also be called once for each Kuneiform schema that exists on a node when the node starts up.
 
 The InitializeFunc receives a map of metadata passed from the client (these are the values used when importing and aliasing an extension).
 The function is then able to verify, modify, or add to the map as needed.  The returned map will be included in every subsequent call to the extension

@@ -43,9 +43,8 @@ them from crashing the daemon (which can cause database corruption).
 
 ## Initialization
 
-When a new Kuneiform schema is deployed, it calls the provided `Initialize` method on each extension it imports, for each time it is imported.
-If the same extensions is imported twice, it will be initialized twice.  This is done to allow for multiple instances of the same extension to be used
-in a single schema.
+When a new Kuneiform schema is deployed, it calls the provided `Initialize` method on each extension it imports, for each time it is imported.  This creates a
+new extension "instance"; essentially, a connection to the extenstion with its own metadata.  This allows the same extension to be used any number of times.
 
 The `Initialize` method takes a map of initialization variables, and can validate, modify, or add to them.  For example, a hypothetical ERC20 extension
 may be imported in Kuneiform as:
