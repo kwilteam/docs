@@ -191,6 +191,14 @@ Now, simply use the Makefile to download Kwil and run both Kwil and your extensi
 make download-and-run
 ```
 
+If you need to access the Kwil database using TLS, you can also generate a certificate and run NGINX as a reverse proxy:
+  
+```bash
+make download-and-run-ssl
+```
+
+You will then need to access the database on https://localhost:443
+
 **And that's it!**  You have successfully shipped your first Kwil extension alongside a Kwil database!
 
 ## Next Steps
