@@ -13,6 +13,7 @@ The database subcommand contains all of the commands necessary for interacting w
 
 * Deploy: Deploying a database schema
 * Drop: Dropping a database schema
+* Query: Queries a database (can only accept read-only statements)
 * List: Listing database schemas for a wallet
 * Read Schema: Displays the schema of a deployed database
 * Execute: Execute a query against a database
@@ -34,6 +35,17 @@ The drop subcommand is used to drop a deployed database.  You can only drop data
 
 ```
 kwil-cli database drop mydb
+```
+
+## Read
+
+The read subcommand is used to execute an ad-hoc SELECT statement against a database.
+This statement cannot modify state, and is therefore read-only.  It takes one argument, which is the SQL query you wish to execute.  It can be configured to point to either database ID's or databases identified by name and owner:
+
+```bash
+kwil-cli database query 'SELECT * FROM my_table LIMIT 10' --dbid xca123
+
+kwil-cli database query 'SELECT * FROM my_table LIMIT 10' --name my_db --owner 0xabc123
 ```
 
 ## List
