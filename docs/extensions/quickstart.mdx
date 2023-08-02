@@ -191,13 +191,13 @@ Now, simply use the Makefile to download Kwil and run both Kwil and your extensi
 make download-and-run
 ```
 
-If you need to access the Kwil database using TLS, you can also generate a certificate and run NGINX as a reverse proxy:
-  
-```bash
-make download-and-run-ssl
-```
+:::tip
 
-You will then need to access the database on https://localhost:443
+To access the KwilProvider https://localhost:8080 in browser from the Kuneiform IDE, you may need to disable some browser security protections. 
+
+For Brave Browser, disable the shields for ide.kwil.com by clicking the lion icon in the top right corner of the browser.
+
+:::
 
 **And that's it!**  You have successfully shipped your first Kwil extension alongside a Kwil database!
 
