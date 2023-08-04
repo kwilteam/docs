@@ -38,18 +38,25 @@ The schema contains 13 actions that could be called within a social media applic
 
 ### Public & Private Actions
 
-Public / Private actions are a very simple way to bifurcate action access and usage. In Kwil, public actions mean that any wallet address can execute the actions. Private actions mean that only the database creator can execute the actions.
+Public / Private actions function similarily to how public / private methods work in TypeScript. In Kwil, public actions mean that they can be called externally by a database user. Private actions can only be called from within other Kuneiform actions.
 
 ```typescript tite="social_network.kf"
-action set_admin($address, $access) private {
-    INSERT INTO admin_table
-    VALUES ($address, $access)
+action check_balance() private {
+    SELECT
+        CASE
+            WHEN balance < 10 THEN ERROR('insufficient balance')
+            ELSE null
+        END
+    FROM balances WHERE wallet = @caller;
+}
+
+action read_post($post_id) public {
+    check_balance();
+    SELECT * FROM posts WHERE id = $post_id;
 }
 ```
 
-In the example file, we have a private action that allows the database owner to add wallet addresses to an admin table. This would be helpful for permissioning in our application certain permissions, such as a private settings page.
-
-Private functions are useful for seeding databases. Because Kwil does not yet have the ability to add in seed data at database generation, private methods are a useful alternative.
+In the example file, we we have a private action that checks whether the user's wallet has a balance of at least 10. If the balance is less than 10, the action will throw an error. This action can then be called within any other action in the file to enforce a minimum balance requirement before executing an action.
 
 ### Contextual Variables
 
