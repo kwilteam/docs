@@ -36,9 +36,9 @@ Action parameters represent user inputs provided when the action is called. Thes
 action add_user($id, $name, $username) <public | private> {}
 ```
 
-## Setting Query Privacy
+## Setting Action Privacy
 
-Privacy levels can be set for your query. A private query can only be executed by the wallet that created the database, while a public query is executable by any user:
+Privacy levels can be set for your action. Similar to public / private in [TypeScript](https://www.tutorialsteacher.com/typescript/data-modifiers), private actions can only be called by other actions in the Kuneiform schema. Public actions can be called by any external database user.
 
 ```typescript
 action add_user($id, $name, $username) public {}
