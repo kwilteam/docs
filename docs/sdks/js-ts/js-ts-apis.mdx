@@ -45,6 +45,12 @@ Retrieves the schema of a database given its unique identifier (DBID).
 
 A promise that resolves to the schema of the database.
 
+:::tip 
+
+The result of `.getSchema()` is stored in the [TTL cache](./overview#optional-configuration) for 10 minutes. You can customize or disable the TTL cache by setting the `cache` option in the `WebKwil` or `NodeKwil` constructor.
+
+:::
+
 ### getAccount()
 
 ```typescript
