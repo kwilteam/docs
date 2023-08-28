@@ -15,8 +15,6 @@ Kwil is the first permissionless database that enables structured data storage a
 
 **Have a question? Join our [Discord](<https://discord.com/invite/HzRPZ59Kay>)!**
 
-Kwil is the first permissionless database that enables structured data storage across a decentralized network. Kwil extends the functionality of traditional relational databases by providing a layer on top of existing engines that enforce rules necessary for building secure, permissionless data stores.
-
 Kwil combines the structure and utility of a traditional OLTP database with the guarantees of decentralized networks.  Broadly speaking, users can think of it as a relational database with the following features:
 
 - Secure, permissionless, deterministic relational data storage and retrieval.
