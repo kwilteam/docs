@@ -1,0 +1,10 @@
+{
+    "label": "CLI",
+    "position": 3,
+    "link": {
+      "type": "generated-index",
+      "description": "Kwild Command Line Interface Guide "
+    },
+    "collapsed": true
+}
+

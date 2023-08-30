@@ -1,0 +1,107 @@
+---
+sidebar_position: 1
+sidebar_label: "Configuration"
+id: daemon-config
+title: Configuration
+description: How to configure the Kwil Daemon
+slug: /daemon/config/
+---
+
+Kwild application reads its config from the config.toml located in the home_dir/abci/config/config.toml. This include both the Kwildb and the chain configuration.
+
+## Kwild Application config
+### Basic config
+- `PRIVATE_KEY`: This variable is used to store a cryptographic private key (hex format). This is a required field to run the node
+
+- `GRPC_LISTEN_ADDRESS`: This variable sets the address at which the gRPC server of the daemon listens for connections. The default value is :50051.
+
+- `HTTP_LISTEN_ADDRESS`: This variable sets the address at which the HTTP server of the daemon listens for connections. The default value is :8080.
+
+- `SQLITE_FILE_PATH`: This variable sets the file path for all SQLite files. If not provided, it defaults to data/kwil.db/ under the home directory on Unix systems.
+
+- `WITHOUT_GAS_COSTS`: This variable sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction
+
+- `WITHOUT_NONCES`: This variable sets whether nonces should be enabled for the transactions. By default nonces are enabled for the transactions.
+
+- `EXTENSION_ENDPOINTS`: This variable defines endpoints for extensions. Multiple endpoints can be specified, separated by commas.
+
+- `TLS_CERT_FILE`: This variable sets the path to a file containing certificate that is used to create the HTTPS RPC server. The path can be either an absolute path or path relative to the kwild home directory. If not provided, only http server would be created.
+
+- `TLS_KEY_FILE`: This variable sets the path to a file containing matching private key that is used to create the HTTPS RPC server. The path can be either an absolute path or path relative to the kwild home directory. If not provided, only http server would be created.
+
+- `hostname`: This variable sets the Kwild server hostname
+
+### Database Snapshots
+Kwild supports snapshotting your application state (sqlite database files) from a specified directory
+- **ENABLED**: This variable sets whether the node to enable snapshots
+
+- `SNAPSHOT_DIR`: This variable sets the directory where the snapshots are to be stored. Can be absolute or relative to the kwild root directory
+
+- `SNAPSHOT_HEIGHTS`: This variable sets the heights at which the snapshots are to be taken. Default hieght is 10000 blocks, this implies that a snapshot of the kwil db database is taken for every 10k blocks.
+
+- `MAX_SNAPSHOTS`: Maximum number of snapshots to be kept in the snapshot_dir. If max limit is reached, the oldest would be deleted and replaced by the latest snapshot
+
+
+### logging
+- `LOG_LEVEL`: This variable sets the logging level of the daemon. The default level is info.
+
+- `LOG_OUTPUT_PATHS`: This variable sets the output paths for logs. Multiple paths can be specified, separated by commas. By default, logs are written to stdout.
+
+- `LOG_FORMAT`: This variable sets the logging format. Supports 'plain' or 'json'
+
+## Kwild Blockchain configuration:
+- `moniker`: This variable sets a custom human-readable name for the node.
+
+### RPC Server Configuration Options
+
+- `laddr`: This variable sets the TCP or UNIX socket address for the RPC server to listen on. Default listening address is on "tcp://127.0.0.1:26657"
+
+- `timeout_broadcast_tx_commit`: This variable sets the time to wait for a transaction to be committed during `/broadcast_tx_commit`. Default timeout is 10s.
+
+### Consensus Configuration Options
+
+- `timeout_propose`: This variable sets the time to wait for a proposal block before prevoting nil. Default timeout is 3s
+
+- `timeout_prevote`: This variable sets the time to wait after receiving +2/3 prevotes for "anything". Default timeout is 1s
+
+- `timeout_precommit`: This variable sets the time to wait after receiving +2/3 precommits for "anything". Default timeout is 1s
+
+- `timeout_commit`: This variable sets the time to wait after committing a block before starting on the new height. Default timeout is 1s
+
+### P2P Configuration Options
+
+- `laddr`: This variable sets the Address to listen for incoming connections. Default listening address is "tcp://0.0.0.0:26656"
+
+- `external_address`: This variable sets the Address to advertise to peers for them to dial. If empty, will use the same port as the laddr, and will introspect on the listener
+
+- `persistent_peers`: This variable sets the Comma-separated list of nodes to connect to and maintain persistent connections. This is a required field for a new node to connect to the kwild network.
+
+- `addr_book_strict`: Toggle for strict address routability rules.
+
+- `max_num_inbound_peers`: This variable sets the Maximum number of inbound peers.
+
+- `max_num_outbound_peers`: This variable sets the Maximum number of outbound peers to connect to, excluding persistent peers.
+
+- `unconditional_peer_ids`: This variable sets the List of node IDs for which connections will be (re)established irrespective of the max connections.
+
+- `allow_duplicate_ip`: This variable sets the Toggle to disable guard against peers connecting from the same IP.
+
+### Mempool Configuration Options
+
+- `size`: This variable sets the Maximum number of transactions in the mempool.
+
+- `max_txs_bytes`: This variable sets the Limit on the total size of all transactions in the mempool.
+
+- `cache_size`: This variable sets the Size of the cache used to filter transactions seen earlier.
+
+### State Sync Configuration Options
+
+- `enable`: This variable sets the Toggle to enable state sync rapid bootstrapping.
+
+- `rpc_servers`: This variable sets the RPC servers for light client verification and state data retrieval.
+
+- `temp_dir`: This variable sets the Temporary directory for state sync snapshot chunks.
+
+- `discovery_time`: This variable sets the Time to spend discovering snapshots before initiating a restore.
+
+- `chunk_request_timeout`: This variable sets the Timeout duration before re-requesting a chunk.

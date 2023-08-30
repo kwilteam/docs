@@ -1,0 +1,188 @@
+---
+sidebar_position: 3
+sidebar_label: "Utils"
+id: daemon-cmdline-utils
+title: Utils Subcommand
+description: Kwild Utils Command Line
+slug: /daemon/cmdline/utils
+---
+
+Utils commands provides tools to generate & view required configuration for running a kwild node or a network. 
+
+```
+kwild utils --help 
+
+utils is a command that contains tools to generate and view files required for kwil network
+
+Usage:
+  kwild utils [command]
+
+Available Commands:
+  gen-private-key  Generates ed25519 private key and shows the pubkey, CometBFT address, and node ID for the generated private key.
+  genesis-hash     Generates genesis hash of the sqlite db and if genesis file provided, updates the app_hash in the genesis file
+  init             Initializes files required for a kwil node
+  key-info         Show the pubkey, CometBFT address, and Node ID for an Ed25519 private key.
+  reset-state      (unsafe) Remove all the data and WAL, for testing purposes only
+  testnet          Initializes the files required for a kwil test network
+  unsafe-reset-all (unsafe) Remove all the blockchain's data and WAL, reset this node's validator to genesis state, for testing purposes only
+
+Flags:
+  -h, --help   help for utils
+
+Global Flags:
+      --config string   kwild config file
+
+Use "kwild utils [command] --help" for more information about a command.
+```
+
+### Kwil Node Initialization
+
+To launch a Kwild node, you require a private key, a config.toml, and a genesis file placed in the Kwild home directory. By using kwild utils init, you can generate all the necessary configurations to initiate a Kwild node.
+
+```kwild utils init --help
+Initializes files required for running a kwild server
+
+Usage:
+  kwild utils init [flags]
+
+Flags:
+  -h, --help                 help for init
+  -i, --initial-height int   initial height of the first block
+  -o, --output-dir string    directory to
+   store initialization data for the node (default ".kwild")
+
+Global Flags:
+      --config string   kwild config file
+```
+
+Example: `kwild utils init -o "/tmp/kwild/"` would generate the required configuration in the directory "/tmp/kwild"
+
+
+### Testnet Initialization
+
+```
+./.build/kwild-darwin-arm64 utils testnet --help 
+
+testnet will create "v + n" number of directories and populate each with
+necessary files (genesis, config and populate them with the keys etc.).
+
+Note, strict routability for addresses is turned off in the config file.
+Optionally, it will fill in persistent_peers list in config file using either hostnames or IPs.
+
+Example:
+        kwild testnet --v 4 --o ./output --populate-persistent-peers --starting-ip-address 192.168.10.2
+
+Usage:
+  kwild utils testnet [flags]
+
+Aliases:
+  testnet, net
+
+Flags:
+      --config string                config file to use (note some options may be overwritten)
+  -h, --help                         help for testnet
+      --hostname stringArray         manually override all hostnames of validators (use --hostname multiple times for multiple hosts)Example: --hostname '192.168.10.10' --hostname: '192.168.10.20'
+      --hostname-prefix string       hostname prefix ("node" results in persistent peers list ID0@node0:26656, ID1@node1:26656, ...) (default "node")
+      --hostname-suffix string       hostname suffix (".xyz.com" results in persistent peers list ID0@node0.xyz.com:26656, ID1@node1.xyz.com:26656, ...)
+      --initial-height int           initial height of the first block
+      --node-dir-prefix string       prefix the directory name for each node with (node results in node0, node1, ...) (default "node")
+  -n, --non-validator-num int        number of non validators to initialize the testnet with (default 4)
+  -o, --output-dir string            directory to store initialization data for the testnet (default ".testnet")
+      --p2p-port int                 P2P Port (default 26656)
+      --populate-persistent-peers    update config of each node with the list of persistent peers build using either hostname-prefix or starting-ip-address (default true)
+      --starting-ip-address string   starting IP address ("192.168.0.1" results in persistent peers list ID0@192.168.0.1:26656, ID1@192.168.0.2:26656, ...)
+  -v, --validator-num int            number of validators to initialize the testnet with (default 4)
+
+Global Flags:
+      --config string   kwild config file
+```
+
+** Usage:**
+
+#### Create 2 Validators with ip addresses starting from 192.168.10.2
+```
+kwild testnet -v 2 -o ./outputdir --populate-persistent-peers --starting-ip-address 192.168.10.2
+```
+Both the nodes are listed as validators in the genesis file 
+
+`persistent_peers:  "nodeid1@192.168.10.2:26656,nodeid2@192.168.10.3:26656"`
+
+#### Create 2 Validators with specific ip addresses 
+```
+kwild testnet -v 2 -o ./outputdir --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
+```
+Both the nodes are listed as validators in the genesis file 
+
+`persistent_peers: "nodeid1@192.168.10.10:26656,nodeid2@192.168.10.20:26656"`
+
+
+#### Create 1 Validator and 1 non-validator
+```
+kwild testnet -v 1 -n 1 -o ./outputdir --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
+
+(or)
+
+kwild testnet -v 1 -n 1 -o ./outputdir --populate-persistent-peers --starting-ip-address 192.168.10.2
+```
+Only the validator node's info is listed under validators in the genesis file 
+
+
+
+### Create Genesis Hash
+For scenarios where we are bootstrapping a network with non empty database state, app_hash for this database can be generated using the genesis-hash utility.
+```
+kwild utils genesis-hash --help
+Generates genesis hash of the sqlite db and if genesis file provided, updates the app_hash in the genesis file.
+If genesis file is not provided, only the genesis hash is printed to stdout.
+
+Usage:
+  kwild utils genesis-hash [db-dir] [flags]
+
+Flags:
+      --genesis-file string   genesis file to update the app_hash in
+  -h, --help                  help for genesis-hash
+
+Global Flags:
+      --config string   kwild config file
+
+```
+
+
+**Usage:**
+
+
+```
+kwild utils genesis-hash [db-dir-path]
+```
+Generates and prints app_hash for the database located at db-dir-path
+
+
+```
+kwild utils genesis-hash [db-dir-path] --genesis-file $genesis-file-path
+```
+
+If genesis file is provided, app_hash in the genesis file is updated with the generated hash of the inital database state
+
+
+### Generate Private key
+```
+kwild utils gen-private-key
+```
+This command generates a ed25519 private key and displays public key, address and nodeId
+
+
+### Display key info
+```
+kwild utils key-info [privatekey(hex)]
+```
+Given a hex encoded private key (privatekey in the config.toml), this command would display the key info such as public key, address and nodeId
+
+
+
+### Reset commands
+
+`kwild unsafe-reset-all` and `kwild reset-state` are unsafe commands and not to be used in the production. These commands requires the config file to be passed through the `--config` flag
+
+`kwild reset-state`: resets the blockchain state present in the db_dir directory (in config.toml)
+
+`kwild unsafe-reset-all` resets the entire node state including the kwildb

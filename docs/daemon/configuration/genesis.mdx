@@ -1,0 +1,79 @@
+---
+sidebar_position: 2
+sidebar_label: "Genesis"
+id: daemon-genesis
+title: Genesis
+description: Genesis file configuration
+slug: /daemon/genesis
+---
+Genesis file in `rootdir/abci/config/` defines the initial kwild state upon the initialization of the kwild network
+
+- `genesis_time`: This field specifies the official time at which the blockchain is initialized.
+
+- `chain_id`: This field specifies the ID of the blockchain. This must be unique for every blockchain. The ChainID must be less than 50 symbols.
+
+- `initial_height`: This field sets the initial height the blockchain should begin at. Default value is "0", but in the scenario of network upgrade or restart, starting from the stopped height ensure uniqueness to previous heights.  
+
+- `consensus_params`:
+    - `block`:
+        - `max_bytes`: This field sets the Max block size, in bytes.
+        - `max_height`: This field sets the Max gas per block.
+    - `evidence`:
+        - `max_age_num_blocks`: This field sets the Max age of evidence, in blocks. The basic formula for calculating this is: MaxAgeDuration / {average block time}.
+        - `max_age_duration`: This field sets the Max age of evidence, in time. It should correspond with an app’s “unbonding period” or other similar mechanism for handling Nothing-At-Stake attacks.
+    - `max_bytes`: This field sets the maximum size in bytes of evidence that can be committed in a single block and should fall comfortably under the max block bytes.
+- `validator`:
+    -  `pub_key_types`: This field sets the Public key types validators can use.
+- `version`:
+    - `app_version`: This field sets the ABCI application version.
+- `validators`: This field sets the List of initial validators. Note this may be overridden entirely by the application, and may be left empty to make explicit that the application will initialize the validator set upon InitChain.
+    - `pub_key`: The first element specifies the key type, using the declared PubKeyName for the adopted key type. The second element are the pubkey bytes.
+    - `power`: The validator’s voting power.
+    - `name`: Name of the validator (optional).
+- `app_hash`: The expected application hash (as returned by the ResponseInfo ABCI message) upon genesis. If the app’s hash does not match, kwild will panic.
+
+
+If the node is booting up with initial data, the app_hash of the genesis file can be initalized by using the below kwild command line:
+`kwild utils genesis-hash "kwil-database-directory-path" --genesis-file "genesis-file-path"`
+
+
+
+```
+### SAMPLE GENESIS FILE ###
+{
+  "genesis_time": "2023-08-28T22:24:04.513472Z",
+  "chain_id": "kwil-chain-RQMl2F",
+  "initial_height": "0",
+  "consensus_params": {
+    "block": {
+      "max_bytes": "22020096",
+      "max_gas": "-1"
+    },
+    "evidence": {
+      "max_age_num_blocks": "100000",
+      "max_age_duration": "172800000000000",
+      "max_bytes": "1048576"
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ]
+    },
+    "version": {
+      "app": "0"
+    }
+  },
+  "validators": [
+    {
+      "address": "6F129A1818CB42DD80FFE51943EAC0BC9FF9E4EE",
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "L737LDRTYv7P5I2apSxOBwJD3U0CS7b2eo9K37s2lPM="
+      },
+      "power": "1",
+      "name": "validator-0"
+    }
+  ],
+  "app_hash": "4F8735846B8CFB01A277430A392DD3DB7B66510C358C5F4A2AF88A348CB20A62"
+}
+```

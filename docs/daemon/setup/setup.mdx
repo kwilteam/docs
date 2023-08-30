@@ -1,0 +1,87 @@
+---
+sidebar_position: 1
+sidebar_label: "Setup"
+id: daemon-setup
+title: Setup
+description: Setting up Kwild node
+slug: /daemon/setup
+---
+
+This guide provides step-by-step instructions for configuring and launching a single instance of Kwil node. It covers how to initiate the node as a genesis node or to join an existing network of Kwil nodes during startup.
+
+Running a Kwild node requires a private key for the node, genesis file and a configuration file. 
+See [config.toml specification](../configuration/configuration.mdx) and [genesis specification](../configuration/genesis.mdx) for more details on the node configuration.
+
+## Home directory structure
+```
+home_dir/
+   |- config.toml    (app and chain configuration for running the kwild node)
+   |- abci/
+   |   |- config/
+   |   |   |- genesis.json   (genesis file for the network configuration)
+   |   |- data/ 
+```
+home_dir can be specified either using the `--home` flag during server start or by setting the `home_dir:` config in the config.toml file. 
+home_dir essentially is the default directory where all the blockchain and the kwild databases will be stored, unless specified otherwise. cometbft home is defined as `home_dir/abci`
+
+Checkout `genesis_file, db_dir, sqlite_file_path` configs in config.toml to overwrite the data storage locations, these configs can also be specified through cmd line flags during server start and take preference over the ones in the config.toml file.
+
+All these configs can use either absolute paths or relative paths. If relative paths are used, sqlite_file_path should be relative to home_dir, whereas the chain specific configs such as genesis and db_dir should be relative to the cometbft home dir i.e `home_dir/abci`
+
+### Initialization
+The home directory can be initialized with the default configuration files using the kwild command line as below.
+
+```
+kwild utils init -o "home-dir-path"
+```
+
+This command will generate the config.toml and genesis.json files using default settings. Additionally, it creates cryptographic key pairs and populates the configuration files with these keys.
+
+After generating these files, if you wish to alter any specific settings, you have the option to manually edit these configuration files or utilize flags when running `kwild server start` to override the existing configurations while starting the server.
+
+
+### Running Kwild node as genesis node
+Once the required configuration is generated and updated, the kwild server can be started as follows:
+
+#### Provide configuration through config file
+```
+kwild server start --config "config-file-path"
+```
+
+#### Provide configuration through flags (required are the private_key and home directory)
+```
+kwild server start --app.private_key 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --home "/tmp/.kwild/"
+```
+
+#### Provide both config file and the flags
+```
+`kwild server start --config "config-file-path" --home "/tmp/.kwild" --chain.p2p.laddr "tcp:192.168.1.10:26656"`
+```
+
+
+
+### Connecting to kwil network on startup
+
+To connect to the existing network:
+
+1. Replace the genesis file with that of the network's genesis file
+
+2. Update the p2p.persistent_peers with the peers address set either in the config.toml or through the cmdline flag --chain.p2p.persistent_peers. 
+    
+    persistent_peers is essentially a comma seperated string of `nodeid@ip:port` of peers of the existing kwil network you want to connect to.
+
+    ```
+    # command line
+
+    kwild server start --p2p.persistent_peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+    ```
+
+    (or)
+
+    ```
+    # config.toml file
+
+    [chain.p2p]
+    persistent_peers = "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+    ```
+
