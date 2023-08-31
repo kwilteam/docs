@@ -7,27 +7,27 @@ description: Running Kwil Network
 slug: /daemon/network/setup
 ---
 
-This guide provides a step-by-step instruction on preparing a setup to deploy a kwil network with N validator nodes and M non-validator nodes
+This guide provides a step-by-step instructions on preparing a setup to deploy a kwild network with N validator nodes and M non-validator nodes
 
-#### Generating config for the N+M nodes
+#### Generating config for the N Validator + M Non-Validator nodes
 
 testnet utils command can be used to generate node for testnet deployments.
 
-For example, Configuration required to deploy a network with 1 Validator node and 1 Non-Validator node can be generated as below.
-```
-kwild testnet -v 2 -n 1 -o ./outputdir --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20' --hostname: '192.168.10.30'
+For example, Configuration required to deploy a network with N=2 Validator nodes and M=1 Non-Validator node can be generated as below.
+```bash
+kwild testnet -v 2 -n 1 -o "path/to/output/dir" --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20' --hostname: '192.168.10.30'
 ```
 If the IP addresses are not consecutive, provide explicit ip addresses using --hostname as shown in the above command. 
 If the ip addresses of these nodes are consecutive, you can instead use the starting-ip-address flag as follows:
 
-```
-kwild testnet -v 2 -n 1 -o ./outputdir --populate-persistent-peers --starting-ip-address '192.168.10.10'
+```bash
+kwild testnet -v 2 -n 1 -o "path/to/output/dir" --populate-persistent-peers --starting-ip-address '192.168.10.10'
 ```
 
-This command would generate 3 directories with required configuration files (config.toml and genesis.json)
-using --populate-persistent-peers also populates the persistent_peers config in the config.toml file in all the directories
+This command would generate 3 directories under `"path/to/output/dir"` with required configuration files (config.toml and genesis.json)
+and enabling the `--populate-persistent-peers` flag populates the persistent_peers config in the config.toml file in all the directories based on the ip addresses configured using either `--hostname`  or the `--starting-ip-address` flag
 
-Genesis file is populated with the 2 nodes pre-established as Validators. 
+The Genesis file's initial validator list in this example would be populated with the 2 validator nodes info.
 
 
 #### Deploying the kwild network
@@ -35,6 +35,6 @@ Genesis file is populated with the 2 nodes pre-established as Validators.
 1. Generate the configuration locally for N + M nodes as shown above using the testnet cmdline utility
 2. Move the node directories to corresponding node devices
 3. Start the server on all the nodes by running the command:
-    ```
-    kwild server start --config "path-to-config.toml"
+    ```bash
+    kwild server start --config "path/to/node/idx/config.toml"
     ```

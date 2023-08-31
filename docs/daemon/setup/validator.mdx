@@ -7,16 +7,16 @@ description: Managing Network Validators
 slug: /daemon/setup/validator
 ---
 
-Validators in CometBFT are responsible for producing new blocks in the blockchain. They do so by participating in a PBFT consensus by broadcasting votes containing cryptographic signatures produced by signing the messages using the validator's private key. 
+Validators in CometBFT are responsible for producing new blocks in the blockchain. They do so by participating in a Practical Byzantine Fault Tolerance (PBFT) based consensus by broadcasting votes containing cryptographic signatures produced by signing the messages using the validator's private key. 
 
 There are 2 ways to become a Validator:
 1. Specifying them in the Genesis file before starting the Network
 2. Going through a federated consensus based join process
 
 ### Genesis File:
-Network can be deployed with initial set of validators by specifying them in the genesis file. These initial validator nodes information need to be added under the `"validators"` in the genesis file
+Network can be deployed with initial set of validators by specifying them in the genesis file. These initial validator nodes information need to be added under the `"validators"` in the genesis file as shown in the below code snippet. 
 
-```
+```json
  "validators": [
     {
       "address": "186FD58AB225847A54D2176993A534E799F28F68",
@@ -44,35 +44,29 @@ Network can be deployed with initial set of validators by specifying them in the
 
 If a node wants to join as a validator after the deployment, it can do so by undergoing through a pbft consensus based approval process. The process of joining the network as a validator through federated consensus involves the following steps:
 
-1. Node that wishes to become a Validator issues a join request blockchain transaction. These Join requests are signed by the joiner node's private key. JoinRequest can be sent using the kwild cli as below.
-```
-kwild validator join 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 10 --config "/tmp/kwild/config.toml"
-```
-
-2. Existing validators on hearing this Join request will vote on whether to allow this node as a Validator. If they decide to allow, they issue an approval request for the joiner signed by the current validators private key. Approval request is sent as a blockchain transaction. 
-```
-kwild validator approve RRtYUKGiOVxl8DLpFSQFu4DKvTCcVnOFMsHBPTIv4Gk= 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --config "path-to-config.toml"
+1. Node that wishes to become a Validator issues a join request blockchain transaction. These Join requests are signed by the joiner node's private key. JoinRequest can be sent using the kwild cli as below. Refer to [Issuing a join request](../cli/validator.mdx#join-request) for more information on this command.
+```bash
+kwild validator join 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 10 --config "path/to/my/config.toml"
 ```
 
-3. Once each validator node hears atleast supermajority(2/3rd) of approvals by the current validators, they include the joiner node in the ValidatorSet updates to be sent to the CometBFT core. 
-
-The status of the Join request can be queried as follows. 
-```
-kwild validator status RRtYUKGiOVxl8DLpFSQFu4DKvTCcVnOFMsHBPTIv4Gk= --config "path-to-config.toml"
+2. Existing validators on hearing this Join request will vote on whether to allow this node as a Validator. If they decide to allow, they issue an approval request for the joiner signed by the current validators private key. Approval request is sent as a blockchain transaction. Refer to [approval request](../cli/validator.mdx#approval-request) for more information on this command.
+```bash
+kwild validator approve RRtYUKGiOVxl8DLpFSQFu4DKvTCcVnOFMsHBPTIv4Gk= 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --config "path/to/my/config.toml"
 ```
 
-4. Once there is consensus on the ValidatorSet updates by supermajority of the nodes, CometBFT makes the nodes in the ValidatorSet Updates as Validator nodes and can start participating in the consensus decisions starting from the next round. 
+3. Once each validator node hears atleast super majority(2/3rd) of approvals by the current validators, they include the joiner node in the ValidatorSet updates to be sent to the CometBFT core. 
 
+The status of the Join request can be queried as follows. Refer to [join request status](../cli/validator.mdx#join-request-status) for more information on this command.
+```bash
+kwild validator status RRtYUKGiOVxl8DLpFSQFu4DKvTCcVnOFMsHBPTIv4Gk= --config "path/to/my/config.toml"
+```
 
-
-Approval Request:
-
-
-JoinRequest Status:
+4. Once there is consensus on the ValidatorSet updates by super majority (>2/3rd) of the nodes, CometBFT makes the nodes in the ValidatorSet Updates as Validator nodes and can start participating in the consensus decisions starting from the next round. 
 
 
 ### Step down from Validator status
 When a nodes decides to step down from its role as a Validator, it can initiate this process by sending a leave request transaction signed by the private key of this node. Once the transaction is mined, the CometBFT sets the Validator power to 0, effectively demoting the node from the validator status. From the next round onwards, the node would lose its ability to participate in the consensus decisions
+```bash title="Leave request"
+kwild validator leave 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --config "path/to/my/config.toml"
 ```
-kwild validator leave 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --config "/tmp/kwild/config.toml"
-```
+Refer to [leave request](../cli/validator.mdx#leave-request) for more information on this command.

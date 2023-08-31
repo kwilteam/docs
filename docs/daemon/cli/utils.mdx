@@ -9,7 +9,7 @@ slug: /daemon/cmdline/utils
 
 Utils commands provides tools to generate & view required configuration for running a kwild node or a network. 
 
-```
+```bash
 kwild utils --help 
 
 utils is a command that contains tools to generate and view files required for kwil network
@@ -37,9 +37,10 @@ Use "kwild utils [command] --help" for more information about a command.
 
 ### Kwil Node Initialization
 
-To launch a Kwild node, you require a private key, a config.toml, and a genesis file placed in the Kwild home directory. By using kwild utils init, you can generate all the necessary configurations to initiate a Kwild node.
+To run a kwild node, you require a private key, a config.toml, and a genesis file. All these necessary configuration files required to run a single instance of kwild node can be auto-generated using the init subcommand.
 
-```kwild utils init --help
+```bash
+kwild utils init --help
 Initializes files required for running a kwild server
 
 Usage:
@@ -55,13 +56,13 @@ Global Flags:
       --config string   kwild config file
 ```
 
-Example: `kwild utils init -o "/tmp/kwild/"` would generate the required configuration in the directory "/tmp/kwild"
+Example: `kwild utils init -o "path/to/output/dir"` would generate the required configuration in the directory "path/to/output/dir"
 
 
 ### Testnet Initialization
 
-```
-./.build/kwild-darwin-arm64 utils testnet --help 
+```bash
+kwild utils testnet --help 
 
 testnet will create "v + n" number of directories and populate each with
 necessary files (genesis, config and populate them with the keys etc.).
@@ -100,37 +101,40 @@ Global Flags:
 ** Usage:**
 
 #### Create 2 Validators with ip addresses starting from 192.168.10.2
+```bash
+kwild testnet -v 2 -o "path/to/output/dir" --populate-persistent-peers --starting-ip-address 192.168.10.2
 ```
-kwild testnet -v 2 -o ./outputdir --populate-persistent-peers --starting-ip-address 192.168.10.2
-```
-Both the nodes are listed as validators in the genesis file 
+This command would generate config.toml, genesis.json and cryptographic key pairs for 2 validator nodes of ip addresses 192.168.10.2 and 192.168.10.3. 
+The Genesis file is created with both these validators as the initial validators
+This command also updates the persistent_peers in the config.toml to `persistent_peers:  "nodeid1@192.168.10.2:26656,nodeid2@192.168.10.3:26656"`
 
-`persistent_peers:  "nodeid1@192.168.10.2:26656,nodeid2@192.168.10.3:26656"`
 
 #### Create 2 Validators with specific ip addresses 
+``` bash
+kwild testnet -v 2 -o "path/to/output/dir" --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
 ```
-kwild testnet -v 2 -o ./outputdir --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
-```
-Both the nodes are listed as validators in the genesis file 
-
-`persistent_peers: "nodeid1@192.168.10.10:26656,nodeid2@192.168.10.20:26656"`
+This command would generate config.toml, genesis.json and cryptographic key pairs for 2 validator nodes of ip addresses 192.168.10.10 and 192.168.10.20.
+The Genesis file is created with both these validators as the initial validators
+This command also updates the persistent_peers in the config.toml to `persistent_peers:  "nodeid1@192.168.10.10:26656,nodeid2@192.168.10.20:26656"`
 
 
 #### Create 1 Validator and 1 non-validator
-```
-kwild testnet -v 1 -n 1 -o ./outputdir --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
+``` bash
+kwild testnet -v 1 -n 1 -o "path/to/output/dir" --populate-persistent-peers --hostname '192.168.10.10' --hostname: '192.168.10.20'
 
 (or)
 
-kwild testnet -v 1 -n 1 -o ./outputdir --populate-persistent-peers --starting-ip-address 192.168.10.2
+kwild testnet -v 1 -n 1 -o "path/to/output/dir" --populate-persistent-peers --starting-ip-address 192.168.10.2
 ```
-Only the validator node's info is listed under validators in the genesis file 
+This command would generate config.toml, genesis.json and cryptographic key pairs for 1 validator nodes and 1 non-validator node. 
+Only the validator node's info is listed as initial validator in the genesis file 
+This command would also populate the persistent_peers in the config.toml file.
 
 
 
 ### Create Genesis Hash
 For scenarios where we are bootstrapping a network with non empty database state, app_hash for this database can be generated using the genesis-hash utility.
-```
+```bash
 kwild utils genesis-hash --help
 Generates genesis hash of the sqlite db and if genesis file provided, updates the app_hash in the genesis file.
 If genesis file is not provided, only the genesis hash is printed to stdout.
@@ -151,28 +155,35 @@ Global Flags:
 **Usage:**
 
 
+```bash
+kwild utils genesis-hash "path/to/db/dir"
 ```
-kwild utils genesis-hash [db-dir-path]
-```
-Generates and prints app_hash for the database located at db-dir-path
+Generates and prints the app_hash generated for the database located at db-dir-path
 
 
-```
-kwild utils genesis-hash [db-dir-path] --genesis-file $genesis-file-path
+```bash
+kwild utils genesis-hash "path/to/db/dir" --genesis-file "path/to/my/genesis.json"
 ```
 
-If genesis file is provided, app_hash in the genesis file is updated with the generated hash of the inital database state
+If genesis file is provided, app_hash in the genesis file is updated with the generated hash of the initial database state
 
 
 ### Generate Private key
-```
+```bash
 kwild utils gen-private-key
+
+Private key (hex): 4a9b9ba077993ff3f163bd86cfe5bf60fc1249b44c5ad70a9698ccd5c1bf60c088523e05b304f2c5136342634fb866fcb41043d0dc1598b59837fe731d0ffa2c
+Private key (base64): SpuboHeZP/PxY72Gz+W/YPwSSbRMWtcKlpjM1cG/YMCIUj4FswTyxRNjQmNPuGb8tBBD0NwVmLWYN/5zHQ/6LA==
+Public key (base64): iFI+BbME8sUTY0JjT7hm/LQQQ9DcFZi1mDf+cx0P+iw=
+Public key (cometbft hex): PubKeyEd25519{88523E05B304F2C5136342634FB866FCB41043D0DC1598B59837FE731D0FFA2C}
+Address (string): 417961B2A02F9F5C805CE687456528B92D135554
+Node ID: 417961b2a02f9f5c805ce687456528b92d135554
 ```
-This command generates a ed25519 private key and displays public key, address and nodeId
+This command generates a ed25519 private key and displays public key, address and node Id in different formats
 
 
 ### Display key info
-```
+```bash
 kwild utils key-info [privatekey(hex)]
 ```
 Given a hex encoded private key (privatekey in the config.toml), this command would display the key info such as public key, address and nodeId
@@ -185,4 +196,4 @@ Given a hex encoded private key (privatekey in the config.toml), this command wo
 
 `kwild reset-state`: resets the blockchain state present in the db_dir directory (in config.toml)
 
-`kwild unsafe-reset-all` resets the entire node state including the kwildb
+`kwild unsafe-reset-all` resets the entire node state

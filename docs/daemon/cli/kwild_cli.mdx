@@ -7,11 +7,12 @@ description: Kwild Command Line
 slug: /daemon/cmdline
 ---
 
-The kwild command line interface (CLI) provides a comprehensive suite of commands and utilities for configuring and interacting with Kwild services
+The kwild command line interface (CLI) are used to configure and manage kwild nodes.
 
 ### Basic Usage
 
-``` kwild --help
+``` bash
+kwild --help
 kwild allows you to configure Kwild services
 
 Usage:
@@ -32,12 +33,12 @@ Use "kwild [command] --help" for more information about a command.
 
 #### Main Commands
 
-- `Server`: Contains subcommands specific to running the kwild node.
+- `server`: Contains subcommands specific to running the kwild node.
 
-- `Validator`: Contains a suite of subcommands that are useful for validator management. These commands facilitate operations such as joining or leaving a network as a validator, granting approval to a validator join, and checking a validator's status.
+- `validator`: Contains a suite of subcommands that are useful for validator management. These commands facilitate operations such as joining or leaving a network as a validator, granting approval to a validator join, and checking a validator's status.
 
-- `Utils`: contains utility commands that help in generating and viewing files necessary for setting up the Kwild network
+- `utils`: Contains utility commands that help in generating and viewing files necessary for setting up the Kwild network.
 
 #### Global flags
 
-- `--config (string)`: Specifies the kwild config.toml file
+- `--config (string)`: Specifies the kwild config.toml file.

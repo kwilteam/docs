@@ -7,8 +7,8 @@ description: Kwild node Command Line
 slug: /daemon/cmdline/server
 ---
 
-Kwild server commands provides a way to interact and operate kwild server.
-```
+kwild server command is used to start the Kwil daemon. 
+``` bash
 kwild server --help
 
 Commands to run Kwild Server
@@ -28,14 +28,13 @@ Global Flags:
 Use "kwild server [command] --help" for more information about a command.
 ```
 
-
-
 To start the Kwild server:
-`kwild server start --config "config-file-path"`
+`kwild server start --config "path/to/my/config.toml"`
 
-All the kwild application and chain configuration defined in the config.toml can be overwritten using flags while starting the server. 
+This command also provides support to configure all the kwild configurations using the below flags while starting the server. 
+Refer to [different ways of starting Kwil daemon](./../setup/setup.mdx#running-kwild-node-as-genesis-node) for more information on using this command.
 
-```
+```bash
 ./.build/kwild-darwin-arm64 server start --help
 Starts node with Kwild and CometBFT services
 
@@ -46,7 +45,7 @@ Flags:
       --app.extension_endpoints strings                   Kwild app extension endpoints
       --app.grpc_listen_addr string                       Kwild app gRPC listen address (default "localhost:50051")
       --app.hostname string                               Kwild Server hostname
-      --app.http_listen_addr string                       Kwild app HTTP listen address (default "localhost:8081")
+      --app.http_listen_addr string                       Kwild app HTTP listen address (default "localhost:8080")
       --app.private_key string                            Kwild app's private key
       --app.snapshots.enabled                             Enable snapshots
       --app.snapshots.max_snapshots uint                  Maximum snapshots (default 3)
@@ -56,35 +55,38 @@ Flags:
       --app.tls_key_file string                           TLS key file path for RPC Server
       --app.without_gas_costs                             Kwild app without gas costs (default true)
       --app.without_nonces                                Kwild app without nonces
-      --chain.addr_book_strict                            chain P2P address book strict (default true)
-      --chain.allow_duplicate_ip                          chain P2P allow duplicate IP
       --chain.consensus.timeout_commit duration           chain consensus timeout commit (default 1s)
       --chain.consensus.timeout_precommit duration        chain consensus timeout precommit (default 1s)
       --chain.consensus.timeout_prevote duration          chain consensus timeout prevote (default 1s)
       --chain.consensus.timeout_propose duration          chain consensus timeout propose (default 3s)
-      --chain.max_num_inbound_peers int                   chain P2P maximum number of inbound peers (default 40)
-      --chain.max_num_outbound_peers int                  chain P2P maximum number of outbound peers (default 10)
+      --chain.db_dir string                               Chain database directory path (default "data")
+      --chain.genesis string                              Genesis file path (default "config/genesis.json")
       --chain.mempool.cache_size int                      chain mempool cache size (default 10000)
       --chain.mempool.max_txs_bytes int                   chain mempool maximum transactions bytes (default 1073741824)
       --chain.mempool.size int                            chain mempool size (default 5000)
       --chain.moniker string                              Chain moniker (default "Charithas-MBP-2.lan")
+      --chain.p2p.addr_book_strict                        chain P2P address book strict (default true)
+      --chain.p2p.allow_duplicate_ip                      chain P2P allow duplicate IP
       --chain.p2p.external_address string                 chain P2P external address
-      --chain.p2p.listen_addr string                      chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.laddr string                            chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.max_num_inbound_peers int               chain P2P maximum number of inbound peers (default 40)
+      --chain.p2p.max_num_outbound_peers int              chain P2P maximum number of outbound peers (default 10)
       --chain.p2p.persistent_peers string                 chain P2P persistent peers
-      --chain.rpc_laddr string                            Chain RPC listen address (default "tcp://127.0.0.1:26657")
+      --chain.p2p.unconditional_peer_ids string           chain P2P unconditional peer IDs
+      --chain.rpc.laddr string                            Chain RPC listen address (default "tcp://127.0.0.1:26657")
       --chain.state_sync.chunk_request_timeout duration   chain state sync chunk request timeout (default 10s)
       --chain.state_sync.discovery_time duration          chain state sync discovery time (default 15s)
       --chain.state_sync.enable                           chain state sync enable
       --chain.state_sync.rpc_servers strings              chain state sync rpc servers
       --chain.state_sync.temp_dir string                  chain state sync temp dir
       --chain.timeout_broadcast_tx_commit duration        chain timeout broadcast tx commit (default 10s)
-      --chain.unconditional_peer_ids string               chain P2P unconditional peer IDs
   -h, --help                                              help for start
+      --home_dir string                                   Kwild home directory to store blockchain, kwildb and other data
       --log.log_format string                             Kwild app log format (default "plain")
       --log.log_level string                              Kwild app log level (default "info")
       --log.log_output_paths strings                      Kwild app log output paths (default [stdout])
       --sqlite_file_path string                           Kwild app sqlite file path (default "data/kwil.db")
 
 Global Flags:
-      --config string   kwild config file (.toml)
+      --config string   kwild config file
 ```
