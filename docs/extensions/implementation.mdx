@@ -59,8 +59,8 @@ use <extension_name> {
 } as <extension_alias>;
 ```
 
-The initialize method could then perform validation to ensure that smart contract exists, and potentially add additional variables to the map, such as
-the token name, symbol, and decimals.
+The initialize method could then perform validation log on the passed values, add additional variables to the map, or do fire off some other process.  If an error is
+returned during the `Initialize` function, it will cause the deployment of the Kuneiform schema to fail.
 
 ### Corresponding Typescript Extension:
 
