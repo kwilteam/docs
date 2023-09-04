@@ -21,7 +21,7 @@ The error function raises an exception, and causes the SQL statement to fail.  I
 
 ### format(_FORMAT,..._)
 
-The format(FORMAT,...) SQL function works like the sqlite3_mprintf() C-language function and the printf() function from the standard C library. The first argument is a format string that specifies how to construct the output string using values taken from subsequent arguments. If the FORMAT argument is missing or NULL then the result is NULL. The %n format is silently ignored and does not consume an argument. The %p format is an alias for %X. The %z format is interchangeable with %s. If there are too few arguments in the argument list, missing arguments are assumed to have a NULL value, which is translated into 0 or 0.0 for numeric formats or an empty string for %s. See the built-in printf() documentation for additional information.
+This works like the printf() function from the standard C library. The first argument is a format string that specifies how to construct the output string using values taken from subsequent arguments. If the FORMAT argument is missing or NULL then the result is NULL. The %n format is silently ignored and does not consume an argument. The %p format is an alias for %X. The %z format is interchangeable with %s. If there are too few arguments in the argument list, missing arguments are assumed to have a NULL value, which is translated into 0 or 0.0 for numeric formats or an empty string for %s.
 
 ### glob(_X,Y_)
 
@@ -29,8 +29,6 @@ The glob(X,Y) function is equivalent to the expression "Y GLOB X". Note that the
 
     name GLOB '*helium*'
 	glob('*helium*',name) 
-
-If the sqlite3_create_function() interface is used to override the glob(X,Y) function with an alternative implementation then the GLOB operator will invoke the alternative implementation.
 
 ### hex(_X_)
 
@@ -65,8 +63,6 @@ The like() function is used to implement the "Y LIKE X [ESCAPE Z]" expression. I
 
 	name LIKE '%neon%'
     like('%neon%',name)
-
-The sqlite3_create_function() interface can be used to override the like() function and thereby change the operation of the LIKE operator. When overriding the like() function, it may be important to override both the two and three argument versions of the like() function. Otherwise, different code may be called to implement the LIKE operator depending on whether or not an ESCAPE clause was specified.
 
 ### lower(_X_)
 
