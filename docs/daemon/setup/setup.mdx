@@ -1,86 +1,160 @@
 ---
 sidebar_position: 1
-sidebar_label: "Setup"
+sidebar_label: "Single Node"
 id: daemon-setup
-title: Setup
+title: Running a standalone node
 description: Setting up Kwild node
 slug: /daemon/setup
 ---
 
-This guide provides step-by-step instructions for configuring and launching a single instance of a kwild node. It covers both on initializing the node as a genesis node and to join an existing network of kwild nodes during startup.
+This guide provides step-by-step instructions for configuring and launching a single instance of a kwild node. It covers topics on 
+-  How to initialize the node as a genesis node and 
+-  How to join an existing network of kwild nodes during startup.
 
-Running a kwild node requires a private key for the node, genesis file and a configuration file. 
-See [config.toml specification](../configuration/configuration.mdx), [genesis specification](../configuration/genesis.mdx) and [generate private key](../cli/utils.mdx#generate-private-key) for more details on the node configuration.
-
-## Home directory structure
-This is the default directory to store the all the data such as blockchain data, sqldb data, signed messages etc, unless otherwise specified.
+## Root directory
+This is the default directory to store the all the configuration and data such as blockchain data, sql database data, signed messages etc, unless otherwise specified.
 ```
 home_dir/
-   |- config.toml            
-   |- abci/                     # cometbft home directory
+   |- config.toml
+   |- private_key         
+   |- abci/                     # chain root directory, stores blockchain data & config
    |   |- config/
    |   |   |- genesis.json   
    |   |- data/ 
 ```
-home_dir can be specified either using the `--home_dir` flag during server start or by setting the `home_dir` config in the config.toml file. 
-The data storage locations can be overwritten either by using `genesis_file, db_dir, sqlite_file_path` configs in config.toml to overwrite the data storage locations, these configs can also be specified through cmd line flags during server start and take preference over the ones in the config.toml file.
+Default root directory is `~/.kwild`. This configuration can be overwritten either setting `KWILD_ROOT_DIR` environment variable or by using `--root_dir` command line flag.
 
-All these configs can use either absolute paths or relative paths. If relative paths are used, sqlite_file_path should be relative to home_dir, whereas the chain specific configs such as genesis and db_dir should be relative to the cometbft home dir i.e `home_dir/abci`
+## Configuration
+Running a kwild node requires a private key for the node, genesis file and a configuration file. 
+See [config.toml specification](../configuration/configuration.mdx), [genesis specification](../configuration/genesis.mdx) and [generate private key](../cli/utils.mdx#generate-private-key) for more details on the node configuration.
 
-### Initialization
-The home directory `home_dir` can be initialized with the default configuration files using the kwild command line as below.
+There are multiple ways to generate this config and run the kwild node.
+1. Quickstart node using --autogen flag
+2. Use admin cli utils to initialize the root directory 
+3. Manual configuration
+This config can be automatically generated if node is run with `kwild --autogen`
 
-```bash
-kwild utils init -o "path/to/home/dir"
-```
+### Quickstart the node using the autogen flag
 
-This command will generate the config.toml and genesis.json files using default settings. Additionally, it creates cryptographic key pairs and populates the configuration files with these keys.
+Use the --autogen flag to swiftly initiate the node without delving into the configuration details. This will automatically generate any missing `private_key` and `genesis.json` files that are required for running a kwild node.
 
-If you wish to modify any specific settings, you have the option to manually edit these configuration files or utilize flags when running `kwild server start` to override the existing configurations while starting the server. Refer [server flags](../cli/server.mdx) and [config usage](../configuration/configuration.mdx) to get more information of all the flags supported.
+You also have the option to modify some default settings of the genesis file using below flags:
+- `--without_gas_costs`
+- `--without_nonces`
+- `--validator_join_expiry`
+- `--chain_id_prefix`
 
+However, these flags are only effective when generating a new genesis.json file. If a genesis.json file already exists, the node will operate based on its current configuration
 
-### Running a genesis kwild node
-Once the required configuration is generated and updated, the kwild server can be started as follows:
+### Setup using the kwil-admin cli
 
-#### Configure using a config.toml file
-```bash 
-kwild server start --config "path/to/my/config.toml"
-```
-
-#### Configure using flags 
-private_key and home_dir are required for running a server.
-
-```bash
-kwild server start --app.private_key 20825f3eddf9b7f334cfce30dac8d03931965a6a305f7e62185db026d34198ccdfed8973a7c385a320528a7b131418fc57813ae8841dacc0cc6ecf34631f4409 --home "/tmp/.kwild/"
-```
-
-#### Configure using both config.toml file and the flags
-When both config.toml and flags are used, the flags take precedence over the configurations in the config.toml file.
+The root directory can be initialized with the default configuration files using the kwil-admin command line utility as shown below.
 
 ```bash
-`kwild server start --config "config-file-path" --home "/tmp/.kwild" --chain.p2p.laddr "tcp:192.168.1.10:26656"`
+kwil-admin setup init -o "path/to/root/dir"
+```
+This command will generate the missing private_key, config.toml, genesis.json files using default settings. 
+
+### Manual configuration
+Manually generate and configure private_key, genesis.json and config.toml as shown below.
+
+#### Generate private_key
+Generate private key file using the kwil-admin utils as shown below.
+```bash
+kwil-admin key gen -o "path/to/private/key/file"
+```
+
+#### View key information
+Public Key, NodeID, Address corresponding to the private key can be viewed using the below command. Public key and Address are required to configure genesis file and nodeID is required to populate persistent_peers
+```bash
+kwil-admin key info -k "path/to/private/key/file"
+
+Private key (hex): 132fd675ea871170a21e2b0f99fa68cbb99ccefb3ff7f2a38856105caf101d1af2003e9021ba911b58c1a6da0aef211a038d343f2d3a95db7bc3dca7805b939b
+Private key (base64): Ey/WdeqHEXCiHisPmfpoy7mczvs/9/KjiFYQXK8QHRryAD6QIbqRG1jBptoK7yEaA400Py06ldt7w9yngFuTmw==
+Public key (base64): 8gA+kCG6kRtYwabaCu8hGgONND8tOpXbe8Pcp4Bbk5s=
+Public key (cometized hex): PubKeyEd25519{F2003E9021BA911B58C1A6DA0AEF211A038D343F2D3A95DB7BC3DCA7805B939B}
+Public key (plain hex): f2003e9021ba911b58c1a6da0aef211a038d343f2d3a95db7bc3dca7805b939b
+Address (string): 494317B995E6A4522E5610183DEC52A33F034B0A
+Node ID: 494317b995e6a4522e5610183dec52a33f034b0a
+```
+
+#### Genesis file configuration
+Copy the sample [genesis.json](./../configuration/genesis.mdx#complete-genesis-file) into `root_dir/abci/config/genesis.json` and update the configuration as required.
+
+Manually update the chain_id, initial_height, app_hash configurations in the genesis.json file.
+The current node can be added as one of the inital validators in the genesis file as below. The base64 public key is used here. 
+```bash
+  "validators": [
+    {
+      "address": "494317B995E6A4522E5610183DEC52A33F034B0A",
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "8gA+kCG6kRtYwabaCu8hGgONND8tOpXbe8Pcp4Bbk5s="
+      },
+      "power": "1",
+      "name": "validator-0"
+    }
+  ],
+```
+#### Config.toml 
+Download the sample [config.toml](./../configuration/default_config.toml) into `root_dir/config.toml` and update the configuration as required. The minial configuration required is: 
+
+```bash
+App configuration:
+  - grpc_listen_addr: "localhost:50051"
+  - http_listen_addr: "localhost:8080"
+
+Chain configuration:
+  - rpc.laddr:  "tcp://127.0.0.1:26657"
+  - p2p.laddr:  "tcp://127.0.0.1:26657"
+  - p2p.persistent_peers: "39303daa43f5205627e0c6bddfe36f11be721f01@localhost:26666" 
+  # This can be empty for a genesis node, for others its of format "nodeID1@ip1:port1,nodeID2@ip2:port2..."
+```
+Refer [config.toml specification](./../configuration/configuration.mdx) for more details on configuring config.toml
+
+
+## Running the genesis node
+Running a kwild node successfully requires the private_key and genesis.json files. If any of these files are not configured, running kwild with the `--autogen` flag will autogenerate any missing configuration files and starts the node using the generated config:
+```bash
+kwild --root_dir "path/to/root/dir" --autogen
+```
+
+Otherwise, initialize the root_dir with the required configuration files as specified in [configuration section](./setup.mdx#configuration) and then run the node without `--autogen` flag
+```
+kwild --root_dir "path/to/root/dir"
 ```
 
 
 
-### Connecting to other peers on the kwil network
+## Running a non-genesis node
 
-To connect a kwil node to the existing network during startup:
+To start a kwild node and connect to the existing network:
 
-1. Replace the genesis file with that of the network's genesis file.
+1. Generate the required config files as specified in the [configuration section](./setup.mdx#configuration)
 
-2. Update the p2p.persistent_peers with the peer address set either in the config.toml or through the cmdline flag --chain.p2p.persistent_peers. 
+2. Replace the genesis file with that of the network's genesis file.
+
+3. Update the p2p.persistent_peers with the peer address set either in the config.toml or through the cmdline flag or through env variable and start the node.
     
     persistent_peers is essentially a comma separated string of `nodeid@ip:port` of peers of the existing kwil network you want to connect to.
 
     ```bash title="--p2p.persistent_peers cmdline flag"
-    kwild server start --p2p.persistent_peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+    kwild --root_dir "path/to/root/dir" --p2p.persistent_peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
     ```
+
+   (or)
+
+    ```bash title="KWILD_P2P_PERSISTENT_PEERS Env variable"
+    KWILD_P2P_PERSISTENT_PEERS="d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+    kwild --root_dir "path/to/root/dir"
+    ```    
 
     (or)
 
     ```bash title="persistent_peers option in config.toml"
     [chain.p2p]
     persistent_peers = "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+
+    kwild --root_dir "path/to/root/dir"
     ```
 

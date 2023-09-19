@@ -5,9 +5,10 @@
 # NOTE: Any path below can be absolute (e.g. "/var/myawesomeapp/data") or
 # relative to the home directory (e.g. "data")
 
-# Home Directory Structure:
-# HomeDir/
+# Root Directory Structure:
+# RootDir/
 #   |- config.toml    (app and chain configuration for running the kwild node)
+#   |- private_key   (node's private key)
 #   |- abci/
 #   |   |- config/
 #   |   |   |- genesis.json   (genesis file for the network)
@@ -25,23 +26,21 @@
 # Only the config.toml and genesis file are required to run the kwild node
 # The rest of the files & directories are created by the kwild node on startup
 
-
-# Directory to store the kwild node's data (described above)
-home_dir = "test/tmp2/node0"
-
 #######################################################################
 ###                    Logging Config Options                       ###
 #######################################################################
 [log]
 # Output level for logging, default is "info". Other options are "debug", "error", "warn", "trace"
-log_level = "info"
+level = "info"
 
 # Output paths for the logger, can be stdout or a file path
 output_paths = ["stdout"]
 
 # Output format: 'plain' or 'json'
-log_format = "plain"
+format = "json"
 
+# Time format: "epochfloat" (default), "epochmilli", or "rfc3339milli"
+time_format = "epochfloat"
 
 #######################################################################
 ###                      App Config Options                         ###
@@ -49,7 +48,7 @@ log_format = "plain"
 
 [app]
 # Node's Private key
-private_key = "537f5eb0cabae6d59be6b1489f7964e5137f138c89ae9e95358ddb9d49b2634e568c40e08a0eff2c920ff2ab1f914be3ff889fe7062528a7290a82d0db00985c"
+private_key_path = "private_key"
 
 # TCP or UNIX socket address for the KWILD App's GRPC server to listen on
 grpc_listen_addr = "localhost:50051"
@@ -60,14 +59,8 @@ http_listen_addr = "localhost:8080"
 # List of Extension endpoints to be enabled ex: ["localhost:50052", "169.198.102.34:50053"]
 extension_endpoints = []
 
-# Toggle to enable gas costs for transactions and queries
-without_gas_costs = true
-
-# Toggle to disable nonces for transactions and queries
-without_nonces = false
-
 # KWILD Sqlite database file path
-sqlite_file_path = "data/kwil.db"
+sqlite_file_path = "data/kwild.db"
 
 # The path to a file containing certificate that is used to create the HTTPS server.
 # Might be either absolute path or path related to the kwild root directory.
@@ -111,14 +104,9 @@ snapshot_dir = "snapshots"
 ###                 Chain  Main Base Config Options                 ###
 #######################################################################
 [chain]
+
 # A custom human readable name for this node
-moniker = "node1"
-
-# Blockchain Genesis file
-genesis_file = "config/genesis.json"
-
-# Blockchain database directory
-db_dir = "data"
+moniker = ""
 
 #######################################################################
 ###                 Advanced Configuration Options                  ###
@@ -130,7 +118,7 @@ db_dir = "data"
 [chain.rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
-laddr = "tcp://localhost:26657"
+laddr = "tcp://127.0.0.1:26657"
 
 # How long to wait for a tx to be committed during /broadcast_tx_commit.
 # WARNING: Using a value larger than 10s will result in increasing the
@@ -163,7 +151,7 @@ timeout_commit = "1s"
 [chain.p2p]
 
 # Address to listen for incoming connections
-laddr = "tcp://localhost:26656"
+laddr = "tcp://0.0.0.0:26656"
 
 # Address to advertise to peers for them to dial
 # If empty, will use the same port as the laddr,
@@ -172,11 +160,9 @@ laddr = "tcp://localhost:26656"
 # example: 159.89.10.97:26656
 external_address = ""
 
-pex = false
-
 # Comma separated list of nodes to keep persistent connections to (used for bootstrapping)
 # Example: "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
-persistent_peers = "39303daa43f5205627e0c6bddfe36f11be721f01@localhost:26666"
+persistent_peers = ""
 
 # Set true for strict address routability rules
 # Set false for private or local networks
@@ -204,7 +190,7 @@ size = 5000
 # Limit the total size of all txs in the mempool.
 # This only accounts for raw transactions (e.g. given 1MB transactions and
 # max_txs_bytes=5MB, mempool will only accept 5 transactions).
-max_txs_bytes = 1073741824
+#max_txs_bytes = xx .ChainCfg.Mempool.MaxTxsBytes xx
 
 # Size of the cache (used to filter transactions we saw earlier) in transactions
 cache_size = 10000

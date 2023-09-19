@@ -32,3 +32,8 @@ The Kwil network offers a unique method of writer access-control for application
 ### Embedding Value In Data
 
 Smart contract platforms enable developers to code with programmable money.  In a Kwil database, developers are able to atomically capture the value of data to assets that exist on other blockchains.  By combining tokens with valuable data, builders are able to create new business models, value capture mechanisms, and user incentives that couldn't exist previously.
+
+
+### Consensus
+
+The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for practical byzantine fault tolerant (PBFT) consensus.  For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.37/)

@@ -7,58 +7,36 @@ description: How to configure the Kwil Daemon
 slug: /daemon/config/
 ---
 
-This section outlines the complete set of configurations available for the operation of a kwild node. The configurations are categorized into two distinct types: chain-specific configurations that pertain to the underlying blockchain functionality, and app-specific configurations that govern the behavior of kwild application. 
-
-To start a kwild server, these configurations should be provided either using a config.toml or through cmdline flags or both (in which case, flags take precedence). See [setup instructions](../setup/setup.mdx) for more details on different ways to run a kwild node.
+This section outlines the complete set of configurations available for the operation of a kwild node. The configurations are categorized into three distinct types: chain-specific configurations that pertain to the underlying blockchain functionality, app-specific configurations that govern the behavior of kwild application and logging. 
 
 Lets take a look into the different sections of the config. 
 
-
-## home_dir
-- `home_dir`:  This variable is used to specify the default directory to store the all the data such as blockchain data, sqldb data etc. Configurations such as sqlite_file_path for sqldb, db_dir for blockchain data provide more granular control in deciding where to store that particular data.
-
 ## logging
 
-- `LOG_LEVEL`: This variable sets the logging level of the daemon. The default level is info.
+- `level`: This variable sets the logging level of the daemon. The default level is info.
 
-- `LOG_OUTPUT_PATHS`: This variable sets the output paths for logs. Multiple paths can be specified, separated by commas. By default, logs are written to stdout.
+- `output_paths`: This variable sets the output paths for logs. Multiple paths can be specified, separated by commas. By default, logs are written to stdout.
 
-- `LOG_FORMAT`: This variable sets the logging format. Supports 'plain' or 'json'.
+- `format`: This variable sets the logging format. Supports 'plain' or 'json'.
 
-## app
+- `time_format`: This variables sets the time format for logs. Available options are **epochfloat** (default), **epochmilli**, or **rfc3339milli**.
+
+## app   
 This section contains configuration specific to the operation of kwild application.
-
-- `private_key`: This variable is used to store a cryptographic private key (hex format). This is a required field to run the node.
 
 - `grpc_listen_addr`: This variable sets the address at which the gRPC server of the daemon listens for connections. The default value is :50051.
 
 - `http_listen_addr`: This variable sets the address at which the HTTP server of the daemon listens for connections. The default value is :8080.
 
-- `sqlite_file_path`: This variable sets the file path for all SQLite files. If not provided, it defaults to data/kwil.db/ under the specified home_dir.
-
-- `without_gas_costs`: This variable sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
-
-- `without_nonces`: This variable sets whether nonces should be enabled for the transactions. By default nonces are enabled for the transactions.
+- `sqlite_file_path`: This variable sets the file path for all SQLite files. If not provided, it defaults to `data/kwil.db/` under the specified root_dir.
 
 - `extension_endpoints`: This variable defines endpoints for extensions. Multiple endpoints can be specified, separated by commas.
 
-- `tls_cert_file`: This variable sets the path to a file containing certificate that is used to create the HTTPS RPC server. The path can be either an absolute path or path relative to the configured home_dir. If not provided, only http server would be created.
+- `tls_cert_file`: This variable sets the path to a file containing certificate that is used to create the HTTPS RPC server. The path can be either an absolute path or path relative to the configured home_dir. If not provided, only http server would be created. 
 
 - `tls_key_file`: This variable sets the path to a file containing matching private key that is used to create the HTTPS RPC server. The path can be either an absolute path or path relative to the configured home_dir. If not provided, only http server would be created.
 
 - `hostname`: This variable sets the kwild server hostname.
-
-### snapshots
-This subsection provides configuration required to support and maintain sqlite db snapshots.
-
-- `enabled`: This variable sets whether to enable snapshots on the kwild node.
-
-- `snapshot_dir`: This variable sets the directory where the snapshots are to be stored. Can be absolute or relative to the kwild root directory.
-
-- `snapshot_heights`: This variable sets the heights at which the snapshots are to be taken. Default height is 10000 blocks, this implies that a snapshot of the kwil db database is taken for every 10k blocks.
-
-- `max_snapshots`: Maximum number of snapshots to be kept in the snapshot_dir. If max limit is reached, the oldest would be deleted and replaced by the latest snapshot.
-
 
 ## chain:
 This section contains configuration specific to cometbft based blockchain.
@@ -111,25 +89,51 @@ This subsection describes the configuration to manage blockchain's transaction m
 
 - `cache_size`: This variable sets the Size of the cache used to filter transactions seen earlier.
 
-### statesync
-This subsection describes the configuration for supporting statesync. 
-
-- `enable`: Toggle to enable state sync based rapid bootstrapping.
-
-- `rpc_servers`: This variable sets the rpc servers for light client verification and state data retrieval.
-
-- `temp_dir`: This variable sets the temporary directory for storing state sync snapshot chunks.
-
-- `discovery_time`: This variable sets the time to spend discovering snapshots before initiating a restore.
-
-- `chunk_request_timeout`: This variable sets the timeout duration before re-requesting a chunk.
-
-
 This is the structure in which these configs must appear in the config.toml file. Here is a sample [config.toml](./default_config.toml) for reference. 
 
-## Flags
-All these fields can also be configured using flags via dot notation during the kwild server start. For example, to update max_snapshots, a config under the 'app' section and 'snapshots' subsection, the field can be updated through flag app.snapshots.max_snapshots.
+## Config Override
+All the configs in config.toml can be overwritten either using the env variables or the command line flags while starting the node.  
 
-```bash
-kwild server start --app.snapshots.max_snapshots 10
+The order of precedence: `flags > env variables > config.toml > defaults`. 
+
+These configs can be translated into env variables or flags using the below rules: 
+
+
+:::note
+``` title=config.toml
+[section]
+   field1 = val1
+[section.subsection]
+   field2 = val2
 ```
+The flag and env variables for field1 & field2 are as follows:
+```
+All environment variables corresponding to the configs are prefixed by "KWILD_"
+Env variable:
+- KWILD_SECTION_FIELD1
+- KWILD_SECTION_SUBSECTION_FIELD2
+
+Flags:
+- section.field1
+- section.subsection.field2
+```
+:::
+
+For example, to overwrite the log level config during the startup:
+```bash title="Env variable"
+KWILD_LOG_LEVEL=debug
+
+kwild --root_dir "path/to/root/dir"
+```
+
+```bash title="Command line flag"
+kwild --root_dir "path/to/root/dir" --log.level "debug"
+```
+
+```bash title="Both env and cmdline flags"
+KWILD_LOG_LEVEL=debug
+
+kwild --root_dir "path/to/root/dir" --log.level "info"
+```
+If both flags and env variables are set, flags take precedence over environment variables.
+

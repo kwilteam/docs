@@ -1,0 +1,84 @@
+---
+sidebar_position: 2
+sidebar_label: "CLI"
+id: daemon-cmdline
+title: Kwild CLI Guide
+description: Kwild Command Line
+slug: /daemon/cmdline
+---
+
+Kwild command starts both the blockchain and the database services of kwild node. 
+
+### Quickstart a kwild node:
+Run the below command to quickstart a kwild node without specifying any configuration.
+```bash
+kwild --autogen  --root_dir "path/to/root/dir"
+```
+This command will generate the missing configuration in the root directory and starts the node with the generated configuration. 
+
+The default root directory used is `~/.kwild` and can be overwritten using `--root_dir`
+
+### Run node with specific configuration
+If root directory is already intialized with the required configuration, then node can be started just by running the below command:
+```bash
+kwild --root_dir "path/to/root/dir"
+```
+
+### Config override using flags
+The kwild command also supports overriding the configuration using the cmd line flags.  Use `--help or -h` for detailed information on all the flags supported by the kwild cli. For more information, refer [config override through flags](./configuration/configuration.mdx#config-override)
+
+```bash
+kwild --help
+kwild: the Kwil blockchain node and RPC server
+
+Usage:
+  kwild [flags]
+
+Flags:
+  -a, --autogen                                           auto generate private key and genesis file if not exist
+  -r, --root_dir string                                   kwild root directory for config and data (default "~/.kwild")
+  -l, --log.level string                                  Kwild app log level (default "info")
+      --log.format string                                 Kwild app log format (default "json")
+      --log.time_format string                            Kwild app time log format (default "epochfloat")
+      --log.output_paths strings                          Kwild app log output paths (default [stdout])
+      --app.private_key_path string                       Path to private key file
+      --app.grpc_listen_addr string                       Kwild app gRPC listen address (default "localhost:50051")
+      --app.http_listen_addr string                       Kwild app HTTP listen address (default "localhost:8080")
+      --app.sqlite_file_path string                       Kwild app sqlite file path (default "data/kwild.db")
+      --app.tls_cert_file string                          TLS certificate file path for RPC Server
+      --app.tls_key_file string                           TLS key file path for RPC Server
+      --app.hostname string                               Kwild Server hostname
+      --app.extension_endpoints strings                   Kwild app extension endpoints
+      --app.snapshots.enabled                             Enable snapshots
+      --app.snapshots.recurring_height uint               Recurring snapshot height (default 10000)
+      --app.snapshots.max_snapshots uint                  Maximum snapshots (default 3)
+      --app.snapshots.snapshot_dir string                 Snapshot directory path (default "snapshots")
+      --chain.moniker string                              Node moniker
+      --chain.rpc.laddr string                            Chain RPC listen address (default "tcp://127.0.0.1:26657")
+      --chain.rpc.timeout_broadcast_tx_commit duration    chain timeout broadcast tx commit (default 10s)
+      --chain.p2p.laddr string                            chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.external_address string                 chain P2P external address
+      --chain.p2p.persistent_peers string                 chain P2P persistent peers
+      --chain.p2p.addr_book_strict                        chain P2P address book strict
+      --chain.p2p.unconditional_peer_ids string           chain P2P unconditional peer IDs
+      --chain.p2p.max_num_inbound_peers int               chain P2P maximum number of inbound peers (default 40)
+      --chain.p2p.max_num_outbound_peers int              chain P2P maximum number of outbound peers (default 10)
+      --chain.p2p.allow_duplicate_ip                      chain P2P allow duplicate IP (default true)
+      --chain.mempool.size int                            chain mempool size (default 5000)
+      --chain.mempool.cache_size int                      chain mempool cache size (default 10000)
+      --chain.consensus.timeout_propose duration          chain consensus timeout propose (default 3s)
+      --chain.consensus.timeout_prevote duration          chain consensus timeout prevote (default 1s)
+      --chain.consensus.timeout_precommit duration        chain consensus timeout precommit (default 1s)
+      --chain.consensus.timeout_commit duration           chain consensus timeout commit (default 1s)
+      --chain.state_sync.enable                           chain state sync enable
+      --chain.state_sync.temp_dir string                  chain state sync temp dir
+      --chain.state_sync.rpc_servers strings              chain state sync rpc servers
+      --chain.state_sync.discovery_time duration          chain state sync discovery time (default 15s)
+      --chain.state_sync.chunk_request_timeout duration   chain state sync chunk request timeout (default 10s)
+      --without_gas_costs                                 disables gas costs, default: true (default true)
+      --without_nonces                                    disables nonces, default: false (default true)
+      --validator_join_expiry int                         number of blocks before a join request expires, default: 86400 aka 1 day if block rate is 1 block/sec (default 86400)
+      --chain_id_prefix string                            chain prefix, default: 'kwil-chain-' (default "kwil-chain-")
+  -h, --help                                              help for kwild
+  -v, --version                                           version for kwild
+```

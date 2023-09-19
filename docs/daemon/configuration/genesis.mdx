@@ -9,7 +9,7 @@ slug: /daemon/genesis
 
 A Genesis file defines the initial state and parameters needed to bootstrap a new blockchain network. It serves as the starting point for the entire blockchain system by defining key aspects of the network, including its initial validators, initial height, consensus rules, and more. All participants in the network need to have the same genesis file to start with the same initial conditions. Any discrepancies or errors in the genesis file could prohibit the node either from joining the network or from producing blocks.
 
-## Simple genesis file
+## Genesis file with minimal configuration
 Here is an example of genesis.json file with minimal configuration:
 ```json title="sample genesis.json file"
 {
@@ -44,25 +44,27 @@ A Genesis file essentially consists of:
 
 ### Initial Validators
  `validators`: This field sets the List of initial validators. Each validator should provide the below information:
+  - `pub_key`: consisting of key types and pubkey bytes.
+  - `address`: address of the pub_key
+  - `power`: The validator’s voting power, default: 1 (currently power is treated as a binary config. Power 0 indicates that the node is a non-validator)
 
+Cryptographic keys for a kwild node can be generated and viewed using the `kwil-admin key` cmdline utility as shown below. 
+```bash
+# Generate private key
+kwil-admin key gen -o "path/to/private/key/file"
 
-    - `pub_key`: consisting of key types and pubkey bytes.
-    - `address`: address of the pub_key
-    - `power`: The validator’s voting power, default: 1 (currently power is treated as a binary config. Power 0 indicates that the node is a non-validator)
-
-    cryptographic keys for a kwild node can be generated using the kwild util cmd line as below. This command will also prints out the pubkey and address which can be used under the validators in the genesis.json file. Refer [cli guide](../cli/utils.mdx#generate-private-key) for more information on using the kwild utils cmdline to generate cryptographic key pairs.
-    ```bash
-    kwild utils gen-private-key
-    ```
+# View Generated key info
+kwil-admin key info -k "path/to/private/key/file"
+```
 
 ### Initial app_hash
  `app_hash`: The app_hash representing the initial application state.
 
-  If the node is booting up with initial data, the app_hash of the genesis file can be initialized/updated by running:
+  If the node is booting up with initial data, the app_hash of the genesis file can be initialized by running:
+  ```bash
+  kwil-admin setup genesis-hash "path/to/initialDB/dir" -g "path/to/my/genesis.json"
   ```
-  kwild utils genesis-hash "path/to/initial/db/dir" --genesis-file "path/to/my/genesis.json"
-  ```
-  If `--genesis-file` is not provided, the command would stdout the app_hash, which can be used to manually update app_hash in genesis.json. Refer [cli guide](../cli/utils.mdx#create-genesis-hash) for more information on app_hash generation.
+  If `--genesis or -g` is not provided, the command would stdout the app_hash, which can be used to manually update app_hash in genesis.json. 
 
 ## Advanced Configurations
 ### Consensus Params
@@ -75,6 +77,7 @@ Genesis file can also be used to establish predefined set of consensus rules suc
 #### Validator type:
   - `validator`:
     -  `pub_key_types`: This field sets the Public key types validators can use.
+    -  `join_expiry`: This field sets the   umber of blocks after which the validator join request expires if not approved. The default expiry is 86400 blocks which is equivalent to 1 day if blocks are prodcued at the rate of 1 block/sec
 
 #### ABCI app Version:
   - `version`:
@@ -86,6 +89,10 @@ Genesis file can also be used to establish predefined set of consensus rules suc
       - `max_age_duration`: This field sets the Max age of evidence, in time.
       - `max_bytes`: This field sets the maximum size in bytes of evidence that can be committed in a single block and should fall comfortably under the max block bytes.
 
+#### General
+  - `without_nonces`: This field sets whether nonces should be enabled for the transactions. By default nonces are enabled for the transactions.
+
+  - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
 
 ## Complete genesis file
 Here is an example of a genesis file with complete configuration
@@ -107,11 +114,14 @@ Here is an example of a genesis file with complete configuration
     "validator": {
       "pub_key_types": [
         "ed25519"
-      ]
+      ],
+      "join_expiry": "86400"
     },
     "version": {
       "app": "0"
-    }
+    },
+    "without_gas_costs": true,
+    "without_nonces": false
   },
   "validators": [
     {
