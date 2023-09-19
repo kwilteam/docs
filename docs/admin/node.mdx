@@ -1,0 +1,192 @@
+---
+sidebar_position: 6
+sidebar_label: "Node RPC"
+id: admin-node
+title: Administration of a Running Node
+description: Controlling a running node on the authenticated RPC service with the validator command
+slug: /admin/node
+---
+
+The `node` command is used to control a running Kwil node via its authenticated
+RPC service.
+
+The subcommands share the following syntax:
+
+```
+kwil-admin node [--rpcserver RPCSERVER] [--authrpc-cert AUTHRPC-CERT]
+  [--tlskey TLSKEY] [--tlscert TLSCERT] <command> [<args>]
+```
+
+## Setup
+
+:::warning
+The assumption is that the user of `kwil-admin` is the node
+operator. Access must not be granted to untrusted parties.
+:::
+
+Communication between `kwil-admin` and `kwild` is both encrypted and
+mutually-authenticated. Each side has their own key pair, where the node's is
+used to encrypt the communications, and the client's is used to authenticate
+itself with the node. Thus, setup involves generating client credentials, and
+setting them as an authorized RPC client on the Node.
+
+Use of the `node` commands requires the following:
+
+- The node's TLS (encrypted transport) certificate, specified with
+  `--authrpc-cert`. The default is "kwild.cert". This would be retrieved from
+  the node where it is located at `~/.kwild/rpc.cert` by default.
+- RPC client credentials. This is a key pair used to authenticate `kwil-admin`
+  (the client) with `kwild` (the server).  The key and certificate parts are
+  specified by `--tlskey` and `--tlscert`.
+- Adding the client certificate to the Node's allowed clients, which is locate
+  on the node machine as `~/.kwild/clients.pem` by default.
+- Configure the Kwil node's `admin_listen_addr` so the service is accessible to
+  `kwil-admin`. See [Kwil Node Configuration](../daemon/config) for more
+  information.
+
+The `kwild` process may be running locally, on a remote host, or inside a Docker
+container. Set and expose the admin RPC service ports as required.
+
+:::note
+Rapidly evolving procedures here. This is all likely to change soon.
+:::
+
+### Generation of Credentials on the Node
+
+The node will generate its own TLS key and certificate, which is used encrypt
+the communications on its authenticated RPC server. As a convenience, `kwild`
+will also generate new *client* credentials on start up if the file
+`~/.kwild/clients.pem` does not exist.
+
+The corresponding `auth.{cert,key}` files may then be used by the operator to
+with th `kwil-admin node` commands for remote access to the node. 
+
+## Generation of Credentials by `kwil-admin`
+
+The `kwil-admin node gen-auth-key` command may be used to generate new
+credentials to `~/.kwil-admin/auth.{cert,key}`.
+
+With this method, the contents of the `auth.cert` file must be appended to the
+node's `clients.pem` file. Specifically,
+
+1. Generate credentials with `./kwil-admin node gen-auth-key`
+2. Securely copy the `~/.kwil-admin/auth.cert` file to the machine where `kwild`
+   is running, if it is not the same host.
+3. Append the contents of the copied `auth.cert` to the node's `clients.pem` file.
+
+  ```sh
+  cat auth.cert >> ~/.kwild/clients.pem
+  ```
+
+If `kwil-admin` is being used on the same machine as `kwild`, you would skip
+copy step and do:
+
+```sh
+cat ~/.kwil-admin/auth.cert >> ~/.kwild/clients.pem
+```
+
+## Commands
+
+The following commands perform node actions via the node's authenticated RPC
+service, configured as described above. All flags are optional if the required
+files are placed in the `~/.kwil-admin` folder.
+
+```
+Usage: kwil-admin node [--rpcserver RPCSERVER] [--authrpc-cert AUTHRPC-CERT]
+  [--tlskey TLSKEY] [--tlscert TLSCERT] <command> [<args>]
+
+Options:
+  --rpcserver RPCSERVER, -s RPCSERVER
+                         admin RPC server address [default: 127.0.0.1:50151]
+  --authrpc-cert AUTHRPC-CERT
+                         kwild's TLS certificate [default: kwild.cert]
+  --tlskey TLSKEY        our TLS key file to establish a mTLS (authenticated)
+                         connection [default: auth.key]
+  --tlscert TLSCERT      our TLS certificate file for server to authenticate us
+                         [default: auth.cert]
+  --help, -h             display this help and exit
+  --version              display version and exit
+```
+
+### Version
+
+The `version` subcommand returns `kwild`'s version string set at compile time.
+For example, a development version of `kwild` may report something similar to
+the following:
+
+```sh
+$ kwil-admin node version
+kwild version 0.5.1-pre+0975d68fb.dirty
+```
+
+### Status
+
+Node status is requested with the `status` subcommand:
+
+For example, `kwil-admin node status` returns JSON formatted status information:
+
+```json
+{
+  "node": {
+    "chain_id": "kwil-chain-nUkVIp",
+    "name": "kwilnode42",
+    "node_id": "9fde182db6dc5c2d5a08f395cdc9320a76a4f15d",
+    "proto_ver": 8,
+    "app_ver": 0,
+    "block_ver": 0,
+    "listen_addr": "tcp://0.0.0.0:26656",
+    "rpc_addr": "tcp://0.0.0.0:26657"
+  },
+  "sync": {
+    "app_hash": "51ffe4001668c0ea7791a2e8d647fe88d7542f2594e91382ca0a7026db6a1571",
+    "best_block_hash": "9f7d2fc800e3926e04db7ae72778faa47cb551394662dcc131824203efa9bbd8",
+    "best_block_height": 27462,
+    "best_block_time": "2023-09-19T15:46:36.693-05:00",
+    "syncing": false
+  },
+  "current_validator": {
+    "pubkey": "d659e53ff403c52a1ae85445c51dd714d57e75b4ae6fa2e009a9082bfef870db",
+    "pubkey_type": "ed25519",
+    "power": 1
+  }
+}
+```
+
+### Peers
+
+A list of the peers currently connected to the node are reported with the
+`peers` subcommand. For example, the output of running `kwil-admin node peers`
+on a node with 2 connected peers would look like:
+
+```json
+[
+  {
+    "node": {
+      "chain_id": "chain-Ba2NYd",
+      "name": "k2",
+      "node_id": "658ea486c3fecf0e6869ad5fc632dd17fc35691a",
+      "proto_ver": 8,
+      "app_ver": 0,
+      "block_ver": 0,
+      "listen_addr": "tcp://127.0.0.1:26756",
+      "rpc_addr": "tcp://127.0.0.1:26757"
+    },
+    "inbound": false,
+    "remote_addr": "127.0.0.1"
+  },
+  {
+    "node": {
+      "chain_id": "chain-Ba2NYd",
+      "name": "k3",
+      "node_id": "8224ce41147ef2f791a06b1bf5e3fa77d0d543f6",
+      "proto_ver": 8,
+      "app_ver": 0,
+      "block_ver": 0,
+      "listen_addr": "tcp://127.0.0.1:26856",
+      "rpc_addr": "tcp://127.0.0.1:26857"
+    },
+    "inbound": false,
+    "remote_addr": "127.0.0.1"
+  }
+]
+```

@@ -1,0 +1,95 @@
+---
+sidebar_position: 5
+sidebar_label: "Validator Commands"
+id: admin-validators
+title: Validator Information and Transactions
+description: Validator transactions (join/approve/leave) and queries with the validator command
+slug: /admin/validators
+---
+
+The `validators` command provides functions for creating and broadcasting
+validator-related transactions (join/approve/leave), and retrieving information
+on the current validators and join requests.
+
+```
+kwil-admin validators [--rpcserver RPCSERVER] <command> [<args>]
+```
+
+Each of the subcommands uses a Kwil node's public RPC service (`--rpcserver`),
+where the default is "127.0.0.1:50051".
+
+## List Current Validators
+
+The current validator set is retrieved with the `list` command.  For example:
+
+```
+$ kwild validator list
+Current validator set:
+  0. {pubkey = 9fed4b19eab0cf87370bff0c7ef04cfcff5b268d096578d3ef5ae3c1010939d8, power = 1}
+  1. {pubkey = f1693096d252eac5e366436314996ec39c189dffb997ad7414ed306e3d9244c4, power = 1}
+  2. {pubkey = f28e3cd6d11e9c5d2d00ea8b9c1e18cc01e568f0b186888fb274567461774fbc, power = 1}
+```
+
+## Show Join Request Status
+
+To view the status of an active join request, use the `join-status` command:
+
+```
+kwil-admin validators join-status JOINER
+```
+
+This command requires only the public key of the candidate validator `JOINER`
+with an active join request. For example,
+
+```
+$ kwild validator join-status "6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0"
+Candidate: 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0 (want power 1)
+ Validator 9fed4b19eab0cf87370bff0c7ef04cfcff5b268d096578d3ef5ae3c1010939d8, approved = false
+ Validator f1693096d252eac5e366436314996ec39c189dffb997ad7414ed306e3d9244c4, approved = false
+ Validator f28e3cd6d11e9c5d2d00ea8b9c1e18cc01e568f0b186888fb274567461774fbc, approved = false
+```
+
+## Join
+
+A node may request to join as a validator with the `join` subcommand:
+
+```
+kwil-admin validators join [--key-file KEY-FILE] [PRIVKEY]
+```
+
+The private key of the node (prospective validator) that will sign the
+transaction is specified with either a file containing the key, or a positional
+argument containing the hexadecimal string for the key.  For example:
+
+```sh
+$ ./kwild validator join --key-file ~/secrets/validator_private_key
+Joining the network as a validator...
+Node PublicKey: d692a88b6fee8d1399f7aab70db25001080dbf2fe8ca4f345e0fdca6b853713a
+tx hash: 125ae9009a5056a152542aa84e97a2a49c547e492dffdfea50eb44623fbb3efb
+tx sender: 1pKoi2/ujROZ96q3DbJQAQgNvy/oyk80Xg/cprhTcTo=
+tx signature (ed25519): ce56440b1ecd529b5345a6662f3a30831b7d85ddc714036c4e7b124dd0481429478c1459c1833a8e9fa338329b0f217ca04c4381bb53679e3d72dec3317e7b09
+tx payload (validator_join): 0001e2a0d692a88b6fee8d1399f7aab70db25001080dbf2fe8ca4f345e0fdca6b853713a01
+```
+
+## Approve
+
+A current validator may approve an active join request for a candidate
+validator using the `approve` subcommand:
+
+```
+kwil-admin validators approve [--key-file KEY-FILE] JOINER [PRIVKEY]
+```
+
+This command has the same syntax as the `join` command except with the addition
+of the `JOINER` positional argument, which specifies the public key
+(hexadecimal) of the candidate validator that is being approved.
+
+## Leave
+
+A current validator may leave the validator set using the `leave` command:
+
+```
+kwil-admin validators leave [--key-file KEY-FILE] [PRIVKEY]
+```
+
+The syntax is identical to the `join` command.

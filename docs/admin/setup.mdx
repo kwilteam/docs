@@ -1,0 +1,137 @@
+---
+sidebar_position: 4
+sidebar_label: "Node Setup"
+id: admin-setup
+title: Node Setup and Configuration Tools
+description: Node setup and configuration with the setup subcommand
+slug: /admin/setup
+---
+
+The `setup` command provides functions for creating and managing node
+configuration and data, including:
+
+* performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
+* updating genesis config with initial SQLite files (`genesis-hash`)
+* resetting node state (`reset-state`) and all node data files (`reset`)
+
+## Quick Setup of a Single Kwil Node
+
+The `init` command facilitates quick setup of an isolated Kwil node on a fresh
+network in which that node is the single validator.  This permits rapid
+prototyping and evaluation of Kwil DB functionality.
+
+For example, to create a node configuration for a new network in a root Kwild
+Daemon folder at `~/.kwild-new`:
+
+```sh
+$ kwil-admin setup init -o ~/.kwild-new
+Generated genesis file /home/user/.kwild-new/abci/config/genesis.json
+Successfully initialized node directory:  /home/user/.kwild-new
+```
+
+The above command also generated a new `config.toml` and `private_key` file in
+the node directory.
+
+Additional nodes may join this new network by specifying the existing node as a
+persistent peer in `kwild`'s configuration and in the validators section of the
+genesis configuration. See [Kwil Daemon Configuration](../daemon/config) for
+more information on node setup.
+
+## Creating a New Test Network of Several Nodes
+
+The `setup testnet` command is used to create multiple node configurations, all
+with the same genesis config, and pre-configured to connect to each other. This
+command has several options:
+
+```
+kwil-admin setup testnet [--validators V] [--non-validators N] [--config FILE]
+  [--output-dir DIR] [--node-dir-prefix PRE] [--hostname-prefix PRE]
+  [--hostname-suffix SUF] [--starting-ip IP] [--hostname HOSTNAME] [--p2p-port PORT]
+```
+
+There are defaults for each flag, with the output writing to a folder called
+`.testnet` in the current folder.  For example, the following command creates a
+new testnet work with 8 total nodes comprising 4 validators and 4 non-validators:
+
+```sh
+$ ./kwil-admin setup testnet -o ~/.kwild-testnet-xyz
+Successfully initialized 8 node directories: /home/jon/.kwild-testnet-xyz
+
+$ tree ~/.kwild-testnet-xyz
+/home/user/.kwild-testnet-xyz
+├── node0
+│   ├── abci
+│   │   ├── config
+│   │   │   └── genesis.json
+│   │   └── data
+│   ├── config.toml
+│   └── private_key
+├── node1
+│   ├── abci
+│   │   ├── config
+│   │   │   └── genesis.json
+...
+```
+
+The config files for each of the nodes will specify all of the other nodes a
+persistent peers so that they will connect to each other on startup. This is
+generally only practical for small test networks with fewer than 12 nodes.
+
+The following options may be used to control what is generated:
+
+- `--validators` or `-v` is number of validators [default: 4]
+- `--non-validators` or `-n` is the number of non-validators [default: 4]
+- `--config` is a template config file to use, default is none
+- `--output-dir` or `-o` is the parent directory for all of generated node folders [default: ".testnet"]
+- `--node-dir-prefix` is the prefix for the node directories (node results in node0, node1, ...) [default: "node"]
+- `--hostname-prefix` is the prefix for node host names e.g. node results in node0, node1, etc.
+- `--hostname-suffix` is the suffix for node host names e.g. .example.com results in node0.example.com, node1.example.com, etc.
+- `--starting-ip` is the starting IP address of the first network node, with subsequent nodes on the next address in the subnet
+- `--hostname` overrides all hostnames of the nodes
+- `--p2p-port` or `-p` is the TCP port port on which the nodes listens for P2P connections
+
+## Updating Genesis Config with Initial SQLite Data
+
+If preparing a network with initial databases, it is required to update the "app
+hash" in `kwild`'s genesis configuration to reflect the initial state that
+includes one or more SQLite files. The syntax is:
+
+```
+kwil-admin setup genesis-hash [--genesis GENESIS] [DBDIR]
+```
+
+Both inputs are optional, using default paths. `GENESIS` is the path to the
+genesis file to patch, which is `~/.kwild/abci/config/genesis.json` by default.
+The `DBDIR` argument is the directory containing all of kwild's .sqlite files to
+be hashed, which is `~/.kwild/data/kwil.db/` by default.
+
+## Resetting All Application Data
+
+To delete all of a Kwil node's data files, use the `reset` command.
+
+**WARNING: This command should not be used on production systems. This should
+only be used to reset disposable test nodes.**
+
+```
+kwil-admin setup reset [--root_dir DIR] [--force] [--sqlpath DIR] [--snappath DIR]
+```
+
+This command only requires one: (a) `--root_dir` to specify a node root
+directory containing the files to reset, or (b) `--force` to automatically reset
+the files in the default node root directory at `~/.kwild`.
+
+The paths to the SQLite files (`--sqlpath`) and snapshots (`--snappath`) are
+optional, but provided here since they are configurable on the node.
+
+## Resetting Only Chain state
+
+To reset the block chain state data while leaving all of the other application
+data such as the SQLite databases intact, use the `reset-state` command. This
+will delete the data files under `<root_dir>/abci/data`
+
+```
+kwil-admin setup reset-state [--root_dir DIR] [--force]
+```
+
+As with the `reset` command, only one of the two flags are required.
+
