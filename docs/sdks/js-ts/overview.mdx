@@ -9,12 +9,16 @@ import {InitTabs} from './code_tabs.jsx'
 
 Below is a quick overview of how to use the Kwil JS SDK.  For more detailed information, see the [API Reference](/docs/sdks/js-ts/apis).
 
+Please note that the `@kwilteam/kwil-js` package should only be used with Kwil Daemons on the CometBFT Release (v0.6.0 and above).  For earlier releases, please use the [`kwil`](https://www.npmjs.com/package/kwil) package. The `kwil` package is deprecated and will not be maintained.
+
+The migration guide from `kwil` to `@kwilteam/kwil-js` can be found [here](/docs/sdks/js-ts/migration).
+
 ## Installation
 
 The Kwil JS SDK can be installed using npm.
 
 ```bash
-npm install kwil
+npm install @kwilteam/kwil-js
 ```
 
 ## Initialize
@@ -29,87 +33,151 @@ The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Et
 
 <InitTabs />
 
-## Fund an Account
+## Identifiers
 
-**To get testnet tokens, go to the Kwil [testnet faucet](<https://faucet.kwil.com>).**  To deposit funds, you will first need to approve the tokens to be spent by the deposit smart contract.  Then you can deposit the tokens.
-Once deposited, it will take 12 block confirmations before the Kwil network will recognize the deposit.
+### Public Keys
 
-```js
-const funder = await kwil.getFunder(provider)
+In Kwil, accounts are identified by a public key. Kwil supports Secp256k1 Public Keys (e.g. EVM networks such as Ethereum) and ED25519 Public Keys (e.g Near Protocol).
 
-let res = await funder.approve("1000000000000000000") 
-// wait a few seconds for the ERC20 approval to be mined
+Note that a Secp256k1 public key is different than an Ethereum address. To recover the public key, use the following utility function:
 
-res = await funder.deposit("1000000000000000000")
-// wait for 12 block confirmations
+```javascript
+import { Utils } from '@kwilteam/kwil-js'
+
+const signer = await provider.getSigner(); // can use wallet if NodeJS
+const publicKey = await Utils.recoverSecp256k1PubKey(signer, 'Welcome to our app! Sign this message to reveal your public key.'); 
 ```
 
-## Reading A Deployed Database Schema
+### Database Identifiers (DBID)
 
-```js
+In Kwil, databases are identified by a 'database identifier', which is a hex encoded SHA224 Hash of the database name and public key, prepended with an `x`.
+
+```javascript
+const dbid = kwil.getDBID('public_key', 'database_name')
+```
+
+## Database Info
+
+### List Databases 
+
+``` javascript
+const res = await kwil.listDatabases("public_key")
+// res.data = ["db1", "db2", "db3"]
+```
+
+### Read a Deployed Database Schema
+``` javascript
+const dbid = kwil.getDBID("public_key", "database_name")
 const schema = await kwil.getSchema(dbid)
 
-// list the tables in the schema
-for (const table of schema.data.tables) {
-    console.log(table.name)
-}
-
-// list the available actions
-for (const action of schema.data.actions) {
-   if action.public {
-       console.log(action.name)
-   }
-}
+/*
+    schema.data = {
+        owner: Uint8Array,
+        name: "database_name",
+        tables: [ tableObject1, tableObject2, tableObject3 ],
+        actions: [ action1, action2, action3 ],
+        extensions: [ extension1, extension2 ]
+    }
+*/
 ```
 
-## Executing Actions
+### Get Account Info
 
-You can chain action methods execute insert/update/delete/read operations on a database.
 ``` javascript
+const res = await kwil.getAccount("public_key")
+
+/*
+    res.data = {
+        address: "public_key",
+        balance: "some_balance",
+        nonce: "some_nonce"
+    }
+*/
+```
+
+## Database Queries
+
+### Create, Update, Delete (CUD) Actions
+
+Any action that executes a CUD operation must be signed and broadcasted to the network as a transaction.
+
+``` javascript
+import { Utils } from '@kwilteam/kwil-js'
+
 // begin constructing the values for the action
 const input = new Utils.ActionInput()
-    .put("$username", "satoshi")
-    .put("$age", "42")
+    .put("input_name_1", "input_value_1")
+    .put("input_name_2", "input_value_2")
+    .put("input_name_3", "input_value_3")
+
+// retrieve database ID to locate action
+const dbid = kwil.getDBID("publicKey", "database_name")
 
 // construct and sign action transaction
-const actionTx = await kwil
+const tx = await kwil
     .actionBuilder()
     .dbid(dbid)
-    .name("create_user")
+    .name("your_action_name")
     .concat(input)
+    .publicKey('public_key')
     .signer(await provider.getSigner()) // can use wallet if NodeJS
     .buildTx()
 
 // broadcast transaction to kwil network
-let res = await kwil.broadcast(actionTx)
+const res = await kwil.broadcast(tx)
 
-// if the action returns data, it will be in res.data.body
-//
-//    res.data = {
-//        txHash: "0xhash",
-//        fee: "some_spent_fee",
-//        body: [
-//            {
-//            ...
-//            }
-//        ]
-//    }
+/*
+    res.data = {
+        tx_hash: "some_hash",
+    }
+*/
 ```
 
-## Executing Ad-Hoc Select Queries
+### Reading Data
+
+To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
+
+#### `View` Action Message
+
+```javascript
+import { Utils } from '@kwilteam/kwil-js'
+
+// begin constructing the values for the action
+const input = new Utils.ActionInput()
+    .put("input_name_1", "input_value_1")
+    .put("input_name_2", "input_value_2")
+    .put("input_name_3", "input_value_3")
+
+// retrieve database ID to locate action
+const dbid = kwil.getDBID("public_key", "database_name")
+
+// construct and sign action transaction
+const msg = await kwil
+    .actionBuilder()
+    .dbid(dbid)
+    .name("your_action_name")
+    .concat(input)
+    .buildMsg()
+
+// broadcast transaction to kwil network
+const res = await kwil.call(msg)
+
+/*
+    res.data = {
+        result: [ query results ],
+    }
+*/
+```
+
+#### Select Query
 
 ``` javascript
-const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
-// res.data = [
-//    {
-//        username: "satoshi",
-//        age: 42,
-//        ...
-//    },
-//    {
-//        username: "vitalik",
-//        age: 27,
-//        ...
-//    }
-// ]
+const dbid = kwil.getDBID("public_key", "database_name")
+const res = await kwil.selectQuery(dbid, "SELECT * FROM users")
+
+/*
+    res.data = [
+        ...
+    ]
+*/
 ```
