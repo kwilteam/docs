@@ -5,13 +5,13 @@ This website is built using [Docusaurus 2](https://docusaurus.io/), a modern sta
 ### Installation
 
 ```
-$ yarn
+$ npm install
 ```
 
 ### Local Development
 
 ```
-$ yarn start
+$ npm start
 ```
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
@@ -19,23 +19,25 @@ This command starts a local development server and opens up a browser window. Mo
 ### Build
 
 ```
-$ yarn build
+$ npm run build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
 ### Deployment
 
-Using SSH:
+We use firebase for hosting docs. If your firebase account has permissions to publish, run:
 
 ```
-$ USE_SSH=true yarn deploy
+$ firebase login
 ```
 
-Not using SSH:
-
+Select the `kwil-docs` project:
 ```
-$ GIT_USER=<Your GitHub username> yarn deploy
+$ firebase use kwil-docs
 ```
 
-If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+Then deploy:
+```
+$ firebase deploy
+```
