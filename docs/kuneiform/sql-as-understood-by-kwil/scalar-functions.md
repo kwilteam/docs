@@ -15,9 +15,9 @@ The abs(X) function returns the absolute value of the numeric argument X. Abs(X)
 
 The coalesce() function returns a copy of its first non-NULL argument, or NULL if all arguments are NULL. Coalesce() must have at least 2 arguments.
 
-### error(_statement_)
+### error(_X_)
 
-The error function raises an exception, and causes the SQL statement to fail.  It takes a string that will be returned to the user in the query result.
+The error function raises an exception, and causes the SQL statement X to fail. It takes a string that will be returned to the user in the query result.
 
 ### format(_FORMAT,..._)
 
