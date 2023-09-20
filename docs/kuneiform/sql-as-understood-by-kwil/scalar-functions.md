@@ -17,7 +17,7 @@ The coalesce() function returns a copy of its first non-NULL argument, or NULL i
 
 ### error(_X_)
 
-The error function raises an exception, and causes the SQL statement X to fail. It takes a string that will be returned to the user in the query result.
+The error function raises an exception, and causes the SQL statement to fail. It takes a string _X_ that will be returned to the user in the query result when triggered.
 
 ### format(_FORMAT,..._)
 
