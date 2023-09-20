@@ -11,19 +11,19 @@ The Kwil CLI supports setting default values that are commonly passed as flags. 
 
 To set defaults that persist on your machine, run the command:
 
-```
+```sh
 kwil configure
 ```
 
 You can skip over any value by simply pressing enter.
 
-## Kwil GRPC URL
+## Kwil gRPC URL
 
-The Kwil GRPC URL is the URL of the Kwil provider you are connecting to.  This acts as your gateway to the network, similar to Ethereum providers.  It is necessary for virtually all functions besides approving tokens, reading your total deposit balance, and utils.   Your URL can be passed in with a protocol (i.e. `http://localhost:8080` or without one `locahost:8080`).
+The Kwil gRPC URL is the URL of the Kwil provider you are connecting to.  This acts as your gateway to the network, similar to Ethereum providers.  It is necessary for virtually all functions besides approving tokens, reading your total deposit balance, and utils.   Your URL can be passed in with a protocol (i.e. `http://localhost:8080` or without one `locahost:8080`).
 
 To set the Kwil RPC URL with a flag, you can pass `--kwil-provider=localhost:8080`.
 
-> The current Kwil GRPC URL can be found [here](../links).
+> The current Kwil gRPC URL can be found [here](../links).
 
 ## Client Chain RPC URL
 
