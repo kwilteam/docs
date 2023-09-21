@@ -9,7 +9,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 module.exports = {
   title: 'Kwil Docs',
-  tagline: 'Relational Databases for WEB3',
+  tagline: 'Relational Databases for Web3',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
