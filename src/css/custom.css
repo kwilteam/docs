@@ -56,3 +56,11 @@
   --ifm-code-font-size: 95%;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
 }
+
+.markdown code {
+  white-space: pre-wrap;
+}
+
+pre {
+  white-space: pre-wrap;
+}

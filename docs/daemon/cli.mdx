@@ -3,29 +3,32 @@ sidebar_position: 2
 sidebar_label: "CLI"
 id: daemon-cmdline
 title: Kwild CLI Guide
-description: Kwild Command Line
+description: Kwild Command Line Guide
 slug: /daemon/cmdline
 ---
 
-Kwild command starts both the blockchain and the database services of kwild node. 
+`kwild` command starts the blockchain and the database services of the Kwil node. 
 
-### Quickstart a kwild node:
-Run the below command to quickstart a kwild node without specifying any configuration.
+### Quickstart a Kwil node:
+
+Run the below command to quickstart a Kwil node without specifying any configuration.
 ```bash
-kwild --autogen  --root_dir "path/to/root/dir"
+kwild --autogen
 ```
-This command will generate the missing configuration in the root directory and starts the node with the generated configuration. 
-
-The default root directory used is `~/.kwild` and can be overwritten using `--root_dir`
+This command will generate the missing configuration in the location `~/.kwild` and starts the node with the generated configuration. 
 
 ### Run node with specific configuration
-If root directory is already intialized with the required configuration, then node can be started just by running the below command:
+
+All the configuration required for running a Kwil node has to be located under the root directory. The default root directory used is `~/.kwild` and can be overwritten using the `--root_dir` command line flag.
+
+If the root directory is initialized with the required configuration, then the node can be started by running the below command:
 ```bash
 kwild --root_dir "path/to/root/dir"
 ```
 
-### Config override using flags
-The kwild command also supports overriding the configuration using the cmd line flags.  Use `--help or -h` for detailed information on all the flags supported by the kwild cli. For more information, refer [config override through flags](./configuration/configuration.mdx#config-override)
+### Override configuration using command line flags
+
+The `kwild` command also supports overriding the configuration using the command line flags.  Use `--help or -h` for detailed information on all the command line flags supported by the `kwild` CLI. For more information, refer to the [configuration guide](./configuration/configuration.mdx#config-override)
 
 ```bash
 kwild --help
