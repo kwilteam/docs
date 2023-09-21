@@ -12,7 +12,7 @@ configuration and data, including:
 
 * performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
 * updating genesis config with initial SQLite files (`genesis-hash`)
-* resetting node state (`reset-state`) and all node data files (`reset`)
+* resetting node state and all data files (`reset`)
 
 ## Quick Setup of a Single Kwil Node
 
@@ -20,10 +20,10 @@ The `init` command facilitates quick setup of an isolated Kwil node on a fresh
 network in which that node is the single validator.  This permits rapid
 prototyping and evaluation of Kwil DB functionality.
 
-For example, to create a node configuration for a new network in a root Kwild
-Daemon folder at `~/.kwild-new`:
+For example, to create a node configuration for a new network in a node root
+folder at `~/.kwild-new`:
 
-```sh
+```
 $ kwil-admin setup init -o ~/.kwild-new
 Generated genesis file /home/user/.kwild-new/abci/config/genesis.json
 Successfully initialized node directory:  /home/user/.kwild-new
@@ -51,9 +51,9 @@ kwil-admin setup testnet [--validators V] [--non-validators N] [--config FILE]
 
 There are defaults for each flag, with the output writing to a folder called
 `.testnet` in the current folder.  For example, the following command creates a
-new testnet work with 8 total nodes comprising 4 validators and 4 non-validators:
+new test network with 8 total nodes comprising 4 validators and 4 non-validators:
 
-```sh
+```
 $ ./kwil-admin setup testnet -o ~/.kwild-testnet-xyz
 Successfully initialized 8 node directories: /home/jon/.kwild-testnet-xyz
 
@@ -73,13 +73,13 @@ $ tree ~/.kwild-testnet-xyz
 ...
 ```
 
-The config files for each of the nodes will specify all of the other nodes a
+The config files for each of the nodes will specify all of the other nodes as
 persistent peers so that they will connect to each other on startup. This is
 generally only practical for small test networks with fewer than 12 nodes.
 
 The following options may be used to control what is generated:
 
-- `--validators` or `-v` is number of validators [default: 4]
+- `--validators` or `-v` is the number of validators [default: 4]
 - `--non-validators` or `-n` is the number of non-validators [default: 4]
 - `--config` is a template config file to use, default is none
 - `--output-dir` or `-o` is the parent directory for all of generated node folders [default: ".testnet"]
@@ -88,7 +88,7 @@ The following options may be used to control what is generated:
 - `--hostname-suffix` is the suffix for node host names e.g. .example.com results in node0.example.com, node1.example.com, etc.
 - `--starting-ip` is the starting IP address of the first network node, with subsequent nodes on the next address in the subnet
 - `--hostname` overrides all hostnames of the nodes
-- `--p2p-port` or `-p` is the TCP port port on which the nodes listens for P2P connections
+- `--p2p-port` or `-p` is the TCP port on which each node listens for P2P connections
 
 ## Updating Genesis Config with Initial SQLite Data
 
@@ -102,8 +102,8 @@ kwil-admin setup genesis-hash [--genesis GENESIS] [DBDIR]
 
 Both inputs are optional, using default paths. `GENESIS` is the path to the
 genesis file to patch, which is `~/.kwild/abci/config/genesis.json` by default.
-The `DBDIR` argument is the directory containing all of kwild's .sqlite files to
-be hashed, which is `~/.kwild/data/kwil.db/` by default.
+The `DBDIR` argument is the directory containing all of `kwild`'s SQLite files
+to be hashed, which is `~/.kwild/data/kwil.db/` by default.
 
 ## Resetting All Application Data
 
@@ -122,16 +122,3 @@ the files in the default node root directory at `~/.kwild`.
 
 The paths to the SQLite files (`--sqlpath`) and snapshots (`--snappath`) are
 optional, but provided here since they are configurable on the node.
-
-## Resetting Only Chain state
-
-To reset the block chain state data while leaving all of the other application
-data such as the SQLite databases intact, use the `reset-state` command. This
-will delete the data files under `<root_dir>/abci/data`
-
-```
-kwil-admin setup reset-state [--root_dir DIR] [--force]
-```
-
-As with the `reset` command, only one of the two flags are required.
-

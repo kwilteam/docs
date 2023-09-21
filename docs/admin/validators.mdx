@@ -42,7 +42,7 @@ This command requires only the public key of the candidate validator `JOINER`
 with an active join request. For example,
 
 ```
-$ kwild validator join-status "6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0"
+$ kwil-admin validators join-status "6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0"
 Candidate: 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0 (want power 1)
  Validator 9fed4b19eab0cf87370bff0c7ef04cfcff5b268d096578d3ef5ae3c1010939d8, approved = false
  Validator f1693096d252eac5e366436314996ec39c189dffb997ad7414ed306e3d9244c4, approved = false
@@ -61,8 +61,8 @@ The private key of the node (prospective validator) that will sign the
 transaction is specified with either a file containing the key, or a positional
 argument containing the hexadecimal string for the key.  For example:
 
-```sh
-$ ./kwild validator join --key-file ~/secrets/validator_private_key
+```
+$ kwil-admin validators join --key-file ~/secrets/validator_private_key
 Joining the network as a validator...
 Node PublicKey: d692a88b6fee8d1399f7aab70db25001080dbf2fe8ca4f345e0fdca6b853713a
 tx hash: 125ae9009a5056a152542aa84e97a2a49c547e492dffdfea50eb44623fbb3efb
