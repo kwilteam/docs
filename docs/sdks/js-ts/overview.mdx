@@ -133,6 +133,38 @@ const res = await kwil.broadcast(tx)
 */
 ```
 
+#### Custom Signers
+
+The `.signer()` method also allows you to pass a custom signing function (must receive and return a `Uint8Array`) and the enumerator for the signature type used.
+
+Currently, Kwil supports three signature types:
+
+| Type  | Enumerator |
+|:----- |:------:|
+| Secp256k1  | 'secp256k1_ep' |
+| Ed25519    | 'ed25519' |
+| Ed25519 w/ NEAR Digest | 'ed25519_nr' |
+
+To sign with a ed25519 signature:
+
+```javascript
+import nacl from 'tweetnacl';
+
+const keys = nacl.sign.keyPair();
+const customSigner = (msg) => nacl.sign.detached(msg, keys.secretKey);
+
+const tx = await kwil
+    .actionBuilder()
+    .dbid(dbid)
+    .name('your_action_name')
+    .concat(input)
+    .publicKey(keys.publicKey)
+    .signer(customSigner, 'ed25519')
+    .buildTx()
+
+await kwil.broadcast(tx);
+```
+
 ### Reading Data
 
 To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
