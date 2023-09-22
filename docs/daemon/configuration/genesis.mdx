@@ -1,17 +1,17 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 sidebar_label: "Genesis"
 id: daemon-genesis
 title: Genesis Configuration
 description: Genesis specification
-slug: /daemon/genesis
+slug: /daemon/config/genesis
 ---
 
-A Genesis file defines the initial state and parameters needed to bootstrap a new blockchain network. It serves as the starting point for the entire blockchain system by defining key aspects of the network, including its initial validators, initial height, consensus rules, and more. All the nodes in the network need to have the same genesis file to start with the same initial conditions. Any discrepancies or errors in the genesis file could prohibit the node either from joining the network or from producing blocks.
+A genesis file defines the initial state and parameters needed to bootstrap a new blockchain network. It serves as the starting point for the entire blockchain system by defining key aspects of the network, including its initial validators, initial height, consensus rules, and more. All the nodes in the network need to have the same genesis file to start with the same initial conditions. Any discrepancies or errors in the genesis file could prohibit the node from joining the network or producing blocks.
 
-## Genesis file with minimal configuration
+## Minimal Configuration
 
-Here is an example of a genesis.json file with minimal configuration:
+Below is a sample `genesis.json` file featuring a basic configuration:
 
 ```json title="sample genesis.json file"
 {
@@ -33,77 +33,53 @@ Here is an example of a genesis.json file with minimal configuration:
 }
 ```
 
-## Genesis file contents
+## Genesis File Contents
 
-A Genesis file essentially consists of:
-
-### Genesis time
+### Genesis Time
 
  `genesis_time`: This field specifies the official time at which the blockchain is initialized.
 
 ### Chain ID
 
- `chain_id`: This field specifies the ID of the blockchain network. This must be unique for every blockchain. The ChainID must be less than 50 symbols.
+ `chain_id`: This field uniquely identifies the blockchain network and should not exceed 50 characters.
 
-### Initial height
+### Initial Height
 
- `initial_height`: This field sets the initial height the blockchain should begin.  `Default value is 0`, but in the scenario of network upgrade or restart, starting from the stopped height ensures uniqueness to previous heights.
+ `initial_height`: This field sets the initial height the blockchain should begin at. Although the default height is 0, during a network upgrade or restart, commencing from the last known height ensures distinctness from prior heights.
 
 ### Genesis Validators
 
- `validators`: This field sets the list of the initial set of validators. Each validator should provide the below information:
-  - `pub_key`: consisting of key types and public key bytes.
-  - `address`: address of the pub_key
-  - `power`: The validator’s voting power, `default: 1`. Power 0 indicates that the node is a non-validator.
+ `validators`: This field sets the list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
+  - `pub_key`: This field specifies the validator's public key bytes.
+  - `address`: This field specifies the address of the validator's public key.
+  - `power`: The validator’s voting power. Power 0 indicates that the node is a non-validator.
 
-Cryptographic keys for a kwild node can be generated and viewed using the `kwil-admin key` command line utility as shown below. 
+### Genesis App Hash
 
-```bash
-# Generate private key
-kwil-admin key gen -o "path/to/private/key/file"
-
-# View Generated key info
-kwil-admin key info -k "path/to/private/key/file"
-```
-
-### Initial app_hash
-
- `app_hash`: The app_hash represents the initial application state. If the node is booting up with initial data, the app_hash of the genesis file can be initialized by running the below command. 
-
-  ```bash
-  kwil-admin setup genesis-hash "path/to/initial/db/dir" -g "path/to/my/genesis.json"
-  ```
-
-  If `--genesis or -g` is not provided, the command would stdout the app_hash. 
+ `app_hash`: The app hash is a hash generated from the initial application state.
 
 ## Advanced Configurations
 
 ### Consensus Params
 
-Genesis file can also be used to establish a predefined set of consensus rules such as:
-#### Block rules:
+The genesis file can also be used to establish a predefined set of consensus rules such as:
+#### Block Rules:
 
   - `block`: 
       - `max_bytes`: This field specifies the maximum block size, in bytes.
       - `max_height`: This field specifies the maximum gas per block.
 
-#### Validator type:
+#### Validator Type:
 
   - `validator`:
-    -  `pub_key_types`: This field sets the public key types validators can use.
-    -  `join_expiry`: This field sets the number of blocks after which the validator join request expires if not approved. The default expiry is 86400 blocks which is equivalent to 1 day if blocks are produced at the rate of 1 block/sec
+    -  `pub_key_types`: This field sets the public key types validators can use. Currently, only the `ed25519` key type is supported.
 
-#### ABCI app Version:
+    -  `join_expiry`: This field sets the number of blocks after which the validator join request expires if not approved. The default expiry is 86400 blocks, which is equivalent to 1 day if blocks are produced at the rate of 1 block/sec.
+
+#### ABCI App Version:
 
   - `version`:
     - `app_version`: This field sets the ABCI application version. If an ABCI application is running a different version leads to consensus failures. 
-
-#### Block evidence:
-
-  - `evidence`:
-      - `max_age_num_blocks`: This field sets the maximum age of evidence, in blocks. The basic formula for calculating this is MaxAgeDuration / {average block time}.
-      - `max_age_duration`: This field sets the maximum age of evidence, in time.
-      - `max_bytes`: This field sets the maximum size in bytes of evidence that can be committed in a single block and should fall comfortably under the max block bytes.
 
 #### General
 
@@ -111,9 +87,9 @@ Genesis file can also be used to establish a predefined set of consensus rules s
 
   - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
 
-## Complete genesis file
+## Complete Genesis Configuration
 
-Here is an example of a Genesis file with complete configuration
+Below is an example of a genesis file with complete configuration:
 
 ```json title="sample genesis.json file"
 {
@@ -124,11 +100,6 @@ Here is an example of a Genesis file with complete configuration
     "block": {
       "max_bytes": "22020096",
       "max_gas": "-1"
-    },
-    "evidence": {
-      "max_age_num_blocks": "100000",
-      "max_age_duration": "172800000000000",
-      "max_bytes": "1048576"
     },
     "validator": {
       "pub_key_types": [

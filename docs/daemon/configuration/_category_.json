@@ -1,9 +1,9 @@
 {
     "label": "Configuration",
-    "position": 3,
+    "position": 2,
     "link": {
       "type": "generated-index",
-      "description": "Kwild Configuration Guide "
+      "description": "This section provides a detailed description of the genesis and operational parameters available for configuring a Kwil node."
     },
     "collapsed": true
 }

@@ -1,0 +1,162 @@
+---
+sidebar_position: 3
+sidebar_label: "Using Kwild"
+id: daemon-kwild
+title: Running a Kwil Node
+description: How to deploy a Kwil node using kwild
+slug: /daemon/kwild
+---
+
+The `kwild` command starts the blockchain and the database services of the Kwil node. This guide provides step-by-step instructions to launch a Kwil node.
+
+## Root Directory
+
+This is the default directory to store all the configuration and data such as blockchain data, SQL database data, signed messages, etc, unless specified otherwise.
+
+```
+home_dir/
+   |- config.toml
+   |- private_key         
+   |- abci/                     # chain root directory, stores blockchain data & config
+   |   |- config/
+   |   |   |- genesis.json   
+   |   |- data/ 
+```
+
+The default root directory is `~/.kwild`. You can override this configuration by setting the KWILD_ROOT_DIR environment variable or using the `--root_dir` command line flag.
+
+## Quickstart
+
+Quickstart mode can be used to swiftly deploy a node without delving into the configuration details.  To run in this mode, use the `kwild` command with the `--autogen` flag.
+
+```bash
+kwild --autogen
+```
+This command will auto-generate the necessary configuration in the root directory and starts the node using this configuration. This also create a new private chain with the initialized node as its sole member and validator. 
+
+It's crucial to note, however, that the node operates under a default configuration in the quickstart mode. For production deployments, it's highly recommended to tailor the configuration to your specific needs, as discussed in subsequent sections. 
+
+## Configuration
+
+Running a Kwil node requires `genesis.json`, `config.toml` and a `private_key` files. All these configuration files must be present under the root directory. Refer to the [config](./config/settings) and [genesis specification](./config/genesis) for a detailed overview and instructions on node configuration.
+
+This section describes multiple ways to initialize the root directory with these configuration files.
+
+### Kwil Admin Tools
+
+The `kwil-admin setup init` command can be used to quickly setup the root directory with the default configuration required for running an isolated single node. Refer to the [setup guide](./../admin/setup#quick-setup-of-a-single-kwil-node) for more information on its usage.
+
+### Manual Configuration
+
+Manually generate and configure `private_key`, `genesis.json` and `config.toml` as shown below:
+
+#### Private Key
+
+Kwil nodes use e25519 keys for validator related operations. Refer to the [key management guide](./../admin/keys#generation) for generating these node keys. The node's private_key file must reside at location `root_dir/private_key`, else configure the location using `app.private_key_path` in `config.toml`.
+
+#### Genesis File (genesis.json)
+
+To deploy a new Kwil network, copy the sample [genesis.json](./config/genesis#complete-genesis-configuration) into `root_dir/abci/config/genesis.json`. Manually update the `chain_id`, `initial_height`, `app_hash` configurations in the genesis.json file. Ensure that the chain id uniquely identifies this network. 
+
+To start the node as a validator, the node's base64 public key and address must be listed under the `validators` in the genesis file as shown below. Refer to the [key management guide](./../admin/keys#key-information) to view the public key, address and node id corresponding to the node's private key.
+
+```json title="Genesis Validators"
+  "validators": [
+    {
+      "address": "6F129A1818CB42DD80FFE51943EAC0BC9FF9E4EE",        
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "L737LDRTYv7P5I2apSxOBwJD3U0CS7b2eo9K37s2lPM="     # Base64 encoded
+      },
+      "power": "1",
+      "name": "validator-0"
+    }
+  ],
+```
+
+Refer to the [genesis specification](./config/genesis#advanced-configurations) for advanced configuration options.
+
+To connect a node to an existing network, obtain the genesis file from the desired network and set it as the genesis file for that node.
+
+#### Config File (config.toml)
+
+Copy the sample [config.toml](./config/settings#sample-configtoml) into `root_dir/config.toml` and update the configuration as required. 
+
+Notable options include the RPC and HTTP server settings such as `app.grpc_listen_addr`, `app.http_listen_addr`, `chain.rpc.listen_addr` and `chain.p2p.listen_addr`.
+
+Configure `chain.p2p.persistent_peers` to establish and maintain persistent connections with other nodes in the network. This field can be empty if the network is made up of a standalone node. 
+
+Refer to the [configuration specification](./config/settings) for more options on tuning a Kwil application.
+
+### Override Configuration During Startup
+
+The Kwil application supports the ability to override the configuration at node startup through the command line flags and environment variables
+Use `--help or -h` for detailed information on all the parameters that can be overwritten through command line flags. 
+
+For instance, to modify the log level and chain RPC address during the node startup, you can use one of the following methods:
+
+```bash title="Environment variable"
+KWILD_LOG_LEVEL=debug
+KWILD_CHAIN_RPC_LISTEN_ADDRESS="tcp://127.0.0.1:26656"
+
+kwild --root_dir "path/to/root/dir"
+```
+
+```bash title="Command line flags"
+kwild --root_dir "path/to/root/dir" --log.level "debug" --chain.rpc.listen_addr "tcp://127.0.0.1:26656"
+```
+
+```bash title="Both environment and command line flags"
+KWILD_LOG_LEVEL=debug
+KWILD_CHAIN_RPC_LISTEN_ADDRESS="tcp://127.0.0.1:26656"
+
+kwild --root_dir "path/to/root/dir" --log.level "info" --chain.rpc.listen_addr "tcp://192.168.1.20:30000"
+```
+If both flags and env variables are set, flags take precedence over environment variables. Therefore, in this example, the Kwil application uses `info` log level and RPC listen address as `tcp://192.168.1.20:30000`.
+
+Refer to the [translation guide](./config/settings#config-override) for more information on mapping the config parameters to the command line flags and environment variables.
+
+
+## Deploy a Kwil Network
+
+A private Kwil network with a standalone node can be deployed by running `kwild` as shown below:
+
+```bash
+kwild --root_dir "path/to/root/dir"
+```
+The root directory must have the required configuration for the node to start successfully, else use [quickstart mode](./kwild#quickstart). 
+
+Whether this node starts as a validator or a non-validator is determined by its presence in the initial validator list within the genesis file.
+
+
+## Connecting To Kwil Network
+
+To connect to an existing Kwil network during startup:
+- Node should use the genesis file corresponding to the Kwil network that it wishes to join.
+- Update the `chain.p2p.persistent_peers` with the peer addresses from the network using one of the following methods and start the node. `persistent_peers` is a comma-separated string of `nodeid@ip:port` of peers to establish and maintain connections upon startup.
+
+  ```bash title="Command line flag:  --chain.p2p.persistent_peers"
+  kwild --root_dir "path/to/root/dir" --chain.p2p.persistent_peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+  ```
+
+  ```bash title="Environment variable:  KWILD_CHAIN_P2P_PERSISTENT_PEERS"
+  KWILD_CHAIN_P2P_PERSISTENT_PEERS="d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+
+  kwild --root_dir "path/to/root/dir"
+  ```    
+
+  ```bash title="persistent_peers option in config.toml"
+  [chain.p2p]
+  persistent_peers = "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+
+  kwild --root_dir "path/to/root/dir"
+  ```
+
+4. Note that, this node joins the network by default as a non-validator. Please refer to the [Validator guide](./validator#federated-consensus-based-join-process) for more information on becoming a validator node. 
+
+
+## Deploy Network With Multiple Nodes
+
+The `kwil-admin setup testnet` command can be used to generate the configuration required to bootstrap a network with multiple nodes, all with the same genesis configuration, pre-configured to connect to each other. Refer to the [testnet deployment guide](./../admin/setup#creating-a-new-test-network-of-several-nodes) for more information on the command usage. 
+
+Once the configuration is generated, copy each of the node's configuration to the root directories of the corresponding nodes. Run `kwild` on each node to deploy the network and connect to the peers in the network.
