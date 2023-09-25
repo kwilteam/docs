@@ -20,12 +20,8 @@ Below is a sample `genesis.json` file featuring a basic configuration:
   "initial_height": "0",
   "validators": [
     {
-      "address": "6F129A1818CB42DD80FFE51943EAC0BC9FF9E4EE",
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "L737LDRTYv7P5I2apSxOBwJD3U0CS7b2eo9K37s2lPM="
-      },
-      "power": "1",
+      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "power": 1,
       "name": "validator-0"
     }
   ],
@@ -37,7 +33,7 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 
 ### Genesis Time
 
- `genesis_time`: This field specifies the official time at which the blockchain is initialized.
+ `genesis_time`: This field specifies the official time (ISO 8601 format) at which the blockchain is initialized.
 
 ### Chain ID
 
@@ -50,9 +46,9 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 ### Genesis Validators
 
  `validators`: This field sets the list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
-  - `pub_key`: This field specifies the validator's public key bytes.
-  - `address`: This field specifies the address of the validator's public key.
+  - `pub_key`: This field specifies the validator's public key bytes (hex).
   - `power`: The validator’s voting power. Power 0 indicates that the node is a non-validator.
+  - `name`: The validator’s name. 
 
 ### Genesis App Hash
 
@@ -79,7 +75,7 @@ The genesis file can also be used to establish a predefined set of consensus rul
 #### ABCI App Version:
 
   - `version`:
-    - `app_version`: This field sets the ABCI application version. If an ABCI application is running a different version leads to consensus failures. 
+    - `app_version`: This field sets the ABCI application version. 
 
 #### General
 
@@ -115,12 +111,8 @@ Below is an example of a genesis file with complete configuration:
   },
   "validators": [
     {
-      "address": "6F129A1818CB42DD80FFE51943EAC0BC9FF9E4EE",
-      "pub_key": {
-        "type": "tendermint/PubKeyEd25519",
-        "value": "L737LDRTYv7P5I2apSxOBwJD3U0CS7b2eo9K37s2lPM="
-      },
-      "power": "1",
+      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "power": 1,
       "name": "validator-0"
     }
   ],
