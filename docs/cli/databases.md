@@ -23,7 +23,7 @@ The database subcommand contains all of the commands necessary for interacting w
 
 The `deploy` subcommand is used to deploy a database schema. The `deploy` command takes no arguments, however has one required flag.  Users must specify the relative filepath to their JSON with the `--path` or `-p` flag.
 
-```
+```bash
 kwil-cli database deploy --path=./my_db.json
 ```
 
@@ -33,7 +33,7 @@ kwil-cli database deploy --path=./my_db.json
 
 The drop subcommand is used to drop a deployed database.  You can only drop databases that have been deployed with your configured wallet.  The drop command takes one argument, which is the name of the database you wish to drop.
 
-```
+```bash
 kwil-cli database drop mydb
 ```
 
@@ -52,7 +52,7 @@ kwil-cli database query 'SELECT * FROM my_table LIMIT 10' --name my_db --owner 0
 
 The list subcommand is used to list the databases deployed by a particular wallet.  This command takes no arguments, and by default will list the databases for the wallet you have configured.  You can list databases deployed from any wallet using the optional --owner (or -o) flag.
 
-```
+```bash
 kwil-cli database list --owner=0x37Fc1953e4A26007E6Df52f06B5897a998F51f5D
 ```
 
@@ -62,19 +62,19 @@ The read-schema subcommand is used to display schema information for a deployed 
 
 To select a database by its owner and name, you can use the `--owner`(or `-o`) flag, and the `--name` (or `-n`) flag.  If no `--owner` flag is provided, it will default to databases owned by the wallet you are using, if a wallet has been [configured](../cli/configuration).
 
-```
+```bash
 kwil-cli database read-schema --name=mydb
 ```
 
 or
 
-```
+```bash
 kwil-cli database read-schema --owner=0x37Fc1953e4A26007E6Df52f06B5897a998F51f5D --name=db1
 ```
 
 Alternatively, you can pass the `--dbid` flag (or `-i`)`  to identify the database to read from.
 
-```
+```bash
 kwil-cli database read-schema --dbid=xc57b99f921ac99896d861b4462d7874212e0a63e53b2c53d91b0f6d2
 ```
 
@@ -88,13 +88,13 @@ To specify the name of the query you wish to execute, you also have to pass a re
 
 Finally, in order to pass parameters to the query, you must specify the inputs as arguments.  You must first specify the name of the parameter you are filling, and then the value.  Queries should follow the layout below:
 
-```
+```bash
 kwil-cli database execute <input_name_1>:<value> <input_name_2>:<value> --action=<action_name> --dbid=<db_id>
 ```
 
 For example, if you were executing an INSERT query named "create_user" that took two parameters: name (text), and age (int), you would pass my arguments as follows:
 
-```
+```bash
 kwil-cli database execute name:satoshi age:32 --action=create_user  --name=mydb --owner=0x37Fc1953e4A26007E6Df52f06B5897a998F51f5D
 ```
 
@@ -194,8 +194,9 @@ An example that sets all batch inserted rows in the column created_at to your ma
 ```
 
 ### Example:
+
 An example usage of the batch command looks like this:
 
-```
+```bash
 kwil-cli database batch --path=./users.csv --action=create_user -m=id:id -m=full_name:name -m=age:age --dbid=xe37cbd1f883460c05d773a685b1c53b4b809f8c3794476b32e7fb5d3 --value=created_at:$(date -I seconds)
 ```

@@ -1,0 +1,74 @@
+---
+sidebar_position: 2
+sidebar_label: "Usage"
+id: admin-use
+title: Using the Kwil admin tool
+description: How to use the Kwil admin tool
+slug: /admin/usage
+---
+
+`kwil-admin` provides several functions for node setup and administration that
+are accessible through sub-commands.
+
+To show `kwil-admin` usage and all of the available top level commands, provide
+the `-h` or `--help` flag:
+
+```
+$ kwil-admin -h
+kwil-admin: The Kwil node admin tool
+
+kwil-admin version 0.5.1
+Usage: kwil-admin <command> [<args>]
+
+Options:
+  --help, -h             display this help and exit
+  --version              display version and exit
+
+Commands:
+  key
+  setup
+  validators
+  node
+  help
+  version
+```
+
+With the exception of `help` and `version`, each of the commands must be used
+with a sub-command. For example, to list the `key` sub-commands:
+
+```
+$ ./kwil-admin key -h
+kwil-admin: The Kwil node admin tool
+
+kwil-admin version 0.5.1
+Usage: kwil-admin key <command> [<args>]
+  --help, -h             display this help and exit
+  --version              display version and exit
+
+Commands:
+  info                   Display info about a node private key.
+  gen                    Generate a node private key.
+```
+
+To see usage of the `key info` sub command:
+
+```
+$ ./kwil-admin key info -h
+kwil-admin: The Kwil node admin tool
+
+kwil-admin version 0.5.1
+Usage: kwil-admin key info [--key-file KEY-FILE] [PRIVKEY]
+
+Positional arguments:
+  PRIVKEY                Private key (hexadecimal string)
+
+Options:
+  --key-file KEY-FILE, -k KEY-FILE
+                         file containing the private key
+  --help, -h             display this help and exit
+  --version              display version and exit
+```
+
+The following sections will describe each of the commands provided by
+`kwil-admin`, but always reference the syntax and full set of options shown by
+appending the `-h` (or `--help`) flag to the full command in question.

@@ -1,0 +1,51 @@
+---
+sidebar_position: 1
+sidebar_label: "Installation"
+id: admin-installation
+title: Installation
+description: How to install the Kwil admin tool
+slug: /admin/installation
+---
+
+Until the main Kwil DB repository is open source, the `kwil-admin` command line
+application may be (a) used from within the Kwil Docker image or (b) downloaded
+from the `kwil-cli` binary release repository.
+
+## From within the Kwil Docker Image
+
+To install the most recent Kwil image, run:
+
+```bash
+docker pull kwildb/kwil:latest
+```
+
+With a running container (e.g. `docker container run kwild:latest`), open an
+interactive shell in the container where you can run `kwil-admin` commands:
+
+```bash
+docker exec -it <container-name-or-id> /bin/sh
+```
+
+## Download the Standalone `kwil-admin` Executable
+
+The Kwil daemon (`kwild`) and the node administration tool will be
+packaged together. Download the [latest release](https://github.com/kwilteam/kwil-binaries/releases)
+for your platform.  Extract the `kwil-admin` file from the archive and put it
+into a folder that is in your `PATH` environment.
+
+:::note
+The binaries will be packaged as described above after the next major release.
+The repository link may change soon.
+:::
+
+## Verify Installation
+
+Open a terminal and run the following at the command prompt:
+
+```bash
+kwil-admin version
+```
+
+If installed correctly, it should display a message such as `kwil-admin version 0.5.1`.
+
+Continue to the [Usage page](./usage) for a description of all the available commands.

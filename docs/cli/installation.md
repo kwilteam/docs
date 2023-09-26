@@ -7,8 +7,10 @@ description: CLI Installation
 slug: /cli/installation
 ---
 
-## Install Locally 
+## Install Locally
+
 Kwil CLI binaries can be found [here.](https://github.com/kwilteam/kwil-cli/releases/tag/v0.1.2) Contained in the repo are binaries for:
+
 * Linux amd64
 * Linux arm64
 * Darwin (MacOS) amd64+arm64
