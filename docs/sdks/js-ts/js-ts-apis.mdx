@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 id: js-ts-apis
-title: JS / TS APIs
+title: API Reference
 description: List of APIs available in Kwil JS
 slug: /sdks/js-ts/apis
 ---
@@ -18,11 +18,11 @@ The main class for interacting with the Kwil network.
 getDBID(owner: string, name: string): string
 ```
 
-Generates a unique database identifier (DBID) from the provided owner's Ethereum wallet address and a database name.
+Generates a unique database identifier (DBID) from the provided owner's public key and a database name.
 
 #### Parameters
 
-- `owner`: The owner's Ethereum wallet address. This should be a valid Ethereum address.
+- `owner`: The owner's public key
 - `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
@@ -57,11 +57,11 @@ The result of `.getSchema()` is stored in the [TTL cache](./overview#optional-co
 async getAccount(owner: string): Promise<GenericResponse<Account>>
 ```
 
-Retrieves an account using the owner's Ethereum wallet address.
+Retrieves an account using the owner's public key.
 
 #### Parameters
 
-- `owner`: The owner's Ethereum wallet address. This should be a valid Ethereum address.
+- `owner`: The owner's public key.
 
 #### Returns
 
@@ -77,7 +77,7 @@ Returns an instance of `ActionBuilder` for this client.
 
 #### Returns
 
-An `ActionBuilder` instance. `ActionBuilder` is used to build action transactions to be broadcasted to the Kwil network.
+An `ActionBuilder` instance. `ActionBuilder` is used to build action transactions to be broadcasted to the Kwil network or messages to be called from the Kwil network.
 
 ### dbBuilder() 
 
@@ -91,21 +91,17 @@ Returns an instance of `DBBuilder` for this client.
 
 A `DBBuilder` instance. `DBBuilder` is used to build new database transactions to be broadcasted to the Kwil network.
 
-### broadcast()
+### dropDbBuilder()
 
 ``` typescript
-async broadcast(tx: Transaction): Promise<GenericResponse<TxReceipt>>
+dropDbBuilder(): NonNil<DBBuilder>
 ```
 
-Broadcasts a transaction on the network.
-
-#### Parameters
-
-- `tx`: The transaction to broadcast. The transaction can be built using the `ActionBuilder` or `DBBuilder`.
+Returns an instance of `DBBuilder` for this client. This is used to build drop database transactions to be broadcasted to the Kwil network.
 
 #### Returns
 
-A promise that resolves to the receipt of the transaction. The transaction receipt includes the transaction hash, fee, and body.
+A `DBBuilder` instance. `DBBuilder` is used to build drop database transactions to be broadcasted to the Kwil network.
 
 ### listDatabases()
 
@@ -117,7 +113,7 @@ Lists all databases owned by a particular owner.
 
 #### Parameters
 
-- `owner`: The owner's Ethereum wallet address. This should be a valid Ethereum address.
+- `owner`: The owner's public key.
 
 #### Returns
 
@@ -135,22 +131,6 @@ Pings the server and gets a response.
 
 A promise that resolves to a string indicating the server's response.
 
-### getFunder()
-
-``` typescript
-async getFunder(signer: Signer | ethers.Wallet): Promise<Funder>
-```
-
-Gets a funder object associated with a signer, which can be used for adding funds to a user's account.
-
-#### Parameters
-
-- `signer`: The signer associated with the user's account.
-
-#### Returns
-
-A promise that resolves to a `Funder` object.
-
 ### selectQuery()
 
 ``` typescript
@@ -166,6 +146,52 @@ Performs a SELECT query on a database. The query must be a read-only query.
 
 #### Returns
 A promise that resolves to an array of objects of database records.
+
+### broadcast()
+
+``` typescript
+async broadcast(tx: Transaction): Promise<GenericResponse<TxReceipt>>
+```
+
+Broadcasts a transaction on the network.
+
+#### Parameters
+
+- `tx`: The transaction to broadcast. The transaction can be built using the `ActionBuilder` or `DBBuilder`.
+
+#### Returns
+
+A promise that resolves to the receipt of the transaction. The transaction receipt includes the transaction hash, fee, and body.
+
+### call()
+
+``` typescript
+async call(msg: Message): Promise<GenericResponse<MessageReceipt>>
+```
+
+Executes a `view` action on the network.
+
+#### Parameters
+
+- `msg`: The message to execute. The message can be built using the `ActionBuilder`.
+
+#### Returns
+
+A promise that resolves to the receipt of the message. The message receipt includes the result.
+
+### txInfo()
+
+```typescript
+async txInfo(hash: string): Promise<GenericResponse<TxInfoReceipt>>
+```
+
+Retrieves information about a transaction given its hash.
+
+#### Parameters
+- `hash`: The hash of the transaction.
+
+#### Returns
+A promise that resolves to the transaction information, including the hash, blockheight of the transaction, the tx payload, and the tx result.
 
 ## Action Builder
 
@@ -213,16 +239,39 @@ Concatenates the provided actionInputs to the list of inputs to be executed in t
 #### Returns
 The `ActionBuilder` instance for chaining.
 
+### publicKey()
+
+```typescript
+publicKey(publicKey: string): NonNil<ActionBuilder>
+```
+
+Sets the public key of the user that is executing the action transaction.
+
+#### Parameters
+- `publicKey`: The public key of the user that is executing the action transaction.
+
+#### Returns
+The `ActionBuilder` instance for chaining.
+
 ### signer()
 
 ```typescript
-signer(signer: Signer): NonNil<ActionBuilder>
+signer(signer: Signer | (msg: Uint8Array, ...args: any[]) => Promise<Uint8Array>, signatureType?: SignatureType): NonNil<ActionBuilder>
 ```
 
 Sets the signer for the action transaction.
 
 #### Parameters
-- `signer`: The signer for the action transaction. This must be a valid ethereum signer.
+- `signer`: The signer for the action transaction. It can receive an EtherJS signer or a custom signer function.
+- `signatureType`: The signature type. This is only required if a custom signer function is provided.
+
+The following signature types can be used:
+
+| Type  | Enumerator |
+|:----- |:------:|
+| Secp256k1  | 'secp256k1_ep'     |
+| Ed25519    | 'ed25519'     |
+| Ed25519 w/ NEAR Digest | 'ed25519_nr' |
 
 #### Returns
 The `ActionBuilder` instance for chaining.
@@ -236,7 +285,18 @@ async buildTx(): Promise<Transaction>
 Builds the action transaction.
 
 #### Returns
-A promise that resolves to the Transaction object. This transaction can be broadcasted to the Kwil network.
+A promise that resolves to the Transaction object. This transaction can be broadcasted to the Kwil network with the `kwil.broadcast()` method.
+
+### buildMsg()
+
+```typescript
+async buildMsg(): Promise<Message>
+```
+
+Builds the message to be called from the Kwil network. Messages are for `view` actions.
+
+#### Returns
+A promise that resolves to the Message object. This message can be called from the Kwil network wit the `kwil.call()` method.
 
 ## Action Inputs
 
@@ -245,7 +305,7 @@ The `ActionInput` class is a utility class to build action inputs to be executed
 ### put()
     
 ```typescript
-put(key: string, value: T): ActionInput 
+put(key: string, value: any): ActionInput 
 ```
 
 Adds or replaces a value for a single action input.
@@ -260,7 +320,7 @@ The `ActionInput` instance for chaining.
 ### putIfAbsent()
 
 ```typescript
-putIfAbsent(key: string, value: T): ActionInput
+putIfAbsent(key: string, value: any): ActionInput
 ```
 
 Adds a value for a single action input if the key is not already present.
@@ -275,7 +335,7 @@ The current `ActionInput` class for chaining.
 ### replace()
 
 ```typescript
-replace(key: string, value: T): ActionInput
+replace(key: string, value: any): ActionInput
 ```
 
 Replaces a value for a single action input if the key is already present.
@@ -290,7 +350,7 @@ The current `ActionInput` class for chaining.
 ### get()
 
 ```typescript
-get(key: string): T
+get(key: string): any
 ```
 
 Retrieves an action input value given its key.
@@ -304,7 +364,7 @@ The value associated with the action input name.
 ### getOrDefault()
 
 ```typescript
-getOrDefault(key: string, defaultValue: T): T
+getOrDefault(key: string, defaultValue: any): any
 ```
 
 Retrieves a value by its action input name, or a default value if the action input name is not present.
@@ -361,7 +421,7 @@ A read-only array of entries.
 ### putFromObject()
 
 ```typescript
-putFromObject(obj: T): ActionInput
+putFromObject(obj: object): ActionInput
 ```
 
 Adds or replaces values from and object of action name/key-value pairs.
@@ -375,7 +435,7 @@ The current `ActionInput` instance for chaining.
 ### putIfAbsentFromObject()
 
 ```typescript
-putIfAbsentFromObject(obj: T): ActionInput
+putIfAbsentFromObject(obj: object): ActionInput
 ```
 
 Adds values from and object of action name/key-value pairs if the key is not already present.
@@ -389,7 +449,7 @@ The current `ActionInput` instance for chaining.
 ### replaceFromObject()
 
 ```typescript
-replaceFromObject(obj: T): ActionInput
+replaceFromObject(obj: object): ActionInput
 ```
 
 Replaces values from and object of action name/key-value pairs if the key is already present.
@@ -403,7 +463,7 @@ The current `ActionInput` instance for chaining.
 ### putFromObjects()
 
 ```typescript
-putFromObjects(objs: T[]): ActionInput[]
+putFromObjects(objs: object[]): ActionInput[]
 ```
 
 Creates multiple `ActionInput` instances from an array of objects.
@@ -442,7 +502,7 @@ A new `ActionInput` instance.
 ### static fromObject()
 
 ```typescript
-static fromObject(obj: T): ActionInput
+static fromObject(obj: object): ActionInput
 ```
 
 Creates a new `ActionInput` instance from an object.
@@ -456,7 +516,7 @@ A new `ActionInput` instance.
 ### static fromObjects()
 
 ```typescript
-static fromObjects(objs: T[]): ActionInput[]
+static fromObjects(objs: objects[]): ActionInput[]
 ```
 
 Creates multiple `ActionInput` instances from an array of objects.
@@ -473,16 +533,39 @@ The `DBBuilder` class is used to build transactions for new databases to be depl
 
 Note that the DBBuilder class is not the recommended way to deploy databases on Kwil. We strongly recommend using the [Kuneiform IDE](docs/kuneiform/introduction).
 
+### publicKey()
+
+```typescript
+publicKey(publicKey: string): NonNil<DBBuilder>
+```
+
+Sets the public key of the user that is executing the database transaction.
+
+#### Parameters
+- `publicKey`: The public key of the user that is executing the database transaction.
+
+#### Returns
+The `DBBuilder` instance for chaining.
+
 ### signer()
 
 ```typescript
-signer(signer: Signer): NonNil<DBBuilder>
+signer(signer: Signer | (msg: Uint8Array, ...args: any[]) => Promise<Uint8Array>, signatureType?: SignatureType): NonNil<ActionBuilder>
 ```
 
 Sets the signer for the database transaction.
 
 #### Parameters
-- `signer`: The signer for the database transaction. This must be a valid ethereum signer.
+- `signer`: The signer for the action transaction. It can receive an EtherJS signer or a custom signer function.
+- `signatureType`: The signature type. This is only required if a custom signer function is provided.
+
+The following signature types can be used:
+
+| Type  | Enumerator |
+|:----- |:------:|
+| Secp256k1  | 'secp256k1_ep'     |
+| Ed25519    | 'ed25519'     |
+| Ed25519 w/ NEAR Digest | 'ed25519_nr' |
 
 #### Returns
 The `DBBuilder` instance for chaining.
@@ -512,109 +595,39 @@ Builds the database transaction.
 #### Returns
 A promise that resolves to the Transaction object. This transaction can be broadcasted to the Kwil network.
 
-## Funder
-
-The `Funder` class is used to add funds to a manage funds on a user's account. It can be called using the `getFunder` method on the `Kwil` object.
-
-### getAllowance()
-
-```typescript
-async getAllowance(address: string): Promise<AllowanceRes>
-```
-
-Retrieves the token allowance for a particular address.
-
-#### Parameters
-- `address`: The address to retrieve the allowance for.
-
-#### Returns
-A promise that resolves to the allowance for the address.
-
-### getBalance()
-
-```typescript
-async getBalance(address: string): Promise<BalanceRes>
-```
-
-Retrieves the wallet token balance for a particular address. The token is the token used for funding gas costs on the configured Kwil provider.
-
-#### Parameters
-- `address`: The address to retrieve the balance for.
-
-#### Returns
-A promise that resolves to the balance for the address.
-
-### approve()
-
-```typescript
-async approve(amount: BigNumberish): Promise<ethers.ContractTransactionResponse> 
-```
-
-Approves / set allowance for a certain amount of tokens for transfer.
-
-#### Parameters
-- `amount`: The amount of tokens to approve. This must be a string or BigNumber. Note that Kwil tokens have 18 decimal places.
-
-#### Returns
-A promise that resolves to the transaction response.
-
-### deposit()
-
-```typescript
-async deposit(amount: BigNumberish): Promise<ethers.ContractTransactionResponse> 
-```
-
-Deposits a certain amount of tokens. Funds must be approved before depositing.
-
-#### Parameters
-- `amount`: The amount of tokens to deposit. This must be a string or BigNumber. Note that Kwil tokens have 18 decimal places.
-
-#### Returns
-A promise that resolves to the transaction response.
-
-### getDepositedBalance()
-
-```typescript
-async getDepositedBalance(address: string): Promise<DepositRes>
-```
-
-Retrieves the deposited token balance for a particular address. The token is the token used for funding gas costs on the configured Kwil provider.
-
-#### Parameters
-- `address`: The address to check the deposited balance for.
-
-#### Returns
-A promise that resolves to the deposited balance result.
-
-### getTokenAddress()
-
-```typescript
-async getTokenAddress(): Promise<TokenRes>
-```
-
-Retrieves the token address used for funding gas costs on the configured Kwil provider.
-
-#### Returns
-A promise that resolves to the token address result.
-
 ## Utils
 
 The `Utils` namespace contains utility functions or classes for interacting with the Kwil network.
 
-### ActionBuilder
-Please see the [ActionBuilder](#action-builder) section above.
+### ActionInput
+Please see the [ActionInput](#action-inputs) section above.
 
-### generateDBIB()
+### generateDBID()
     
 ```typescript
-generateDBIB(owner: string, name: string): string
+generateDBID(owner: string, name: string): string
 ```
 
 An alternative to the kwil.getDBID() method, allowing developers to retrieve a database ID without instantiating the Kwil class.
 
 #### Parameters
-- `owner`: The owner's Ethereum wallet address. This should be a valid Ethereum address.
+- `owner`: The owner's public key.
 - `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 A string that represents the unique identifier for the database.
+
+### recoverSecp256k1PubKey()
+
+```typescript
+async recoverSecp256k1PubKey(signer: Signer, message?: string): Promise<string>
+```
+
+Recovers the public key from a secp256k1 signature.
+
+#### Parameters
+- `signer`: The signer to recover the public key from. This must be a signer from Ethers v5 or Ethers v6.
+- `message`: An optional message to sign. If not provided, the message will be 'Sign this message to recover your public key.'
+
+#### Returns
+A promise that resolves to the public key.
