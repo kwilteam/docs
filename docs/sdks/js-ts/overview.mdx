@@ -121,6 +121,7 @@ const tx = await kwil
     .concat(input)
     .publicKey('public_key')
     .signer(await provider.getSigner()) // can use wallet if NodeJS
+    .description("Click sign to execute the action!") // your custom signature message to appear in browser wallet
     .buildTx()
 
 // broadcast transaction to kwil network
@@ -160,6 +161,7 @@ const tx = await kwil
     .concat(input)
     .publicKey(keys.publicKey)
     .signer(customSigner, 'ed25519')
+    .description("Click sign to execute the action!")
     .buildTx()
 
 await kwil.broadcast(tx);
@@ -168,6 +170,8 @@ await kwil.broadcast(tx);
 ### Reading Data
 
 To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
+
+If a `view` action has a `must_sign` attribute, then you must add `.signer()` and `.publicKey()` methods to the action builder. You can optionally add a `.description()` method to customize the signature message.
 
 #### `View` Action Message
 
@@ -183,7 +187,7 @@ const input = new Utils.ActionInput()
 // retrieve database ID to locate action
 const dbid = kwil.getDBID("public_key", "database_name")
 
-// construct and sign action transaction
+// construct message
 const msg = await kwil
     .actionBuilder()
     .dbid(dbid)
@@ -191,7 +195,7 @@ const msg = await kwil
     .concat(input)
     .buildMsg()
 
-// broadcast transaction to kwil network
+// call from kwil network
 const res = await kwil.call(msg)
 
 /*
