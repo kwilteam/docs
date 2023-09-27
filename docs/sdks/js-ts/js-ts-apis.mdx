@@ -276,6 +276,20 @@ The following signature types can be used:
 #### Returns
 The `ActionBuilder` instance for chaining.
 
+### description()
+
+```typescript
+description(description: string): NonNil<ActionBuilder>
+```
+
+Customize the message that will be displayed in a users wallet when they sign the action.
+
+#### Parameters
+- `description`: The description to display in the user's wallet.
+
+#### Returns
+The `ActionBuilder` instance for chaining.
+
 ### buildTx()
 
 ```typescript
@@ -533,6 +547,20 @@ The `DBBuilder` class is used to build transactions for new databases to be depl
 
 Note that the DBBuilder class is not the recommended way to deploy databases on Kwil. We strongly recommend using the [Kuneiform IDE](docs/kuneiform/introduction).
 
+### payload()
+
+```typescript
+payload(payload: object): NonNil<DBBuilder>
+```
+
+Sets the payload for the database transaction. The payload must be a compiled Kuneiform file. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
+
+#### Parameters
+- `payload`: The payload for the database transaction. This must be a valid compiled Kuneiform.
+
+#### Returns
+The `DBBuilder` instance for chaining.
+
 ### publicKey()
 
 ```typescript
@@ -570,16 +598,16 @@ The following signature types can be used:
 #### Returns
 The `DBBuilder` instance for chaining.
 
-### payload()
+### description()
 
 ```typescript
-payload(payload: object): NonNil<DBBuilder>
+description(description: string): NonNil<DBBuilder>
 ```
 
-Sets the payload for the database transaction. The payload must be a compiled Kuneiform file. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
+Customize the message that will be displayed in a users wallet when they sign the database transaction.
 
 #### Parameters
-- `payload`: The payload for the database transaction. This must be a valid compiled Kuneiform.
+- `description`: The description to display in the user's wallet.
 
 #### Returns
 The `DBBuilder` instance for chaining.
