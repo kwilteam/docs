@@ -32,16 +32,17 @@ table users {
 }
 
 // a public action for creating a user
+// it will store the user's wallet address
 action create_user ($id, $username, $age) public {
     INSERT INTO users
-    VALUES ($id, $username, $age, @caller);
+    VALUES ($id, $username, $age, address(@caller));
 }
 
 // a public action for updating a user's own mutable data
 action update_user ($username, $age) public {
     UPDATE users
     SET username=$username, age=$age
-    WHERE address=@caller;
+    WHERE address=address(@caller);
 }
 ```
 

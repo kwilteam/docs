@@ -40,6 +40,8 @@ The schema contains 13 actions that could be called within a social media applic
 
 Public / Private actions function similarily to how public / private methods work in TypeScript. In Kwil, public actions mean that they can be called externally by a database user. Private actions can only be called from within other Kuneiform actions.
 
+// TODO: @luke we need to update "wallet" to either "address" or "public_key", and use either `address(@caller)` or `public_key(@caller, 'hex')` in the queries.
+
 ```typescript tite="social_network.kf"
 action check_balance() private {
     SELECT

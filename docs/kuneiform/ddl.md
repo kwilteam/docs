@@ -7,7 +7,7 @@ description: An outline of Kuneiform's supported data definition language.
 slug: /kuneiform/ddl
 ---
 
-DDL in Kuneiform is comprised of "Tables" that contain the structure of data.
+DDL in Kuneiform is comprised of "tables" that contain the structure of data.
 
 ## Database Declaration in Kuneiform Language
 
@@ -65,7 +65,7 @@ In a table, a foreign key declaration would look like:
 table users {
     id int primary,
     name text unique,
-    ...other columns
+    // ...other columns
 }
 
 table posts {
@@ -80,11 +80,11 @@ table posts {
 
 Below are a list of operations that available for the foreign key declaration:
 
-- ```no_action``` no operation is triggered.
-- ```restrict``` the column cannot be updated.
-- ```set_null``` the column is set to null.
-- ```set_default``` the column is set to the columns default value (if specified in the table declaration).
-- ```cascade``` the change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
+- ```no_action``` No operation is triggered.
+- ```restrict``` Other calls to the other refrenced column will fail to update the column.
+- ```set_null``` The column is set to null.
+- ```set_default``` The column is set to the column's default value (if specified in the table declaration).
+- ```cascade``` The change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
 
 ## Indexing in Tables
 

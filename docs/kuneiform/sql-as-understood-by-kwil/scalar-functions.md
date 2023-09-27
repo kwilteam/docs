@@ -11,9 +11,13 @@ slug: /scalar-functions
 
 The abs(X) function returns the absolute value of the numeric argument X. Abs(X) returns NULL if X is NULL. Abs(X) returns 0.0 if X is a string or blob that cannot be converted to a numeric value. If X is the integer -9223372036854775808 then abs(X) throws an integer overflow error since there is no equivalent positive 64-bit two complement value.
 
+### address(_X_)
+
+The address(X) function returns the wallet address of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. It will preserve the address format (e.g. EVM, NEAR, etc.) of the originating caller's native chain.
+
 ### coalesce(_X,Y,..._)
 
-The coalesce() function returns a copy of its first non-NULL argument, or NULL if all arguments are NULL. Coalesce() must have at least 2 arguments.
+The coalesce(X,Y...) function returns a copy of its first non-NULL argument, or NULL if all arguments are NULL. Coalesce() must have at least 2 arguments.
 
 ### error(_X_)
 
@@ -32,12 +36,12 @@ The glob(X,Y) function is equivalent to the expression "Y GLOB X". Note that the
 
 ### hex(_X_)
 
-The hex() function interprets its argument as a BLOB and returns a string which is the upper-case hexadecimal rendering of the content of that blob.
+The hex(X) function interprets its argument as a BLOB and returns a string which is the upper-case hexadecimal rendering of the content of that blob.
 If the argument X in "hex(X)" is an integer or floating point number, then "interprets its argument as a BLOB" means that the binary number is first converted into a UTF8 text representation, then that text is interpreted as a BLOB. Hence, "hex(12345678)" renders as "3132333435363738" not the binary representation of the integer value "0000000000BC614E".
 
 ### ifnull(_X,Y_)
 
-The ifnull() function returns a copy of its first non-NULL argument, or NULL if both arguments are NULL. Ifnull() must have exactly 2 arguments. The ifnull() function is equivalent to coalesce() with two arguments.
+The ifnull(X,Y) function returns a copy of its first non-NULL argument, or NULL if both arguments are NULL. Ifnull() must have exactly 2 arguments. The ifnull() function is equivalent to coalesce() with two arguments.
 
 ### iif(_X,Y,Z_)
 
@@ -59,7 +63,7 @@ For string values, length(X) must read the entire string into memory in order to
 
 ### like(_X,Y_), like(_X,Y,Z_)
 
-The like() function is used to implement the "Y LIKE X [ESCAPE Z]" expression. If the optional ESCAPE clause is present, then the like() function is invoked with three arguments. Otherwise, it is invoked with two arguments only. Note that the X and Y parameters are reversed in the like() function relative to the infix LIKE operator. X is the pattern and Y is the string to match against that pattern. Hence, the following expressions are equivalent:
+The like(X,Y,Z) function is used to implement the "Y LIKE X [ESCAPE Z]" expression. If the optional ESCAPE clause is present, then the like() function is invoked with three arguments. Otherwise, it is invoked with two arguments only. Note that the X and Y parameters are reversed in the like() function relative to the infix LIKE operator. X is the pattern and Y is the string to match against that pattern. Hence, the following expressions are equivalent:
 
 	name LIKE '%neon%'
     like('%neon%',name)
@@ -83,6 +87,10 @@ The multi-argument min() function returns the argument with the minimum value. T
 ### nullif(_X,Y_)
 
 The nullif(X,Y) function returns its first argument if the arguments are different and NULL if the arguments are the same. The nullif(X,Y) function searches its arguments from left to right for an argument that defines a collating function and uses that collating function for all string comparisons. If neither argument to nullif() defines a collating function then the BINARY collating function is used.
+
+### public_key(_X_), public_key(_X,Y_)
+
+The public_key(X,Y) function returns the public key of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. The caller blob should be passed in as the first argument. It optionally takes a second argument to specify the desired output encoding type. This can be `'blob'`, `'hex'`, `'base64'`, or `'base64url'`.  If not specified, it will be returned as `'blob'`.
 
 ### quote(_X_)
 

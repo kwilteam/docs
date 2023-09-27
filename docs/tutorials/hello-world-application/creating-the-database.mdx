@@ -67,6 +67,8 @@ Lastly, declare the actions that will be used in the database. Actions are prede
 
 Below are four actions for executing select, insert, update, and delete queries on the database.
 
+// TODO: @luke we need to update "wallet" to either "address" or "public_key", and use either `address(@caller)` or `public_key(@caller, 'hex')` in the queries.
+
 ```typescript title="hello-world.kf"
 database hello_world;
 
