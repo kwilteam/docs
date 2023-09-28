@@ -35,12 +35,26 @@ The schema contains 13 actions that could be called within a social media applic
 
 ## Concepts
 
+### View Actions
+
+If an action returns data, it should be given a `view` access tag. The advantage to using a `view` action is that it returns data directly from the node, rather than having to wait for the transaction to be mined. Any data returned from a `view` action has been mined on the network.
+
+```typescript title="social_network.kf"
+action get_user_by_username($username) public view {
+    SELECT *
+    FROM users
+    WHERE username=$username;
+}
+```
+
+You can read more about other access tags [here](/docs/kuneiform/supported-features#access-tags).
+
 ### Public & Private Actions
 
 Public / Private actions function similarily to how public / private methods work in TypeScript. In Kwil, public actions mean that they can be called externally by a database user. Private actions can only be called from within other Kuneiform actions.
 
 ```typescript tite="social_network.kf"
-action check_balance() private {
+action check_balance() private view {
     SELECT
         CASE
             WHEN balance < 10 THEN ERROR('insufficient balance')
@@ -49,7 +63,7 @@ action check_balance() private {
     FROM balances WHERE wallet = address(@caller);
 }
 
-action read_post($post_id) public {
+action read_post($post_id) public view {
     check_balance();
     SELECT * FROM posts WHERE id = $post_id;
 }
