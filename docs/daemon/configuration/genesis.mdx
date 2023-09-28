@@ -1,0 +1,121 @@
+---
+sidebar_position: 3
+sidebar_label: "Genesis"
+id: daemon-genesis
+title: Genesis Configuration
+description: Genesis specification
+slug: /daemon/config/genesis
+---
+
+A genesis file defines the initial state and parameters needed to bootstrap a new blockchain network. It serves as the starting point for the entire blockchain system by defining key aspects of the network, including its initial validators, initial height, consensus rules, and more. All the nodes in the network need to have the same genesis file to start with the same initial conditions. Any discrepancies or errors in the genesis file could prohibit the node from joining the network or producing blocks.
+
+## Minimal Configuration
+
+Below is a sample `genesis.json` file featuring a basic configuration:
+
+```json title="sample genesis.json file"
+{
+  "genesis_time": "2023-08-28T22:24:04.513472Z",
+  "chain_id": "kwil-chain-RQMl2F",
+  "initial_height": "0",
+  "validators": [
+    {
+      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "power": 1,
+      "name": "validator-0"
+    }
+  ],
+  "app_hash": "4F8735846B8CFB01A277430A392DD3DB7B66510C358C5F4A2AF88A348CB20A62"
+}
+```
+
+## Genesis File Contents
+
+### Genesis Time
+
+ `genesis_time`: This field specifies the official time (ISO 8601 format) at which the blockchain is initialized.
+
+### Chain ID
+
+ `chain_id`: This field uniquely identifies the blockchain network and should not exceed 50 characters.
+
+### Initial Height
+
+ `initial_height`: This field sets the initial height the blockchain should begin at. Although the default height is 0, during a network upgrade or restart, commencing from the last known height ensures distinctness from prior heights.
+
+### Genesis Validators
+
+ `validators`: This field sets the list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
+  - `pub_key`: This field specifies the validator's public key bytes (hex).
+  - `power`: The validator’s voting power. Power 0 indicates that the node is a non-validator.
+  - `name`: The validator’s name. 
+
+### Genesis App Hash
+
+ `app_hash`: The app hash is a hash generated from the initial application state.
+
+## Advanced Configurations
+
+### Consensus Params
+
+The genesis file can also be used to establish a predefined set of consensus rules such as:
+#### Block Rules:
+
+  - `block`: 
+      - `max_bytes`: This field specifies the maximum block size, in bytes.
+      - `max_height`: This field specifies the maximum gas per block.
+
+#### Validator Type:
+
+  - `validator`:
+    -  `pub_key_types`: This field sets the public key types validators can use. Currently, only the `ed25519` key type is supported.
+
+    -  `join_expiry`: This field sets the number of blocks after which the validator join request expires if not approved. The default expiry is 86400 blocks, which is equivalent to 1 day if blocks are produced at the rate of 1 block/sec.
+
+#### ABCI App Version:
+
+  - `version`:
+    - `app_version`: This field sets the ABCI application version. 
+
+#### General
+
+  - `without_nonces`: This field sets whether nonces should be enabled for the transactions. By default, nonces are enabled for the transactions.
+
+  - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
+
+## Complete Genesis Configuration
+
+Below is an example of a genesis file with complete configuration:
+
+```json title="sample genesis.json file"
+{
+  "genesis_time": "2023-08-28T22:24:04.513472Z",
+  "chain_id": "kwil-chain-RQMl2F",
+  "initial_height": "0",
+  "consensus_params": {
+    "block": {
+      "max_bytes": "22020096",
+      "max_gas": "-1"
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ],
+      "join_expiry": "86400"
+    },
+    "version": {
+      "app": "0"
+    },
+    "without_gas_costs": true,
+    "without_nonces": false
+  },
+  "validators": [
+    {
+      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "power": 1,
+      "name": "validator-0"
+    }
+  ],
+  "app_hash": "4F8735846B8CFB01A277430A392DD3DB7B66510C358C5F4A2AF88A348CB20A62"
+}
+```
