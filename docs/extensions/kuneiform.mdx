@@ -45,7 +45,7 @@ To call a method on an extension, you need to use the alias you gave it when imp
 
 ```typescript
 action use_caller_balance () public {
-    $balance = my_token.balanceOf(@caller);
+    $balance = my_token.balanceOf(address(@caller));
     // rest of the action...
 }
 ```
@@ -79,8 +79,8 @@ table nft {
 }
 
 action read_nft() public {
-    $usdc_balance = usdc_token.balanceOf(@caller);
-    $dai_balance = dai_token.balanceOf(@caller);
+    $usdc_balance = usdc_token.balanceOf(address(@caller));
+    $dai_balance = dai_token.balanceOf(address(@caller));
 
     SELECT CASE WHEN $usdc_balance + $dai_balance < 100
     THEN ERROR('caller does not have enough balance') END;
