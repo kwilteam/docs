@@ -14,7 +14,7 @@ slug: /kwil-cli/configuration
 ## Persistent Configuration 
 
 A configuration file will be used to store the configuration, which also serves
-as default values for global flags(if file exists). The configuration file is located at `~/.kwil/config.json` by default.
+as default values for global flags(if file exists). The configuration file is located at `~/.kwil_cli/config.json` by default.
 
 You can run this command to easily configure the CLI:
 
