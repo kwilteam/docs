@@ -20,8 +20,6 @@ This section assumes prior familiarity and understanding of SQL.
 
 Kwil supports nesting subqueries within a query to retrieve a value from another table. In the example below, we use a subquery to retrieve a user's identifier based on their wallet address.
 
-// TODO: @luke we need to update "wallet" to either "address" or "public_key", and use either `address(@caller)` or `public_key(@caller, 'hex')` in the queries.
-
 ```typescript title="social_network.kf"
 action like_post($post_id) public {
     INSERT INTO likes (user_id, post_id)
