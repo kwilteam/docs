@@ -15,31 +15,13 @@ It supports the following subcommands:
 * [drop](#drop): Drop a database schema that is deployed to the network.
 * [query](#query): Query a database using a raw SELECT statement.
 * [list](#list): List the schemas deployed by a certain wallet.
-* [read-chema](#read-schema): Display the schema of a deployed database.
-* [execute](#executing-action): Execute an [action](../kuneiform/dml#action-declaration-in-kuneiform-language) against database.
+* [read-schema](#read-schema): Display the schema of a deployed database.
+* [execute](#execute): Execute an [action](../Kuneiform/dml#action-declaration-in-Kuneiform-language) against database.
 * [batch](#batch): Execute a transactionally consistent batch execution from a CSV.
-* [call](#call-action): Call an `view` [action](../kuneiform/dml#action-declaration-in-kuneiform-language) against database.
+* [call](#call-action): Call an `view` [action](../Kuneiform/dml#action-declaration-in-Kuneiform-language) against database.
 
 :::info
 You can check the documentation of a command while calling it by passing the flag `--help` or `-h`:
-
-```bash
-$ kwil-cli database deploy -h
-Deploy databases
-
-Usage:
-  kwil-cli database deploy [flags]
-
-Flags:
-  -h, --help          help for deploy
-  -p, --path string   Path to the database definition file (required)
-  -t, --type string   File type of the database definition file (kf or json).  defaults to kf (kuneiform). (default "kf")
-
-Global Flags:
-      --kwil-provider string   The kwil provider endpoint
-      --private-key string     The private key of the wallet that will be used for signing
-```
-
 :::
 
 :::tip
@@ -56,7 +38,7 @@ Height: 53531
 
 ## Deploy
 
-The `deploy` subcommand is used to deploy a database schema. The `deploy` command takes no arguments, however has one required flag `--path` or `-p`, which is the relative file path to a kuneiform file. You can also use a kuneiform JSON file by provide the flag `--type json` or `-t json`.
+The `deploy` subcommand is used to deploy a database schema. The `deploy` command takes no arguments, however has one required flag `--path` or `-p`, which is the relative file path to a Kuneiform file. You can also use a Kuneiform JSON file by provide the flag `--type json` or `-t json`.
 
 ```bash
 $ kwil-cli database deploy --path=./my_db.kf
@@ -69,7 +51,7 @@ TxHash: 52b32477ec6f8919de28af413893ab153e8c8adbf4a47682fa1bba272773f119
 
 ## Drop
 
-The `drop` subcommand is used to drop a deployed database.  You can only drop a database that have been deployed with your provided wallet.  The drop command takes one argument, which is the name of the database you wish to drop.
+The `drop` subcommand is used to drop a deployed database.  You can only drop a database that have been deployed with your [configured private key](./configuration.md).  The drop command takes one argument, which is the name of the database you wish to drop.
 
 ```bash
 kwil-cli database drop mydb
@@ -97,9 +79,9 @@ $ kwil-cli database query 'SELECT * FROM users LIMIT 1' --name mydb --owner 04fa
 
 ## List
 
-The `list` subcommand is used to list the databases deployed by a particular wallet.  
-This command takes no arguments, and by default will list the databases for the wallet you have configured.  
-You can list databases deployed from any wallet using the optional --owner (or -o) flag.
+The `list` subcommand is used to list the databases deployed by a particular public key.  
+This command takes no arguments, and by default will list the databases for the private key you have configured.  
+You can list databases deployed from any hex encoded public key using the optional --owner (or -o) flag.
 
 ```bash
 $ kwil-cli database list --owner=04fa5c2d7e9272aca88958a86b444bfe77d0cffb0687e37f02203d356aa63af56ce33426eb39a2966245d6da26257c0678299d3a3728cfbe917314a13ec3b1536e
@@ -133,13 +115,13 @@ Tables:
       NOT_NULL
 ```
 
-## Executing Action
+## Execute
 
 The `execute` subcommand is used to execute an predefined action against the database.
 
 A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./kwil-cli/configuration).
 
-You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the kuneiform schema.
+You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the Kuneiform schema.
 
 Finally, in order to pass parameters to the query, you must specify the inputs as arguments.  You must first specify the name of the parameter you are filling, and then the value.  Queries should follow the layout below:
 
@@ -150,7 +132,7 @@ kwil-cli database execute <input_name_1>:<value> <input_name_2>:<value> --action
 For example, if you were executing an action named "create_user" that took three parameters: $id (int), $username (text), and $age (int), you would pass arguments as follows:
 
 ```bash
-$ kwil-cli database execute "id:1" "username:satoshi" "age:33" --name mydb --action=create_user  
+$ kwil-cli database execute 'id:1' 'username:satoshi' 'age:33' --name mydb --action=create_user  
 
 ## output
 TxHash: f955d6e835e033786aa2ad6b001b91558a7504852ea4fd88c85e6c4ea0bdd147
@@ -158,14 +140,14 @@ TxHash: f955d6e835e033786aa2ad6b001b91558a7504852ea4fd88c85e6c4ea0bdd147
 
 ## Call Action
 
-The `call` subcommand is used to execute an predefined `view`` action against a database.
+The `call` subcommand is used to execute an predefined [`view` action](../kuneiform/supported-features.mdx#access-tags) against a database.
 
-The same flags that the `execute` subcommand supports can be used here.  This command contains one additional flag `--authenticate`, which signs the message, identifying the caller's public key to the database. If this flag is not provided, the message will not be signed.
+The same flags that the []`execute`](#execute) subcommand supports can be used here.  This command contains one additional flag `--authenticate`, which signs the message, identifying the caller's public key to the database. If this flag is not provided, the message will not be signed.
 
 For example, to call an action named `get_user` that took one parameter `username (text)`, you would pass arguments as follows:
 
 ```bash
-$ kwil-cli database call username:satoshi --action=get_user  --name=mydb
+$ kwil-cli database call 'username:satoshi' --action=get_user  --name=mydb
 
 ## output
 | age | id | username |
@@ -180,7 +162,7 @@ The `batch` subcommand is used to execute an action with the data from a CSV fil
 
 A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./kwil-cli/configuration).
 
-You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the kuneiform schema.
+You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the Kuneiform schema.
 
 `--path` need to provided to point to the csv file containing the actual inputs.
 
@@ -208,7 +190,7 @@ action create_user($id, $name, $age) public {
 You would specify these inputs as follows:
 
 ```bash
---map-input='id=id' --map-input='full_name:name' --map-input='age:age'
+--map-input='id:id' --map-input='full_name:name' --map-input='age:age'
 ```
 
 or

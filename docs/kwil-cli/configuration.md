@@ -30,7 +30,7 @@ The configuration file will be stored at `~/.kwil-cli/config.json`.
 
 ## Global Flags
 
-Global flags just override the values in the configuration file(if exists) in runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to `provider.kwil.com:80`, using a config flag:
+Global flags override the values in the configuration file at runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to `provider.kwil.com:80`, using a config flag:
 
 ```bash
 kwil-cli database list --kwil-provider=provider.kwil.com:80
