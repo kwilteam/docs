@@ -11,17 +11,19 @@ Now that the database has been deployed, we can begin interacting with it throug
 
 ## Prerequisites
 
-Ensure you have the Kwil JS SDK downloaded by running:
+Ensure you have the [Kwil JS SDK](https://www.npmjs.com/package/@kwilteam/kwil-js) downloaded by running:
 
 ```zsh
-npm i kwil
+npm i @kwilteam/kwil-js
 ```
 
 ## Initialize Kwil Client
 
 Before we can interact with our database, we must first initialize a Kwil client. Note the slight difference between the NodeJS and Browser clients.
 
-We will also declare the database ID (DBID) and signer wallet as variables that can be used within the rest of the application. A DBID is a unique identifier for a database generated from the wallet deployer address and database name. **Make sure you set the walletAddress variable to the address you deployed the schema with, as well as use your own private key for the signer**.
+We will also declare the database ID (DBID) and signer wallet as variables that can be used within the rest of the application. A DBID is a unique identifier for a database generated from the databse owner's public key and database name.
+
+If needed, you can [recover](/docs/sdks/js-ts/overview#public-keys) your Secp256k1 public key with the recovery [utility function](/docs/sdks/js-ts/apis#generatedbid).
 
 :::tip
 
@@ -50,17 +52,18 @@ const kwil = new NodeKwil({
   kwilProvider: "https://<kwil-provider-url>",
 });
 
-const walletAddress = "<your-wallet-address>"; // Use your own address here
+const publicKey = "<your-public-key>"; // Use the database owner public key
 const databaseName = "hello_world";
 
-const dbid = Utils.generateDBID(walletAddress, databaseName);
+const dbid = Utils.generateDBID(publicKey, databaseName);
 
 const signer = new Wallet("<ethereum-private-key>"); // Use your own private key here
 
 module.exports = {
   kwil,
   dbid,
-  signer,
+  publicKey
+  signer
 };
 ```
 
@@ -75,10 +78,10 @@ export const kwil = new WebKwil({
   kwilProvider: "https://provider.kwil.com",
 });
 
-const walletAddress = "<your-wallet-address>"; // Use your own address here
+export const publicKey = "<your-public-key>"; // Use the database owner public key
 const databaseName = "hello_world";
 
-export const dbid = Utils.generateDBID(walletAddress, databaseName);
+export const dbid = Utils.generateDBID(publicKey, databaseName);
 
 const provider = new BrowserProvider(window.ethereum);
 export const signer = await provider.getSigner();
@@ -95,10 +98,10 @@ export const kwil: WebKwil = new WebKwil({
   kwilProvider: "https://<kwil-provider-url>",
 });
 
-const walletAddress = "<your-wallet-address>"; // Use your own address here
+export const publicKey = "<your-public-key>"; // Use the database owner public key
 const databaseName = "hello_world";
 
-export const dbid: string = Utils.generateDBID(walletAddress, databaseName);
+export const dbid: string = Utils.generateDBID(publicKey, databaseName);
 
 const provider: BrowserProvider = new BrowserProvider(window.ethereum);
 export const signer: Signer = new Wallet("<ethereum-private-key>"); // Use your own private key here
@@ -138,7 +141,7 @@ The signer used to sign the transaction is an Ethereum signer. In this example, 
 <TabItem value="node">
 
 ```js title="insert_greeting.js"
-const { kwil, dbid, signer } = require("./index");
+const { kwil, dbid, publicKey, signer } = require("./index");
 const { Utils } = require("kwil");
 
 async function addGreeting(id, msg) {
@@ -152,6 +155,8 @@ async function addGreeting(id, msg) {
         .name("insert_greeting")
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Inserts a greeting into the database")
         .buildTx();
 
     return await kwil.broadcast(actionTx);
@@ -164,7 +169,7 @@ addGreeting(1, "Hello World!")
 <TabItem value="browser">
 
 ```js title="insert_greeting.js"
-import { kwil, dbid, signer } from "./index";
+import { kwil, dbid, publicKey, signer } from "./index";
 import { Utils } from "kwil";
 
 async function addGreeting(id, msg) {
@@ -178,6 +183,8 @@ async function addGreeting(id, msg) {
         .name("insert_greeting")
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Inserts a greeting into the database")
         .buildTx();
 
     return await kwil.broadcast(actionTx);
@@ -190,7 +197,7 @@ addGreeting(1, "Hello World!")
 <TabItem value="ts">
 
 ```ts title="insert_greeting.ts"
-import { kwil, dbid, signer } from './index';
+import { kwil, dbid, publicKey, signer } from './index';
 import { Utils, Types } from 'kwil';
 
 async function executeInsery(id, msg): Promise<Types.GenericResponse<Types.TxReceipt>> {
@@ -204,6 +211,8 @@ async function executeInsery(id, msg): Promise<Types.GenericResponse<Types.TxRec
         .name('insert_greeting')
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Inserts a greeting into the database")
         .buildTx();
 
     return await kwil.broadcast(actionTx);
@@ -227,9 +236,7 @@ Once this action has been executed, the database will contain the following data
 
 ### select_greetings
 
-To retrieve data from the database, we can call the `select_greetings` action. As defined, this action will return all data in the greetings table.
-
-This action follows the same process as the previous action. The only difference is that we are not passing any inputs to the action and thus do not need to construct an `ActionInput` object.
+To retrieve data from the database, we can call the `select_greetings` action. Because `select_greeting` is a `view` action, we will build a message and pass it to the `kwil.call()` API.
 
 <Tabs
     defaultValue="node"
@@ -242,18 +249,17 @@ This action follows the same process as the previous action. The only difference
 <TabItem value="node">
 
 ```js title="select_greetings.js"
-const { kwil, dbid, signer } = require("./index");
+const { kwil, dbid } = require("./index");
 const { Utils } = require("kwil");
 
 async function readGreetings() {
-    const actionTx = await kwil
+    const message = await kwil
         .actionBuilder()
         .dbid(dbid)
         .name("select_greetings")
-        .signer(signer)
-        .buildTx();
+        .buildMsg();
 
-    return await kwil.broadcast(actionTx);
+    return await kwil.call(message);
 }
 
 readGreetings();
@@ -261,30 +267,26 @@ readGreetings();
     {
         status: 200,
         data: {
-            txHash: 'some_hash',
-            fee: 'some_fee',
-            body: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
+            result: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
         }
     }
 */
 ```
-
 </TabItem>
 <TabItem value="browser">
 
 ```js title="select_greetings.js"
-import { kwil, dbid, signer } from "./index";
+import { kwil, dbid } from "./index";
 import { Utils } from "kwil";
 
 async function readGreetings() {
-    const actionTx = await kwil
+    const message = await kwil
         .actionBuilder()
         .dbid(dbid)
         .name("select_greetings")
-        .signer(signer)
-        .buildTx();
+        .buildMsg();
 
-    return await kwil.broadcast(actionTx);
+    return await kwil.call(message);
 }
 
 readGreetings();
@@ -292,30 +294,26 @@ readGreetings();
     {
         status: 200,
         data: {
-            txHash: 'some_hash',
-            fee: 'some_fee',
-            body: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
+            result: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
         }
     }
 */
 ```
-
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="select_greetings.ts"
-import { kwil, dbid, signer } from './index';
+import { kwil, dbid } from './index';
 import { Utils, Types } from 'kwil';
 
-async function readGreetings(): Promise<Types.GenericResponse<Types.TxReceipt>> {
-    const actionTx: Types.Transaction = await kwil
+async function readGreetings() {
+    const message = await kwil
         .actionBuilder()
         .dbid(dbid)
-        .name('select_greetings')
-        .signer(signer)
-        .buildTx();
+        .name("select_greetings")
+        .buildMsg();
 
-    return await kwil.broadcast(actionTx);
+    return await kwil.call(message);
 }
 
 readGreetings();
@@ -323,9 +321,7 @@ readGreetings();
     {
         status: 200,
         data: {
-            txHash: 'some_hash',
-            fee: 'some_fee',
-            body: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
+            result: [ { id: 1, message: 'Hello World!', wallet: '<your_wallet_address>'} ]
         }
     }
 */
@@ -337,7 +333,7 @@ readGreetings();
 
 To update data in the database, we can call the `update_greeting` action. As defined, this action will update the message field of the greetings table.
 
-This action follows the same process as the `insert_greeting` [action](#insert_greeting), requiring us to construct an `ActionInput` object and pass it to the action.
+This action follows the same process as the `insert_greeting` [action](#insert_greeting), requiring us to construct an `ActionInput` object, build a transaction, and pass it to the `kwil.broadcast()` API.
 
 <Tabs
     defaultValue="node"
@@ -350,7 +346,7 @@ This action follows the same process as the `insert_greeting` [action](#insert_g
 <TabItem value="node">
 
 ```js title="update_greeting.js"
-const { kwil, dbid, signer } = require("./index");
+const { kwil, dbid, publicKey, signer } = require("./index");
 const { Utils } = require("kwil");
 
 async function updateGreeting(id, msg) {
@@ -364,6 +360,8 @@ async function updateGreeting(id, msg) {
     .name("update_greeting")
     .concat(inputs)
     .signer(signer)
+    .publicKey(publicKey)
+    .description("Updates a greeting in the database")
     .buildTx();
 
   return await kwil.broadcast(actionTx);
@@ -376,7 +374,7 @@ updateGreeting(1, "Hello Kwil!");
 <TabItem value="browser">
 
 ```js title="update_greeting.js"
-import { kwil, dbid, signer } from "./index";
+import { kwil, dbid, publicKey, signer } from "./index";
 import { Utils } from "kwil";
 
 async function updateGreeting(id, msg) {
@@ -390,6 +388,8 @@ async function updateGreeting(id, msg) {
     .name("update_greeting")
     .concat(inputs)
     .signer(signer)
+    .publicKey(publicKey)
+    .description("Updates a greeting in the database")
     .buildTx();
 
   return await kwil.broadcast(actionTx);
@@ -402,7 +402,7 @@ updateGreeting(1, "Hello Kwil!");
 <TabItem value="ts">
 
 ```ts title="update_greeting.ts"
-import { kwil, dbid, signer } from './index';
+import { kwil, dbid, publicKey, signer } from './index';
 import { Utils, Types } from 'kwil';
 
 async function updateGreeting(id: number, msg: string): Promise<Types.GenericResponse<Types.TxReceipt>> {
@@ -416,6 +416,8 @@ async function updateGreeting(id: number, msg: string): Promise<Types.GenericRes
         .name('update_greeting')
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Updates a greeting in the database")
         .buildTx();
 
     return await kwil.broadcast(actionTx);
@@ -454,7 +456,7 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 <TabItem value="node">
 
 ```js title="delete_greeting.js"
-const { kwil, dbid, signer } = require("./index");
+const { kwil, dbid, publicKey, signer } = require("./index");
 const { Utils } = require("kwil");
 
 async function deleteGreeting(id) {
@@ -466,6 +468,8 @@ async function deleteGreeting(id) {
         .name("delete_greeting")
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Deletes a greeting from the database")
         .buildTx();
     
     return await kwil.broadcast(actionTx);
@@ -478,7 +482,7 @@ deleteGreeting(1);
 <TabItem value="browser">
 
 ```js title="delete_greeting.js"
-import { kwil, dbid, signer } from "./index";
+import { kwil, dbid, publicKey, signer } from "./index";
 import { Utils } from "kwil";
 
 async function deleteGreeting(id) {
@@ -490,6 +494,8 @@ async function deleteGreeting(id) {
         .name("delete_greeting")
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Deletes a greeting from the database")
         .buildTx();
     
     return await kwil.broadcast(actionTx);
@@ -502,7 +508,7 @@ deleteGreeting(1);
 <TabItem value="ts">
 
 ```ts title="delete_greeting.ts"
-import { kwil, dbid, signer } from './index';
+import { kwil, dbid, publicKey, signer } from './index';
 import { Utils, Types } from 'kwil';
 import { BrowserProvider, Signer } from 'ethers';
 
@@ -516,6 +522,8 @@ async function deleteGreeting(id): Promise<Types.GenericResponse<Types.TxReceipt
         .name('delete_greeting')
         .concat(inputs)
         .signer(signer)
+        .publicKey(publicKey)
+        .description("Deletes a greeting from the database")
         .buildTx();
 
     return await kwil.broadcast(actionTx);
@@ -531,7 +539,7 @@ Once this transaction is executed, the record will be deleted from the database.
 
 ## Read-Only Queries
 
-In addition to using actions to read data from the database, we can also use read-only queries. These queries are executed on a single node and do not require a transaction to be broadcasted to the network. This is useful for reading data from the database without incurring any gas fees.
+In addition to using `view` actions to read data from the database, we can also use write SELECT queries.
 
 To execute a read-only query, we can use the `selectQuery` method on the `kwil` object. This method takes in a `dbid` and a `query` as parameters. The `query` parameter is a string that contains a valid SQL SELECT query.
 
@@ -661,6 +669,7 @@ getSchema(dbid);
             name: 'hello_world',
             tables: [ [Object] ],
             actions: [ [Object], [Object], [Object], [Object] ],
+            extensions: [ [Object] ]
         }
     }
 */
@@ -686,6 +695,7 @@ getSchema(dbid);
             name: 'hello_world',
             tables: [ [Object] ],
             actions: [ [Object], [Object], [Object], [Object] ],
+            extensions: [ [Object] ]
         }
     }
 */

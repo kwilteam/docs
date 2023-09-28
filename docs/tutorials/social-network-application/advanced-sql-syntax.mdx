@@ -12,7 +12,7 @@ You can view the full syntax tree supported by Kwil in the [SQL section](/docs/c
 
 ## Prerequisites
 
-This section assumes prior familiarity and understanding of SQL.
+This section assumes prior familiarity with SQL.
 
 ## Syntax Features
 
@@ -26,7 +26,7 @@ action like_post($post_id) public {
     VALUES ((
         SELECT id
         FROM users
-        WHERE address = @caller
+        WHERE address = address(@caller)
     ),
     $post_id);
 }
@@ -40,7 +40,7 @@ In the `get_feed` action below, we use two `INNER JOIN`s to return a result of p
 
 ```typescript title="social_network.kf"
 // get_feed gets the 20 most recent posts from accounts a user follows, and takes an offset to specify where the counting should begin
-action get_feed($username, $offset) public {
+action get_feed($username, $offset) public view {
     SELECT p.id, p.title, p.content, p.post_date, u.username
     FROM posts AS p
     INNER JOIN followers AS f ON p.author_id = f.followed_id
@@ -67,7 +67,7 @@ action delete_post ($id) public {
     AND author_id = (
         SELECT id
         FROM users
-        WHERE address=@caller
+        WHERE address=address(@caller)
     );
 }
 ```
@@ -85,7 +85,7 @@ This action is made purely to display CTE's in an understandable way. It is not 
 :::
 
 ```typescript title="social_network.kf"
-action get_celebrity_feed($username, $offset) public {
+action get_celebrity_feed($username, $offset) public view {
 // using a CTE containing popular users
     WITH popular_users AS (
         SELECT followers.followed_id AS id, users.username AS username
