@@ -7,8 +7,7 @@ description: Install kwil-cli
 slug: /kwil-cli/installation
 ---
 
-
-For now kwil is yet not opensourced, you can download kwil-cli binary [here.](https://github.com/kwilteam/kwil-cli/releases/tag/v0.1.2) 
+For now kwil is yet not opensourced, you can download kwil-cli binary [here.](https://github.com/kwilteam/kwil-release-repo/releases)
 
 These platforms are supported:
 
