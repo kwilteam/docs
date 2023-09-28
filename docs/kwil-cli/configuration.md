@@ -7,57 +7,43 @@ description: Configurations for kwil-cli
 slug: /kwil-cli/configuration
 ---
 
-**kwil-cli** supports two ways to provide configuration:
-- persistent configuration, e.g. local configuration file
-- global flags, taking effect only for the current cli invocation
+`kwil-cli` supports two ways to provide configuration:
 
-## Persistent Configuration 
+- persistent configuration, via a local configuration file
+- global flags, which last only for the specified command's lifetime.
 
-A configuration file will be used to store the configuration, which also serves
-as default values for global flags(if file exists). The configuration file is located at `~/.kwil_cli/config.json` by default.
+Global flag configs are given precedence over persistent configs.
 
-You can run this command to easily configure the CLI:
+## Persistent Configuration
 
-```sh
+To create a reusable, persistent configuration, you can use the `configure` command.  This will give you the option to set a default value for all global configs.
+
+```bash
 kwil-cli configure
 ```
 
-> You can skip over any value by simply pressing enter.
+:::tip
+You can skip over any config by simply pressing enter.
+:::
 
-### Kwil gRPC URL
-
-The Kwil gRPC URL is the URL of the Kwil provider you are connecting to.  This acts as your gateway to the network, similar to Ethereum providers.  It is necessary for virtually all subcommands except `utils`.   
-
-To set the Kwil RPC URL with flag, you can use `--kwil-provider=localhost:8080`.
-
-> NOTE: This is gRPC url, you don't need to specify protocal like http/https.
-
-> NOTE: We provide a public gRPC [URL](grpc.kwil.com:80) for testing purposes, but we recommend running your own node for production.
-
-### Private Key
-
-Your private key(you can get from your wallet) is used to sign transaction/message for Kwil network.
-
-Currently, **kwil-cli** supports following wallet private key:
-- evm private key, i.e. secp256k1 private key
-
-To set this variable with a global flag, you can use `--private-key=[YOUR_PRIVATE_KEY]`.
-
-### TLS certeficate
-
-TLS certificate file is used to establish secure connection to Kwil provider.
-
-To set the TLS certeficat file with flag, you can use `--tls-cert-file=[YOUR_TLS_CERT_FILE]`.
-
+The configuration file will be stored at `~/.kwil-cli/config.json`.
 
 ## Global Flags
 
-Global flags just override the values in the configuration file(if exists) in runtime, without modifying the configuration file itself.
+Global flags just override the values in the configuration file(if exists) in runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to `provider.kwil.com:80`, using a config flag:
 
-Flags includes:
-- `--kwil-provider`: specify Kwil gRPC URL
-- `--private-key`: specify private key
-- `--tls-cert-file`: specify TLS certificate file
+```bash
+kwil-cli database list --kwil-provider=provider.kwil.com:80
+```
 
+## Available Configs
+
+Below is a table containing the available configs, their flags, an example value, and a description.
+
+| Config | Flag | Example | Description |
+|-|-|-|-|
+| gRPC URL | `--kwil-provider` | `provider.kwil.com:80` | The gRPC endpoint of a Kwil node, which will be used for accessing data on the node's network. |
+|Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br></br>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
+| TLS Cert File Path| `--tls-cert-file` | `~/certs/kwil_provider.pem` | The filepath to be used for the TLS cert to be used over gRPC.  If empty, communication will be unencrypted. |
 
 > NOTE: There is another specical flag `--output`, which is used to specify the output format. By default it's `text`, but you can also set it to `json`.  When set to `json`, command output will be formatted as JSON instead of text.

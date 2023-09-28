@@ -7,18 +7,18 @@ description: Utility commands provided in kwil-cli
 slug: /kwil-cli/utils
 ---
 
-The `utils` subcommand contains utility functions that may be helpful as you use Kwil. The command contains the following functionality:
+The `utils` subcommand contains utility functions that may be generally helpful as you use Kwil. The subcommand contains the following functionality:
 
-* [ping](#ping): pings your Kwil provider to check you correctly configured the provider
-* [print-config](#print-config): prints your local configuration
-* [query-tx](#query-tx): Queries the status of a transaction by hash
+* [ping](#ping): Pings your Kwil provider to check if it is accessible.
+* [print-config](#print-config): Prints your local CLI configuration.
+* [query-tx](#query-tx): Queries the status of a transaction, identified by its hash.
 
 ## ping
 
 The `ping` subcommand is used to see if you can establish a connection with your Kwil provider. It takes no arguments and has no flags.
 
 ```bash
-kwil-cli utils ping
+$ kwil-cli utils ping
 
 ## Output
 pong
@@ -38,6 +38,8 @@ TLSCertFile:
 ```
 
 ## query-tx
+
+the `query-tx` subcommand queries a tx by its transaction id, and returns its current status.
 
 ```bash
 kwil-cli utils query-tx 852aaa9d923359b1b65f0fedb28a4ded92d0ea3276b60bb3c1ce7f9345ec1276

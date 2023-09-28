@@ -7,8 +7,7 @@ description: kwil-cli is the command line interface for Kwil database.
 slug: /kwil-cli
 ---
 
-**kwil-cli** is the command line interface for Kwil database, which allows you to 
-manage databases in Kwil network.
+`kwil-cli` is a command line interface for interacting with Kwil databases.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
