@@ -48,7 +48,7 @@ action add_user($id, $name, $username) public owner {}
 
 ## Defining SQL Queries in an Action
 
-The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with `$`.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing. All query statements **must** end with a semicolon. If queries return results, the final query statement will be returned to the client.
+The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with `$`.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing. All query statements **must** end with a semicolon. If queries return results, the final query statement will be returned to the client.  Queries that return data must use the [`view`](./supported-features#access-tags) tag.
 
 ```typescript
 // the following queries will be executed transactionally.
@@ -62,7 +62,7 @@ action add_user($id, $name, $username) public {
 
 ## Raising Errors in Kwil
 
-In a SQL query on Kwil, you can use the ```ERROR()``` function to raise an error and stop the execution of an action. This is useful for enforcing conditional logic in a query / action.
+In a SQL query on Kwil, you can use the `ERROR()` function to raise an error and stop the execution of an action. This is useful for enforcing conditional logic in a query / action.
 
 ```typescript
 // a sample action to check a user's balance before revealing data.

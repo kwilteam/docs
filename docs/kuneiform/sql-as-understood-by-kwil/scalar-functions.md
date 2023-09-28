@@ -13,7 +13,7 @@ The abs(X) function returns the absolute value of the numeric argument X. Abs(X)
 
 ### address(_X_)
 
-The address(X) function returns the wallet address of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. It will preserve the address format (e.g. EVM, NEAR, etc.) of the originating caller's native chain.
+The address(X) function returns the wallet address of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. It will preserve the address format (e.g. EVM, NEAR, etc.) of the originating caller's native chain.  It will return the address as type text.
 
 ### coalesce(_X,Y,..._)
 
