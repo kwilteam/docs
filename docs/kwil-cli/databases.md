@@ -14,7 +14,7 @@ It supports the following subcommands:
 * [deploy](#deploy): Deploy a database schema as a new database.
 * [drop](#drop): Drop a database schema that is deployed to the network.
 * [query](#query): Query a database using a raw SELECT statement.
-* [list](#list): List the schemas deployed by a certain wallet.
+* [list](#list): List the schemas deployed by a certain public key.
 * [read-schema](#read-schema): Display the schema of a deployed database.
 * [execute](#execute): Execute an [action](../Kuneiform/dml#action-declaration-in-Kuneiform-language) against database.
 * [batch](#batch): Execute a transactionally consistent batch execution from a CSV.
