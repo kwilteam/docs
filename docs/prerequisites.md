@@ -11,17 +11,6 @@ In order to begin using Kwil, you will need the following:
 
 - An Ethereum compatible Wallet
 - A Kwil database endpoint (see the [links page](./links.mdx) for a list of public endpoints)
-- Testnet tokens from the [Kwil Faucet](<https://faucet.kwil.com>) (if you are using a public Kwil network)
-- A small amount of gEth ([faucet](https://faucet.quicknode.com/drip))
-
-## Testnet Token Details
-
-Below are the testnet token details for funding gas costs on the public Kwil network:
-
-- Network: Goerli
-- Contract Address: 0x123b2cc26f7083c9eB38A9A2015F021dBf6368de
-- Token Symbol: KWIL_BETA_1
-- Token Decimals: 18
 
 ## Next Steps
 

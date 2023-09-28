@@ -16,31 +16,27 @@ This tutorial also assumes a basic understanding of SQL.
 
 ## Setup
 
-To use the public Kwil network, you must to submit a small amount of Kwil testnet tokens into the public funding pool. The funding pool is an escrow smart contract used to pay for the gas costs of your transactions.
+The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.kwil.com). You can also use the [Kwil CLI](/docs/cli/installation.md).
 
-### Funding
-
-The quickest way to fund your database is in the [Kuneiform IDE](https://ide.kwil.com). You can also use the [Kwil CLI](/docs/cli/installation.md).
-
-In the Kuneiform IDE, first set the token approval for your Kwil Testnet Tokens. This will take about 30 seconds to confirm.
+In the Kuneiform IDE, you must connect to the endpoint for the Kwil Network you are deploying to. For this tutorial, we will be deploying to a network running on `http://localhost:8080`. You can add your network in the `Workspace` Menu:
 
 <div style={{ display: "flex", justifyContent: "center" }}>
-  <img src={require("./assets/approve-funds.png").default} alt="Token Approval" />
+  <img src={require("./assets/workspace-menu.png").default} alt="Workspace Menu" />
 </div>
 <br />
 
-Next, deposit the approved Kwil Testnet tokens into the funding pool. This will take 12 Goerli block confirmations (~144 seconds) before the balance updates. You can continue to the next step while waiting for the balance to update.
+Next, add the network details in the popup Menu. After you click "OK", the IDE will automatically switch to the new network.
 
 <div style={{ display: "flex", justifyContent: "center"  }}>
-  <img src={require("./assets/deposit-funds.png").default} alt="Token Deposit" />
+  <img src={require("./assets/add-workspace.png").default} alt="Token Deposit" />
 </div>
 
 ## Create Database
 
-The best practice for deploying a database is with the [Kuneiform in-browser IDE](<https://ide.kwil.com>).  The IDE makes it very easy to build, deploy, and use databases on any Kwil network.
+In the Kuneiform IDE, create a new file called `hello-world.kf`. This file will contain the database declaration, tables, and actions that can be executed on the database.
 
 #### 1. Declare Database
-In the Kuneiform IDE, create a new file called `hello-world.kf`. This file will contain the database declaration, tables, and actions that can be executed on the database. Note that the database declaration must the first line of the file and must be in the format `database <database-name>;`.
+In the `hello-world.kf` file, declare the database name. Note that the database declaration must the first line of the file and must be in the format `database <database-name>;`.
 
 ```typescript title="hello-world.kf"
 database hello_world;
@@ -77,24 +73,24 @@ table greetings {
   #wallet_index index(wallet)
 }
 
-action select_greetings () public {
+action select_greetings () public view {
   SELECT * FROM greetings;
 }
 
 action insert_greeting ($id, $message) public {
   INSERT INTO greetings
-  VALUES ($id, $message, @caller);
+  VALUES ($id, $message, address(@caller));
 }
 
 action update_greeting ($id, $message) public {
   UPDATE greetings 
   SET message = $message 
-  WHERE id = $id AND wallet = @caller;
+  WHERE id = $id AND wallet = address(@caller);
 }
 
 action delete_greeting ($id) public {
   DELETE FROM greetings 
-  WHERE id = $id AND wallet = @caller;
+  WHERE id = $id AND wallet = address(@caller);
 }
 ```
 

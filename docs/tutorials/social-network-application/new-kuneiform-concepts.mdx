@@ -11,15 +11,14 @@ In this tutorial, we will expand on the functionality introduced in the [Hello W
 ## Prerequisites
 
 This tutorial assumes that you are familiar with the concepts introduced in the [Hello World Tutorial](/docs/tutorials/hello-world/creating-the-database), including:
-- How to fund your database
-- Basic Kuneiform Syntax for database decelarations, tables, and actions.
+- Basic Kuneiform Syntax for database declarations, tables, and actions.
 - How to interact with your database via the Kwil JS/TS SDK.
 - How to execution actions and read-only queries on your database.
 
 If any of these concepts are not familiar to you, we strongly recommend returning to the [Hello World Tutorial](/docs/tutorials/hello-world/creating-the-database) and then come back to this tutorial.
 
 ## Setup
-This tutorial references the `social_network.kf` file that comes loaded in the [Kuneiform IDE](https://ide.kwil.com/). You can find this file under the `sample_databases` folder.
+This tutorial references the `social_network.kf` file that comes loaded in the [Kuneiform IDE](https://ide.kwil.com/). You can find this file under the `sample_databases` folder in the `Default Workspace`.
 
 If the file is not in your IDE, simply clear all browsing history for https://ide.kwil.com and reload the page.
 
@@ -47,7 +46,7 @@ action check_balance() private {
             WHEN balance < 10 THEN ERROR('insufficient balance')
             ELSE null
         END
-    FROM balances WHERE wallet = @caller;
+    FROM balances WHERE wallet = address(@caller);
 }
 
 action read_post($post_id) public {
@@ -60,16 +59,16 @@ In the example file, we we have a private action that checks whether the user's 
 
 ### Contextual Variables
 
-Kuneiform syntax contains the concept of contextual variables. Contextual variables contain values that are based on the current execution of an action.  They are denoted by an `@` prefix, followed by the variable name. An example is `@caller`, which injects the wallet address of the action caller.  See the [contextual variables section](../../kuneiform/dml#using-contextual-variables-in-actions) for more information.
+Kuneiform syntax contains the concept of contextual variables. Contextual variables contain values that are based on the current execution of an action.  They are denoted by an `@` prefix, followed by the variable name. An example is `@caller`, which injects the public key of the action caller. To get the wallet address, wrap the `@caller` with `address`. See the [contextual variables section](../../kuneiform/dml#using-contextual-variables-in-actions) for more information.
 
 ```typescript title="social_network.kf"
 action create_user ($id, $username, $age) public {
     INSERT INTO users
-    VALUES ($id, $username, $age, @caller);
+    VALUES ($id, $username, $age, address(@caller));
 }
 ```
 
-In the example above, we use the caller variable to automatically retrieve a users wallet address and pass it as a value to the SQL query. When the action is executed, it will only require the `$id`, `username`, and `age` parameters. The wallet address will be automatically passed when the transaction is signed.
+In the example above, we use the caller variable to automatically retrieve a users public key and pass it as a value to the SQL query. When the action is executed, it will only require the `$id`, `$username`, and `$age` parameters. The public key will be automatically passed when the transaction is signed.
 
 ### Date-Time Functions
 Kwil allows certain deterministic date-time functions in its SQL syntax. This is useful for executing comparison operations with date information.
@@ -83,7 +82,7 @@ action create_post ($id, $title, $content, $date_string) public {
     VALUES ($id, $title, $content, (
         SELECT id
         FROM users
-        WHERE address=@caller
+        WHERE address=address(@caller)
     ), $date_string);
 }
 ```
@@ -91,7 +90,7 @@ action create_post ($id, $title, $content, $date_string) public {
 Once the date-time string is set, we can call date-time functions in our queries.
 
 ```typescript title="social_network.kf"
-action get_feed($username, $offset) public {
+action get_feed($username, $offset) public view {
     SELECT p.id, p.title, p.content, p.post_date, u.username
     FROM posts AS p
     INNER JOIN followers AS f ON p.author_id = f.followed_id
