@@ -33,6 +33,24 @@ The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Et
 
 <InitTabs />
 
+### Optional Configuration
+
+The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required field is `kwilProvider`; however, you have additional configuration options available to you:
+
+```js
+import { WebKwil, Utils } from 'kwil'; // or NodeKwil
+
+const kwil = new WebKwil({
+    kwilProvider: 'https://provider.kwil.com',
+    // optional configuration
+    timeout: number; // timeout for requests, default 30000
+    logging: boolean; // enable logging, default false
+    logger: Function // custom logger, default console.log
+    cache: number // ttl for cache in seconds, default is 10 minutes. 0 disables cache.
+});
+
+```
+
 ## Identifiers
 
 ### Public Keys
