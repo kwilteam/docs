@@ -13,7 +13,7 @@ application may be downloaded from the Kwil binary release repository.
 
 ## Download the `kwil-cli` Executable
 
-The Kwil cli(`kwil-cli`) will be packaged together with Kwil deamon(`kwild`) and Kwil admin tool(`kwil-admin`).
+The Kwil cli (`kwil-cli`) will be packaged together with Kwil deamon (`kwild`) and Kwil admin tool (`kwil-admin`).
 Download the [latest release](https://github.com/kwilteam/binary-releases/releases/tag/v0.6.0-beta)
 for your platform.  Extract the `kwil-cli` file from the archive and put it
 into a folder that is in your `PATH` environment.
@@ -33,4 +33,4 @@ kwil-cli version
 
 If installed correctly, it should display a message such as ` Version:	0.6.0-beta`.
 
-Continue to the [Configuration page](./configuration) to setup.
+Continue to the [Configuration](./configuration) page to setup.
