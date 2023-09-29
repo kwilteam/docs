@@ -7,11 +7,26 @@ description: How to install the Kwil Daemon tool
 slug: /daemon/installation
 ---
 
-While Kwil is under heavy development, the team has made the project closed source. However, the Kwil team regularly releases
-Kwil Docker images to Docker Hub. This allows you to run Kwil on your own machine, without having to build the project from source.
+Until the main Kwil DB repository is open source, the `kwild` command line 
+application may be downloaded from the Kwil binary release repository.
 
-To install the most recent Kwil image, run:
+
+## Download the `kwild` Executable
+
+The Kwil Daemon (`kwild`) will be packaged together with Kwil Admin Tool (`kwil-admin`) and Kwil Cli (`kwil-cli`).
+Download the [latest release](https://github.com/kwilteam/binary-releases/releases/latest)
+for your platform.  Extract the `kwild` file from the archive and put it
+into a folder that is in your `PATH` environment.
+
+
+## Verify Installation
+
+Open a terminal and run the following at the command prompt:
 
 ```bash
-docker pull kwildb/kwil:latest
+kwild --version
 ```
+
+If installed correctly, it should display the version info match your downloaded version.
+
+Continue to the [Using Kwild](./kwild) page for running Kwil node.
