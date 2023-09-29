@@ -51,7 +51,7 @@ TxHash: 52b32477ec6f8919de28af413893ab153e8c8adbf4a47682fa1bba272773f119
 
 ## Drop
 
-The `drop` subcommand is used to drop a deployed database.  You can only drop a database that have been deployed with your [configured private key](./configuration.md).  The drop command takes one argument, which is the name of the database you wish to drop.
+The `drop` subcommand is used to drop a deployed database.  You can only drop a database that have been deployed with your [configured private key](./configuration).  The drop command takes one argument, which is the name of the database you wish to drop.
 
 ```bash
 kwil-cli database drop mydb
@@ -61,7 +61,7 @@ kwil-cli database drop mydb
 
 The `query` subcommand is used to execute an ad-hoc SELECT statement against database. This statement cannot modify state, and is therefore read-only. It takes one argument, which is the SQL query you wish to execute.  
 
-A target database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`.  The `--owner` flag takes the hex encoded public key of a database deployer, and the `--name` flag takes the name given to the database when it was deployed. `--dbid` will be used if both are provided. If an `--owner` flag is not provided, it will default to the public key of the private key that is [configured](./kwil-cli/configuration).
+A target database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`.  The `--owner` flag takes the hex encoded public key of a database deployer, and the `--name` flag takes the name given to the database when it was deployed. `--dbid` will be used if both are provided. If an `--owner` flag is not provided, it will default to the public key of the private key that is [configured](./configuration).
 
 ```bash
 $ kwil-cli database query 'SELECT * FROM users LIMIT 1' --dbid x24c29a32f0bc70ffa5b413687f8d122c67a4d316ac245197adf82436
@@ -95,7 +95,7 @@ Databases belonging to '04fa5c2d7e9272aca88958a86b444bfe77d0cffb0687e37f02203d35
 
 The `read-schema` subcommand is used to display schema information for a deployed database.  This command takes no arguments, however it can accept several different flags.
 
-A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./kwil-cli/configuration).
+A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./configuration).
 
 ```bash
 # configured private key will be used to determine owner
@@ -119,7 +119,7 @@ Tables:
 
 The `execute` subcommand is used to execute an predefined action against the database.
 
-A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./kwil-cli/configuration).
+A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./configuration).
 
 You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the Kuneiform schema.
 
@@ -160,7 +160,7 @@ $ kwil-cli database call 'username:satoshi' --action=get_user  --name=mydb
 
 The `batch` subcommand is used to execute an action with the data from a CSV file.  The action is executed transactionally, with either all succeeding or all failing.
 
-A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./kwil-cli/configuration).
+A database can either be selected with `--owner` and `--name`, or with a database ID `--dbid`. `--dbid` will be used if both are given. If an `--owner` flag is not provided, it will default to the hex public key of the private key that is [configured](./configuration).
 
 You need to pass a required `--action` flag to specify the name of the action you wish to execute.  This name must be the same as the one defined in the Kuneiform schema.
 
