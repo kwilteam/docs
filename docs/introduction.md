@@ -11,7 +11,7 @@ slug: /introduction
 
 ## Web3 Native Decentralized Database Networks
 
-Kwil is a framework for deploying relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical byanztine fault tolerant (pBFT) later on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
+Kwil is a framework for deploying relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical byanztine fault tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
 
 Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine who, where, and how the nodes are run in their blockchain.
 
