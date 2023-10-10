@@ -11,13 +11,13 @@ slug: /introduction
 
 ## Web3 Native Decentralized Database Networks
 
-Kwil is a framework for deploying relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical byanztine fault tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
+Kwil is a framework for leveraging relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical byanztine fault tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
 
-Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine who, where, and how the nodes are run in their blockchain.
+Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine how, where, and by whom nodes are run in their blockchain
 
 **Have a question? Join our [Discord](<https://discord.com/invite/HzRPZ59Kay>)!**
 
-Kwil combines the structure and utility of a traditional OLTP database with the guarantees of blockchain networks.  Broadly speaking, users can think of Kwil networks as a relational database with the following features:
+Kwil combines the structure and utility of a traditional transactional database with the guarantees of blockchain networks.  Broadly speaking, users can think of Kwil networks as a relational database with the following features:
 
 - Secure, permissionless, deterministic relational data storage and retrieval across of a network of nodes.
 - Integrates natively with other Web3 platforms, concepts, and tooling.
