@@ -53,7 +53,7 @@ module.exports = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           editUrl:
-            'https://github.com/kwilteam/docs/tree/main/',
+            'https://github.com/kwilteam/docs/tree/main',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
