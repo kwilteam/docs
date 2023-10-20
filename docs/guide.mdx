@@ -1,0 +1,412 @@
+---
+sidebar_position: 10
+sidebar_label: "Walkthrough"
+id: deployment-guide
+title: Deployment Guide
+description: Deployment Guide
+slug: /walkthrough
+---
+
+This tutorial will show in detail how to:
+- [Configure a Kwil node](./walkthrough#configuration)
+- [Deploy a Kwil network with a standalone node](./walkthrough#deploy-a-standalone-kwil-node) 
+- [Deploy a Kwil network with multiple nodes](./walkthrough#deploy-a-multi-node-kwil-network)
+- [Add a node to the existing Kwil network](./walkthrough#join-kwil-network)
+- [Deploy databases](./walkthrough#deploy-database)
+- [Deploy local test networks](./walkthrough#test-networks)
+
+## Prerequisites
+
+In order to begin using Kwil, you will need the following:
+- Binaries: Download `kwild`, `kwil-admin`, and `kwil-cli` [here](https://github.com/kwilteam/binary-releases/releases/tag/v0.6.0-beta).
+- Sample Kuneiform files can be viewed online at [https://ide.kwil.com](https://ide.kwil.com) under `sample_databases` folder. Refer to the [Kuneiform Guide](./category/kuneiform) to create your own Kuneiform schema files. 
+
+## Deploy a Standalone Kwil Node
+
+### Configuration
+
+Initialize the root directory with the required configuration files by running the below command.
+
+```bash
+$ kwil-admin setup init -o ~/.kwild
+Successfully initialized node directory: ~/.kwild
+```
+
+This generates the new node's private key, genesis and config files in the specified root directory.
+If the `-o` flag is not used, the default location is `./.testnet`.
+
+```bash
+$ tree ~/.kwild
+~/.kwild
+├── abci
+│   ├── config
+│   │   └── genesis.json
+│   └── data
+├── config.toml
+└── private_key
+
+4 directories, 3 files
+```
+
+The configuration is initially set to its default values. These can be updated manually or overridden using command line flags or environment variables. Refer to the [configuration guide](./daemon/kwild#configuration-override) for more information on this.
+
+Notable settings in `config.toml` and `genesis.json` are described below.
+
+#### Application Configuration (`config.toml`)
+
+This file contains operational parameters for the blockchain and databases. Some vital configurations include:
+
+- `app.grpc_listen_addr`: The address on which the user gRPC server listens (default is `localhost:50051`).
+- `app.http_listen_addr`: The address on which the HTTP gateway to the gRPC service listens (default `localhost:8080`).
+- `chain.p2p.listen_addr`: The node's P2P Default listening address is `0.0.0.0:26656`
+
+:::tip
+Each of the options in the `config.toml` file may be set with corresponding command line flags or environment variables as shown [here](./daemon/kwild#configuration-override).
+:::
+
+#### Genesis File (`genesis.json`)
+
+The settings in this file define the initial state of the blockchain. Notable options include `initial_height`, `chain_id` and `validators`
+
+:::warning
+Settings of the genesis file cannot be changed after launching a network. Changing these after a network is started can result in a consensus failure.
+:::
+
+### Deploy
+
+Deploy a Kwil node by running the `kwild` application:
+
+```bash
+# default root directory: ~/.kwild
+$ kwild 
+
+(or)
+
+# Specify root directory explicitly
+$ kwild --root_dir "path/to/root/dir"
+
+(or)
+
+# If config files were not generated with kwil-admin, use quickstart mode
+$ kwild --autogen --root_dir "path/to/root/dir"
+```
+
+The above commands launches a private Kwil network comprising a single node, which hosts both a Kwil database and blockchain. Debug logs of the node's services during startup are shown below:
+
+```json title="Logging of Node Services Initialization"
+{"msg":"starting server..."}
+
+{"msg":"grpc server started","address":"localhost:50051"}
+
+{"msg":"http server started","address":"localhost:8080"}
+```
+
+The P2P and consensus engine's RPC service will have similar logs that display the effective listening addresses and the node's ID:
+
+```json
+"msg":"Add our address to book",
+"book":"~/.kwild/abci/config/addrbook.json",
+"addr":"b58257d0fd67c0757327ff16ec701990c24d5336@0.0.0.0:26656"
+
+"msg":"Starting RPC HTTPS server on 127.0.0.1:26657"
+"cert": "~/.kwild/rpc.cert", 
+"key": "~/.kwild/rpc.key"
+```
+
+Upon initializing all the services successfully, the Kwil node will begin mining blocks:
+
+```json title="Mining Blocks"
+// Block 1
+"msg":"finalizing commit of block",
+"module":"consensus",
+"height":1,
+"hash":"F1DFEC0D85C7D8D6FF827830DE0BFFA40A496B2388E295833231546614213767",
+"root":"C2CE859968C5AB7EC765BE39F1B12F27DFA1FBD1820C90501A4F13DE2581A4AC",
+"num_txs":4
+
+// Block 2
+"msg":"finalizing commit of block",
+"module":"consensus",
+"height":2,
+"hash":"A16C9BCC99D4DE0AF346BD8E261B750C7C4378D8A44F12B7D5BDF6F44F98A15A",
+"root":"CCBFD901930A79C2E9930A701608685381D29111ED4AA8355FB6F2654AD133C6",
+"num_txs":2
+```
+
+Once the Kwil node is up, users can start interacting with the Kwil database by using [`kwil-cli`](./kwil-cli/). The node operator can use [`kwil-admin`](./admin).
+
+### Verify gRPC Connectivity
+
+Users can `ping` the Kwil node to check the status of the Kwil node. If the node is active and online, it will reply with a `pong` message in response.
+
+```bash
+# Use --kwil-provider to specify the grpc listen addr of the Kwil node you wish to connect to.
+$ kwil-cli utils ping --kwil-provider "localhost:50051"
+pong
+```
+
+### Transactions
+
+Once the Kwil node is up, users can start issuing transactions with the help of the `kwil-cli` tool. Refer to the [database guide](./kwil-cli/databases) for full documentation on the CLI for available database operations.
+
+Below, we deploy a database using a transaction. We then call the blockchain using the returned transaction hash to verify that it was successful.
+
+#### Deploy Database
+
+A database schema can be deployed on the Kwil nodes using `kwil-cli` as shown below. Refer to the [Kuneiform Guide](./category/kuneiform) to create your own database schema.
+:::tip
+You can write, parse, and deploy Kuneiform, as well as view sample Kuneiform files, online at https://ide.kwil.com.
+:::
+
+```bash title="Deploy a sample database"
+$ kwil-cli database deploy -p ./sample_test_db.kf --kwil-provider "localhost:50051"
+TxHash: 0b77fade7234277931cd43688ad1f3832623527e02993ce5c95946ab03774f92
+```
+
+#### Transaction status
+
+The transaction status can be queried using the transaction hash as follows:
+
+```bash
+$ kwil-cli utils query-tx 0b77fade7234277931cd43688ad1f3832623527e02993ce5c95946ab03774f92 --kwil-provider "localhost:50051"
+
+Transaction ID: 0b77fade7234277931cd43688ad1f3832623527e02993ce5c95946ab03774f92
+Status: success
+Height: 9912
+```
+
+## Join Kwil Network
+
+To add a new node to the existing Kwil network:
+1. Generate the required configuration as shown [above](./walkthrough#configuration).
+2. Obtain the `genesis.json` file for the desired network from another participant, and ensure that it is placed properly at the location `root_dir/abci/config/genesis.json`.
+3. Update the `chain.p2p.persistent_peers` with the peer addresses from the network using one of the methods described [here](./daemon/kwild#connecting-to-a-kwil-network) and start the node.
+
+  For example, the above node's p2p address is: `"b58257d0fd67c0757327ff16ec701990c24d5336@0.0.0.0:26656"`. 
+  ```toml 
+  [p2p]
+  "persistent_peers" = "b58257d0fd67c0757327ff16ec701990c24d5336@0.0.0.0:26656"
+  ```
+4. Start the node by running `kwild`.
+
+  ```bash
+  # Deploy Kwil Node
+  kwild --root_dir "path/to/root/dir"
+  ```
+
+5. Verify the connectivity to the existing node by running:
+  ```bash
+  # Check Peers connected to:
+  $ kwil-admin node peers
+  ```
+  ```json title="Connected Peers"
+  [
+      {
+          "node": {
+          "chain_id": "chain-Ba2NYd",
+          "name": "node-0",
+          "node_id": "b58257d0fd67c0757327ff16ec701990c24d5336",  // Peer ID
+          "proto_ver": 8,
+          "app_ver": 0,
+          "block_ver": 0,
+          "listen_addr": "tcp://127.0.0.1:26656",
+          "rpc_addr": "tcp://127.0.0.1:26657"
+          },
+          "inbound": false,
+          "remote_addr": "127.0.0.1"
+      }
+  ]
+  ```
+
+## Deploy a Multi-Node Kwil Network
+
+This section describes how to deploy a network with interconnected nodes from startup.
+
+Suppose you wish to deploy a network comprising three nodes, where two nodes act as validators and one non-validator. The IP addresses of the nodes will be `192.168.2.10`, `192.168.2.20` and `192.168.2.30` respectively.
+
+### Configuration
+
+Generate the required configuration for these nodes by running:
+
+```bash
+kwil-admin setup testnet -v 2 -n 1 --hostname "192.168.2.10" --hostname "192.168.2.20" --hostname "192.168.2.10" -o "./testnet"
+```
+
+This generates `private_key`, `genesis.json` and `config.toml` files for all the 3 nodes at location `./testnet`.
+
+```bash
+$ ls ./.testnet                                                              
+node0   node1   node2
+
+$ tree  ./.testnet/node0
+./.testnet/node0
+├── abci
+│   ├── config
+│   │   └── genesis.json
+│   └── data
+├── config.toml
+└── private_key
+
+4 directories, 3 files
+```
+
+The `persistent_peers` config in the `config.toml` is populated based on the IP addresses configured using either the `--hostname`  or the `--starting-ip-address` flag as shown below:
+
+```bash 
+$ cat ~/.kwild/node0/config.toml| grep persistent_peers
+persistent_peers = "fab8e5110fc5fd31ee02893fd204c72bde98ca1f@192.168.10.2:10,af3f6e68c844c3ffec2a78226934a0ad25a3cfea@192.168.2.20:0,753957364371f8c92146afd10853b4c0d3dec56b@192.168.2.30:0"
+```
+
+Ensure that the genesis file is configured with 2 nodes as initial validators as shown below:
+```bash
+$ cat ~/.kwild/node0/abci/config/genesis.json | jq '.validators'
+[
+  {
+    "address": "FAB8E5110FC5FD31EE02893FD204C72BDE98CA1F",
+    "pub_key": {
+      "type": "tendermint/PubKeyEd25519",
+      "value": "zELrwxQTSt3U5WU3z9sSGBdhXqeyioR9F5M+Zlh2Uyc="
+    },
+    "power": "1",
+    "name": "validator-0"
+  },
+  {
+    "address": "AF3F6E68C844C3FFEC2A78226934A0AD25A3CFEA",
+    "pub_key": {
+      "type": "tendermint/PubKeyEd25519",
+      "value": "HR9zoOYqcYLoMiMcF6YPi8a2OObPAITPcczlvxV6kg4="
+    },
+    "power": "1",
+    "name": "validator-1"
+  }
+]
+```
+
+### Deploy
+1. Copy the respective node configurations to their host machines root directory.
+
+2. Deploy each node on its machine:
+  ```bash
+  # On Machine running 192.168.2.10 
+  $ kwild --root_dir "path/to/root/dir"
+
+  # On Machine running 192.168.2.20
+  $ kwild --root_dir "path/to/root/dir"
+
+  # On Machine running 192.168.2.30
+  $ kwild --root_dir "path/to/root/dir"
+  ```
+
+## Test Networks
+
+A multi-node "testnet" for testing and development may be deployed on a single machine with the nodes running inside of Docker containers.
+
+### Configuration
+
+Generate configuration by running:
+
+```bash
+kwil-admin setup testnet -v 2 -n 1 --hostname "172.10.100.2" --hostname "172.10.100.3" --hostname "172.10.100.4" -o "./testnet"
+```
+
+### Deploy
+Docker compose can be used to automate the whole process to deploy multiple nodes on a single host machine. Below is a sample compose file:
+<details>
+    <summary>sample docker-compose.yml file</summary>
+
+  ```yaml
+    version: "1"
+
+    services:
+      node0:
+        container_name: node0
+        image: kwild:latest
+        ports:
+          - "8080:8080"
+          - "50051:50051"
+          - "26656:26656"
+          - "26657:26657"
+        env_file:
+          - .env
+        volumes:
+          - type: bind
+            source: ./testnet/node0
+            target: /app/kwil
+        networks:
+          kwil-int-testnet:
+            ipv4_address: 172.10.100.2
+        command: |
+          --root_dir=/app/kwil
+          --log.level=${LOG_LEVEL:-info}
+          --app.grpc_listen_addr=:50051
+          --app.http_listen_addr=:8080
+          --chain.p2p.external_address=tcp://0.0.0.0:26656
+          --chain.rpc.listen_addr=tcp://0.0.0.0:26657
+
+      node1:
+        container_name: node1
+        image: kwild:latest
+        ports:
+          - "8081:8080"
+          - "50052:50051"
+          - "26666:26656"
+          - "26667:26657"
+        env_file:
+          - .env
+        volumes:
+          - type: bind
+            source: ./testnet/node1
+            target: /app/kwil
+        networks:
+          kwil-int-testnet:
+            ipv4_address: 172.10.100.3
+        command: |
+          --root_dir=/app/kwil
+          --log.level=${LOG_LEVEL:-info}
+          --app.grpc_listen_addr=:50051
+          --app.http_listen_addr=:8080
+          --chain.p2p.external_address=tcp://0.0.0.0:26656
+          --chain.rpc.listen_addr=tcp://0.0.0.0:26657
+
+      node2:
+        container_name: node2
+        image: kwild:latest
+        ports:
+          - "8082:8080"
+          - "50053:50051"
+          - "26676:26656"
+          - "26677:26657"
+        env_file:
+          - .env
+        volumes:
+          - type: bind
+            source: ./testnet/node2
+            target: /app/kwil
+        networks:
+          kwil-int-testnet:
+            ipv4_address: 172.10.100.4
+        command: |
+          --root_dir=/app/kwil
+          --log.level=${LOG_LEVEL:-info}
+          --app.grpc_listen_addr=:50051
+          --app.http_listen_addr=:8080
+          --chain.p2p.external_address=tcp://0.0.0.0:26656
+          --chain.rpc.listen_addr=tcp://0.0.0.0:26657
+
+    networks:
+      kwil-int-testnet:
+        name: kwil-int-testnet
+        ipam:
+          driver: default
+          config:
+            - subnet: 172.10.100.0/16
+  ```
+  </details>
+
+  ```bash
+  # To bring-up the Kwil network with 3 nodes, run:
+  $ docker compose up -d
+
+  # To stop the 3 nodes, run:
+  $ docker compose down
+  ```
