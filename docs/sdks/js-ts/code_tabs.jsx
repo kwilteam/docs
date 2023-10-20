@@ -25,7 +25,7 @@ import { WebKwil, Utils } from 'kwil';
 const provider = new BrowserProvider(window.ethereum)
 
 // dbid is a unique database identifier generated from a database deployer and name
-const dbid = Utils.generateDBID("0xdatabase_deployer_address", "database_name")
+const dbid = Utils.generateDBID("deployer_public_key", "database_name")
 
 const kwil = new WebKwil({
     kwilProvider: "https://provider.kwil.com"
@@ -41,7 +41,7 @@ const Utils = kwiljs.Utils;
 const provider = new Wallet("ethereum_private_key", new JsonRpcProvider("https://mainnet.infura.io..."))
 
 // dbid is a unique database identifier generated from a database deployer and name
-const dbid = Utils.generateDBID("0xdatabase_deployer_address", "database_name")
+const dbid = Utils.generateDBID("deployer_public_key", "database_name")
 
 const kwil = new kwiljs.NodeKwil({
     kwilProvider: "https://provider.kwil.com",
