@@ -19,13 +19,13 @@ Because Kwil database [networks](#kwil-network) are sovereign blockchains, there
 
 Accounts are public / private keypairs that represent a single user or entity on a Kwil Network. Accounts are used to deploy databases and execute CRUD operations.
 
-Each account has a public_key, nonce, and balance.
+Each account has a public key, nonce, and balance.
 
 Accounts are identified by public keys. Natively, Kwil supports Secp256k1 keys (used in EVM) and ED25519 keys (used in Solana, NEAR, etc).
 
 ## Databases 
 
-In Kwil, databases refer to SQL deployments on a Kwil Network. The Kwil [SQL engine](/docs/category/sql-as-understood-by-kwil) is based on SQLite with modifications to support deterministic execution and consensus.
+In Kwil, databases refer to relational database schemas on a Kwil Network. The Kwil [SQL engine](/docs/category/sql-as-understood-by-kwil) is based on SQLite with modifications to support deterministic execution and consensus.
 
 ### Kuneiform
 
@@ -34,11 +34,11 @@ In Kwil, databases refer to SQL deployments on a Kwil Network. The Kwil [SQL eng
 In a Kuneiform file, you can define:
 - Relational Tables
 - Actions - CRUD Operations that can be executed on the database.
-- Extensions - Custom logic that can be executed on the database.
+- Extensions - Import additional logic that can be executed on the database.
 
 ### Database Identifiers
 
-Database identifiers (DBIDs) are unique identifiers for a database on a [Kwil Network](#kwil-network). DBIDs are generated from the public key of the account that deployed the database and the database name. A DBID is a SHA224 hash of the database owner's account public key and database name.
+Database identifiers (DBIDs) are unique identifiers for a database on a [Kwil Network](#kwil-network). DBIDs are generated from database name and database owner's public key. A DBID is a SHA224 hash of the database owner's account public key and database name.
 
 ### Transactions
 
@@ -46,7 +46,7 @@ Transactions are database deployments, database drops, and state changing (Creat
 
 ### View Actions
 
-View actions are read-only actions that can be executed on a database. View actions are called from a single node and may or may not require signature. The advantage of view actions is that they can be executed without the need to wait for consensus.
+View actions are the primary way of reading data from a database. View actions are called from a single node and may or may not require signature. The advantage of view actions is that they can be executed without the need to wait for consensus.
 
 ## Kwil Network
 
