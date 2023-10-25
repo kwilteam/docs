@@ -1,0 +1,68 @@
+---
+sidebar_position: 2
+sidebar_label: "Concepts"
+id: concepts
+title: Kwil Concepts
+description: Core Concepts of Kwil
+slug: /concepts
+---
+
+# Kwil Concepts
+
+Because Kwil database [networks](#kwil-network) are sovereign blockchains, there are a few concepts that are unique or borrowed from other blockchain platforms. These concepts are transversal across Kwil (frontends, SDKs, Nodes, etc.).
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+    <img src={require('../static/img/kwil-concepts.png').default} alt="Concepts Overview" />
+</div>
+
+## Accounts
+
+Accounts are public / private keypairs that represent a single user or entity on a Kwil Network. Accounts are used to deploy databases and execute CRUD operations.
+
+Each account has a public key, nonce, and balance.
+
+Accounts are identified by public keys. Natively, Kwil supports Secp256k1 keys (used in EVM) and ED25519 keys (used in Solana, NEAR, etc).
+
+## Databases 
+
+In Kwil, databases refer to relational database schemas on a Kwil Network. The Kwil [SQL engine](/docs/category/sql-as-understood-by-kwil) is based on SQLite with modifications to support deterministic execution and consensus.
+
+### Kuneiform
+
+[Kuneiform](/docs/category/kuneiform) is the syntax language for defining a database on Kwil. You can think of Kuneiform as a smart contract language (e.g. [Solidity](https://soliditylang.org/)), but for relational databases.
+
+In a Kuneiform file, you can define:
+- Relational Tables
+- Actions - CRUD Operations that can be executed on the database.
+- Extensions - Import additional logic that can be executed on the database.
+
+### Database Identifiers
+
+Database identifiers (DBIDs) are unique identifiers for a database on a [Kwil Network](#kwil-network). DBIDs are generated from database name and database owner's public key. A DBID is a SHA224 hash of the database owner's account public key and database name.
+
+### Transactions
+
+Transactions are database deployments, database drops, and state changing (Create, Update, Delete) actions that are executed on a database. Transactions are signed by an account and are propagated to the Kwil Network. Transactions are executed deterministically on each node in the network and are validated by the nodes. 
+
+### View Actions
+
+View actions are the primary way of reading data from a database. View actions are called from a single node and may or may not require signature. The advantage of view actions is that they can be executed without the need to wait for consensus.
+
+## Kwil Network
+
+A Kwil Network is a sovereign blockchain that is used to deploy databases and execute CRUD operations. Kwil Networks are composed of one or more [Kwil Nodes](#kwil-node). A project may have its own Kwil Network, or multiple projects may share a Kwil Network.
+
+## Kwil Node
+
+Kwil Nodes run the [Kwil Daemon](/docs/category/kwil-daemon) and are the infrastructure that power Kwil Networks. Kwil Nodes are responsible for:
+- Storing the state of the Kwil Network
+- Executing transactions
+- Validating transactions
+- Propagating transactions to other nodes
+- Maintaining consensus
+
+Each node has a public / private ED25519 keypair that is used to sign transactions and blocks. Note that the Node keypair is only for validating the blockchain, and is different from the [account](#accounts) keypair.
+
+## Extensions
+
+[Extensions](/docs/category/extensions) are stateless applications that run on each [Kwil Node](#kwil-node) in a [Kwil Network](#kwil-network). Extensions sit next to the database engine and can be used to implement arbitrary logic, access control, and value accrual mechanisms directly into the databases. Extensions are written in Go or TypeScript.
