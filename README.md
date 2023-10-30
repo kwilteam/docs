@@ -1,45 +1,98 @@
-# Website
+# Contributing changes to Kwil Docs
 
-This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
+Like other Kwil sources, [Kwil docs](https://github.com/kwilteam/docs) is an open source repository hosted on GitHub, and we welcome pull requests into our repo.
 
-## Installation
+Kwil docs uses [Docusaurus 2](https://docusaurus.io/) as our online document management system.
 
-```
-$ npm install
-```
+Before contributing, please familiarize yourself with [Docusaurus markdown](https://docusaurus.io/docs/category/guides) features. If you have used tools such as MkDocs previously, you should find the Docusaurus experience familiar.
 
-## Local Development
+## Minor Edits
 
-```
-$ npm start
-```
+For minor edits to the existing Kwil docs, e.g., fixing typos, or adding small paragraphs of text, it is recommended to simply:
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+- Fork the Kwil docs repository
 
-## Build
+- Use GitHub to edit the page to which you wish to contribute, using markdown
 
-```
-$ npm run build
-```
+- Push the changes to a new branch 
 
-This command generates static content into the `build` directory and can be served using any static contents hosting service.
+- Issue a pull request into the Kwil docs repository
 
-### Deployment
+**Note** : Do NOT use this approach for major contributions such as new pages, adding navigation between pages, adding external content such as images, since your changes will require testing in Docusaurus.
 
-We use firebase for hosting docs. If your firebase account has permissions to publish, run:
+## Prerequisites
 
-```
-$ firebase login
-```
+### Fork the Kwil docs repository
 
-Select the `kwil-docs` project:
+Make a [fork](https://docs.github.com/en/get-started/quickstart/fork-a-repo) of Kwil docs to your own repo.
 
-```
-$ firebase use kwil-docs
-```
+### Clone the Kwil Docs repository
 
-Then deploy:
+If you use git ssh:
 
-```
-$ firebase deploy
-```
+`git clone git@github.com:GITUSERNAME/docs.git`
+
+If you use git https:
+
+`git clone https://github.com/GITUSERNAME/docs.git`
+
+where `GITUSERNAME` is your git profile handle.
+
+### Install Node v16.14 or Above
+
+Docusaurus requires Node v16.14 or above.
+
+Kwil recommends you use [nvm](https://github.com/nvm-sh/nvm) to manage your node.js environments.
+
+`nvm install 16.14`
+
+### Use NPM to fetch package dependencies
+
+As with any node.js app, use [npm](https://www.npmjs.com/) to install all dependency packages
+
+`npm install`
+
+## Running the Kwil docs Docusaurus app
+
+It is recommended that you run the Kwil Docusaurus app while developing new content for the docs, as you will be able to interactively view changes as you make them to the markdown files.
+
+`npm start`
+
+This step should start the node development server and launch a web browser to the home page, e.g.,
+
+`http://localhost:3000/docs/introduction`
+
+## Adding your contribution to Kwil docs
+
+You will need to familiarize yourself with the Docusaurus file layout, categorization, and other features. 
+Docusaurus provide an interactive [sandbox Playground](https://docusaurus.io/docs/playground) that will help you get up to speed.
+
+When ready, use your favourite Node.js IDE tooling, e.g., VS Code, to add new pages, React.js scripts, CSS styles etc., in accordance with Docusaurus guidelines.
+
+## Committing changes and pushing to a new branch
+
+After you’ve tested your changes:
+
+- Stage any newly added and updated pages
+
+`git add .`
+
+- Commit your changes to a new branch. 
+
+`git commit -m "Add new section for new feature XYZ"`
+
+- Push to a new branch. For branch naming, please use the convention feature/change_short_description
+
+`git push -u origin feature/add_XYZ_section`
+
+## Issuing a Pull Request
+
+Return to the Kwil docs home page in GitHub and navigate to [Pull Requests](https://github.com/kwilteam/docs/pulls).
+
+Click the Compare and pull request button, add a brief description of the changes made, including a motivation for why this will benefit the Kwil community, and then finally click the Create pull request button. 
+
+All pull requests will be reviewed as soon as possible, and if accepted, will be merged and published.
+
+Thank you for your contribution!
+
+
