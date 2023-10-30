@@ -9,8 +9,6 @@ slug: /tutorials/hello-world/creating-the-database
 In Step 1 of this tutorial, we will walk through creating the database for a "Hello World" Kwil application.
 This will introduce you to the basic concepts of Kwil, including creating a database using the Kuneiform IDE, and exposing actions to allow access the database.
 
-> **TODO** NB - add alt / title / hover text over all icons in the Kuneiform IDE, e.g. Connect Wallet, LHS Nav bar, the new file and new folder icons etc.
-
 ## Prerequisites
 
 Before you begin, ensure that you have the prerequisites outlined in the ["Prerequisites"](../../prerequisites.md) section.
@@ -23,13 +21,9 @@ The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.k
 
 In the [Kuneiform IDE](https://ide.kwil.com/), you must connect your wallet to the endpoint for the Kwil Network you are deploying to. 
 
-> **TODO, no, use either Goerli or existing public Kwil test network**
-
 For this tutorial, we will be deploying to a network running on `http://localhost:8080`. 
 
 Add a new network by clicking on the `Default Workspace` dropdown in the Kuneiform IDE. This will bring up the `Workspace` Menu. Click on the `New Workspace +` option.
-
-> **TODO** add a red arrow highlighting the 'New Workspace' option.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img src={require("./assets/workspace-menu.png").default} alt="Workspace Menu" />
@@ -37,10 +31,6 @@ Add a new network by clicking on the `Default Workspace` dropdown in the Kuneifo
 <br />
 
 Next, add the network details in the popup Menu. After you click "OK", the IDE will automatically switch to the new network.
-
-> **TODO** Believe that https://provider.kwil.com would make sense for a 1st pass Tutorial example as it does NOT require the user to set up their own network as a prerequisite.
-
-> **TODO** How can I delete or Edit a Workspace once I've added it in the Kuneiform IDE?
 
 <div style={{ display: "flex", justifyContent: "center"  }}>
   <img src={require("./assets/add-workspace.png").default} alt="Token Deposit" />
@@ -149,7 +139,7 @@ and select our `hello-world.kf` file from the dropdown:
 </div>
 <br />
 
-Then, click `Compile`. Your Kuneiform code will now be checked for errors, and compiled **TODO** into EVM bytecode??
+Then, click `Compile`. Your Kuneiform code will now be checked for errors, and compiled into JSON to be submitted to the Kwil network.
 You will be notified if the code has compiled successfully. If there are any syntax errors, you will be advised of the error and line number at which it occurred.
 
 > **TODO** show a successful screen here (? green message?)
