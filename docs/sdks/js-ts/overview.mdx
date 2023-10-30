@@ -69,8 +69,8 @@ import { BrowserProvider } from "ethers";
 const provider = new BrowserProvider(window.ethereum);
 const signer = await provider.getSigner(); // can use wallet if NodeJS
 const publicKey = await Utils.recoverSecp256k1PubKey(
-  signer,
-  "Welcome to our app! Sign this message to reveal your public key."
+    signer,
+    "Welcome to our app! Sign this message to reveal your public key."
 );
 ```
 
@@ -109,10 +109,10 @@ If you wish to sign with something other than an EtherJS signer, you may pass a 
 
 Currently, Kwil supports two signature types:
 
-| Type      |   Enumerator   |
-| :-------- | :------------: |
-| Secp256k1 | 'secp256k1_ep' |
-| Ed25519   |   'ed25519'    |
+| Type      |   Enumerator   | Description |
+| :-------- | :------------: | ----------- |
+| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature. |
 
 To use an ed25519 signature:
 
@@ -145,20 +145,15 @@ Any action that executes a CUD operation must be signed and broadcasted to the n
 <TabItem value="js">
 
 ```javascript
-import { Utils } from "@kwilteam/kwil-js";
-
-// begin constructing the values for the action
-const input = new Utils.ActionInput()
-  .put("input_name_1", "input_value_1")
-  .put("input_name_2", "input_value_2")
-  .put("input_name_3", "input_value_3");
-
 // construct action body
 const actionBody = {
-  dbid,
-  action: "your_action_name",
-  inputs: input,
-  description: "Click sign to execute the action!",
+    dbid,
+    action: "your_action_name",
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+    description: "Click sign to execute the action!",
 };
 
 // pass action body and signer to execute method
@@ -175,19 +170,16 @@ const res = await kwil.execute(actionBody, kwilSigner);
 <TabItem value="ts">
 
 ```typescript
-import { Utils, Types } from "@kwilteam/kwil-js";
-
-// begin constructing the values for the action
-const input: Types.ActionInput = new Utils.ActionInput()
-  .put("input_name_1", "input_value_1")
-  .put("input_name_2", "input_value_2")
-  .put("input_name_3", "input_value_3");
+import { Types } from "@kwilteam/kwil-js";
 
 // construct action body
 const actionBody: Types.ActionBody = {
   dbid: dbid,
   action: "your_action_name",
-  inputs: input,
+  inputs:[{
+     input_name_1: "input_value_1",
+     input_name_2: ...
+  }],
   description: "Click sign to execute the action!",
 };
 
@@ -224,22 +216,17 @@ If a `view` action has a `mustsign` attribute, then you can also pass a `KwilSig
 <TabItem value="js">
 
 ```javascript
-import { Utils } from '@kwilteam/kwil-js'
-
-// begin constructing the values for the action
-const input = new Utils.ActionInput()
-    .put("input_name_1", "input_value_1")
-    .put("input_name_2", "input_value_2")
-    .put("input_name_3", "input_value_3")
-
 const actionBody = {
     dbid,
     action: "your_action_name",
-    inputs: input
-}
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+};
 
 // pass action body to execute method
-const res = await kwil.call(actionBody)
+const res = await kwil.call(actionBody);
 
 /*
     res.data = {
@@ -247,26 +234,24 @@ const res = await kwil.call(actionBody)
     }
 */
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```typescript
-import { Utils, Types } from '@kwilteam/kwil-js'
-
-// begin constructing the values for the action
-const input: Types.ActionInput = new Utils.ActionInput()
-    .put("input_name_1", "input_value_1")
-    .put("input_name_2", "input_value_2")
-    .put("input_name_3", "input_value_3")
+import { Types } from "@kwilteam/kwil-js";
 
 const actionBody: Types.ActionBody = {
     dbid,
     action: "your_action_name",
-    inputs: input
-}
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+};
 
 // pass action body to execute method
-const res = await kwil.call(actionBody)
+const res = await kwil.call(actionBody);
 
 /*
     res.data = {
@@ -274,6 +259,7 @@ const res = await kwil.call(actionBody)
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
@@ -302,7 +288,9 @@ const res = await kwil.listDatabases("public_key");
 ### Read a Deployed Database Schema
 
 ```javascript
-const dbid = kwil.getDBID("public_key", "database_name");
+import { Utils } from "@kwilteam/kwil-js";
+
+const dbid = Utils.generateDBID("public_key", "database_name");
 const schema = await kwil.getSchema(dbid);
 
 /*

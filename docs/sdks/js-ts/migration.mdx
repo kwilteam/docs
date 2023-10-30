@@ -44,7 +44,7 @@ const publicKey = await Utils.recoverSecp256k1PubKey(signer, 'Welcome to our app
 
 ### Get Account Identified by Public Key, Public Keys Returned as Bytes
 
-In the old version, accounts were identified by Ethereum Wallets. Now, they are identified by public keys (Secp256k1 or ED25519). Public keys can be represented by a Hex string or bytes (Uint8Array). If using a NEAR public key, you may also pass the Base58 encoded public key with the "ed25519:" prefix.
+In the old version, accounts were identified by Ethereum Wallets. Now, they are identified by public keys (Secp256k1 or ED25519). Public keys can be represented by a Hex string or bytes (Uint8Array).
 
 When returned from the server, public keys will always be represented as a Uint8Array.
 
@@ -174,10 +174,10 @@ If you wish to sign with something other than an EtherJS signer, you may pass a 
 
 Currently, Kwil supports two signature types:
 
-| Type  | Enumerator |
-|:----- |:------:|
-| Secp256k1  | 'secp256k1_ep'     |
-| Ed25519    | 'ed25519'     |
+| Type      |   Enumerator   | Description |
+| :-------- | :------------: | ----------- |
+| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature. |
 
 To use an ed25519 signature:
 
