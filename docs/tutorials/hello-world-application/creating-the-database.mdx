@@ -6,19 +6,24 @@ title: Creating The Database
 description: Creating a database for the hello world application!
 slug: /tutorials/hello-world/creating-the-database
 ---
-In this tutorial, we will walk through creating a very simple "Hello World" application with Kwil. This tutorial will introduce you to the basics of Kwil, including creating a database and executing actions through the SDK.
+In Step 1 of this tutorial, we will walk through creating the database for a "Hello World" Kwil application.
+This will introduce you to the basic concepts of Kwil, including creating a database using the Kuneiform IDE, and exposing actions to allow access the database.
 
 ## Prerequisites
 
 Before you begin, ensure that you have the prerequisites outlined in the ["Prerequisites"](../../prerequisites.md) section.
 
-This tutorial also assumes a basic understanding of SQL.
+This tutorial assumes you have a basic understanding of SQL.
 
 ## Setup
 
-The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.kwil.com). You can also use the [Kwil CLI](/docs/kwil-cli/installation).
+The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.kwil.com). (You can also use the [Kwil CLI](/docs/kwil-cli/installation), but this will be introduced in a later Tutorial.)
 
-In the Kuneiform IDE, you must connect to the endpoint for the Kwil Network you are deploying to. For this tutorial, we will be deploying to a network running on `http://localhost:8080`. You can add your network in the `Workspace` Menu:
+In the [Kuneiform IDE](https://ide.kwil.com/), you must connect your wallet to the endpoint for the Kwil Network you are deploying to. 
+
+For this tutorial, we will be deploying to a network running on `http://localhost:8080`. 
+
+Add a new network by clicking on the `Default Workspace` dropdown in the Kuneiform IDE. This will bring up the `Workspace` Menu. Click on the `New Workspace +` option.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   <img src={require("./assets/workspace-menu.png").default} alt="Workspace Menu" />
@@ -31,23 +36,45 @@ Next, add the network details in the popup Menu. After you click "OK", the IDE w
   <img src={require("./assets/add-workspace.png").default} alt="Token Deposit" />
 </div>
 
-## Create Database
+## Declaring Database Schema and Actions
 
-In the Kuneiform IDE, create a new file called `hello-world.kf`. This file will contain the database declaration, tables, and actions that can be executed on the database.
+In the Kuneiform IDE, click on the 'New File' icon and create a new file called `hello-world.kf`. This file will contain the database declaration, tables, and actions that can be executed on the database.
 
-#### 1. Declare Database
+<div style={{ display: "flex", justifyContent: "center"  }}>
+  <img src={require("./assets/add-new-file.png").default} alt="Add new Kuneiform file" />
+</div>
+
+#### 1. Database Declaration
 In the `hello-world.kf` file, declare the database name. Note that the database declaration must the first line of the file and must be in the format `database <database-name>;`.
 
-```typescript title="hello-world.kf"
+```sql title="hello-world.kf"
 database hello_world;
 ```
 
-#### 2. Declare Tables
-Next, declare the tables that will exist in the database. Tables are declared in the format `table <table-name> { <column-name> <column-type> <column-attributes>,};`. For information on support data types, attributes, and other features, visit the [supported features](../../kuneiform/supported-features) section.
+#### 2. Table Declaration
+Next, we will declare the tables that exist in the database. 
 
-You can also add an index to one or more columns by calling `#<index-name> <index-type>(<index-columns>)` in the table declaration. Below, we create a B-Tree index on the `wallet` column.
+Tables are declared in the format 
 
-```typescript title="hello-world.kf"
+```sql
+table <table-name> { 
+     <column-name> <column-type> <column-attributes>, 
+     ...
+}
+```
+
+For information on support data types, attributes, and other features, visit the [supported features](../../kuneiform/supported-features) section.
+
+#### 3. Adding B-Tree indexes
+
+Indexing freqently-accessed columns improves performance. Indexes can be added to one or more columns by adding the following to the `table` declaration.:
+```
+  #<index-name> <index-type>(<index-columns>)
+``` 
+
+Below, we create a B-Tree index called `wallet_index` on the `wallet` column:
+
+```sql title="hello-world.kf"
 database hello_world;
 
 table greetings {
@@ -58,12 +85,21 @@ table greetings {
 }
 ```
 
-#### 3. Declare Actions
-Lastly, declare the actions that will be used in the database. Actions are predefined SQL statements that can be executed on the database. Actions are declared in the format `action <action-name> ($<action-paramater>) <private/public> { <sql-statement> };`. More information on on the supported Kwil SQL syntax can be found [here](/docs/category/sql-as-understood-by-kwil). More information on the supported environment variables can be found [here](../../kuneiform/dml#using-contextual-variables-in-actions).
+#### 4. Declaring Actions
+Lastly, we will declare the actions that can be used to access the database. 
+Actions are predefined SQL statements that can be executed on the database. 
+
+Actions are declared in the format:
+```sql
+action <action-name> ($<action-parameter>) <private/public> { 
+  <sql-statement>;
+}
+``` 
+More information on on the supported Kwil SQL syntax can be found [here](/docs/category/sql-as-understood-by-kwil). More information on the supported environment variables can be found [here](../../kuneiform/dml#using-contextual-variables-in-actions).
 
 Below are four actions for executing select, insert, update, and delete queries on the database.
 
-```typescript title="hello-world.kf"
+```sql title="hello-world.kf"
 database hello_world;
 
 table greetings {
@@ -94,12 +130,27 @@ action delete_greeting ($id) public {
 }
 ```
 
-## Deploy Database
-Once the Kuneiform file is complete, toggle to the third tab in the IDE and select the `hello-world.kf` file from the dropdown. Then, click the `Compile` and `Deploy` buttons to deploy the database to the Kwil network. You will receive a confirmation message once the database is deployed.
+## Compiling Kuneiform source files
+
+Now that we have completed our Kuneiform database and action definitions, click on the `Compile and Deploy` icon in left-hand navigation panel in the IDE, 
+and select our `hello-world.kf` file from the dropdown:
+
+<div style={{ display: "flex", justifyContent: "center"  }}>
+  <img src={require("./assets/compile-kuneiform.png").default} alt="Compile and Deploy" />
+</div>
+<br />
+
+Then, click `Compile`. Your Kuneiform code will now be checked for errors, and compiled into JSON to be submitted to the Kwil network.
+You will be notified if the code has compiled successfully. If there are any syntax errors, you will be advised of the error and line number at which it occurred.
+
+## Deploying a Database
+
+After successful compilation, click the `Deploy` button to deploy the database to the Kwil network. 
+You will receive a confirmation message once the database is deployed.
 
 <div style={{ display: "flex", justifyContent: "center", width: "75%", margin: "auto" }}>
   <img src={require("./assets/deploy-successful.png").default} alt="Token Approval" />
 </div>
 <br />
 
-And that is it! You have successfully created a database on the Kwil network. In step 2, we will walk through using the database with the Kwil SDK.
+Congratulations! Now that you have successfully created a database on the Kwil network, let's move on to Step 2, where we will test our database using the Kwil SDK.

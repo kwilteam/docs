@@ -7,14 +7,15 @@ description: Things you will need to begin using Kwil!
 slug: /prerequisites
 ---
 
-In order to begin using Kwil, you will need the following:
+To begin using Kwil, you will need the following:
 
-- An Ethereum compatible Wallet
+- An Ethereum compatible Wallet, such as [Metamask](https://metamask.io/)
 - A Kwil database endpoint (see the [links page](./links.mdx) for a list of public endpoints)
+- Access the [Kuneiform IDE](kuneiform/introduction.mdx)
 
 ## Next Steps
 
-Once you have the above materials, jump into any of the following guides to get started.
+Once you have the above prerequisites, jump into any of the following guides to get started.
 
 - [Building a "Hello, World!" database](./tutorials/hello-world-application/creating-the-database.mdx)
 - [Learn how to design schemas with Kuneiform](./kuneiform/introduction.mdx)
