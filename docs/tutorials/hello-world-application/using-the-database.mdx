@@ -50,6 +50,7 @@ const { Wallet } = require("ethers");
 
 const kwil = new NodeKwil({
   kwilProvider: "https://<kwil-provider-url>",
+  chainId: "kwil-test-chain"
 });
 
 const ethersWallet = new Wallet("<ethereum-private-key>"); // Use your own private key here
@@ -78,6 +79,7 @@ import { BrowserProvider } from "ethers";
 
 export const kwil = new WebKwil({
   kwilProvider: "https://provider.kwil.com",
+  chainId: "kwil-test-chain"
 });
 
 const provider = new BrowserProvider(window.ethereum);
@@ -100,6 +102,7 @@ import { BrowserProvider, Signer } from "ethers";
 
 export const kwil: WebKwil = new WebKwil({
   kwilProvider: "https://<kwil-provider-url>",
+  chainId: "kwil-test-chain"
 });
 
 const provider: BrowserProvider = new BrowserProvider(window.ethereum);
@@ -200,7 +203,7 @@ addGreeting(1, "Hello World!")
 import { kwil, dbid, publicKey, kwilSigner } from './index';
 import { Utils, Types } from 'kwil';
 
-async function executeInsery(id, msg): Promise<Types.GenericResponse<Types.TxReceipt>> {
+async function addGreeting(id, msg): Promise<Types.GenericResponse<Types.TxReceipt>> {
     const inputs: Types.ActionInput = new Utils.ActionInput()
         .put('$id', 1)
         .put('$message', 'Hello World!');
