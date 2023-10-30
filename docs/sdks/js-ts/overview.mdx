@@ -5,11 +5,14 @@ title: Kwil JS Overview
 description: Using the Kwil JS SDK
 slug: /sdks/js-ts/overview
 ---
-import {InitTabs} from './code_tabs.jsx'
 
-Below is a quick overview of how to use the Kwil JS SDK.  For more detailed information, see the [API Reference](/docs/sdks/js-ts/apis).
+import { InitTabs } from "./code_tabs.jsx";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
-Please note that the `@kwilteam/kwil-js` package should only be used with Kwil Daemons on the CometBFT Release (v0.6.0 and above).  For earlier releases, please use the [`kwil`](https://www.npmjs.com/package/kwil) package. The `kwil` package is deprecated and will not be maintained.
+Below is a quick overview of how to use the Kwil JS SDK. For more detailed information, see the [API Reference](/docs/sdks/js-ts/apis).
+
+Please note that the `@kwilteam/kwil-js` package should only be used with Kwil Daemons on the CometBFT Release (v0.6.0 and above). For earlier releases, please use the [`kwil`](https://www.npmjs.com/package/kwil) package. The `kwil` package is deprecated and will not be maintained.
 
 The migration guide from `kwil` to `@kwilteam/kwil-js` can be found [here](/docs/sdks/js-ts/migration).
 
@@ -60,10 +63,15 @@ In Kwil, accounts are identified by a public key. Kwil supports Secp256k1 Public
 Note that a Secp256k1 public key is different than an Ethereum address. To recover the public key, use the following utility function:
 
 ```javascript
-import { Utils } from '@kwilteam/kwil-js'
+import { Utils } from "@kwilteam/kwil-js";
+import { BrowserProvider } from "ethers";
 
+const provider = new BrowserProvider(window.ethereum);
 const signer = await provider.getSigner(); // can use wallet if NodeJS
-const publicKey = await Utils.recoverSecp256k1PubKey(signer, 'Welcome to our app! Sign this message to reveal your public key.'); 
+const publicKey = await Utils.recoverSecp256k1PubKey(
+    signer,
+    "Welcome to our app! Sign this message to reveal your public key."
+);
 ```
 
 ### Database Identifiers (DBID)
@@ -71,22 +79,219 @@ const publicKey = await Utils.recoverSecp256k1PubKey(signer, 'Welcome to our app
 In Kwil, databases are identified by a 'database identifier', which is a hex encoded SHA224 Hash of the database name and public key, prepended with an `x`.
 
 ```javascript
-const dbid = kwil.getDBID('public_key', 'database_name')
+const dbid = kwil.getDBID("public_key", "database_name");
+```
+
+## Signers
+
+Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CUD actions, certain read operations, etc).
+
+To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-Js supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
+
+```javascript
+import { Utils, KwilSigner } from "@kwilteam/kwil-js";
+import { BrowserProvider } from "ethers";
+
+// get ethers signer
+const provider = new BrowserProvider(window.ethereum);
+const signer = await provider.getSigner();
+
+// get secp256k1 public key
+const publicKey = await Utils.recoverSecp256k1PubKey(signer);
+
+// create kwil signer
+const kwilSigner = new KwilSigner(signer, publicKey);
+```
+
+#### Custom Signers
+
+If you wish to sign with something other than an EtherJS signer, you may pass a callback function that accepts and returns a `Uint8Array()` and the enumerator for the signature type used.
+
+Currently, Kwil supports two signature types:
+
+| Type      |   Enumerator   | Description |
+| :-------- | :------------: | ----------- |
+| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature. |
+
+To use an ed25519 signature:
+
+```javascript
+import nacl from "tweetnacl";
+import { KwilSigner } from "@kwilteam/kwil-js";
+
+// create keypair and signer
+const keys = nacl.sign.keyPair();
+const customSigner = (msg) => nacl.sign.detached(msg, keys.secretKey);
+
+const kwilSigner = new KwilSigner(customSigner, keys.publicKey, "ed25519");
+```
+
+## Database Queries
+
+### Create, Update, Delete (CUD) Actions
+
+Any action that executes a CUD operation must be signed and broadcasted to the network through the `kwil.execute()` method.
+
+`.execute()` takes an object that matches the `ActionBody` interface. Action body has two required fields: `dbid` and `action`. You can also optionally add an `inputs` field if the action requires inputs, and a `description` field to customize the signature message.
+
+<Tabs
+    defaultValue="js"
+    values={[
+        { label: 'JavaScript', value: 'js', },
+        { label: 'Typescript', value: 'ts', },
+    ]}
+>
+<TabItem value="js">
+
+```javascript
+// construct action body
+const actionBody = {
+    dbid,
+    action: "your_action_name",
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+    description: "Click sign to execute the action!",
+};
+
+// pass action body and signer to execute method
+const res = await kwil.execute(actionBody, kwilSigner);
+
+/*
+    res.data = {
+        tx_hash: "hash",
+    }
+*/
+```
+
+</TabItem>
+<TabItem value="ts">
+
+```typescript
+import { Types } from "@kwilteam/kwil-js";
+
+// construct action body
+const actionBody: Types.ActionBody = {
+  dbid: dbid,
+  action: "your_action_name",
+  inputs:[{
+     input_name_1: "input_value_1",
+     input_name_2: ...
+  }],
+  description: "Click sign to execute the action!",
+};
+
+// pass action body and signer to execute method
+await kwil.execute(actionBody, kwilSigner);
+
+/*
+    res.data = {
+        tx_hash: "hash",
+    }
+*/
+```
+
+</TabItem>
+</Tabs>
+
+### Reading Data
+
+To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
+
+#### `View` Action Message
+
+`View` actions are read-only actions that can be used to query data without having to wait for a transaction to be mined on Kwil.
+
+If a `view` action has a `mustsign` attribute, then you can also pass a `KwilSigner` as a second argument to the `.call()` method.
+
+<Tabs
+    defaultValue="js"
+    values={[
+        { label: 'JavaScript', value: 'js', },
+        { label: 'Typescript', value: 'ts', },
+    ]}
+>
+<TabItem value="js">
+
+```javascript
+const actionBody = {
+    dbid,
+    action: "your_action_name",
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+};
+
+// pass action body to execute method
+const res = await kwil.call(actionBody);
+
+/*
+    res.data = {
+        result: [ query results ],
+    }
+*/
+```
+
+</TabItem>
+<TabItem value="ts">
+
+```typescript
+import { Types } from "@kwilteam/kwil-js";
+
+const actionBody: Types.ActionBody = {
+    dbid,
+    action: "your_action_name",
+    inputs: [{
+        input_name_1: "input_value_1",
+        input_name_2: ...
+    }],
+};
+
+// pass action body to execute method
+const res = await kwil.call(actionBody);
+
+/*
+    res.data = {
+        result: [ query results ],
+    }
+*/
+```
+
+</TabItem>
+</Tabs>
+
+#### Select Query
+
+```javascript
+const dbid = kwil.getDBID("public_key", "database_name");
+const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
+
+/*
+    res.data = [
+        ...
+    ]
+*/
 ```
 
 ## Database Info
 
-### List Databases 
+### List Databases
 
-``` javascript
-const res = await kwil.listDatabases("public_key")
+```javascript
+const res = await kwil.listDatabases("public_key");
 // res.data = ["db1", "db2", "db3"]
 ```
 
 ### Read a Deployed Database Schema
-``` javascript
-const dbid = kwil.getDBID("public_key", "database_name")
-const schema = await kwil.getSchema(dbid)
+
+```javascript
+import { Utils } from "@kwilteam/kwil-js";
+
+const dbid = Utils.generateDBID("public_key", "database_name");
+const schema = await kwil.getSchema(dbid);
 
 /*
     schema.data = {
@@ -101,8 +306,8 @@ const schema = await kwil.getSchema(dbid)
 
 ### Get Account Info
 
-``` javascript
-const res = await kwil.getAccount("public_key")
+```javascript
+const res = await kwil.getAccount("public_key");
 
 /*
     res.data = {
@@ -110,128 +315,5 @@ const res = await kwil.getAccount("public_key")
         balance: "some_balance",
         nonce: "some_nonce"
     }
-*/
-```
-
-## Database Queries
-
-### Create, Update, Delete (CUD) Actions
-
-Any action that executes a CUD operation must be signed and broadcasted to the network as a transaction.
-
-``` javascript
-import { Utils } from '@kwilteam/kwil-js'
-
-// begin constructing the values for the action
-const input = new Utils.ActionInput()
-    .put("input_name_1", "input_value_1")
-    .put("input_name_2", "input_value_2")
-    .put("input_name_3", "input_value_3")
-
-// retrieve database ID to locate action
-const dbid = kwil.getDBID("publicKey", "database_name")
-
-// construct and sign action transaction
-const tx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name("your_action_name")
-    .concat(input)
-    .publicKey('public_key')
-    .signer(await provider.getSigner()) // can use wallet if NodeJS
-    .description("Click sign to execute the action!") // your custom signature message to appear in browser wallet
-    .buildTx()
-
-// broadcast transaction to kwil network
-const res = await kwil.broadcast(tx)
-
-/*
-    res.data = {
-        tx_hash: "some_hash",
-    }
-*/
-```
-
-#### Custom Signers
-
-The `.signer()` method also allows you to pass a custom signing function (must receive and return a `Uint8Array`) and the enumerator for the signature type used.
-
-Currently, Kwil supports three signature types:
-
-| Type  | Enumerator |
-|:----- |:------:|
-| Secp256k1  | 'secp256k1_ep' |
-| Ed25519    | 'ed25519' |
-| Ed25519 w/ NEAR Digest | 'ed25519_nr' |
-
-To sign with a ed25519 signature:
-
-```javascript
-import nacl from 'tweetnacl';
-
-const keys = nacl.sign.keyPair();
-const customSigner = (msg) => nacl.sign.detached(msg, keys.secretKey);
-
-const tx = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name('your_action_name')
-    .concat(input)
-    .publicKey(keys.publicKey)
-    .signer(customSigner, 'ed25519')
-    .description("Click sign to execute the action!")
-    .buildTx()
-
-await kwil.broadcast(tx);
-```
-
-### Reading Data
-
-To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
-
-If a `view` action has a `must_sign` attribute, then you must add `.signer()` and `.publicKey()` methods to the action builder. You can optionally add a `.description()` method to customize the signature message.
-
-#### `View` Action Message
-
-```javascript
-import { Utils } from '@kwilteam/kwil-js'
-
-// begin constructing the values for the action
-const input = new Utils.ActionInput()
-    .put("input_name_1", "input_value_1")
-    .put("input_name_2", "input_value_2")
-    .put("input_name_3", "input_value_3")
-
-// retrieve database ID to locate action
-const dbid = kwil.getDBID("public_key", "database_name")
-
-// construct message
-const msg = await kwil
-    .actionBuilder()
-    .dbid(dbid)
-    .name("your_action_name")
-    .concat(input)
-    .buildMsg()
-
-// call from kwil network
-const res = await kwil.call(msg)
-
-/*
-    res.data = {
-        result: [ query results ],
-    }
-*/
-```
-
-#### Select Query
-
-``` javascript
-const dbid = kwil.getDBID("public_key", "database_name")
-const res = await kwil.selectQuery(dbid, "SELECT * FROM users")
-
-/*
-    res.data = [
-        ...
-    ]
 */
 ```
