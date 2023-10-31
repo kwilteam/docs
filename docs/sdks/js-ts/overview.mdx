@@ -38,13 +38,14 @@ The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Et
 
 ### Optional Configuration
 
-The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required field is `kwilProvider`; however, you have additional configuration options available to you:
+The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required fields are `kwilProvider` and `chainId`; however, you have additional configuration options available to you:
 
 ```js
 import { WebKwil, Utils } from 'kwil'; // or NodeKwil
 
 const kwil = new WebKwil({
     kwilProvider: 'https://provider.kwil.com',
+    chainId: 'your_chain_id',
     // optional configuration
     timeout: number; // timeout for requests, default 30000
     logging: boolean; // enable logging, default false
@@ -53,6 +54,8 @@ const kwil = new WebKwil({
 });
 
 ```
+
+To verify you have the correct chainId, you can use the [`chainInfo()`](#chain-info) method.
 
 ## Identifiers
 
@@ -276,9 +279,27 @@ const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
 */
 ```
 
-## Database Info
+## Network Info
+
+### Chain Info
+
+Returns the chain id, latest block height, and latest block hash for the Kwil chain you are connected to.
+
+```javascript
+const res = await kwil.chainInfo()
+
+/*
+    res.data = {
+        chainId: "your_chain_id",
+        blockHeight: "latest_block_height",
+        blockHash: "latest_block_hash"
+    }
+*/
+```
 
 ### List Databases
+
+Returns all database names belonging to a public key.
 
 ```javascript
 const res = await kwil.listDatabases("public_key");
@@ -306,12 +327,14 @@ const schema = await kwil.getSchema(dbid);
 
 ### Get Account Info
 
+Returns the balance and nonce of a public key.
+
 ```javascript
 const res = await kwil.getAccount("public_key");
 
 /*
     res.data = {
-        address: "public_key",
+        public_key: "public_key",
         balance: "some_balance",
         nonce: "some_nonce"
     }

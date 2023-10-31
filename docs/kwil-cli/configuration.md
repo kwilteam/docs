@@ -43,7 +43,8 @@ Below is a table containing the available configs, their flags, an example value
 | Config | Flag | Example | Description |
 |-|-|-|-|
 | gRPC URL | `--kwil-provider` | `provider.kwil.com:80` | The gRPC endpoint of a Kwil node, which will be used for accessing data on the node's network. |
-|Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br></br>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
+| Kwil Chain ID | `--chain-id` | `kwil-test-chain` | The chain ID of the Kwil network to use. Can be left blank to trust a server-provided value. |
+|Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br/>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
 | TLS Cert File Path| `--tls-cert-file` | `~/certs/kwil_provider.pem` | The filepath to be used for the TLS cert to be used over gRPC.  If empty, communication will be unencrypted. |
 
 > NOTE: There is another specical flag `--output`, which is used to specify the output format. By default it's `text`, but you can also set it to `json`.  When set to `json`, command output will be formatted as JSON instead of text.

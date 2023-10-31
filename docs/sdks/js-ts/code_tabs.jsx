@@ -28,7 +28,8 @@ const provider = new BrowserProvider(window.ethereum)
 const dbid = Utils.generateDBID("deployer_public_key", "database_name")
 
 const kwil = new WebKwil({
-    kwilProvider: "https://provider.kwil.com"
+    kwilProvider: "https://provider.kwil.com",
+    chainId: "your_chain_id"
 });`
 
 const initJsNode = `const { Wallet, JsonRpcProvider } = require('ethers');
@@ -45,6 +46,7 @@ const dbid = Utils.generateDBID("deployer_public_key", "database_name")
 
 const kwil = new kwiljs.NodeKwil({
     kwilProvider: "https://provider.kwil.com",
+    chainId: "your_chain_id"
 });`
 
 export function InitTabs() {

@@ -19,6 +19,7 @@ constructor(config: Config): Kwil
 
 interface Config {
     kwilProvider: string;
+    chainId: string;
     timeout?: number;
     apiKey?: string;
     logging?: boolean;
@@ -32,7 +33,7 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 
 #### Parameters
 
-- `config`: The configuration object for the Kwil class.
+-   `config`: The configuration object for the Kwil class.
 
 #### Returns
 
@@ -57,9 +58,9 @@ Executes a state-changing (Create, Update, Delete) action on the Kwil network.
 
 #### Parameters
 
-- `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
+-   `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
 
-- `kwilSigner`: The signer for the action transaction. This can be created with the `KwilSigner` class.
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
 #### Returns
 
@@ -84,9 +85,9 @@ Calls a `view` action on the network.
 
 #### Parameters
 
-- `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message, if the action requires a signature.
+-   `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message, if the action requires a signature.
 
-- `kwilSigner`: The signer for the action transaction. This can be created with the `KwilSigner` class. A KwilSigner is only required if the action requires a signature.
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class. A KwilSigner is only required if the action requires a signature.
 
 #### Returns
 
@@ -109,9 +110,9 @@ Note that the `.deploy()` method not the recommended way to deploy databases on 
 
 #### Parameters
 
-- `deployBody`: The deploy body to execute. This object should match the `DeployBody` interface and contain the compiled Kuneiform schema. It can also contain a custom signature message. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
+-   `deployBody`: The deploy body to execute. This object should match the `DeployBody` interface and contain the compiled Kuneiform schema. It can also contain a custom signature message. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
 
-- `kwilSigner`: The signer for the action transaction. This can be created with the `KwilSigner` class.
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
 #### Returns
 
@@ -132,9 +133,9 @@ Drops a database from the Kwil network.
 
 #### Parameters
 
-- `dropBody`: The drop body to execute. This object should match the `DropBody` interface and contain the database ID. It can also contain a custom signature message.
+-   `dropBody`: The drop body to execute. This object should match the `DropBody` interface and contain the database ID. It can also contain a custom signature message.
 
-- `kwilSigner`: The signer for the action transaction. This can be created with the `KwilSigner` class.
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
 #### Returns
 
@@ -150,8 +151,8 @@ Generates a unique database identifier (DBID) from the provided owner's public k
 
 #### Parameters
 
-- `owner`: The owner's public key
-- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
+-   `owner`: The owner's public key
+-   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 
@@ -167,7 +168,7 @@ Retrieves the schema of a database given its unique identifier (DBID).
 
 #### Parameters
 
-- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
+-   `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
 
 #### Returns
 
@@ -189,7 +190,7 @@ Retrieves an account using the owner's public key.
 
 #### Parameters
 
-- `owner`: The owner's public key.
+-   `owner`: The owner's public key.
 
 #### Returns
 
@@ -205,11 +206,23 @@ Lists all databases owned by a particular owner.
 
 #### Parameters
 
-- `owner`: The owner's public key.
+-   `owner`: The owner's public key.
 
 #### Returns
 
 A promise that resolves to a list of database names.
+
+### chainInfo()
+
+```typescript
+async chainInfo(): Promise<GenericResponse<ChainInfo>>
+```
+
+Retrieves the chain id, latest block height, and latest block hash on the specified Kwil provider.
+
+#### Returns
+
+A promise that resolves to a `ChainInfo` object, containing the chain id, latest block height, and latest block hash.
 
 ### ping()
 
@@ -233,8 +246,8 @@ Performs a SELECT query on a database. The query must be a read-only query.
 
 #### Parameters
 
-- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
-- `query`: The SELECT query to execute.
+-   `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
+-   `query`: The SELECT query to execute.
 
 #### Returns
 
@@ -250,7 +263,7 @@ Retrieves information about a transaction given its hash.
 
 #### Parameters
 
-- `hash`: The hash of the transaction.
+-   `hash`: The hash of the transaction.
 
 #### Returns
 
@@ -272,18 +285,18 @@ Creates a new instance of the KwilSigner class.
 
 #### Parameters
 
-- `signer`: The signer for the action transaction. It can receive an EtherJS (v5 or v6) signer or a custom signer function.
+-   `signer`: The signer for the action transaction. It can receive an EtherJS (v5 or v6) signer or a custom signer function.
 
-- `publicKey`: The public key of the user that is executing the action transaction. This can be a hex string or a Uint8Array.
+-   `publicKey`: The public key of the user that is executing the action transaction. This can be a hex string or a Uint8Array.
 
-- `signatureType`: The signature type enumerator. This is only required if a custom signer function is provided.
+-   `signatureType`: The signature type enumerator. This is only required if a custom signer function is provided.
 
 The following signature types can be used:
 
-| Type                   |   Enumerator   |
-| :--------------------- | :------------: |
-| Secp256k1              | 'secp256k1_ep' |
-| Ed25519                |   'ed25519'    |
+| Type      |   Enumerator   | Description                                                                                                                                                            |
+| :-------- | :------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature.                                                                                                                         |
 
 #### Returns
 
@@ -315,8 +328,8 @@ Adds or replaces a value for a single action input.
 
 #### Parameters
 
-- `key`: The action input name.
-- `value`: he value to put for the action input.
+-   `key`: The action input name.
+-   `value`: he value to put for the action input.
 
 #### Returns
 
@@ -332,8 +345,8 @@ Adds a value for a single action input if the key is not already present.
 
 #### Parameters
 
-- `key`: The action input name.
-- `value`: The value to put for the action input.
+-   `key`: The action input name.
+-   `value`: The value to put for the action input.
 
 #### Returns
 
@@ -349,8 +362,8 @@ Replaces a value for a single action input if the key is already present.
 
 #### Parameters
 
-- `key`: The action input name.
-- `value`: The value to replace for the action input.
+-   `key`: The action input name.
+-   `value`: The value to replace for the action input.
 
 #### Returns
 
@@ -366,7 +379,7 @@ Retrieves an action input value given its key.
 
 #### Parameters
 
-- `key`: The action input name.
+-   `key`: The action input name.
 
 #### Returns
 
@@ -382,8 +395,8 @@ Retrieves a value by its action input name, or a default value if the action inp
 
 #### Parameters
 
-- `key`: The action input name.
-- `defaultValue`: The default value to return if the key is not present.
+-   `key`: The action input name.
+-   `defaultValue`: The default value to return if the key is not present.
 
 #### Returns
 
@@ -399,7 +412,7 @@ Checks if the map contains a specific action input name.
 
 #### Parameters
 
-- `key`: The action input name.
+-   `key`: The action input name.
 
 #### Returns
 
@@ -415,7 +428,7 @@ Removes a action input name and its associated value from the map.
 
 #### Parameters
 
-- `key`: The action input name to remove.
+-   `key`: The action input name to remove.
 
 #### Returns
 
@@ -431,7 +444,7 @@ Converts the map of action inputs to an array of entries.
 
 #### Parameters
 
-- `filter`: An optional filter function.
+-   `filter`: An optional filter function.
 
 #### Returns
 
@@ -447,7 +460,7 @@ Adds or replaces values from and object of action name/key-value pairs.
 
 #### Parameters
 
-- `obj`: The object from which to extract action name/key-value pairs.
+-   `obj`: The object from which to extract action name/key-value pairs.
 
 #### Returns
 
@@ -463,7 +476,7 @@ Adds values from and object of action name/key-value pairs if the key is not alr
 
 #### Parameters
 
-- `obj`: The object from which to extract action name/key-value pairs.
+-   `obj`: The object from which to extract action name/key-value pairs.
 
 #### Returns
 
@@ -479,7 +492,7 @@ Replaces values from and object of action name/key-value pairs if the key is alr
 
 #### Parameters
 
-- `obj`: The object from which to extract action name/key-value pairs.
+-   `obj`: The object from which to extract action name/key-value pairs.
 
 #### Returns
 
@@ -495,7 +508,7 @@ Creates multiple `ActionInput` instances from an array of objects.
 
 #### Parameters
 
-- `objs`: An array of objects from which to create `ActionInput` instances.
+-   `objs`: An array of objects from which to create `ActionInput` instances.
 
 #### Returns
 
@@ -523,7 +536,7 @@ Creates a new `ActionInput` instance from an iterable array of entries.
 
 #### Parameters
 
-- `entries`: The iterable of set of entries. Entries should be formatted as an array of `[inputName, value]`.
+-   `entries`: The iterable of set of entries. Entries should be formatted as an array of `[inputName, value]`.
 
 #### Returns
 
@@ -539,7 +552,7 @@ Creates a new `ActionInput` instance from an object.
 
 #### Parameters
 
-- `obj`: The object from which to create the `ActionInput`.
+-   `obj`: The object from which to create the `ActionInput`.
 
 #### Returns
 
@@ -555,7 +568,7 @@ Creates multiple `ActionInput` instances from an array of objects.
 
 #### Parameters
 
-- `objs`: An array of objects from which to create `ActionInput` instances.
+-   `objs`: An array of objects from which to create `ActionInput` instances.
 
 #### Returns
 
@@ -579,8 +592,8 @@ An alternative to the kwil.getDBID() method, allowing developers to retrieve a d
 
 #### Parameters
 
-- `owner`: The owner's public key.
-- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
+-   `owner`: The owner's public key.
+-   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 
@@ -596,8 +609,8 @@ Recovers the public key from a secp256k1 signature.
 
 #### Parameters
 
-- `signer`: The signer to recover the public key from. This must be a signer from Ethers v5 or Ethers v6.
-- `message`: An optional message to sign. If not provided, the message will be 'Sign this message to recover your public key.'
+-   `signer`: The signer to recover the public key from. This must be a signer from Ethers v5 or Ethers v6.
+-   `message`: An optional message to sign. If not provided, the message will be 'Sign this message to recover your public key.'
 
 #### Returns
 
