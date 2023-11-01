@@ -229,7 +229,7 @@ Suppose you wish to deploy a network comprising three nodes, where two nodes act
 Generate the required configuration for these nodes by running:
 
 ```bash
-kwil-admin setup testnet -v 2 -n 1 --hostname "192.168.2.10" --hostname "192.168.2.20" --hostname "192.168.2.10" -o "./testnet"
+kwil-admin setup testnet -v 2 -n 1 --hostnames "192.168.2.10" "192.168.2.20" "192.168.2.30" -o "./testnet"
 ```
 
 This generates `private_key`, `genesis.json` and `config.toml` files for all the 3 nodes at location `./testnet`.
@@ -314,7 +314,7 @@ Docker compose can be used to automate the whole process to deploy multiple node
 <details>
     <summary>sample docker-compose.yml file</summary>
 
-  ```yaml
+  ```yaml title="docker-compose.yml"
     version: "1"
 
     services:
@@ -326,8 +326,6 @@ Docker compose can be used to automate the whole process to deploy multiple node
           - "50051:50051"
           - "26656:26656"
           - "26657:26657"
-        env_file:
-          - .env
         volumes:
           - type: bind
             source: ./testnet/node0
@@ -351,8 +349,6 @@ Docker compose can be used to automate the whole process to deploy multiple node
           - "50052:50051"
           - "26666:26656"
           - "26667:26657"
-        env_file:
-          - .env
         volumes:
           - type: bind
             source: ./testnet/node1
@@ -376,8 +372,6 @@ Docker compose can be used to automate the whole process to deploy multiple node
           - "50053:50051"
           - "26676:26656"
           - "26677:26657"
-        env_file:
-          - .env
         volumes:
           - type: bind
             source: ./testnet/node2
