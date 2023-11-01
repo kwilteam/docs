@@ -12,7 +12,7 @@ In this tutorial, we will expand on the functionality introduced in the [Hello W
 
 This tutorial assumes that you are familiar with the concepts introduced in the [Hello World Tutorial](/docs/tutorials/hello-world/creating-the-database), including:
 - Basic Kuneiform Syntax for database declarations, tables, and actions.
-- How to interact with your database via the Kwil JS/TS SDK.
+- How to interact with your database via the `kwil-js` SDK.
 - How to execution actions and read-only queries on your database.
 
 If any of these concepts are not familiar to you, we strongly recommend returning to the [Hello World Tutorial](/docs/tutorials/hello-world/creating-the-database) and then come back to this tutorial.
@@ -29,15 +29,15 @@ Clearing your browser history will remove any created or saved files in the IDE.
 :::
 
 ## Schema Overview
-The schema contains five tables: `users`, `posts`, `likes`, and `followers`.
+The schema contains five tables: `users`, `posts`, `likes`, `followers`, and `balances`.
 
-The schema contains 13 actions that could be called within a social media application to execute some database CRUD operations: `create_user`, `update_users`, `create_posts`, `delete_post`, `like_post`, `unlike_post`, `follow`, `unfollow`, `get_user_by_username`, `get_users_by_wallet`, `get_feed`, and `celebrity_get_feed`.
+The schema contains 15 actions that could be called within a social media application to execute some database CRUD operations: `create_user`, `update_user`, `add_balance`, `check_balance`, `read_post`, `create_post`, `delete_post`, `like_post`, `unlike_post`, `follow`, `unfollow`, `get_user_by_username`, `get_users_by_wallet`, `get_feed`, and `get_celebrity_feed`.
 
 ## Concepts
 
 ### View Actions
 
-If an action returns data, it should be given a `view` access tag. The advantage to using a `view` action is that it returns data directly from the node, rather than having to wait for the transaction to be mined. Any data returned from a `view` action has been mined on the network.
+If an action returns data, it should be given a `view` access tag. The advantage to using a [`view` action](/docs/concepts#view-actions) is that it returns data directly from the node, rather than having to wait for the transaction to be mined. Any data returned from a `view` action has been mined on the network.
 
 ```typescript title="social_network.kf"
 action get_user_by_username($username) public view {
@@ -54,7 +54,7 @@ You can read more about other access tags [here](/docs/kuneiform/supported-featu
 Public / private actions function similarily to how public / private methods work in TypeScript. In Kwil, public actions mean that they can be called externally by a database user. Private actions can only be called from within other Kuneiform actions.
 
 ```typescript tite="social_network.kf"
-action check_balance() private view {
+action check_balance() private view mustsign {
     SELECT
         CASE
             WHEN balance < 10 THEN ERROR('insufficient balance')
@@ -63,7 +63,7 @@ action check_balance() private view {
     FROM balances WHERE wallet = address(@caller);
 }
 
-action read_post($post_id) public view {
+action read_post($post_id) public view mustsign {
     check_balance();
     SELECT * FROM posts WHERE id = $post_id;
 }
@@ -115,7 +115,7 @@ action get_feed($username, $offset) public view {
         WHERE username = $username
     )
     ORDER BY date(p.post_date) DESC NULLS LAST
-    LIMIT 20 OFFSET $offset
+    LIMIT 20 OFFSET $offset;
 }
 ```
 
