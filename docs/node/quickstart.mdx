@@ -23,32 +23,32 @@ kwild --autogen
 
 ## Multi-Node
 
-To run a local Kwil network, you can use the `kwil-admin` tool to generate multiple node configs for you.
+To run a local Kwil network, you can use the `kwil-admin` tool to generate multiple node configs.
 
 ### Generate Configs
 
 To generate the configs for 3 validators in `./kwil-testnet`, run:
 
 ```bash
-kwil-admin setup testnet -v 3 --hostnames "localhost" "localhost" "loocalhost" --output-dir ./kwil-testnet
+kwil-admin setup testnet -v 3 --hostnames "localhost" "localhost" "localhost" --output-dir ./kwil-testnet
 ```
 
-## Run Nodes
+### Run Nodes
 
 To run the nodes, we can use the `kwild` binary in 3 separate terminals.  We will need to specify the `--root_dir` flag to
 point to the directory where the node config is located.
 
 ```bash title="Terminal 1"
-kwild --root_dir ./kwil-testnet/node0 --app.grpc_listen_addr localhost:50051 --app.http_listen_addr localhost:8080 --app.admin_listen_addr localhost:50151 --chain.p2p.listen_addr "tcp://localhost:26656" --chain.rpc.listen_addr "tcp://localhost:26655"
+kwild --root_dir ./kwil-testnet/node0
 ```
 
 ```bash title="Terminal 2"
-kwild --root_dir ./kwil-testnet/node1 --app.grpc_listen_addr localhost:50052 --app.http_listen_addr localhost:8081 --app.admin_listen_addr localhost:50152 --chain.p2p.listen_addr "tcp://localhost:26657" --chain.rpc.listen_addr "tcp://localhost:26654"
+kwild --root_dir ./kwil-testnet/node1
 ```
 
 ```bash title="Terminal 3"
-kwild --root_dir ./kwil-testnet/node2 --app.grpc_listen_addr localhost:50053 --app.http_listen_addr localhost:8082 --app.admin_listen_addr localhost:50153 --chain.p2p.listen_addr "tcp://localhost:26658" --chain.rpc.listen_addr "tcp://localhost:26653"
+kwild --root_dir ./kwil-testnet/node2
 ```
 
-Once the nodes are running, you will be able to see that they are mining blocks.  You can now connect to their gRPC and HTTP
+Once the nodes are running, they will begin mining blocks.  You can now connect to their gRPC and HTTP
 endpoints to interact with your local network.
