@@ -1,9 +1,0 @@
-{
-    "label": "Tutorials",
-    "position": 3,
-    "link": {
-      "type": "generated-index",
-      "description": "The following tutorials will help you understand the basic features of Kwil, such as defining a database schema and actions in Kuneiform, and then compiling and deploying an application to a network."
-    },
-    "collapsed": true
-}

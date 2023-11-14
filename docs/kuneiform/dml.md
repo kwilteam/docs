@@ -116,7 +116,7 @@ A list of supported variables will be kept here:
 
 | Variable | Description                                           |
 |----------|-------------------------------------------------------|
-| @caller  | A blob containing the key type, address format, and public key of the caller executing the action. This should be used in conjuction with functions like [`public_key()`](/docs/scalar-functions#public_keyx-public_keyxy) and [`address()`](/docs/scalar-functions#addressx). |
+| @caller  | A string containing the identifier for a caller's wallet.  For Ethereum wallets, this is the 0x address. |
 | @action  | The name of the action being executed |
 | @dataset | The DBID of the dataset that is being used |
 

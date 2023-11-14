@@ -1,9 +1,0 @@
-{
-    "label": "Tutorial 2: Social App",
-    "position": 2,
-    "link": {
-      "type": "generated-index",
-      "description": "This tutorial expands on the concepts covered in 'Hello World' and introduces advanced Kwil functionality."
-    },
-    "collapsed": true
-}

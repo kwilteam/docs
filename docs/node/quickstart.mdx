@@ -1,0 +1,41 @@
+---
+sidebar_position: 1
+sidebar_label: "Quickstart"
+id: node-quickstart
+title: Node Quickstart
+description: Quickstart guide for running a node
+slug: /node/quickstart
+---
+
+## Installation
+
+To run either a single Kwil node, or a network of nodes, you will need to download the binaries.  Kwil releases
+binaries on [Github](<https://github.com/kwilteam/binary-releases/releases>).
+
+## Single Node
+
+To run a single node, simply use the `kwild` binary with the `--autogen` flag.  This will automatically generate a
+genesis file, private key, and more in the `~/.kwild` directory.
+
+```bash
+kwild --autogen
+```
+
+## Multi-Node
+
+To run a local Kwil network, you can use the `kwil-admin` tool to generate multiple node configs for you.
+
+### Generate Configs
+
+To generate the configs for 3 validators in `./kwil-testnet`, run:
+
+```bash
+kwil-admin setup testnet -v 3 --hostnames "192.168.2.10" "192.168.2.20" "192.168.2.30" --output-dir ./kwil-testnet
+```
+
+## Run Nodes
+
+// TODO: we need a way for this to automatically generate different ports for each node
+```bash
+kwild --root_dir ./kwil-testnet/node0 --app.grpc_listen_addr localhost:50051 --app.http_listen_addr localhost:8080 --chain.p2p.listen_addr "tcp://0.0.0.0:26656" --chain.rpc.listen_addr "tcp://127.0.0.1:26657"
+```
