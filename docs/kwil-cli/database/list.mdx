@@ -1,0 +1,46 @@
+---
+sidebar_position: 6
+sidebar_label: "list"
+id: "list"
+title: "kwil-cli database list"
+description: "List databases owned by a wallet."
+---
+
+List databases owned by a wallet.
+
+An owner can be specified with the --owner flag. If no owner is specified, the locally configured wallet is used.
+
+### Usage
+
+```
+kwil-cli database list [flags]
+```
+
+### Example
+
+```
+# List databases owned by a wallet
+
+$ kwil-cli database list --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64
+Databases belonging to '0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64':
+ - mydb (dbid: x650ec2637346d022d9af95bd12cbac0733af785b92449e4d3b866987)
+ - mydb2 (dbid: xd9e21038623fd4da9067ada21a0f272934ec6b08e47daef004f143b4)
+```
+
+### Options
+
+```
+  -h, --help           help for list
+  -o, --owner string   The owner of the database
+```
+
+### Options inherited from parent commands
+
+```
+      --chain-id string        The expected/intended Kwil Chain ID
+      --kwil-provider string   The Kwil provider endpoint (default "127.0.0.1:50051")
+      --output output format   the format for command output, either 'text' or 'json' (default text)
+      --private-key string     The private key of the wallet that will be used for signing
+      --tls-cert-file string   The path to the TLS certificate, this is required if the kwil provider endpoint is using TLS
+```
+

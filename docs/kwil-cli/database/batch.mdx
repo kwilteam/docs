@@ -1,0 +1,72 @@
+---
+sidebar_position: 1
+sidebar_label: "batch"
+id: "batch"
+title: "kwil-cli database batch"
+description: "Batch execute an action using inputs from a CSV file."
+---
+
+Batch executes an action on a database using inputs from a CSV file.
+
+The `batch` command is used to batch execute an action on a database.  It
+reads in a file from the specified directory, and executes the action in bulk.
+
+To map a CSV column name to an action input, use the `--map-input` flag.
+For example, if there is a CSV column named "user_id", and an action input named "id",
+you can pass the following flag: `--map-input user_id:$id`.
+	
+You can also specify the input values directly using the `--value` flag.
+These values will apply to all inserted rows, and will override the CSV column mappings.
+To do this, map the action input name to the value.  For example, if you want to set the
+"owner" input to the value "0x1234", you can pass the following flag: `--value owner:0x1234`.
+
+You can either specify the database to execute this against with the `--name` and `--owner` 
+flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
+flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
+
+### Usage
+
+```
+kwil-cli database batch [flags]
+```
+
+### Example
+
+```
+# Batch execute an action on a database
+
+# Create a CSV file with the following contents:
+# id,name,age
+# 1,john,25
+# 2,jane,30
+# 3,jack,35
+
+# Execute the "create_user($user_id, $username, $user_age, $created_at)" action on the "mydb" database
+
+$ kwil-cli database batch --path ./users.csv --action create_user --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 --map-input id:user_id --map-input name:username --map-input age:user_age --value created_at:$(date +%s)
+```
+
+### Options
+
+```
+  -a, --action string       the action to execute
+  -i, --dbid string         the database id
+  -h, --help                help for batch
+  -m, --map-input strings   csv column to action parameter mappings (e.g. csv_id:user_id, csv_name:user_name)
+  -n, --name string         the database name
+  -N, --nonce int           nonce override (-1 means request from server) (default -1)
+  -o, --owner string        the database owner
+  -p, --path string         path to the CSV file to use
+  -v, --value strings       action parameter mappings applied to all executions (e.g. id:123, name:john)
+```
+
+### Options inherited from parent commands
+
+```
+      --chain-id string        The expected/intended Kwil Chain ID
+      --kwil-provider string   The Kwil provider endpoint (default "127.0.0.1:50051")
+      --output output format   the format for command output, either 'text' or 'json' (default text)
+      --private-key string     The private key of the wallet that will be used for signing
+      --tls-cert-file string   The path to the TLS certificate, this is required if the kwil provider endpoint is using TLS
+```
+

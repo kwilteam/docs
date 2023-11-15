@@ -1,0 +1,48 @@
+---
+sidebar_position: 8
+sidebar_label: "read-schema"
+id: "read-schema"
+title: "kwil-cli database read-schema"
+description: "Read schema is used to view the details of a deployed database schema."
+---
+
+Read schema is used to view the details of a deployed database schema.
+
+	You can either specify the database to execute this against with the `--name` and `--owner` 
+	flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
+	flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
+
+### Usage
+
+```
+kwil-cli database read-schema [flags]
+```
+
+### Example
+
+```
+# Read the schema of a database
+	
+$ kwil-cli database read-schema --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64
+	
+```
+
+### Options
+
+```
+  -i, --dbid string    the target database id
+  -h, --help           help for read-schema
+  -n, --name string    the target database name
+  -o, --owner string   the target database owner
+```
+
+### Options inherited from parent commands
+
+```
+      --chain-id string        The expected/intended Kwil Chain ID
+      --kwil-provider string   The Kwil provider endpoint (default "127.0.0.1:50051")
+      --output output format   the format for command output, either 'text' or 'json' (default text)
+      --private-key string     The private key of the wallet that will be used for signing
+      --tls-cert-file string   The path to the TLS certificate, this is required if the kwil provider endpoint is using TLS
+```
+
