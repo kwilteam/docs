@@ -10,8 +10,8 @@ slug: /prerequisites
 To begin using Kwil, you will need the following:
 
 - An Ethereum compatible Wallet, such as [Metamask](https://metamask.io/)
-- A Kwil database endpoint (see the [links page](./links.mdx) for a list of public endpoints)
 - Access the [Kuneiform IDE](kuneiform/introduction.mdx)
+- A Kwil Daemon and endpoint (to run a local [Kwil Daemon](./daemon/installation), check out the KwilD [quickstart](./daemon/kwild#quickstart)).
 
 ## Next Steps
 
