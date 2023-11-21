@@ -1,0 +1,37 @@
+---
+sidebar_position: 1
+sidebar_label: "approve"
+id: "kwil-admin-validators-approve"
+title: "kwil-admin validators approve"
+description: "A current validator may approve an active join request for a candidate validator using the `approve` subcommand."
+---
+
+A current validator may approve an active join request for a candidate validator using the `approve` subcommand. If enough validators approve the join request, the candidate validator will be added to the validator set.
+
+### Usage
+
+```
+kwil-admin validators approve <joiner> [flags]
+```
+
+### Example
+
+```
+# Approve a join request for a candidate validator
+kwil-admin validators approve 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0 --key-file "~/.kwild/private_key" --rpcserver localhost:50151
+```
+
+### Options
+
+```
+  -h, --help                 help for approve
+  -k, --key-file string      file containing the private key of the local validator that will sign the transaction (mutually exclusive with --private-key))
+  -p, --private-key string   hex string of the private key of the local validator that will sign the transaction (mutually exclusive with --key-file)
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

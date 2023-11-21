@@ -1,0 +1,37 @@
+---
+sidebar_position: 4
+sidebar_label: "reset-state"
+id: "kwil-admin-setup-reset-state"
+title: "kwil-admin setup reset-state"
+description: "Delete blockchain state files."
+---
+
+Delete blockchain state files.
+
+### Usage
+
+```
+kwil-admin setup reset-state [flags]
+```
+
+### Example
+
+```
+# Delete blockchain state files
+kwil-admin setup reset-state --root_dir "~/.kwild"
+```
+
+### Options
+
+```
+  -f, --force             force removal of default home directory
+  -h, --help              help for reset-state
+  -r, --root_dir string   root directory of the kwild node
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

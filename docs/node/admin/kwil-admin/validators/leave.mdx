@@ -1,0 +1,37 @@
+---
+sidebar_position: 4
+sidebar_label: "leave"
+id: "kwil-admin-validators-leave"
+title: "kwil-admin validators leave"
+description: "A current validator may leave the validator set using the `leave` command."
+---
+
+A current validator may leave the validator set using the `leave` command.
+
+### Usage
+
+```
+kwil-admin validators leave [flags]
+```
+
+### Example
+
+```
+$ kwil-admin validators leave --key-file "~/.kwild/private_key"
+TxHash: a001d7ccf73b05d6aa0d749d25cec60fef4de606533ac21f48043c7cc65dfe1b
+```
+
+### Options
+
+```
+  -h, --help                 help for leave
+  -k, --key-file string      file containing the private key of the local validator that will sign the transaction (mutually exclusive with --private-key))
+  -p, --private-key string   hex string of the private key of the local validator that will sign the transaction (mutually exclusive with --key-file)
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

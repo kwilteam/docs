@@ -1,0 +1,41 @@
+---
+sidebar_position: 2
+sidebar_label: "info"
+id: "kwil-admin-key-info"
+title: "kwil-admin key info"
+description: "Display information about a private key."
+---
+
+Display information about a private key.
+
+The private key can either be passed as a key file path, or as a hex-encoded string.
+
+### Usage
+
+```
+kwil-admin key info [flags]
+```
+
+### Example
+
+```
+# Using a key file
+kwil-admin key info --key-file ~/.kwild/private_key
+
+# Using a hex-encoded string
+kwil-admin key info 381d28cf348c9efbf7d26ea54b647e2cb646d3b98cdeec0f1053a5ff599a036a0aa381bd4aad1670a39977d5416bfac7bd060765adc58a4bb16bbbafeefbae34
+```
+
+### Options
+
+```
+  -h, --help              help for info
+  -o, --key-file string   file containing the private key to display
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

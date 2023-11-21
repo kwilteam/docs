@@ -169,11 +169,11 @@ action get_posts ($user_id) view {
 
 # Deploying the Database
 
-To deploy the database, we will use the [Kwil CLI](../cli).  To deploy the database, run the following command:
+To deploy the database, we will use the [Kwil CLI](cli).  To deploy the database, run the following command:
 
 ```bash
 # highlight-next-line
-$ kwil database deploy --path=./path/to/social_media.kf --kwil-provider='https://provider.kwil.com' --private-key=5331ae5e0fd371797e4fa9ee029f99cb8ebab069e8ce5d33829882d79fc7d345
+$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://provider.kwil.com' --private-key=5331ae5e0fd371797e4fa9ee029f99cb8ebab069e8ce5d33829882d79fc7d345
 TxHash: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
 ```
 
@@ -181,7 +181,7 @@ To check if the deployment is successful, we can query the status of the transac
 
 ```bash
 # highlight-next-line
-$ kwil utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://provider.kwil.com'
+$ kwil-cli utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://provider.kwil.com'
 Transaction ID: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
 Status: success
 Height: 4777

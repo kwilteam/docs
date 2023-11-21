@@ -9,11 +9,7 @@ slug: /scalar-functions
 
 ### abs(_X_)
 
-The abs(X) function returns the absolute value of the numeric argument X. Abs(X) returns NULL if X is NULL. Abs(X) returns 0.0 if X is a string or blob that cannot be converted to a numeric value. If X is the integer -9223372036854775808 then abs(X) throws an integer overflow error since there is no equivalent positive 64-bit two complement value.
-
-### address(_X_)
-
-The address(X) function returns the wallet address of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. It will preserve the address format (e.g. EVM, NEAR, etc.) of the originating caller's native chain.  It will return the address as type text.
+The abs(X) function returns the absolute value of the numeric argument X. Abs(X) returns NULL if X is NULL. Abs(X) returns 0.0 if X is a string that cannot be converted to a numeric value. If X is the integer -9223372036854775808 then abs(X) throws an integer overflow error since there is no equivalent positive 64-bit two complement value.
 
 ### coalesce(_X,Y,..._)
 
@@ -88,10 +84,6 @@ The multi-argument min() function returns the argument with the minimum value. T
 ### nullif(_X,Y_)
 
 The nullif(X,Y) function returns its first argument if the arguments are different and NULL if the arguments are the same. The nullif(X,Y) function searches its arguments from left to right for an argument that defines a collating function and uses that collating function for all string comparisons. If neither argument to nullif() defines a collating function then the BINARY collating function is used.
-
-### public\_key(_X_), public\_key(_X,Y_)
-
-The `public_key(X,Y)` function returns the public key of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. The caller blob should be passed in as the first argument. It optionally takes a second argument to specify the desired output encoding type. This can be `'blob'`, `'hex'`, `'base64'`, or `'base64url'`.  If not specified, it will be returned as `'blob'`.
 
 ### quote(_X_)
 

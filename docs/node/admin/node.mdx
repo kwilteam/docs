@@ -75,7 +75,7 @@ credentials to `~/.kwil-admin/auth.{cert,key}`.
 With this method, the contents of the `auth.cert` file must be appended to the
 node's `clients.pem` file. Specifically,
 
-1. Generate credentials with `./kwil-admin node gen-auth-key`
+1. Generate credentials with `kwil-admin node gen-auth-key`
 2. Securely copy the `~/.kwil-admin/auth.cert` file to the machine where `kwild`
    is running, if it is not the same host.
 3. Append the contents of the copied `auth.cert` to the node's `clients.pem` file.

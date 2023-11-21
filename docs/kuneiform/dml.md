@@ -16,7 +16,7 @@ In Kuneiform, you can define specific SQL queries to execute against your databa
 ```typescript
 action add_user($id, $name, $username) public {
     INSERT INTO users (id, name, username, wallet)
-    VALUES ($id, $name, $username, address(@caller));
+    VALUES ($id, $name, $username, @caller);
 }
 ```
 
@@ -54,7 +54,7 @@ The SQL queries to be executed when the action is called can be defined within t
 // the following queries will be executed transactionally.
 action add_user($id, $name, $username) public {
     INSERT INTO users (id, name, username, wallet)
-    VALUES ($id, $name, $username, address(@caller));
+    VALUES ($id, $name, $username, @caller);
 
     INSERT INTO ... // some other query
 }
@@ -94,7 +94,7 @@ action is_admin() private {
             ELSE null
         END
     FROM user_roles
-    WHERE user_roles.address = address(@caller);
+    WHERE user_roles.address = @caller;
 }
 
 // some action that only users of role 'admin' can access

@@ -14,7 +14,6 @@ Kwil supports a restricted set of data types compared to other relational databa
 | --------- | ----------- |
 | `int` | A 64-bit integer |
 | `text` | A string of text |
-| `blob` | A binary set of data |
 
 ## Attributes
 
@@ -52,4 +51,3 @@ specify other tags.  Below is a list of supported tags:
 | `private` | The action is private and can only be from within other actions. |
 | `owner` | The action can only be called by the dataset deployer. |
 | `view` | The action can be called without modifying state.  This allows the action to be called synchronously, enabling an action to return data. |
-| `mustsign` | A `view` action must still contain a valid signature from the caller.  This is useful for querying data that needs to use `@caller` in the query, or (in the case of private networks) requires some sort of authentication for access control. |

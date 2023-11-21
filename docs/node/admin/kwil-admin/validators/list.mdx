@@ -1,0 +1,39 @@
+---
+sidebar_position: 5
+sidebar_label: "list"
+id: "kwil-admin-validators-list"
+title: "kwil-admin validators list"
+description: "List the current validator set of the network."
+---
+
+List the current validator set of the network.
+
+### Usage
+
+```
+kwil-admin validators list [flags]
+```
+
+### Example
+
+```
+$ kwild validator list
+Current validator set:
+  0. {pubkey = 9fed4b19eab0cf87370bff0c7ef04cfcff5b268d096578d3ef5ae3c1010939d8, power = 1}
+  1. {pubkey = f1693096d252eac5e366436314996ec39c189dffb997ad7414ed306e3d9244c4, power = 1}
+  2. {pubkey = f28e3cd6d11e9c5d2d00ea8b9c1e18cc01e568f0b186888fb274567461774fbc, power = 1}
+```
+
+### Options
+
+```
+  -h, --help               help for list
+  -s, --rpcserver string   admin RPC server address (default: 127.0.0.1:50151) (default "127.0.0.1:50151")
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

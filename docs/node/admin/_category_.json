@@ -1,6 +1,6 @@
 {
     "label": "Admin",
-    "position": 3,
+    "position": 4,
     "link": {
       "type": "generated-index",
       "description": "Usage of the Kwil Admin tool, for managing deployments."

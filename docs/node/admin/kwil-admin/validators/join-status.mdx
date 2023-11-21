@@ -1,0 +1,38 @@
+---
+sidebar_position: 3
+sidebar_label: "join-status"
+id: "kwil-admin-validators-join-status"
+title: "kwil-admin validators join-status"
+description: "Query the status of a pending validator join request."
+---
+
+Query the status of a pending validator join request.
+
+### Usage
+
+```
+kwil-admin validators join-status <joiner> [flags]
+```
+
+### Example
+
+```
+$ kwil-admin validators join-status "6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0"
+Candidate: 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0 (want power 1)
+ Validator 9fed4b19eab0cf87370bff0c7ef04cfcff5b268d096578d3ef5ae3c1010939d8, approved = false
+ Validator f1693096d252eac5e366436314996ec39c189dffb997ad7414ed306e3d9244c4, approved = false
+ Validator f28e3cd6d11e9c5d2d00ea8b9c1e18cc01e568f0b186888fb274567461774fbc, approved = false
+```
+
+### Options
+
+```
+  -h, --help   help for join-status
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+```
+

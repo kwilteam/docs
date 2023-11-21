@@ -27,7 +27,7 @@ If a node wants to become a validator post-network deployment, it can do so by u
 
 3. The join requests remain active for the duration of `join_expiry` defined in the genesis file. The join request will expire if 2/3rd of the current validators don't approve the join request within this duration. The status of the join request can be queried using the `kwil-admin` command line tool. Refer to the [join request status guide](./../admin/validators#show-join-request-status) for more information.
 
-4. Once a super-majority (2/3rd) of approvals is obtained from existing validators, the joiner node achieves validator status. From the next block onward, it can participate in consensus decisions.
+4. Once a super-majority (>2/3rd) of approvals is obtained from existing validators, the joiner node achieves validator status. From the next block onward, it can participate in consensus decisions.
 
 ### Leave Validator Status
 
