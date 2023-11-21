@@ -7,7 +7,7 @@ description: An introduction to the Kuneiform schema language.
 slug: /kuneiform/introduction
 ---
 
-Kuneiform is a language for defining databases on Kwil.  While we typically refer to an entire schema file as a "Kuneiform" file, schema files are technically made of two distinct languages:
+Kuneiform is a language for defining databases on Kwil.  Although we typically refer to an entire schema file as a "Kuneiform" file, schema files are technically made of two distinct languages:
 
 - **Kuneiform (DDL):** The Kuneiform language is specifically a Data Defintion Language (DDL) for Kwil databases.  DDL's typically manage structuring metadata; a common example is the `CREATE TABLE ...` statement in typical SQL databases.  Kuneiform is a more "modern" version of this, featuring a C-like syntax, as well as new features.
 
@@ -19,7 +19,7 @@ You can write, compile, and deploy Kuneiform, as well as view sample Kuneiform f
 
 :::
 
-```typescript
+```typescript title="social_network.kf"
 database social_network;
 
 // table for storing users

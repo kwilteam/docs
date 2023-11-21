@@ -51,7 +51,7 @@ action get_feed($username, $offset) public view {
         WHERE username = $username
     )
     ORDER BY date(p.post_date) DESC NULLS LAST
-    LIMIT 20 OFFSET $offset
+    LIMIT 20 OFFSET $offset;
 }
 ```
 
@@ -60,7 +60,6 @@ Note that join statements are not allowed in `DELETE` queries. As an alternative
 For example, in the `delete_post` action, we can all a subquery to retrieve the auther id from the users table.
 
 ```typescript title="social_network.kf"
-
 action delete_post ($id) public {
     DELETE FROM posts
     WHERE id=$id
@@ -85,13 +84,13 @@ This action is made purely to display CTE's in an understandable way. It is not 
 :::
 
 ```typescript title="social_network.kf"
+// use a common table expression to get popular users
 action get_celebrity_feed($username, $offset) public view {
-// using a CTE containing popular users
     WITH popular_users AS (
         SELECT followers.followed_id AS id, users.username AS username
         FROM followers
         INNER JOIN users ON users.id = followers.followed_id
-        GROUP BY followers.followed_id
+        GROUP BY followers.followed_id, users.username
         HAVING count(followers.follower_id) >= 50000
     )
     SELECT p.id, p.title, p.content, p.post_date, pu.username

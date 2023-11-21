@@ -13,11 +13,13 @@ This will introduce you to the basic concepts of Kwil, including creating a data
 
 Before you begin, ensure that you have the prerequisites outlined in the ["Prerequisites"](../../prerequisites.md) section.
 
-This tutorial also assumes you have sucessfully started a local Kwil Daemon and have a basic understanding of SQL.
+This tutorial uses a local Kwil daemon, running on `http://localhost:8080`. To start a local Kwil daemon, download the latest `kwild_...` binary from the [release repo](https://github.com/kwilteam/binary-releases/releases) and run the KwilD [quickstart command](../../daemon/kwild#quickstart).
+
+This tutorial assumes you have a basic understanding of SQL.
 
 ## Setup
 
-The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.kwil.com). (You can also use the [Kwil CLI](/docs/kwil-cli/installation), but this will be introduced in a later Tutorial.)
+The quickest way to deploy your database is in the [Kuneiform IDE](https://ide.kwil.com).
 
 In the [Kuneiform IDE](https://ide.kwil.com/), you must connect your wallet to the endpoint for the Kwil Network you are deploying to. 
 
@@ -30,7 +32,9 @@ Add a new network by clicking on the `Default Workspace` dropdown in the Kuneifo
 </div>
 <br />
 
-Next, add the network details in the popup Menu. After you click "OK", the IDE will automatically switch to the new network.
+Next, add the network details in the popup Menu. You can find the `chain_id` in under `{root_dir}/.kwild/abci/config/genesis.json`, or you can leave the Chain ID empty and the IDE will retrieve it from the local Kwil node.
+
+After you click "OK", the IDE will automatically switch to the new network.
 
 <div style={{ display: "flex", justifyContent: "center"  }}>
   <img src={require("./assets/add-workspace.png").default} alt="Token Deposit" />
@@ -63,13 +67,29 @@ table <table-name> {
 }
 ```
 
+In our Kuneiform file, add a table called `greetings` with three columns: `id`, `message`, and `wallet`:
+
+```sql title="hello-world.kf"
+database hello_world;
+
+table greetings {
+  id int primary notnull,
+  message text notnull maxlen(100),
+  wallet text notnull,
+}
+```
+
 For information on support data types, attributes, and other features, visit the [supported features](../../kuneiform/supported-features) section.
 
 #### 3. Adding B-Tree indexes
 
 Indexing freqently-accessed columns improves performance. Indexes can be added to one or more columns by adding the following to the `table` declaration.:
+
 ```
+table <table-name> { 
+     ...
   #<index-name> <index-type>(<index-columns>)
+}
 ``` 
 
 Below, we create a B-Tree index called `wallet_index` on the `wallet` column:
@@ -132,7 +152,7 @@ action delete_greeting ($id) public {
 
 ## Compiling Kuneiform source files
 
-Now that we have completed our Kuneiform database and action definitions, click on the `Compile and Deploy` icon in left-hand navigation panel in the IDE, 
+Now that we have created our Kuneiform schema, click on the `Compile and Deploy` icon in left-hand navigation panel in the IDE, 
 and select our `hello-world.kf` file from the dropdown:
 
 <div style={{ display: "flex", justifyContent: "center"  }}>

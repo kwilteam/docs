@@ -31,8 +31,10 @@ This works like the printf() function from the standard C library. The first arg
 
 The glob(X,Y) function is equivalent to the expression "Y GLOB X". Note that the X and Y arguments are reversed in the glob() function relative to the infix GLOB operator. Y is the string and X is the pattern. So, for example, the following expressions are equivalent:
 
-    name GLOB '*helium*'
-	glob('*helium*',name) 
+```null
+name GLOB '*helium*'
+glob('*helium*',name) 
+```
 
 ### hex(_X_)
 
@@ -50,7 +52,6 @@ The iif(X,Y,Z) function returns the value Y if X is true, and Z otherwise. The i
 ### instr(_X,Y_)
 
 The instr(X,Y) function finds the first occurrence of string Y within string X and returns the number of prior characters plus 1, or 0 if Y is nowhere found within X. Or, if X and Y are both BLOBs, then instr(X,Y) returns one more than the number bytes prior to the first occurrence of Y, or 0 if Y does not occur anywhere within X. If both arguments X and Y to instr(X,Y) are non-NULL and are not BLOBs then both are interpreted as strings. If either X or Y are NULL in instr(X,Y) then the result is NULL.
-
 
 ### length(_X_)
 
@@ -88,9 +89,9 @@ The multi-argument min() function returns the argument with the minimum value. T
 
 The nullif(X,Y) function returns its first argument if the arguments are different and NULL if the arguments are the same. The nullif(X,Y) function searches its arguments from left to right for an argument that defines a collating function and uses that collating function for all string comparisons. If neither argument to nullif() defines a collating function then the BINARY collating function is used.
 
-### public_key(_X_), public_key(_X,Y_)
+### public\_key(_X_), public\_key(_X,Y_)
 
-The public_key(X,Y) function returns the public key of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. The caller blob should be passed in as the first argument. It optionally takes a second argument to specify the desired output encoding type. This can be `'blob'`, `'hex'`, `'base64'`, or `'base64url'`.  If not specified, it will be returned as `'blob'`.
+The `public_key(X,Y)` function returns the public key of a [`@caller`](../dml.md/#using-contextual-variables-in-actions) blob. The caller blob should be passed in as the first argument. It optionally takes a second argument to specify the desired output encoding type. This can be `'blob'`, `'hex'`, `'base64'`, or `'base64url'`.  If not specified, it will be returned as `'blob'`.
 
 ### quote(_X_)
 

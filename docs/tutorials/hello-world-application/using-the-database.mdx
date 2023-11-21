@@ -11,10 +11,21 @@ Now that the database has been deployed, we can begin interacting with it throug
 
 ## Prerequisites
 
-Ensure you have the [Kwil JS SDK](https://www.npmjs.com/package/@kwilteam/kwil-js) downloaded by running:
+Ensure you have the [Kwil JS SDK](https://www.npmjs.com/package/@kwilteam/kwil-js) and [EtherJS](https://docs.ethers.org/v6/) downloaded by running:
 
 ```zsh
-npm i @kwilteam/kwil-js
+npm i @kwilteam/kwil-js ethers
+```
+
+Check the local chain id by running:
+
+```bash
+curl http://localhost:8080/api/v1/chain_info
+# {
+#   "chain_id": "some_id",
+#   "height": "123",
+#   "hash": "abc123"
+#}
 ```
 
 ## Initialize Kwil Client
@@ -23,7 +34,7 @@ Before we can interact with our database, we must first initialize a Kwil client
 
 We will also declare the database ID (DBID) and and create the `KwilSigner` that can be used within the rest of the application. A DBID is a unique identifier for a database generated from the databse owner's public key and database name.
 
-If needed, you can [recover](/docs/sdks/js-ts/overview#public-keys) your Secp256k1 public key with the recovery [utility function](/docs/sdks/js-ts/apis#generatedbid).
+If needed, you can recover your [Secp256k1 public key](/docs/sdks/js-ts/overview#public-keys) with the recovery [utility function](/docs/sdks/js-ts/apis#generatedbid).
 
 :::tip
 
@@ -44,76 +55,95 @@ import TabItem from "@theme/TabItem";
 >
 <TabItem value="node">
 
-```js title="index.js"
-const { NodeKwil, KwilSigner, Utils } = require("kwil");
+```js title="setup.js" {7}
+const { NodeKwil, KwilSigner, Utils } = require("@kwilteam/kwil-js");
 const { Wallet } = require("ethers");
 
-const kwil = new NodeKwil({
-  kwilProvider: "https://<kwil-provider-url>",
-  chainId: "kwil-test-chain"
-});
+async function setup() {
+    const kwil = new NodeKwil({
+        kwilProvider: "http://localhost:8080",
+        chainId: "some_id", // Use the chain id from the local chain
+    });
 
-const ethersWallet = new Wallet("<ethereum-private-key>"); // Use your own private key here
+    const ethersWallet = new Wallet("<ethereum-private-key>"); // Use your own private key here
 
-const publicKey = await Utils.recoverSecp256k1PubKey(ethersWallet); // Recover public key
-const databaseName = "hello_world";
+    const publicKey = await Utils.recoverSecp256k1PubKey(ethersWallet);
+    const databaseName = "hello_world";
 
-const dbid = Utils.generateDBID(publicKey, databaseName);
+    const dbid = Utils.generateDBID(publicKey, databaseName);
 
-const kwilSigner = new KwilSigner(ethersWallet, publicKey);
+    const kwilSigner = new KwilSigner(ethersWallet, publicKey);
 
-module.exports = {
-  kwil,
-  dbid,
-  publicKey
-  kwilSigner
-};
+    return {
+        kwil,
+        dbid,
+        kwilSigner,
+    };
+}
+
+module.exports = setup;
 ```
 
 </TabItem>
 <TabItem value="browser">
 
-```js title="index.js"
-import { WebKwil, Utils } from "kwil";
+```js title="setup.js" {7}
+import { WebKwil, KwilSigner, Utils } from "@kwilteam/kwil-js";
 import { BrowserProvider } from "ethers";
 
-export const kwil = new WebKwil({
-  kwilProvider: "https://provider.kwil.com",
-  chainId: "kwil-test-chain"
-});
+export default async function setup() {
+    const kwil = new WebKwil({
+        kwilProvider: "http://localhost:8080",
+        chainId: "some_id", // Use the chain id from the local chain
+    });
 
-const provider = new BrowserProvider(window.ethereum);
-const ethersSigner = await provider.getSigner();
+    const provider = new BrowserProvider(window.ethereum);
+    const ethersSigner = await provider.getSigner();
 
-export const publicKey = await Utils.recoverSecp256k1PubKey(ethersSigner) ; // Use the database owner public key
-const databaseName = "hello_world";
+    const publicKey = await Utils.recoverSecp256k1PubKey(ethersSigner);
+    const databaseName = "hello_world";
 
-export const dbid = Utils.generateDBID(publicKey, databaseName);
+    const dbid = Utils.generateDBID(publicKey, databaseName);
 
-export const kwilSigner = new KwilSigner(ethersSigner, publicKey);
+    const kwilSigner = new KwilSigner(ethersSigner, publicKey);
+
+    return {
+        kwil,
+        dbid,
+        kwilSigner,
+    };
+}
 ```
 
 </TabItem>
 <TabItem value="ts">
 
-```ts title="index.ts"
-import { WebKwil, Utils, KwilSigner } from "kwil";
+```ts title="setup.ts" {7}
+import { WebKwil, KwilSigner, Utils } from "@kwilteam/kwil-js";
 import { BrowserProvider, Signer } from "ethers";
 
-export const kwil: WebKwil = new WebKwil({
-  kwilProvider: "https://<kwil-provider-url>",
-  chainId: "kwil-test-chain"
-});
+export default async function setup() {
+    const kwil: WebKwil = new WebKwil({
+        kwilProvider: "http://localhost:8080",
+        chainId: "some_id", // Use the chain id from the local chain
+    });
 
-const provider: BrowserProvider = new BrowserProvider(window.ethereum);
-const ethersSigner: Signer = await provider.getSigner();
+    const provider: BrowserProvider = new BrowserProvider(window.ethereum);
+    const ethersSigner: Signer = await provider.getSigner();
 
-export const publicKey: string = await Utils.recoverSecp256k1PubKey(ethersSigner); // Use the database owner public key
-const databaseName: string = "hello_world";
+    const publicKey: string = await Utils.recoverSecp256k1PubKey(ethersSigner);
+    const databaseName: string = "hello_world";
 
-export const dbid: string = Utils.generateDBID(publicKey, databaseName);
+    const dbid: string = Utils.generateDBID(publicKey, databaseName);
 
-export const kwilSigner: KwilSigner = new KwilSigner(ethersSigner, publicKey);
+    const kwilSigner: KwilSigner = new KwilSigner(ethersSigner, publicKey);
+
+    return {
+        kwil,
+        dbid,
+        kwilSigner,
+    };
+}
 ```
 
 </TabItem>
@@ -150,75 +180,103 @@ The signer used to sign the transaction is an Ethereum signer. In this example, 
 <TabItem value="node">
 
 ```js title="insert_greeting.js"
-const { kwil, dbid, publicKey, kwilSigner } = require("./index");
-const { Utils } = require("kwil");
+const setup = require("./setup");
+const { Utils } = require("@kwilteam/kwil-js");
 
 async function addGreeting(id, msg) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id)
-        .put("$message", msg);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input = new Utils.ActionInput().put("$id", id).put("$message", msg);
 
     const actionBody = {
         dbid,
         action: "insert_greeting",
-        inputs,
-        description: "Inserts a greeting into the database"
-    }
+        inputs: [input],
+        description: "Inserts a greeting into the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
-addGreeting(1, "Hello World!")
+addGreeting(1, "Hello World!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="browser">
 
 ```js title="insert_greeting.js"
-import { kwil, dbid, publicKey, kwilSigner } from "./index";
-import { Utils } from "kwil";
+import setup from "./setup";
+import { Utils } from "@kwilteam/kwil-js";
 
 async function addGreeting(id, msg) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id)
-        .put("$message", msg);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input = new Utils.ActionInput().put("$id", id).put("$message", msg);
 
     const actionBody = {
         dbid,
         action: "insert_greeting",
-        inputs,
-        description: "Inserts a greeting into the database"
-    }
+        inputs: [input],
+        description: "Inserts a greeting into the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
-addGreeting(1, "Hello World!")
+addGreeting(1, "Hello World!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="insert_greeting.ts"
-import { kwil, dbid, publicKey, kwilSigner } from './index';
-import { Utils, Types } from 'kwil';
+import setup from "./setup";
+import { Utils, Types } from "@kwilteam/kwil-js";
 
-async function addGreeting(id, msg): Promise<Types.GenericResponse<Types.TxReceipt>> {
-    const inputs: Types.ActionInput = new Utils.ActionInput()
-        .put('$id', 1)
-        .put('$message', 'Hello World!');
+async function addGreeting(id: number, msg: string): Promise<Types.GenericResponse<Types.TxReceipt>> {
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input: Types.ActionInput = new Utils.ActionInput().put("$id", 1).put("$message", "Hello World!");
 
     const actionBody: Types.ActionBody = {
         dbid,
-        action: 'insert_greeting',
-        inputs,
-        description: 'Inserts a greeting into the database'
-    }
+        action: "insert_greeting",
+        inputs: [input],
+        description: "Inserts a greeting into the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
+    return res;
 }
 
-addGreeting(1, "Hello World!")
+addGreeting(1, "Hello World!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
@@ -226,12 +284,10 @@ addGreeting(1, "Hello World!")
 
 Once this action has been executed, the database will contain the following data:
 
-```json
-{
-  "id": 1,
-  "message": "Hello World!",
-  "wallet": "<your-wallet-address>"
-}
+```zsh
+| id |   message    |                   wallet                   |
++----+--------------+--------------------------------------------+
+|  1 | Hello World! | 0xAfFDC06cF34aFD7D5801A13d48C92AD39609901D |
 ```
 
 ### select_greetings
@@ -249,15 +305,18 @@ To retrieve data from the database, we can call the `select_greetings` action. B
 <TabItem value="node">
 
 ```js title="select_greetings.js"
-const { kwil, dbid } = require("./index");
+const setup = require("./setup");
 
 async function readGreetings() {
+    const { kwil, dbid } = await setup();
+
     const actionBody = {
         dbid,
-        action: "select_greetings"
-    }
+        action: "select_greetings",
+    };
 
-    return await kwil.call(actionBody);
+    const res = await kwil.call(actionBody);
+    console.log(res);
 }
 
 readGreetings();
@@ -270,17 +329,20 @@ readGreetings();
     }
 */
 ```
+
 </TabItem>
 <TabItem value="browser">
 
 ```js title="select_greetings.js"
-import { kwil, dbid } from "./index";
+import setup from "./setup";
 
 async function readGreetings() {
+    const { kwil, dbid } = await setup();
+
     const actionBody = {
         dbid,
-        action: "select_greetings"
-    }
+        action: "select_greetings",
+    };
 
     return await kwil.call(actionBody);
 }
@@ -295,20 +357,24 @@ readGreetings();
     }
 */
 ```
+
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="select_greetings.ts"
-import { kwil, dbid } from './index';
-import { Types } from 'kwil';
+import setup from "./setup";
+import { Types } from "@kwilteam/kwil-js";
 
 async function readGreetings(): Promise<Types.GenericResponse<Types.MsgReceipt>> {
+    const { kwil, dbid } = await setup();
+
     const actionBody: Types.ActionBody = {
         dbid,
-        action: 'select_greetings'
-    }
+        action: "select_greetings",
+    };
 
     return await kwil.call(actionBody);
+    return res;
 }
 
 readGreetings();
@@ -321,6 +387,7 @@ readGreetings();
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
@@ -341,75 +408,103 @@ This action follows the same process as the `insert_greeting` [action](#insert_g
 <TabItem value="node">
 
 ```js title="update_greeting.js"
-const { kwil, dbid, publicKey, kwilSigner } = require("./index");
-const { Utils } = require("kwil");
+const setup = require("./setup");
+const { Utils } = require("@kwilteam/kwil-js");
 
 async function updateGreeting(id, msg) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id)
-        .put("$message", msg);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input = new Utils.ActionInput().put("$id", id).put("$message", msg);
 
     const actionBody = {
         dbid,
         action: "update_greeting",
-        inputs,
-        description: "Updates a greeting in the database"
-    }
+        inputs: [input],
+        description: "Updates a greeting in the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
 updateGreeting(1, "Hello Kwil!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="browser">
 
 ```js title="update_greeting.js"
-import { kwil, dbid, publicKey, kwilSigner } from "./index";
-import { Utils } from "kwil";
+import setup from "./setup";
+import { Utils } from "@kwilteam/kwil-js";
 
 async function updateGreeting(id, msg) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id)
-        .put("$message", msg);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input = new Utils.ActionInput().put("$id", id).put("$message", msg);
 
     const actionBody = {
         dbid,
         action: "update_greeting",
-        inputs,
-        description: "Updates a greeting in the database"
-    }
+        inputs: [input],
+        description: "Updates a greeting in the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
 updateGreeting(1, "Hello Kwil!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="update_greeting.ts"
-import { kwil, dbid, publicKey, kwilSigner } from './index';
-import { Utils, Types } from 'kwil';
+import setup from "./setup";
+import { Utils, Types } from "@kwilteam/kwil-js";
 
 async function updateGreeting(id: number, msg: string): Promise<Types.GenericResponse<Types.TxReceipt>> {
-    const inputs: Utils.ActionInput = new Utils.ActionInput()
-        .put('$id', id)
-        .put('$message', msg);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input: Utils.ActionInput = new Utils.ActionInput().put("$id", id).put("$message", msg);
 
     const actionBody: Types.ActionBody = {
         dbid,
-        action: 'update_greeting',
-        inputs,
-        description: 'Updates a greeting in the database'
-    }
+        action: "update_greeting",
+        inputs: [input],
+        description: "Updates a greeting in the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
+    return res;
 }
 
-updateGreeting(1, 'Hello Kwil!');
+updateGreeting(1, "Hello Kwil!");
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
@@ -417,12 +512,10 @@ updateGreeting(1, 'Hello Kwil!');
 
 Once this transaction is executed, the database will be updated with the new message.
 
-```json
-{
-  "id": 1,
-  "message": "Hello Kwil!",
-  "wallet": "<your-wallet-address>"
-}
+```zsh
+| id |   message   |                   wallet                   |
++----+-------------+--------------------------------------------+
+|  1 | Hello Kwil! | 0xAfFDC06cF34aFD7D5801A13d48C92AD39609901D |
 ```
 
 ### delete_greeting
@@ -442,73 +535,104 @@ Again, this action follows the same process as the `insert_greeting` [action](#i
 <TabItem value="node">
 
 ```js title="delete_greeting.js"
-const { kwil, dbid, publicKey, kwilSigner } = require("./index");
-const { Utils } = require("kwil");
+const setup = require("./setup");
+const { Utils } = require("@kwilteam/kwil-js");
 
 async function deleteGreeting(id) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input = new Utils.ActionInput().put("$id", id);
 
     const actionBody = {
         dbid,
         action: "delete_greeting",
-        inputs,
-        description: "Deletes a greeting from the database"
-    }
-    
-    return await kwil.execute(actionBody, kwilSigner);
+        inputs: [input],
+        description: "Deletes a greeting from the database",
+    };
+
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
 deleteGreeting(1);
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="browser">
 
 ```js title="delete_greeting.js"
-import { kwil, dbid, publicKey, kwilSigner } from "./index";
-import { Utils } from "kwil";
+import setup from "./setup";
+import { Utils } from "@kwilteam/kwil-js";
 
 async function deleteGreeting(id) {
-    const inputs = new Utils.ActionInput()
-        .put("$id", id);
+    const { kwil, dbid, kwilSigner } = await setup();
     
+    const input = new Utils.ActionInput().put("$id", id);
+
     const actionBody = {
         dbid,
         action: "delete_greeting",
-        inputs,
-        description: "Deletes a greeting from the database"
-    }
+        inputs: [input],
+        description: "Deletes a greeting from the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
 }
 
 deleteGreeting(1);
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
 <TabItem value="ts">
 
 ```ts title="delete_greeting.ts"
-import { kwil, dbid, publicKey, kwilSigner } from './index';
-import { Utils, Types } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
+import setup from "./setup";
+import { Utils, Types } from "@kwilteam/kwil-js";
+import { BrowserProvider, Signer } from "ethers";
 
 async function deleteGreeting(id): Promise<Types.GenericResponse<Types.TxReceipt>> {
-    const inputs: Utils.ActionInput = new Utils.ActionInput()
-        .put('$id', id);
+    const { kwil, dbid, kwilSigner } = await setup();
+
+    const input: Utils.ActionInput = new Utils.ActionInput().put("$id", id);
 
     const actionBody: Types.ActionBody = {
         dbid,
-        action: 'delete_greeting',
-        inputs,
-        description: 'Deletes a greeting from the database'
-    }
+        action: "delete_greeting",
+        inputs: [input],
+        description: "Deletes a greeting from the database",
+    };
 
-    return await kwil.execute(actionBody, kwilSigner);
+    const res = await kwil.execute(actionBody, kwilSigner);
+    console.log(res);
+    return res;
 }
 
 deleteGreeting(1);
+/*
+    res = {
+        status: 200,
+        data: {
+            tx_hash: 'abc123...'
+        }
+    }
+*/
 ```
 
 </TabItem>
@@ -534,17 +658,23 @@ For example, to read all records by a user's wallet address, we can use the foll
 >
 <TabItem value="node">
 
-```js title="selectQuery.js"
-const { kwil, dbid, kwilSigner } = require("./index");
-const { Utils } = require("kwil");
+```js title="select_query.js"
+const setup = require("./setup");
 
-async function selectQuery(id, query) {
-    return await kwil.selectQuery(id, query);
+async function selectQuery() {
+    const { kwil, dbid, kwilSigner } = await setup();
+    
+    const res = await kwil.selectQuery(
+        dbid, 
+        `SELECT * FROM greetings WHERE wallet = '${kwilSigner.signer.address}'`
+    );
+    
+    console.log(res);
 }
 
-selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${kwilSigner.publicKey}`);
+selectQuery();
 /* 
-    {
+    res = {
         status: 200,
         data: [
             {
@@ -560,17 +690,23 @@ selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${kwilSigner.publicKey
 </TabItem>
 <TabItem value="browser">
 
-```js title="selectQuery.js"
-import { kwil, dbid, kwilSigner } from "./index";
-import { Utils } from "kwil";
+```js title="select_query.js"
+import setup from "./setup";
 
-async fuynction selectQuery(id, query) {
-    return await kwil.selectQuery(id, query);
+async fuynction selectQuery() {
+    const { kwil, dbid, kwilSigner } = await setup();
+    
+    const res = await kwil.selectQuery(
+        dbid, 
+        `SELECT * FROM greetings WHERE wallet = '${kwilSigner.signer.address}'`
+    );
+    
+    console.log(res);
 }
 
-selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${kwilSigner.publicKey}`);
-/* 
-    {
+selectQuery();
+/*
+    res = {
         status: 200,
         data: [
             {
@@ -586,20 +722,28 @@ selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${kwilSigner.publicKey
 </TabItem>
 <TabItem value="ts">
 
-```ts title="selectQuery.ts"
-import { kwil, dbid, kwilSigner } from './index';
-import { Utils, Types } from 'kwil';
-import { BrowserProvider, Signer } from 'ethers';
+```ts title="select_query.ts"
+import setup from "./setup";
+import { Types } from "@kwilteam/kwil-js";
+import { BrowserProvider, Signer } from "ethers";
 
 const publicKey: string = kwilSigner.publicKey;
 
 async function selectQuery(id, query): Promise<Types.GenericResponse<Types.SelectReceipt>> {
-    return await kwil.selectQuery(id, query);
+    const { kwil, dbid, kwilSigner } = await setup();
+    
+    const res = await kwil.selectQuery(
+        dbid, 
+        `SELECT * FROM greetings WHERE wallet = '${kwilSigner.signer.address}'`
+    );
+
+    console.log(res);
+    return res;
 }
 
-selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${publicKey}`);
+selectQuery();
 /*
-    {
+    res = {
         status: 200,
         data: [
             {
@@ -611,6 +755,7 @@ selectQuery(dbid, `SELECT * FROM greetings WHERE wallet = ${publicKey}`);
     }
 */
 ```
+
 </TabItem>
 </Tabs>
 
@@ -629,21 +774,22 @@ Note that there is no difference between NodeJs and Browser usage for this metho
 >
 <TabItem value="js">
 
-```js title="getSchema.js"
-const { kwil, dbid } = require("./index");
-const { Utils } = require("kwil");
+```js title="get_schema.js"
+const setup = require("./setup");
 
-async function getSchema(id) {
-    return await kwil.getSchema(id);
+async function getSchema() {
+    const { kwil, dbid } = await setup();
+    const res = await kwil.getSchema(dbid);
+    console.log(res);
 }
 
-getSchema(dbid);
+getSchema();
 /*
-    {
+    res = {
         status: 200,
         data: {
-            owner: <your-wallet-address>,
             name: 'hello_world',
+            owner: <your-public-key>,
             tables: [ [Object] ],
             actions: [ [Object], [Object], [Object], [Object] ],
             extensions: [ [Object] ]
@@ -655,21 +801,24 @@ getSchema(dbid);
 </TabItem>
 <TabItem value="ts">
 
-```ts title="getSchema.ts"
-import { kwil, dbid } from './index';
-import { Utils, Types } from 'kwil';
+```ts title="get_schema.ts"
+import setup from "./setup";
+import { Types } from "@kwilteam/kwil-js";
 
-async function getSchema(id): Promise<Types.GenericResponse<Types.Database<string>>> {
-    return await kwil.getSchema(id);
+async function getSchema(): Promise<Types.GenericResponse<Types.Database<string>>> {
+    const { kwil, dbid } = await setup();
+    const res = await kwil.getSchema(dbid);
+    console.log(res);
+    return res;
 }
 
-getSchema(dbid);
+getSchema();
 /*
-    {
+    res = {
         status: 200,
         data: {
-            owner: <your-wallet-address>,
             name: 'hello_world',
+            owner: <your-wallet-address>,
             tables: [ [Object] ],
             actions: [ [Object], [Object], [Object], [Object] ],
             extensions: [ [Object] ]
@@ -687,8 +836,8 @@ You can also use the Kwil SDK to query other metadata related to database owners
 
 You have now reached the end of the Hello World tutorial! From here, you can jump into any of the following guides to continue learning:
 
-- [Example 2: Building a Social Media Application with Kwil](/docs/category/tutorial-2-social-app)
-- [Kuneiform Language Reference](/docs/kuneiform/introduction)
-- [Kwil Supported SQL Syntax](/docs/category/sql-as-understood-by-kwil)
-- [JavaScript/TypeScript SDK](/docs/sdks/js-ts/overview)
-- [Python SDK](/docs/sdks/python/overview)
+-   [Example 2: Building a Social Media Application with Kwil](/docs/category/tutorial-2-social-app)
+-   [Kuneiform Language Reference](/docs/kuneiform/introduction)
+-   [Kwil Supported SQL Syntax](/docs/category/sql-as-understood-by-kwil)
+-   [JavaScript/TypeScript SDK](/docs/sdks/js-ts/overview)
+-   [Python SDK](/docs/sdks/python/overview)

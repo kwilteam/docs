@@ -19,7 +19,7 @@ database mydb;
 
 ## Table Declaration
 
-Kuneiform Language allows you to establish your own tables, along with defining the corresponding columns and indexes. For every column, you must specify a [data type](/docs/kuneiform/supported-features#data-types) and have the option to set an [attribute type](/docs/kuneiform/supported-features#attributes). Here is an example:
+The Kuneiform Language allows you to establish your own tables, along with defining the corresponding [columns](#adding-columns), [foreign keys](#foreign-key), and [indexes](#indexing-in-tables). For every column, you must specify a [data type](/docs/kuneiform/supported-features#data-types) and have the option to set an [attribute type](/docs/kuneiform/supported-features#attributes). Here is an example:
 
 ```typescript
 table users {
@@ -92,7 +92,7 @@ The Kuneiform Language not only allows column declarations, but also the creatio
 
 ## Index Declaration
 
-You can declare two types of indexes:
+You can declare [three types](./supported-features#indexes) of indexes:
 
 1. Standard binary tree index: This is a conventional B-tree index applied to the chosen column(s). Here's the syntax:
 
@@ -106,6 +106,12 @@ index(column1, column2, ...)
 unique(column1, column2, ...)
 ```
 
+3. Primary index: Primary index creates a composite primary key on the specified columns. The syntax is:
+
+```typescript
+primary(column1, column2, ...)
+```
+
 To declare an index, prefix the index definition with a #. Then, specify the index type and the column(s) the index will apply to. Here's an example:
 
 ```typescript
@@ -117,4 +123,4 @@ table users {
 }
 ```
 
-And that wraps up our guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.
+This concludes our guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.

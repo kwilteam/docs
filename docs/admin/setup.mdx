@@ -46,7 +46,7 @@ command has several options:
 ```
 kwil-admin setup testnet [--validators V] [--non-validators N] [--config FILE]
   [--output-dir DIR] [--node-dir-prefix PRE] [--hostname-prefix PRE]
-  [--hostname-suffix SUF] [--starting-ip IP] [--hostname HOSTNAME] [--p2p-port PORT]
+  [--hostname-suffix SUF] [--starting-ip IP] [--hostnames HOSTNAMES] [--p2p-port PORT]
 ```
 
 There are defaults for each flag, with the output writing to a folder called
@@ -87,7 +87,7 @@ The following options may be used to control what is generated:
 - `--hostname-prefix` is the prefix for node host names e.g. node results in node0, node1, etc.
 - `--hostname-suffix` is the suffix for node host names e.g. .example.com results in node0.example.com, node1.example.com, etc.
 - `--starting-ip` is the starting IP address of the first network node, with subsequent nodes on the next address in the subnet
-- `--hostname` overrides all hostnames of the nodes
+- `--hostnames` overrides all hostnames of the nodes
 - `--p2p-port` or `-p` is the TCP port on which each node listens for P2P connections
 
 ## Updating Genesis Config with Initial SQLite Data
