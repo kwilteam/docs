@@ -49,7 +49,8 @@ import { KwilSigner } from '@kwilteam/kwil-js';
 async function getSigner() {
     const provider = new BrowserProvider(window.ethereum)
     const ethSigner = await provider.getSigner()
-    return new KwilSigner(ethSigner)
+    const ethAddress = await ethSigner.getAddress()
+    return new KwilSigner(ethSigner, ethAddress)
 }
 ```
 
@@ -60,7 +61,7 @@ DBIDs are network-wide unique identifiers for databases.  They are derived from 
 ```typescript
 import { Utils } from '@kwilteam/kwil-js';
 
-const dbid = Utils.getDBID('wallet_address', 'social_media')
+const dbid = Utils.generateDBID('wallet_address', 'social_media')
 ```
 
 ## Write Data
@@ -126,7 +127,7 @@ const kwil = new WebKwil({
     chainId: "kwil-public-testnet-2",
 });
 
-const dbid = Utils.getDBID('wallet_address', 'social_media')
+const dbid = Utils.generateDBID('wallet_address', 'social_media')
 
 async function getSigner() {
     const provider = new BrowserProvider(window.ethereum)

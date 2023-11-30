@@ -12,7 +12,7 @@ import TabItem from "@theme/TabItem";
 
 Below is a quick overview of how to use the Kwil JS SDK. For more detailed information, see the [API Reference](/docs/sdks/js-ts/apis).
 
-Please note that the `@kwilteam/kwil-js` package should only be used with Kwil Daemons on the CometBFT Release (v0.6.0 and above). For earlier releases, please use the [`kwil`](https://www.npmjs.com/package/kwil) package. The `kwil` package is deprecated and will not be maintained.
+Please note that the `@kwilteam/kwil-js` package should only be used with Kwil Daemons v0.6.0 and above. For earlier releases, please use the [`kwil`](https://www.npmjs.com/package/kwil) package. The `kwil` package is deprecated and will not be maintained.
 
 The migration guide from `kwil` to `@kwilteam/kwil-js` can be found [here](/docs/sdks/js-ts/migration).
 
@@ -38,72 +38,65 @@ The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Et
 
 ### Optional Configuration
 
-The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required fields are `kwilProvider` and `chainId`; however, you have additional configuration options available to you:
+The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required fields are `kwilProvider` and `chainId`; however, there are additional configuration options available:
 
 ```js
 import { WebKwil, Utils } from 'kwil'; // or NodeKwil
 
 const kwil = new WebKwil({
-    kwilProvider: 'https://provider.kwil.com',
-    chainId: 'your_chain_id',
+    kwilProvider: 'https://provider.kwil.com';
+    chainId: 'your_chain_id';
     // optional configuration
-    timeout: number; // timeout for requests, default 30000
-    logging: boolean; // enable logging, default false
-    logger: Function // custom logger, default console.log
-    cache: number // ttl for cache in seconds, default is 10 minutes. 0 disables cache.
+    timeout?: number; // timeout for requests, default 30000
+    logging?: boolean; // enable logging, default false
+    logger?: Function // custom logger, default console.log
+    cache?: number // ttl for cache in seconds, default is 10 minutes. 0 disables cache.
 });
-
 ```
 
-To verify you have the correct chainId, you can use the [`chainInfo()`](#chain-info) method.
+To verify you have the correct `chainId`, you can use the [`chainInfo()`](#chain-info) method.
 
 ## Identifiers
 
-### Public Keys
+### Account Identifiers
 
-In Kwil, accounts are identified by a public key. Kwil supports Secp256k1 Public Keys (e.g. EVM networks such as Ethereum) and ED25519 Public Keys (e.g. NEAR Protocol).
+In Kwil, accounts are identified by the signer(s) that are used on the Kwil Network. Kwil natively supports two types of signers: Secp256k1 (EVM) and ED25519.
 
-Note that a Secp256k1 public key is different than an Ethereum address. To recover the public key, use the following utility function:
-
-```javascript
-import { Utils } from "@kwilteam/kwil-js";
-import { BrowserProvider } from "ethers";
-
-const provider = new BrowserProvider(window.ethereum);
-const signer = await provider.getSigner(); // can use wallet if NodeJS
-const publicKey = await Utils.recoverSecp256k1PubKey(
-    signer,
-    "Welcome to our app! Sign this message to reveal your public key."
-);
-```
+Secp256k1 signers use **Ethereum wallet addresses** as identifiers. ED25519 signers use the **ED25519 public key** as identifiers.
 
 ### Database Identifiers (DBID)
 
-In Kwil, databases are identified by a 'database identifier', which is a hex encoded SHA224 Hash of the public key and database name, prepended with an `x`.
+In Kwil, databases are identified by a 'database identifier' (sometime referred to as DBID), which is a hex encoded SHA224 Hash of the database name and public key, prepended with an `x`.
+
+The account identifier can be passed as a hex-encoded string, or as Bytes (Uint8Array).
+
+To get the DBID for an account identifier and database name, you can use the following helper method:
 
 ```javascript
-const dbid = kwil.getDBID("public_key", "database_name");
+import { Utils } from "@kwilteam/kwil-js";
+
+const dbid = Utils.generateDBID('account_identifier', 'database_name')
 ```
 
 ## Signers
 
-Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CUD actions, certain read operations, etc).
+Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CRUD actions, etc).
 
 To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-Js supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
 
 ```javascript
-import { Utils, KwilSigner } from "@kwilteam/kwil-js";
-import { BrowserProvider } from "ethers";
+import { Utils, KwilSigner } from '@kwilteam/kwil-js';
+import { BrowserProvider } from 'ethers';
 
 // get ethers signer
-const provider = new BrowserProvider(window.ethereum);
+const provider = new BrowserProvider(window.ethereum)
 const signer = await provider.getSigner();
 
-// get secp256k1 public key
-const publicKey = await Utils.recoverSecp256k1PubKey(signer);
+// get ethereum address
+const identifier = await signer.getAddress();
 
 // create kwil signer
-const kwilSigner = new KwilSigner(signer, publicKey);
+const kwilSigner = new KwilSigner(signer, identifier);
 ```
 
 #### Custom Signers
@@ -112,10 +105,10 @@ If you wish to sign with something other than an EtherJS signer, you may pass a 
 
 Currently, Kwil supports two signature types:
 
-| Type      |   Enumerator   | Description |
-| :-------- | :------------: | ----------- |
-| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
-| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature. |
+| Type      |   Identifier   |   Enumerator   | Description |
+| :-------- | :------------: | ----------- | ----------- |
+| Secp256k1 | Ethereum Wallet Address | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| ED25519   | ED25519 Public Key |   'ed25519'    | The Kwil Signer will use an ED25519 signature. |signature. 
 
 To use an ed25519 signature:
 
@@ -153,8 +146,8 @@ const actionBody = {
     dbid,
     action: "your_action_name",
     inputs: [{
-        input_name_1: "input_value_1",
-        input_name_2: ...
+        $input_name_1: "input_value_1",
+        $input_name_2: ...
     }],
     description: "Click sign to execute the action!",
 };
@@ -180,8 +173,8 @@ const actionBody: Types.ActionBody = {
   dbid: dbid,
   action: "your_action_name",
   inputs:[{
-     input_name_1: "input_value_1",
-     input_name_2: ...
+     $input_name_1: "input_value_1",
+     $input_name_2: ...
   }],
   description: "Click sign to execute the action!",
 };
@@ -207,7 +200,7 @@ To read data on Kwil, you can (1) execute a `view` action message or (2) query w
 
 `View` actions are read-only actions that can be used to query data without having to wait for a transaction to be mined on Kwil.
 
-If a `view` action has a `mustsign` attribute, then you can also pass a `KwilSigner` as a second argument to the `.call()` method.
+Only one `input` is allowed for `view` actions.
 
 <Tabs
     defaultValue="js"
@@ -223,8 +216,8 @@ const actionBody = {
     dbid,
     action: "your_action_name",
     inputs: [{
-        input_name_1: "input_value_1",
-        input_name_2: ...
+        $input_name_1: "input_value_1",
+        $input_name_2: ...
     }],
 };
 
@@ -248,8 +241,8 @@ const actionBody: Types.ActionBody = {
     dbid,
     action: "your_action_name",
     inputs: [{
-        input_name_1: "input_value_1",
-        input_name_2: ...
+        $input_name_1: "input_value_1",
+        $input_name_2: ...
     }],
 };
 
@@ -269,7 +262,7 @@ const res = await kwil.call(actionBody);
 #### Select Query
 
 ```javascript
-const dbid = kwil.getDBID("public_key", "database_name");
+const dbid = kwil.getDBID("account_identifier", "database_name");
 const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
 
 /*
@@ -281,7 +274,7 @@ const res = await kwil.selectQuery(dbid, "SELECT * FROM users");
 
 ## Network Info
 
-### Chain Info
+### Get Chain Info
 
 Returns the chain id, latest block height, and latest block hash for the Kwil chain you are connected to.
 
@@ -302,16 +295,16 @@ const res = await kwil.chainInfo()
 Returns all database names belonging to a public key.
 
 ```javascript
-const res = await kwil.listDatabases("public_key");
+const res = await kwil.listDatabases("account_identifier");
 // res.data = ["db1", "db2", "db3"]
 ```
 
-### Read a Deployed Database Schema
+### Get Schema
 
 ```javascript
 import { Utils } from "@kwilteam/kwil-js";
 
-const dbid = Utils.generateDBID("public_key", "database_name");
+const dbid = Utils.generateDBID("account_identifier", "database_name");
 const schema = await kwil.getSchema(dbid);
 
 /*
@@ -330,13 +323,69 @@ const schema = await kwil.getSchema(dbid);
 Returns the balance and nonce of a public key.
 
 ```javascript
-const res = await kwil.getAccount("public_key");
+const res = await kwil.getAccount("account_identifier")
 
 /*
     res.data = {
-        public_key: "public_key",
+        identifier: Uint8Array,
         balance: "some_balance",
         nonce: "some_nonce"
     }
 */
 ```
+
+## Kwil Gateway Authentication
+
+Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries. If your Kwil network used a Kwil Gateway, you can use the `kwil.authenticate()` method to authenticate users.
+
+:::tip
+The Kwil Gateway is still in private beta.  If you would like access, please contact our team.
+:::
+
+<Tabs
+    defaultValue="js-web"
+    values={[
+        { label: 'Web', value: 'js-web', },
+        { label: 'NodeJS', value: 'js-node', },
+    ]}
+>
+<TabItem value="js-web">
+
+```javascript
+// pass the kwilSigner to the authenticate method
+const res = await kwil.authenticate(kwilSigner);
+
+/*
+    res = {
+        status: 200,
+        data: {
+            result: "success"
+        }
+    }
+*/
+```
+
+</TabItem>
+<TabItem value="js-node">
+
+``` javascript
+// pass the kwilSigner to the authenticate method
+const res = await kwil.authenticate(kwilSigner);
+
+/*
+    res = {
+        status: 200,
+        data: {
+            result: "success",
+            cookie: "some_cookie"
+        },
+        
+    }
+*/
+
+// pass the cookie to the kwil class
+kwil.setCookie(res.data.cookie)
+```
+
+</TabItem>
+</Tabs>
