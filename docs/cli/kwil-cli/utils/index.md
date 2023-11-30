@@ -26,8 +26,7 @@ Various CLI utility commands.
 
 ### Subqueries
 
-* [kwil-cli utils chain-info](./chain-info)	 - Display information about the connected Kwil network.
-* [kwil-cli utils ping](./ping)	 - Ping the kwil provider endpoint.  If successful, returns 'pong'.
-* [kwil-cli utils print-config](./print-config)	 - Print the current CLI configuration.
-* [kwil-cli utils query-tx](./query-tx)	 - Queries a transaction from the blockchain. Requires 1 argument: the hex encoded transaction id.
-
+* [kwil-cli utils chain-info](./kwil-cli-utils-chain-info) - Display information about the connected Kwil network.
+* [kwil-cli utils ping](./kwil-cli-utils-ping) - Ping the kwil provider endpoint.  If successful, returns 'pong'.
+* [kwil-cli utils print-config](./kwil-cli-utils-print-config) - Print the current CLI configuration.
+* [kwil-cli utils query-tx](./kwil-cli-utils-query-tx) - Queries a transaction from the blockchain. Requires 1 argument: the hex encoded transaction id.

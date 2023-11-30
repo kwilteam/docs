@@ -26,8 +26,8 @@ The Kwil CLI can be configured with a persistent configuration file.  This file 
 
 ### Subqueries
 
-* [kwil-cli configure](./configure)	 - Configure the Kwil CLI with persistent global settings.
+* [kwil-cli configure](./kwil-cli-configure)	 - Configure the Kwil CLI with persistent global settings.
 * [kwil-cli database](./database)	 - The database command is a parent command containing subcommands for interacting with databases.
 * [kwil-cli utils](./utils)	 - Various CLI utility commands.
-* [kwil-cli version](./version)	 - Displays the cli version information.
+* [kwil-cli version](./kwil-cli-version)	 - Displays the cli version information.
 
