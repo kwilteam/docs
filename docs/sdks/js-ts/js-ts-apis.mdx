@@ -58,7 +58,7 @@ A promise that resolves to the authentication success or failure. If using NodeK
 ### call()
 
 ```typescript
-async call(actionBody: ActionBody): Promise<GenericResponse<MessageReceipt>>
+async call(actionBody: ActionBody, kwilSigner?: KwilSigner): Promise<GenericResponse<MessageReceipt>>
 
 interface ActionBody {
     name: string;
@@ -75,6 +75,7 @@ Calls a `view` action on the network.
 #### Parameters
 
 -   `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. The `inputs` array must only have one entry.
+-   `kwilSigner` (optional): The kwilSigner for the call request. This is only required if the action uses a `@caller` contextual variable. The SDK will use the `identifier` in the `kwilSigner` to fill in the `@caller` contextual variable.
 
 #### Returns
 

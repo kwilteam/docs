@@ -1,8 +1,8 @@
-# Migrating from Kwil SDK v3
+# Migrating from Kwil SDK v3 / Old SDK
 
-Below is a list of all key changes from the [Kwil v3 SDK](https://www.npmjs.com/package/kwil).
+Below is a list of all key changes from the [Kwil v3 SDK / old Kwil SDK](https://www.npmjs.com/package/kwil).
 
-Note that this SDK must be used with a Kwil Node v0.6.0 and above. If you are not using a Kwil Node on v0.6.0 or above, please use [Kwil v3](https://www.npmjs.com/package/kwil).
+Note that this SDK must be used with a Kwil Node v0.6.0 and above. If you are not using a Kwil Node on v0.6.0 or above, please use the [old Kwil SDK](https://www.npmjs.com/package/kwil).
 
 ## Breaking Changes
 
@@ -14,7 +14,7 @@ In order to prevent users from accidentally broadcasting transactions to the wro
 
 ```javascript
 const kwil = new WebKwil({
-    provider: 'https://kwil.com',
+    provider: 'https://some_kwil_provider',
 });
 ```
 
@@ -22,7 +22,7 @@ const kwil = new WebKwil({
 
 ```javascript
 const kwil = new WebKwil({
-    provider: 'https://kwil.com',
+    provider: 'https://some_kwil_provider',
     chainId: 'your_chain_id'
 });
 ```
@@ -45,7 +45,7 @@ const res = await kwil.chainInfo()
 
 In the old version, accounts were only identified by Ethereum Wallets. Now, Kwil Networks support pluggable authentication/signers, meaning that the signer determines the appropriate account identifier.
 
-Out of the box, Kwil supports Secp256k1 (Etherum) and Ed25519 signatures. Their corresponding identifiers are below:
+Out of the box, Kwil supports Secp256k1 (Ethereum) and Ed25519 signatures. Their corresponding identifiers are below:
 
 | Type      |   Identifier   | Description |
 | :-------- | :------------: | ----------- |
@@ -87,7 +87,7 @@ const res = await kwil.getAccount('account_identifier');
 
 The previous version of Kwil used an `ActionBuilder()` class to build and sign transactions. `ActionBuilder()` has been moved internally. Actions can now be executed by using the `kwil.execute()` method, passing an object that matches the `ActionBody` interface and a [KwilSigner](#kwil-signer-class--ed25519-signatures) (see more below).
 
-You can also customize the signature message that appears in metamask by adding a `decscription` field to the action body.
+You can also customize the signature message that appears in MetaMask by adding a `decscription` field to the action body.
 
 #### Old Version
 
@@ -142,6 +142,17 @@ const res = await kwil.execute(actionBody, kwilSigner);
 /*
     res.data = {
         tx_hash: ...,
+    }
+*/
+
+const success = await kwil.txInfo(res.data?.tx_hash);
+
+/*
+    success.data = {
+        hash: 'tx_hash',
+        height: 'block height of tx on kwil chain'
+        tx: Transaction (i.e. the transaction that was sent)
+        tx_result: TxResult (gas fee, success message, failure message, etc.)
     }
 */
 ```
@@ -218,6 +229,12 @@ const res = await kwil.call(actionBody);
         result: [ 'record 1', 'record 2, ... ]
     }
 */
+```
+
+If the view action uses a `@caller` contextual variable, you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. Note that the user does not need to sign anything for view actions.
+
+```javascript
+await kwil.call(actionBody, kwilSigner)
 ```
 
 ### TxInfo Endpoint
