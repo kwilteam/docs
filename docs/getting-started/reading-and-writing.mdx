@@ -47,10 +47,10 @@ import { BrowserProvider } from 'ethers';
 import { KwilSigner } from '@kwilteam/kwil-js';
 
 async function getSigner() {
-    const provider = new BrowserProvider(window.ethereum)
-    const ethSigner = await provider.getSigner()
-    const ethAddress = await ethSigner.getAddress()
-    return new KwilSigner(ethSigner, ethAddress)
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    const ethAddress = await ethSigner.getAddress();
+    return new KwilSigner(ethSigner, ethAddress);
 }
 ```
 
@@ -61,7 +61,7 @@ DBIDs are network-wide unique identifiers for databases.  They are derived from 
 ```typescript
 import { Utils } from '@kwilteam/kwil-js';
 
-const dbid = Utils.generateDBID('wallet_address', 'social_media')
+const dbid = Utils.generateDBID('wallet_address', 'social_media');
 ```
 
 ## Write Data
@@ -70,22 +70,21 @@ To write data, we can use the `execute()` method to execute an action:
 
 ```typescript
 async function createUser(id, username, age) {
-    const kwilSigner = await getSigner()
+    const kwilSigner = await getSigner();
 
-    const result = await kwil.execute(
-        {
-            dbid,
-            action: "create_user",
-            inputs: [
-                {
-                    id: id,
-                    username: username,
-                    age: age
-                }
-            ]
-        },
-        kwilSigner
-    )
+    const result = await kwil.execute({
+        dbid,
+        action: "create_user",
+        inputs: [
+            {
+                id: id,
+                username: username,
+                age: age
+            }
+        ]
+    }, kwilSigner);
+
+    return result.data;
 }
 ```
 
@@ -95,19 +94,17 @@ To read data, we will call a `view` action on the schema.  This will return the 
 
 ```typescript
 async function getUser(username) {
-    const result = await kwil.call(
-        {
-            dbid,
-            action: "get_user",
-            inputs: [
-                {
-                    username: username
-                }
-            ]
-        }
-    )
+    const result = await kwil.call({
+        dbid,
+        action: "get_user",
+        inputs: [
+            {
+                username: username
+            }
+        ]
+    });
 
-    // TODO: add a return
+    return result.data;
 }
 ```
 
@@ -127,45 +124,44 @@ const kwil = new WebKwil({
     chainId: "kwil-public-testnet-2",
 });
 
-const dbid = Utils.generateDBID('wallet_address', 'social_media')
+const dbid = Utils.generateDBID('wallet_address', 'social_media');
 
 async function getSigner() {
-    const provider = new BrowserProvider(window.ethereum)
-    const ethSigner = await provider.getSigner()
-    return new KwilSigner(ethSigner)
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    return new KwilSigner(ethSigner);
 }
 
 async function createUser(id, username, age) {
-    const kwilSigner = await getSigner()
+    const kwilSigner = await getSigner();
 
-    const result = await kwil.execute(
-        {
-            dbid,
-            action: "create_user",
-            inputs: [
-                {
-                    id: id,
-                    username: username,
-                    age: age
-                }
-            ]
-        },
-        kwilSigner
-    )
+    const result = await kwil.execute({
+        dbid,
+        action: "create_user",
+        inputs: [
+            {
+                id: id,
+                username: username,
+                age: age
+            }
+        ]
+    }, kwilSigner);
+
+    return result.data;
 }
 
 async function getUser(username) {
-    const result = await kwil.call(
-        {
-            dbid,
-            action: "get_user",
-            inputs: [
-                {
-                    username: username
-                }
-            ]
-        }
-    )
+    const result = await kwil.call({
+        dbid,
+        action: "get_user",
+        inputs: [
+            {
+                username: username
+            }
+        ]
+    });
+
+    return result.data;
 }
 ```
 

@@ -63,7 +63,7 @@ const kwil = new WebKwil({
 
 async function authenticateUser() {
     const kwilSigner = await getSigner();
-    await kwil.authenticate(kwilSigner);
+    return await kwil.authenticate(kwilSigner);
 }
 ```
 
