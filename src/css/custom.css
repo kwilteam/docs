@@ -4,6 +4,39 @@
  * work well for content-centric websites.
  */
 
+@font-face {
+  font-family: 'Averta';
+  src: url("/static/fonts/Averta-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+@font-face {
+  font-family: 'Averta';
+  src: url("/static/fonts/Averta-Bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Averta';
+  src: url("/static/fonts/Averta-Light.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Averta';
+  src: url("/static/fonts/Averta-Semibold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+}
+
+:root {
+  --ifm-font-family-base: 'Averta', sans-serif;
+  --ifm-font-weight-semibold: 600;
+}
 
 .navbar {
   background-color: #418e9d;
@@ -54,7 +87,7 @@
   --ifm-color-primary-lighter: #2b1d0e;
   --ifm-color-primary-lightest: #2b1d0e;
   --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(20,143,160, 0.2);
+  --docusaurus-highlighted-code-line-bg: rgba(20, 143, 160, 0.2);
 }
 
 .markdown code {
