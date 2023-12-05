@@ -17,7 +17,7 @@ This page contains a step-by-step guide for creating and using your first Kwil e
 
 ## Creating a valid Kwil Extension
 
-Kwil currently supports libraries for building extensions in both [TypeScript/JavaScript](./packages/javascript.mdx) and [Golang](./packages/golang.mdx).
+Kwil currently supports libraries for building extensions in both [TypeScript/JavaScript](./packages/js-ts) and [Golang](./packages/go).
 
 We will use either of these libraries to create a gRPC server that can be used as a Kwil extension.
 
@@ -27,7 +27,7 @@ import TabItem from '@theme/TabItem';
 <Tabs>
 <TabItem value="typescript" label="TypeScript / JavaScript" default>
 
-To build an extension server in TypeScript/JavaScript, we will be referencing the example found [here](./packages/javascript.mdx).
+To build an extension server in TypeScript/JavaScript, we will be referencing the example found [here](./packages/js-ts).
 
 ### Initalize Repository
 
@@ -55,7 +55,7 @@ ts-node index.ts
 </TabItem>
 <TabItem value="golang" label="Golang">
 
-To build an extension server in Golang, we will be referencing the example found [here](./packages/golang.mdx)
+To build an extension server in Golang, we will be referencing the example found [here](./packages/go)
 
 ### Creating the go.mod
 
@@ -70,7 +70,7 @@ go mod init github.com/<your_github_username>/<repository_name>
 To create a valid extension server:
 
 1. Create a file called `main.go`
-2. Paste the example code from the [Golang Extension Example](./packages/golang.mdx#example-of-building-an-extension) into the file, or write your own extension.
+2. Paste the example code from the [Golang Extension Example](./packages/go#example-of-building-an-extension) into the file, or write your own extension.
 
 To test that it is working properly, run:
 
@@ -209,5 +209,5 @@ Check out the video below for a step-by-step guide to creating your first Kwil E
 
 ## Next Steps
 
-To get started using the extension within Kuneiform, check out the [Kuneiform Guide for extensions](./kuneiform.mdx).  Or, if you're curious to learn how to build more
-complex extensions, check out the guide to the structure of extensions [here](./implementation.mdx).
+To get started using the extension within Kuneiform, check out the [Kuneiform Guide for extensions](./kuneiform).  Or, if you're curious to learn how to build more
+complex extensions, check out the guide to the structure of extensions [here](./implementation).

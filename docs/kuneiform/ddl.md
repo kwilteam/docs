@@ -123,4 +123,4 @@ table users {
 }
 ```
 
-This concludes our guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.
+This concludes the guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.

@@ -25,7 +25,7 @@ action add_user($id, $name, $username) public {
 Naming an action starts with an action declaration followed by your preferred name:
 
 ```typescript
-action <your_desired_name>() <privacy> {}
+action <your_desired_name>() <public | private> {}
 ```
 
 ## Defining Action Parameters

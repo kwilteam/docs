@@ -23,10 +23,9 @@ The `validators` command provides functions for creating and broadcasting valida
 
 ### Subqueries
 
-* [kwil-admin validators approve](./approve)	 - A current validator may approve an active join request for a candidate validator using the `approve` subcommand.
-* [kwil-admin validators join](./join)	 - A node may request to join the validator set by submitting a join request using the `join` command.
-* [kwil-admin validators join-status](./join-status)	 - Query the status of a pending validator join request.
-* [kwil-admin validators leave](./leave)	 - A current validator may leave the validator set using the `leave` command.
-* [kwil-admin validators list](./list)	 - List the current validator set of the network.
-* [kwil-admin validators remove](./remove)	 - Command `remove` votes to remove a validator from the validator set.
-
+* [kwil-admin validators approve](./kwil-admin-validators-approve) - A current validator may approve an active join request for a candidate validator using the `approve` subcommand.
+* [kwil-admin validators join](./kwil-admin-validators-join) - A node may request to join the validator set by submitting a join request using the `join` command.
+* [kwil-admin validators join-status](./kwil-admin-validators-join-status) - Query the status of a pending validator join request.
+* [kwil-admin validators leave](./kwil-admin-validators-leave) - A current validator may leave the validator set using the `leave` command.
+* [kwil-admin validators list](./kwil-admin-validators-list) - List the current validator set of the network.
+* [kwil-admin validators remove](./kwil-admin-validators-remove) - Command `remove` votes to remove a validator from the validator set.
