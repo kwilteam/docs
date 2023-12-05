@@ -15,15 +15,14 @@ This is the default directory to store all the configuration and data such as bl
 
 ```
 home_dir/
+   |- genesis.json 
    |- config.toml
    |- private_key         
    |- abci/                     # chain root directory, stores blockchain data & config
-   |   |- config/
-   |   |   |- genesis.json   
    |   |- data/ 
 ```
 
-The default root directory is `~/.kwild`. You can override this configuration by setting the `KWILD_ROOT_DIR` environment variable or using the `--root_dir` command line flag.
+The default root directory is `~/.kwild`. You can override this configuration by setting the `KWILD_ROOT_DIR` environment variable or using the `--root-dir` command line flag.
 
 ## Quickstart
 
@@ -42,7 +41,7 @@ Running a Kwil node requires `genesis.json`, `config.toml` and `private_key` fil
 
 ### Private Keys
 
-Kwil nodes use ed25519 keys for validator related operations. Refer to the [key management guide](./../admin/keys#generation) for generating these node keys. The default location of private_key is `root_dir/private_key`. You can override this configuration by setting the `KWILD_APP_PRIVATE_KEY_PATH` environment variable or using the `app.private_key_path` command line flag.
+Kwil nodes use ed25519 keys for validator related operations. Refer to the [key management guide](./../admin/keys#generation) for generating these node keys. The default location of private_key is `root_dir/private_key`. You can override this configuration by setting the `KWILD_APP_PRIVATE_KEY_PATH` environment variable or using the `app.private-key-path` command line flag.
 
 ### Genesis File (genesis.json)
 
@@ -68,9 +67,9 @@ To connect a node to an existing network, obtain the genesis file from the desir
 
 Copy the sample [config.toml](./config/settings#sample-configtoml) into `root_dir/config.toml` and update the configuration as required. 
 
-Notable options include the RPC and HTTP server settings such as `app.grpc_listen_addr`, `app.http_listen_addr`, `chain.rpc.listen_addr` and `chain.p2p.listen_addr`.
+Notable options include the RPC and HTTP server settings such as `app.grpc-listen-addr`, `app.http-listen-addr`, `chain.rpc.listen-addr` and `chain.p2p.listen-addr`.
 
-Configure `chain.p2p.persistent_peers` to establish and maintain persistent connections with other nodes in the network. This field can be empty if the network is made up of a standalone node. 
+Configure `chain.p2p.persistent-peers` to establish and maintain persistent connections with other nodes in the network. This field can be empty if the network is made up of a standalone node. 
 
 Refer to the [configuration specification](./config/settings) for more options on tuning a Kwil application.
 
@@ -85,18 +84,18 @@ For instance, to modify the log level and chain RPC address during the node star
 KWILD_LOG_LEVEL=debug
 KWILD_CHAIN_RPC_LISTEN_ADDRESS="tcp://127.0.0.1:26656"
 
-kwild --root_dir "path/to/root/dir"
+kwild --root-dir "path/to/root/dir"
 ```
 
 ```bash title="Command line flags"
-kwild --root_dir "path/to/root/dir" --log.level "debug" --chain.rpc.listen_addr "tcp://127.0.0.1:26656"
+kwild --root-dir "path/to/root/dir" --log.level "debug" --chain.rpc.listen-addr "tcp://127.0.0.1:26656"
 ```
 
 ```bash title="Both environment and command line flags"
 KWILD_LOG_LEVEL=debug
 KWILD_CHAIN_RPC_LISTEN_ADDRESS="tcp://127.0.0.1:26656"
 
-kwild --root_dir "path/to/root/dir" --log.level "info" --chain.rpc.listen_addr "tcp://192.168.1.20:30000"
+kwild --root-dir "path/to/root/dir" --log.level "info" --chain.rpc.listen-addr "tcp://192.168.1.20:30000"
 ```
 If both flags and env variables are set, flags take precedence over environment variables. Therefore, in this example, the Kwil application uses `info` log level and RPC listen address as `tcp://192.168.1.20:30000`.
 
@@ -108,7 +107,7 @@ Refer to the [translation guide](./config/settings#config-override) for more inf
 A private Kwil network with a standalone node can be deployed by running `kwild` as shown below:
 
 ```bash
-kwild --root_dir "path/to/root/dir"
+kwild --root-dir "path/to/root/dir"
 ```
 The root directory must have the required configuration for the node to start successfully. If you are using [quickstart mode](./kwild#quickstart), this root directory will be generated for you if it does not exist. 
 
@@ -119,23 +118,23 @@ Whether this node starts as a validator or a non-validator is determined by its 
 
 To connect to an existing Kwil network during startup:
 - Obtain the `genesis.json` for the desired network from another participant, and ensure that it is placed properly in your `root_dir`.
-- Update the `chain.p2p.persistent_peers` with the peer addresses from the network using one of the following methods and start the node. `persistent_peers` is a comma-separated string of `nodeid@ip:port` of peers to establish and maintain connections upon startup.
+- Update the `chain.p2p.persistent_peers` with the network peer addresses and start the node. `persistent_peers` is a comma-separated string of `nodeid@ip:port` of peers to establish and maintain connections upon startup.
 
   ```bash title="Command line flag:  --chain.p2p.persistent_peers"
-  kwild --root_dir "path/to/root/dir" --chain.p2p.persistent_peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
+  kwild --root-dir "path/to/root/dir" --chain.p2p.persistent-peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
   ```
 
   ```bash title="Environment variable:  KWILD_CHAIN_P2P_PERSISTENT_PEERS"
   KWILD_CHAIN_P2P_PERSISTENT_PEERS="d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
 
-  kwild --root_dir "path/to/root/dir"
+  kwild --root-dir "path/to/root/dir"
   ```    
 
   ```bash title="persistent_peers option in config.toml"
   [chain.p2p]
   persistent_peers = "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
 
-  kwild --root_dir "path/to/root/dir"
+  kwild --root-dir "path/to/root/dir"
   ```
 
 4. Note that, this node joins the network by default as a non-validator. Please refer to the [Validator Guide](./validator#federated-consensus-based-join-process) for more information on becoming a validator node.
