@@ -78,22 +78,21 @@ For the above node, we would have `b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.
 
 ## Creating A Second Peer Node
 
-We will use the `kwil-admin` tool to create the second node's directories and configs. We can specify where it can find the genesis file,
-as well as peers that it should try to connect to when starting up. 
-
-```bash
-kwil-admin setup init --output-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
---peer b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656
-```
-
-To verify that the second node has been created correctly, we can start it up. Since we are running both of these locally, we need to specify
+Using the `kwil-admin` tool to create the second node's directories and configs, we can specify where to find the genesis file and any
+peers that it should try to connect to when starting up. Since both nodes are running locally, we need to specify
 new addresses for the different endpoints, so that the second node does not conflict with the first node:
 
 ```bash
-kwild --root-dir=./testnet/node1 --app.grpc-listen-addr=localhost:50052 \
---chain.p2p.persistent-peers=f29785e8f9c52635b55f6459b4b3a7330d3dee2e@127.0.0.1:26656 \
---app.http-listen-addr=localhost:8081 --app.admin-listen-addr=unix:///tmp/node1.sock \
---chain.rpc.listen-addr=tcp://127.0.0.1:26658 --chain.p2p.listen-addr=tcp://127.0.0.1:26655
+kwil-admin setup init --output-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
+--app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
+--app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
+--chain.p2p.listen-addr=tcp://127.0.0.1:26655
+```
+
+Start the second node to verify that it was created correctly:
+
+```bash
+kwild --root-dir=./testnet/node1
 ```
 
 If done correctly, you should be able to see the second node's logs, and it should be able to read the network logs.
@@ -119,19 +118,24 @@ To check that the request was successful, we can get a list of pending join requ
 ```bash
 $ kwil-admin validators list-join-requests --rpcserver unix:///tmp/node0.sock
 Pending join requests (1 approval needed):
-  Candidate                                                       | Power | Approvals | Expiration Height
- a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794 |     1 |     10000 | 15906
+ Candidate                                                         | Power | Approvals | Expiration
+-------------------------------------------------------------------+-------+-----------+------------
+ a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794  |     1 |         0 | 16728
 ```
 
 ### Approving The Request
 
-We can vote to approve the join request from the first node. We specify the candidate's public key, which we can get from
-the list of pending join requests as shown above:
+The first node must vote to approve the second node's join request. Using the `kwil_admin` tool, the first node can
+vote to approve the second node by running the `kwil-admin validators approve` command and passing the second node's public key:
 
 ```bash
 kwil-admin validators approve a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794 \
 --rpcserver unix:///tmp/node0.sock
 ```
+
+:::tip
+If the requesting node's public key is unknown, all pending requests and their public keys can be retrieved with the `kwil-admin validators list-join-requests` command.
+:::
 
 And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
