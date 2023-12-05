@@ -62,13 +62,13 @@ To verify you have the correct `chainId`, you can use the [`chainInfo()`](#chain
 
 In Kwil, accounts are identified by the signer(s) that are used on the Kwil Network. Kwil natively supports two types of signers: Secp256k1 (EVM) and ED25519.
 
-Secp256k1 signers use **Ethereum wallet addresses** as identifiers. ED25519 signers use the **ED25519 public key** as identifiers.
+Secp256k1 signers use **Ethereum wallet addresses** as account identifiers. ED25519 signers use the **ED25519 public key** as account identifiers.
 
 ### Database Identifiers (DBID)
 
 In Kwil, databases are identified by a 'database identifier' (sometime referred to as DBID), which is a hex encoded SHA224 Hash of the database name and public key, prepended with an `x`.
 
-The account identifier can be passed as a hex-encoded string, or as Bytes (Uint8Array).
+The account identifier can be passed as a hex-encoded string, or as Bytes (`Uint8Array`).
 
 To get the DBID for an account identifier and database name, you can use the following helper method:
 
@@ -82,7 +82,7 @@ const dbid = Utils.generateDBID('account_identifier', 'database_name')
 
 Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CRUD actions, etc).
 
-To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-Js supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
+To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
 
 ```javascript
 import { Utils, KwilSigner } from '@kwilteam/kwil-js';
@@ -200,7 +200,7 @@ To read data on Kwil, you can (1) execute a `view` action message or (2) query w
 
 `View` actions are read-only actions that can be used to query data without having to wait for a transaction to be mined on Kwil.
 
-Only one `input` is allowed for `view` actions.
+Only one `input` object is allowed in the `inputs` array for `view` actions.
 
 <Tabs
     defaultValue="js"
@@ -215,7 +215,7 @@ Only one `input` is allowed for `view` actions.
 const actionBody = {
     dbid,
     action: "your_action_name",
-    inputs: [{
+    inputs: [{ // only one input object is allowed
         $input_name_1: "input_value_1",
         $input_name_2: ...
     }],
@@ -259,7 +259,7 @@ const res = await kwil.call(actionBody);
 </TabItem>
 </Tabs>
 
-If the view action uses a `@caller` [contextual variable](/docs/kuneiform/dml#using-contextual-variables-in-actions), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. Note that the user does not need to sign for view actions.
+If the view action uses a `@caller` [contextual variable](/docs/kuneiform/dml#using-contextual-variables-in-actions), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. The user does not need to sign for view actions.
 
 ```javascript
 await kwil.call(actionBody, kwilSigner)
@@ -298,10 +298,10 @@ const res = await kwil.chainInfo()
 
 ### List Databases
 
-Returns all database names belonging to a public key.
+Returns all database on a network. If an account identifier is passed, it will return all databases owned by that account.
 
 ```javascript
-const res = await kwil.listDatabases("account_identifier");
+const res = await kwil.listDatabases("account_identifier (optional)");
 // res.data = ["db1", "db2", "db3"]
 ```
 
@@ -345,7 +345,7 @@ const res = await kwil.getAccount("account_identifier")
 Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries. If your Kwil network used a Kwil Gateway, you can use the `kwil.authenticate()` method to authenticate users.
 
 :::tip
-The Kwil Gateway is still in private beta.  If you would like access, please contact our team.
+The Kwil Gateway is still in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
 :::
 
 <Tabs

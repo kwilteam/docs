@@ -232,18 +232,24 @@ The result of `.getSchema()` is stored in the [TTL cache](./overview#optional-co
 ### listDatabases()
 
 ```typescript
-async listDatabases(owner: string): Promise<GenericResponse<string[]>>
+async listDatabases(owner?: string): Promise<GenericResponse<DatasetInfo[]>>
+
+interface DatasetInfo {
+    name: string;
+    owner: Uint8Array;
+    dbid: string;
+}
 ```
 
-Lists all databases owned by a particular owner.
+Lists all databases owned by a particular owner. If no owner is provided, it will list all databases on the network.
 
 #### Parameters
 
--   `owner`: The owner's identifier (e.g. wallet address, public key, etc.).
+-   `owner`(optional): The owner's identifier (e.g. wallet address, public key, etc.).
 
 #### Returns
 
-A promise that resolves to a list of database names.
+A promise that resolves to an array of `DatasetInfo` objects. Each object contains the database name, owner's identifier, and database ID.
 
 ### ping()
 
