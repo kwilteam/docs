@@ -143,7 +143,7 @@ If the requesting node's public key is unknown, all pending requests and their p
 And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
 ```bash
-$ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
+$ kwil-admin validators list-validators --rpcserver unix:///tmp/node0.sock
 Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}
