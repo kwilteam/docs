@@ -26,14 +26,15 @@ kwil-admin node version --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc
 ```
       --authrpc-cert string   kwild's TLS certificate
   -h, --help                  help for version
-  -s, --rpcserver string      admin RPC server address (default: 127.0.0.1:50151) (default "127.0.0.1:50151")
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock]
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert]
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key]
 ```
 
 ### Options inherited from parent commands
 
 ```
       --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
 ```
 

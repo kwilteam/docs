@@ -1,30 +1,33 @@
 ---
-sidebar_position: 1
-sidebar_label: "approve"
-id: "kwil-admin-validators-approve"
-title: "kwil-admin validators approve"
-description: "A current validator may approve an active join request for a candidate validator using the `approve` subcommand."
+sidebar_position: 5
+sidebar_label: "list-join-requests"
+id: "kwil-admin-validators-list-join-requests"
+title: "kwil-admin validators list-join-requests"
+description: "List all pending join requests."
 ---
 
-A current validator may approve an active join request for a candidate validator using the `approve` subcommand. If enough validators approve the join request, the candidate validator will be added to the validator set.
+Command `list-join-requests` lists all pending join requests.
+	
+Join requests are created when a validator wants to join the validator set. The validator must be approved by 2/3 of the current validator set to be added to the validator set.
+Each join request has an expiration block height, after which it is no longer valid.
 
 ### Usage
 
 ```
-kwil-admin validators approve <joiner> [flags]
+kwil-admin validators list-join-requests [flags]
 ```
 
 ### Example
 
 ```
-# Approve a join request for a candidate validator
-kwil-admin validators approve 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0
+# List all pending join requests
+kwil-admin validators list-join-requests
 ```
 
 ### Options
 
 ```
-  -h, --help   help for approve
+  -h, --help   help for list-join-requests
 ```
 
 ### Options inherited from parent commands

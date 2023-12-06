@@ -17,26 +17,24 @@ kwil-admin validators join [flags]
 ### Example
 
 ```
-$ kwil-admin validators join --key-file "~/.kwild/private_key"
-Joining the network as a validator...
-Node PublicKey: d692a88b6fee8d1399f7aab70db25001080dbf2fe8ca4f345e0fdca6b853713a
-tx hash: 125ae9009a5056a152542aa84e97a2a49c547e492dffdfea50eb44623fbb3efb
-tx sender: 1pKoi2/ujROZ96q3DbJQAQgNvy/oyk80Xg/cprhTcTo=
-tx signature (ed25519): ce56440b1ecd529b5345a6662f3a30831b7d85ddc714036c4e7b124dd0481429478c1459c1833a8e9fa338329b0f217ca04c4381bb53679e3d72dec3317e7b09
-tx payload (validator_join): 0001e2a0d692a88b6fee8d1399f7aab70db25001080dbf2fe8ca4f345e0fdca6b853713a01
+# Request to join the validator set
+kwil-admin validators join
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for join
-  -k, --key-file string      file containing the private key of the local validator that will sign the transaction (mutually exclusive with --private-key))
-  -p, --private-key string   hex string of the private key of the local validator that will sign the transaction (mutually exclusive with --key-file)
+  -h, --help   help for join
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
+      --authrpc-cert string   kwild's TLS certificate
+      --output text           the format for command output - either text or `json` (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+  -S, --silence               Silence logs
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
 ```
 

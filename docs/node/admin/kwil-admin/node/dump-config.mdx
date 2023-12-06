@@ -1,31 +1,31 @@
 ---
-sidebar_position: 3
-sidebar_label: "peers"
-id: "kwil-admin-node-peers"
-title: "kwil-admin node peers"
-description: "Print a list of the node's peers, with their public information."
+sidebar_position: 1
+sidebar_label: "dump-config"
+id: "kwil-admin-node-dump-config"
+title: "kwil-admin node dump-config"
+description: "Gets the current config from the node."
 ---
 
-Print a list of the node's peers, with their public information.
+Gets the current config from the node.
 
 ### Usage
 
 ```
-kwil-admin node peers [flags]
+kwil-admin node dump-config [flags]
 ```
 
 ### Example
 
 ```
-# Print a list of the node's peers
-kwil-admin node peers --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc.cert"
+# Get the current config from the node.
+kwil node dump-config --rpcserver unix:///tmp/kwil_admin.sock
 ```
 
 ### Options
 
 ```
       --authrpc-cert string   kwild's TLS certificate
-  -h, --help                  help for peers
+  -h, --help                  help for dump-config
   -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock]
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert]
       --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key]

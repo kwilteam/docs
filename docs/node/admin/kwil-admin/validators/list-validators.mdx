@@ -1,30 +1,30 @@
 ---
-sidebar_position: 1
-sidebar_label: "approve"
-id: "kwil-admin-validators-approve"
-title: "kwil-admin validators approve"
-description: "A current validator may approve an active join request for a candidate validator using the `approve` subcommand."
+sidebar_position: 6
+sidebar_label: "list-validators"
+id: "kwil-admin-validators-list-validators"
+title: "kwil-admin validators list-validators"
+description: "List the current validator set of the network."
 ---
 
-A current validator may approve an active join request for a candidate validator using the `approve` subcommand. If enough validators approve the join request, the candidate validator will be added to the validator set.
+List the current validator set of the network.
 
 ### Usage
 
 ```
-kwil-admin validators approve <joiner> [flags]
+kwil-admin validators list-validators [flags]
 ```
 
 ### Example
 
 ```
-# Approve a join request for a candidate validator
-kwil-admin validators approve 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0
+# List the current validator set of the network
+kwild validators list-validators
 ```
 
 ### Options
 
 ```
-  -h, --help   help for approve
+  -h, --help   help for list-validators
 ```
 
 ### Options inherited from parent commands

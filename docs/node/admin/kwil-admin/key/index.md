@@ -18,9 +18,11 @@ The `key` command provides subcommands for private key generation and inspection
 
 ```
       --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
 ```
 
 ### Subqueries
 
-* [kwil-admin key gen](./kwil-admin-key-gen) - Generate ed25519 keys for usage in validators.
-* [kwil-admin key info](./kwil-admin-key-info) - Display information about a private key.
+* [kwil-admin key gen](./gen)	 - Generate ed25519 keys for usage in validators.
+* [kwil-admin key info](./info)	 - Display information about a private key.
+

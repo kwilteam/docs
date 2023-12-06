@@ -17,21 +17,24 @@ kwil-admin validators leave [flags]
 ### Example
 
 ```
-$ kwil-admin validators leave --key-file "~/.kwild/private_key"
-TxHash: a001d7ccf73b05d6aa0d749d25cec60fef4de606533ac21f48043c7cc65dfe1b
+# Leave the validator set
+kwil-admin validators leave
 ```
 
 ### Options
 
 ```
-  -h, --help                 help for leave
-  -k, --key-file string      file containing the private key of the local validator that will sign the transaction (mutually exclusive with --private-key))
-  -p, --private-key string   hex string of the private key of the local validator that will sign the transaction (mutually exclusive with --key-file)
+  -h, --help   help for leave
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
+      --authrpc-cert string   kwild's TLS certificate
+      --output text           the format for command output - either text or `json` (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+  -S, --silence               Silence logs
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
 ```
 

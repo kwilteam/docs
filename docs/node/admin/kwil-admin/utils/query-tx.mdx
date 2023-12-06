@@ -1,0 +1,33 @@
+---
+sidebar_position: 2
+sidebar_label: "query-tx"
+id: "kwil-admin-utils-query-tx"
+title: "kwil-admin utils query-tx"
+description: "Query a transaction's status by hash."
+---
+
+Query a transaction's status by hash. The hash should be passed as a hex-encoded string.
+
+### Usage
+
+```
+kwil-admin utils query-tx [flags]
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS certificate
+  -h, --help                  help for query-tx
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
+```
+
