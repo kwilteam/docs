@@ -46,9 +46,11 @@ kwil-admin setup testnet -v 4 -o ./output --hostnames 192.168.10.2 192.168.10.3 
 ### Options
 
 ```
+      --alloc allocFlag           account=amount pairs of genesis account allocations (default map[])
   -i, --block-interval duration   shortest block interval in seconds (default 6s)
       --chain-id string           chain ID to use for the genesis file
       --config string             path to a config file to use as a template for all nodes
+      --gas                       enable gas
   -h, --help                      help for testnet
       --hostname-prefix string    prefix for hostnames of nodes
       --hostname-suffix string    suffix for hostnames of nodes
@@ -57,8 +59,10 @@ kwil-admin setup testnet -v 4 -o ./output --hostnames 192.168.10.2 192.168.10.3 
       --node-dir-prefix string    prefix for the node directories (node results in node0, node1, ...) (default "node")
   -n, --non-validators int        number of non-validators to generate
   -o, --output-dir string         parent directory for all of generated node folders (default "./.testnet")
+  -p, --p2p-port int              p2p port for nodes (default 26656)
       --starting-ip string        starting IP address for nodes (default "172.10.100.2")
   -v, --validators int            number of validators to generate (default 3)
+      --without-nonces            disable account nonces
 ```
 
 ### Options inherited from parent commands
