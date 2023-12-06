@@ -1,0 +1,50 @@
+---
+sidebar_position: 1
+sidebar_label: "gen"
+id: "kwil-admin-key-gen"
+title: "kwil-admin key gen"
+description: "Generate ed25519 keys for usage in validators."
+slug: /ref/kwil-admin/key/gen
+---
+
+## kwil-admin key gen
+
+Generate ed25519 keys for usage in validators.
+
+### Synopsis
+
+Generate ed25519 keys for usage in validators.
+
+```
+kwil-admin key gen [flags]
+```
+
+### Examples
+
+```
+# Generate a new key and save it to ./priv_key
+kwil-admin key gen --key-file ./priv_key
+
+# Generate a raw private key
+kwil-admin key gen --raw
+```
+
+### Options
+
+```
+  -h, --help              help for gen
+  -o, --key-file string   file to which the new private key is written (stdout by default)
+  -R, --raw               just print the private key hex without other encodings, public key, or node ID
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-admin key](/docs/ref/kwil-admin/key)	 - The `key` command provides subcommands for private key generation and inspection.
+

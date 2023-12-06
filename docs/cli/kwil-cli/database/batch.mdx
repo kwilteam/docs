@@ -1,0 +1,75 @@
+---
+sidebar_position: 1
+sidebar_label: "batch"
+id: "kwil-cli-database-batch"
+title: "kwil-cli database batch"
+description: "Batch execute an action using inputs from a CSV file."
+slug: /ref/kwil-cli/database/batch
+---
+
+## kwil-cli database batch
+
+Batch execute an action using inputs from a CSV file.
+
+### Synopsis
+
+Batch executes an action on a database using inputs from a CSV file.
+
+To map a CSV column name to an action input, use the `--map-inputs` flag.
+The format is `--map-inputs <csv_column>:<action_input>`.  If the `--map-inputs` flag is not passed,
+the CSV column name will be used as the action input name.
+	
+You can also specify the input values directly using the `--values` flag, delimited by a colon.
+These values will apply to all inserted rows, and will override the CSV column mappings.
+
+You can either specify the database to execute this against with the `--name` and `--owner` 
+flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
+flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
+
+```
+kwil-cli database batch [flags]
+```
+
+### Examples
+
+```
+# Given a CSV file with the following contents:
+# id,name,age
+# 1,john,25
+# 2,jane,30
+# 3,jack,35
+
+# Executing the `create_user($user_id, $username, $user_age, $created_at)` action on the "mydb" database
+kwil-cli database batch --path ./users.csv --action create_user --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 --map-inputs id:user_id name:username age:user_age --values created_at:$(date +%s)
+```
+
+### Options
+
+```
+  -a, --action string        the action to execute
+  -i, --dbid string          the database id
+  -h, --help                 help for batch
+  -m, --map-inputs strings   csv column to action parameter mappings (e.g. csv_id:user_id, csv_name:user_name)
+  -n, --name string          the database name
+  -N, --nonce int            nonce override (-1 means request from server) (default -1)
+  -o, --owner string         the database owner
+  -p, --path string          path to the CSV file to use
+  -v, --values strings       action parameter mappings applied to all executions (e.g. id:123, name:john)
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes             Assume yes for all prompts
+      --chain-id string        the expected/intended Kwil Chain ID
+      --kwil-provider string   the Kwil provider gRPC endpoint (default "127.0.0.1:50051")
+      --output string          the format for command output - either 'text' or 'json' (default "text")
+      --private-key string     the private key of the wallet that will be used for signing
+  -S, --silence                Silence logs
+      --tls-cert-file string   the path to the TLS certificate (if the provider endpoint is using TLS)
+```
+
+### SEE ALSO
+
+* [kwil-cli database](/docs/ref/kwil-cli/database)	 - The database command is a parent command containing subcommands for interacting with databases.
+

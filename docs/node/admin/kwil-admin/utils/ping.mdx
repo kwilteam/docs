@@ -1,0 +1,49 @@
+---
+sidebar_position: 1
+sidebar_label: "ping"
+id: "kwil-admin-utils-ping"
+title: "kwil-admin utils ping"
+description: "Check connectivity with the node's admin RPC interface."
+slug: /ref/kwil-admin/utils/ping
+---
+
+## kwil-admin utils ping
+
+Check connectivity with the node's admin RPC interface.
+
+### Synopsis
+
+Check connectivity with the node's admin RPC interface. If successful, returns 'pong'.
+
+```
+kwil-admin utils ping [flags]
+```
+
+### Examples
+
+```
+# Ping the node's admin RPC interface
+kwil-admin node ping --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc.cert"
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS certificate
+  -h, --help                  help for ping
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-admin utils](/docs/ref/kwil-admin/utils)	 - The `utils` command is used to get information about a running Kwil node.
+

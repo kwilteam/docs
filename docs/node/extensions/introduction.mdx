@@ -1,0 +1,40 @@
+---
+sidebar_position: 1
+sidebar_label: "Extensions Intro"
+id: "extensions-intro"
+title: Extensions Introduction
+description: An introduction to building and using extensions in Kwil.
+slug: /extensions/introduction
+---
+
+Kwil features an extensions system that enables developers to run arbitrary applications alongside their database.  This allows developers to build
+business logic, access control, and value accrual mechanisms directly into their decentralized database.
+
+:::info
+Extensions are currently in alpha, and are subject to change.  **We are actively looking for feedback on the extensions system.**
+:::
+
+## Getting Started
+
+To get started using extensions, check out one of the following resources:
+
+- [Step-by-step on building and running extensions](./quickstart)
+- [Building extensions in TypeScript / JavaScript](./packages/js-ts)
+- [Calling extensions in Kuneiform](./kuneiform)
+
+## What are extensions for?
+
+Extensions were designed to allow developers to utilize arbitrary logic in their databases.  Unlike traditional databases, there is often a need to directly
+couple certain logic to data when using a decentralized database (e.g. token gating).  Due to the nature of decentralized networks, it is often difficult to
+enforce these restrictions at a separate layer.  With extensions, developers are able to directly tie their logic and data, deploying them as one single protocol.
+
+### Examples
+
+1. **Token Gating** - Developers can token gate access to federated Kwil databases using extensions.  This can be done by building an extension to read data from another
+blockchain before a SELECT statement is processed.
+
+2. **Access Control** - Developers can build access control measures that utilize external systems to authenticate users.  This can be done by building an extension
+that reads data from an external system before some action is performed.
+
+3. **Stateless Functions** - Developers can build stateless functions that can be called from within a Kwil database.  This can be done by building an extension
+containing the desired functionality, and calling that from within a Kwil database.

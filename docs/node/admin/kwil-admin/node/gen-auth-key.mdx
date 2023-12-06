@@ -1,0 +1,49 @@
+---
+sidebar_position: 2
+sidebar_label: "gen-auth-key"
+id: "kwil-admin-node-gen-auth-key"
+title: "kwil-admin node gen-auth-key"
+description: "Generate a new key pair for use in the node's validator set."
+slug: /ref/kwil-admin/node/gen-auth-key
+---
+
+## kwil-admin node gen-auth-key
+
+Generate a new key pair for use in the node's validator set.
+
+### Synopsis
+
+Generate a new key pair for use in the node's validator set.
+	
+The key pair is generated and stored in the node's configuration directory, in the files auth.key and auth.cert. The key pair is used to authenticate the admin tool to the node.
+
+```
+kwil-admin node gen-auth-key [flags]
+```
+
+### Examples
+
+```
+# Generate a new TLS key pair to talk to the node
+kwil-admin node gen-auth-key --authrpc-cert "~/.kwild/rpc.cert"
+```
+
+### Options
+
+```
+  -h, --help             help for gen-auth-key
+      --tlscert string   output path for the node's TLS certificate file (default "auth.cert")
+      --tlskey string    output path for the node's TLS key file (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-admin node](/docs/ref/kwil-admin/node)	 - The `node` command is used to get information about a running Kwil node.
+

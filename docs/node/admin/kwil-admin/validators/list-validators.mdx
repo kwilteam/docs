@@ -1,0 +1,49 @@
+---
+sidebar_position: 6
+sidebar_label: "list-validators"
+id: "kwil-admin-validators-list-validators"
+title: "kwil-admin validators list-validators"
+description: "List the current validator set of the network."
+slug: /ref/kwil-admin/validators/list-validators
+---
+
+## kwil-admin validators list-validators
+
+List the current validator set of the network.
+
+### Synopsis
+
+List the current validator set of the network.
+
+```
+kwil-admin validators list-validators [flags]
+```
+
+### Examples
+
+```
+# List the current validator set of the network
+kwild validators list-validators
+```
+
+### Options
+
+```
+  -h, --help   help for list-validators
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS certificate
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+  -S, --silence               Silence logs
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
+

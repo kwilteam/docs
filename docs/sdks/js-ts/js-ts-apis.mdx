@@ -39,32 +39,21 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 
 A new instance of the Kwil class.
 
-### execute()
+### authenticate()
+
+Authenticates the user with a Kwil Gateway. This method will throw an error if your Kwil Network does not have a Kwil Gateway.
 
 ```typescript
-async execute(actionBody: ActionBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
-
-interface ActionBody {
-    name: string;
-    dbid: string;
-    inputs?: ActionInput[] | Entries[];
-    description?: string;
-}
-
-type Entries = { [key: string]: string | number | null };
+async authenticate(signer: KwilSigner): Promise<GenericResponse<AuthSuccess>>
 ```
-
-Executes a state-changing (Create, Update, Delete) action on the Kwil network.
 
 #### Parameters
 
--   `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
-
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+-   `signer`: The signer for the authentication transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
 #### Returns
 
-A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
+A promise that resolves to the authentication success or failure. If using NodeKwil, the return will also include a cookie to be passed to the [`.setCookie()`](#setcookie) method.
 
 ### call()
 
@@ -85,13 +74,24 @@ Calls a `view` action on the network.
 
 #### Parameters
 
--   `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message, if the action requires a signature.
-
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class. A KwilSigner is only required if the action requires a signature.
+-   `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. The `inputs` array must only have one entry.
+-   `kwilSigner` (optional): The kwilSigner for the call request. This is only required if the action uses a `@caller` contextual variable. The SDK will use the `identifier` in the `kwilSigner` to fill in the `@caller` contextual variable.
 
 #### Returns
 
 A promise that resolves to the result of the action / query.
+
+### chainInfo()
+
+```typescript
+async chainInfo(): Promise<GenericResponse<ChainInfo>>
+```
+
+Retrieves the chain id, latest block height, and latest block hash on the specified Kwil provider.
+
+#### Returns
+
+A promise that resolves to a `ChainInfo` object, containing the chain id, latest block height, and latest block hash.
 
 ### deploy()
 
@@ -105,8 +105,6 @@ interface DeployBody {
 ```
 
 Deploys a new database to the Kwil network.
-
-Note that the `.deploy()` method not the recommended way to deploy databases on Kwil. We strongly recommend using the [Kuneiform IDE](/docs/kuneiform/introduction).
 
 #### Parameters
 
@@ -141,17 +139,68 @@ Drops a database from the Kwil network.
 
 A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
 
+### execute()
+
+```typescript
+async execute(actionBody: ActionBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+
+interface ActionBody {
+    name: string;
+    dbid: string;
+    inputs?: ActionInput[] | Entries[];
+    description?: string;
+}
+
+type Entries = { [key: string]: string | number | null };
+```
+
+Executes a state-changing (Create, Update, Delete) action on the Kwil network.
+
+#### Parameters
+
+-   `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
+
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+#### Returns
+
+A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
+
+### funder
+
+```typescript
+kwil.funder: funder
+```
+
+The `funder` property accesses the funding methods for the Kwil network.' See the [Funder](#funder) section below for more information.
+
+### getAccount()
+
+```typescript
+async getAccount(owner: string): Promise<GenericResponse<Account>>
+```
+
+Retrieves an account using the owner's account identifier.
+
+#### Parameters
+
+-   `owner`: The owner's account identifier
+
+#### Returns
+
+A promise that resolves to an `Account` object. The account object includes the owner's identifier, balance, and nonce.
+
 ### getDBID()
 
 ```typescript
 getDBID(owner: string, name: string): string
 ```
 
-Generates a unique database identifier (DBID) from the provided owner's public key and a database name.
+Generates a unique database identifier (DBID) from the provided owner's identifier (e.g. wallet address, public key, etc.) and a database name.
 
 #### Parameters
 
--   `owner`: The owner's public key
+-   `owner`: The owner's identifier (e.g. wallet address, public key, etc.)
 -   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
@@ -180,49 +229,27 @@ The result of `.getSchema()` is stored in the [TTL cache](./overview#optional-co
 
 :::
 
-### getAccount()
-
-```typescript
-async getAccount(owner: string): Promise<GenericResponse<Account>>
-```
-
-Retrieves an account using the owner's public key.
-
-#### Parameters
-
--   `owner`: The owner's public key.
-
-#### Returns
-
-A promise that resolves to an `Account` object. The account object includes the owner's public key, balance, and nonce.
-
 ### listDatabases()
 
 ```typescript
-async listDatabases(owner: string): Promise<GenericResponse<string[]>>
+async listDatabases(owner?: string): Promise<GenericResponse<DatasetInfo[]>>
+
+interface DatasetInfo {
+    name: string;
+    owner: Uint8Array;
+    dbid: string;
+}
 ```
 
-Lists all databases owned by a particular owner.
+Lists all databases owned by a particular owner. If no owner is provided, it will list all databases on the network.
 
 #### Parameters
 
--   `owner`: The owner's public key.
+-   `owner`(optional): The owner's identifier (e.g. wallet address, public key, etc.).
 
 #### Returns
 
-A promise that resolves to a list of database names.
-
-### chainInfo()
-
-```typescript
-async chainInfo(): Promise<GenericResponse<ChainInfo>>
-```
-
-Retrieves the chain id, latest block height, and latest block hash on the specified Kwil provider.
-
-#### Returns
-
-A promise that resolves to a `ChainInfo` object, containing the chain id, latest block height, and latest block hash.
+A promise that resolves to an array of `DatasetInfo` objects. Each object contains the database name, owner's identifier, and database ID.
 
 ### ping()
 
@@ -253,6 +280,18 @@ Performs a SELECT query on a database. The query must be a read-only query.
 
 A promise that resolves to an array of objects of database records.
 
+### setCookie()
+
+```typescript
+kwil.setCookie(cookie: string): void
+```
+
+Sets the cookie for the Kwil Gateway. This method is only available in NodeJS.
+
+#### Parameters
+
+-   `cookie`: The cookie to set.
+
 ### txInfo()
 
 ```typescript
@@ -276,7 +315,7 @@ The `KwilSigner` is a class that is used to sign transactions and messages on Kw
 ### constructor()
 
 ```typescript
-constructor(signer: EthSigner, publicKey: HexString | Uint8Array): KwilSigner;
+constructor(signer: EthSigner, identifier: HexString | Uint8Array): KwilSigner;
 
 constructor(signer: (msg: Uint8Array, ...args: any[]) => Promise<Uint8Array>, publicKey: HexString | Uint8Array, signatureType: SignatureType): KwilSigner;
 ```
@@ -287,20 +326,50 @@ Creates a new instance of the KwilSigner class.
 
 -   `signer`: The signer for the action transaction. It can receive an EtherJS (v5 or v6) signer or a custom signer function.
 
--   `publicKey`: The public key of the user that is executing the action transaction. This can be a hex string or a Uint8Array.
+-   `identifier`: The identifier of the user that is executing the action transaction. This can be a hex string or a Uint8Array.
 
 -   `signatureType`: The signature type enumerator. This is only required if a custom signer function is provided.
 
-The following signature types can be used:
+The following signature types and corresponding identifiers can be used:
 
-| Type      |   Enumerator   | Description                                                                                                                                                            |
-| :-------- | :------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Secp256k1 | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
-| Ed25519   |   'ed25519'    | The Kwil Signer will use an ed25519 signature.                                                                                                                         |
+| Type      |   Identifier   |   Enumerator   | Description |
+| :-------- | :------------: | ----------- | ----------- |
+| Secp256k1 | Ethereum Wallet Address | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| ED25519   | ED25519 Public Key |   'ed25519'    | The Kwil Signer will use an ED25519 signature. |signature.                                                                                                                         |
 
 #### Returns
 
 A new instance of the KwilSigner class.
+
+## Funder
+
+The `Funder` class is used to execute funding-related operations on a Kwil network (if funding is enabled).
+
+### constructor()
+
+The funder class is automatically initialized with the Kwil class. It can be accessed with `kwil.funder`.
+
+### transfer()
+
+```typescript
+async transfer(transferBody: TransferBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+
+interface TransferBody {
+    to: string | Uint8Array;
+    amount: BigInt;
+    description?: string;
+};
+```
+
+#### Parameters
+
+-   `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message.
+
+-   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+#### Returns
+
+A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
 
 ## Action Inputs
 
@@ -592,26 +661,9 @@ An alternative to the kwil.getDBID() method, allowing developers to retrieve a d
 
 #### Parameters
 
--   `owner`: The owner's public key.
+-   `owner`: The owner's account identifier.
 -   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 
 A string that represents the unique identifier for the database.
-
-### recoverSecp256k1PubKey()
-
-```typescript
-async recoverSecp256k1PubKey(signer: Signer, message?: string): Promise<string>
-```
-
-Recovers the public key from a secp256k1 signature.
-
-#### Parameters
-
--   `signer`: The signer to recover the public key from. This must be a signer from Ethers v5 or Ethers v6.
--   `message`: An optional message to sign. If not provided, the message will be 'Sign this message to recover your public key.'
-
-#### Returns
-
-A promise that resolves to the public key.

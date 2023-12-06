@@ -1,0 +1,193 @@
+---
+sidebar_position: 4
+sidebar_label: "Read Access Control"
+id: 'read-access-control'
+title: "Read Access Control"
+description: Enforce restrictions on reading data from a network.
+---
+
+In this tutorial, we will cover how to authenticate a user to enforce read access control. This tutorial expands on the schema created in the [Write Access Control](/docs/getting-started/write-access-control) tutorial.
+
+In Kwil, data is primarily read with `view` actions. For executing `view` actions, the same general access control rules are available as for [`write` actions](/docs/getting-started/write-access-control). However, because data stored on nodes are default public, Kwil networks running in permissioned or federated environments can use the Kwil Gateway to enforce user authentication and stronger read access control.
+
+:::tip
+Setting view action privacy is done using the Kwil Gateway.  The gateway is still in private beta.  If you would like access, please contact our team.
+:::
+
+## Overview
+
+The Kwil Gateway requires a user to sign a message with their [account](/docs/concepts#accounts) keys. Once the signature is verified, the gateway will return the user a cookie to be passed with all subsequent requests.
+
+## Require Authentication in Kuneiform
+
+To signal to the Kwil Gateway that an action requires authentication, and an annotation before the action. 
+
+```sql title="social_media.kf"
+// authentication required view action to reveal a user profile
+@kgw(authn='true')
+action get_profile () view {
+    SELECT *
+    FROM users
+    WHERE address = @caller;
+}
+```
+
+:::warning
+The `@kgw(authn='true')` annotation will only require the user to authenticate IF the Kwil Gateway is enabled.  If the gateway is not enabled, the annotation will be ignored.
+:::
+
+## Authenticating a User
+
+Using the JavaScript SDK and the [KwilSigner](/docs/getting-started/read-write-data#signer), a user can authenticate with the Kwil Gateway. In Browser, the cookie will be stored in the browser's cookie store. In Node.js, the cookie will be returned and then must be passed to the Kwil class.
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+<Tabs
+    defaultValue="browser"
+    values={[
+        { label: 'Browser', value: 'browser', },
+        { label: 'NodeJs', value: 'node', },
+        
+    ]}
+>
+<TabItem value='browser'>
+
+```typescript
+import { WebKwil } from '@kwilteam/kwil-js';
+
+const kwil = new WebKwil({
+    kwilProvider: "https://provider.kwil.com",
+    chainId: "kwil-public-testnet-2",
+});
+
+async function authenticateUser() {
+    const kwilSigner = await getSigner();
+    return await kwil.authenticate(kwilSigner);
+}
+```
+
+</TabItem>
+<TabItem value='node'>
+
+```typescript
+import { NodeKwil } from '@kwilteam/kwil-js';
+
+const kwil = new NodeKwil({
+    kwilProvider: "https://provider.kwil.com",
+    chainId: "kwil-public-testnet-2",
+});
+
+async function authenticateUser() {
+    const kwilSigner = await getSigner();
+    const res = await kwil.authenticate(kwilSigner);
+    kwil.setCookie(res.data.cookie);
+}
+```
+
+</TabItem>
+</Tabs>
+
+## Full Example
+
+The full Kuneiform schema for this tutorial can be found in the dropdown below.
+
+<details>
+  <summary> social_media.kf </summary>
+
+```sql showLineNumbers
+database social_media;
+
+// table for storing application users
+table users {
+    id int primary,
+    username text notnull unique minlen(5) maxlen(32),
+    age int notnull max(120),
+    address text notnull unique // user wallet addresses
+}
+
+// table for storing posts
+table posts {
+    id int primary,
+    title text notnull maxlen(300),
+    content text notnull maxlen(10000),
+    author_id int notnull,
+    post_date text notnull
+}
+
+// table to track user balances
+table {
+    id int primary notnull,
+    author_id int notnull,
+    balance int notnull
+}
+
+// a public action for creating a user
+// it will automatically include the wallet address
+// of the caller in the "address" column
+action create_user ($id, $username, $age) public {
+    INSERT INTO users (id, ysername, age, address)
+    VALUES ($id, $username, $age, @caller);
+}
+
+// a public action for updating mutable user data
+action update_user ($username, $age) public {
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+
+// private action to get user id
+action get_user_id() private {
+  SELECT id
+  FROM users 
+  WHERE address=@caller;
+}
+
+// a public action for creating a post
+// it will automatically include the account id
+// of the caller in the "author_id" column
+action create_post ($id, $title, $content, $date_string) public {
+    $author_id = get_user_id();
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, $author_id, $date_string);
+}
+
+action get_user ($username) view {
+    SELECT *
+    FROM users
+    WHERE username=$username;
+}
+
+// private action to check balance
+action check_balance($author_id, $amount) private {
+    SELECT
+        CASE
+            WHEN balance < $amount THEN ERROR('Insufficient funds')
+            ELSE null
+        END
+    FROM balances
+    WHERE author_id = $author_id;
+}
+
+// get_posts will get the posts for a given user
+// call the private action within a public view action, and require that the balance is at least 10
+action get_posts($user_id) public view {
+    check_balance($user_id, 10);
+    SELECT * FROM posts WHERE author_id = $user_id;
+}
+
+// owner only action to delete a user
+action delete_user($user_id) owner {
+    DELETE FROM users WHERE id = $user_id;
+}
+
+// authentication required view action to reveal a user profile
+@kgw(authn='true')
+action get_profile () view {
+    SELECT *
+    FROM users
+    WHERE address = @caller;
+}
+```
+</details>

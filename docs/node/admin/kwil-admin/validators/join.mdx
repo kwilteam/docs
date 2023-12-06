@@ -1,0 +1,49 @@
+---
+sidebar_position: 2
+sidebar_label: "join"
+id: "kwil-admin-validators-join"
+title: "kwil-admin validators join"
+description: "A node may request to join the validator set by submitting a join request using the `join` command."
+slug: /ref/kwil-admin/validators/join
+---
+
+## kwil-admin validators join
+
+A node may request to join the validator set by submitting a join request using the `join` command.
+
+### Synopsis
+
+A node may request to join the validator set by submitting a join request using the `join` command. The key used to sign the join request will be the treated as the node request to join the validator set. The node will be added to the validator set if the join request is approved by the current validator set. The status of a join request can be queried using the `join-status` command.
+
+```
+kwil-admin validators join [flags]
+```
+
+### Examples
+
+```
+# Request to join the validator set
+kwil-admin validators join
+```
+
+### Options
+
+```
+  -h, --help   help for join
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS certificate
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+  -S, --silence               Silence logs
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
+

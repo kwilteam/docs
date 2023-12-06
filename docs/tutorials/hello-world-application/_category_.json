@@ -1,9 +1,0 @@
-{
-    "label": "Tutorial 1: Hello World",
-    "position": 1,
-    "link": {
-      "type": "generated-index",
-      "description": "The Hello World application with Kwil shows the basic functionality of Kwil, by using the Kuneiform schema language to create a new database, then exposing actions to allow access to the database, and finally writing client code to connect to, and interact with, your database "
-    },
-    "collapsed": true
-}

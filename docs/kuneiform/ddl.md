@@ -47,7 +47,7 @@ To append a column to your table, declare the column name along with a valid col
 table users {
     id int,
     name text,
-    ...other columns
+    // ...other columns
 }
 ```
 
@@ -119,8 +119,8 @@ table users {
     id int primary notnull,
     name text notnull minlen(5),
     #new_index_name unique(id, name),
-    ...other columns & indexes
+    // ...other columns & indexes
 }
 ```
 
-This concludes our guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.
+This concludes the guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.

@@ -1,0 +1,82 @@
+---
+sidebar_position: 3
+sidebar_label: "peer"
+id: "kwil-admin-setup-peer"
+title: "kwil-admin setup peer"
+description: "The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node."
+slug: /ref/kwil-admin/setup/peer
+---
+
+## kwil-admin setup peer
+
+The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node.
+
+### Synopsis
+
+The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node.
+It will automatically generate required directories and keypairs, and can be given a genesis file and peer list for an existing network.
+
+```
+kwil-admin setup peer [flags]
+```
+
+### Examples
+
+```
+# Initialize a node as a peer to an existing network
+kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --peers
+```
+
+### Options
+
+```
+      --app.admin-listen-addr string                 kwild admin listen address (unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+      --app.extension-endpoints strings              kwild extension endpoints
+      --app.grpc-listen-addr string                  kwild gRPC listen address (default "localhost:50051")
+      --app.hostname string                          kwild Server hostname
+      --app.http-listen-addr string                  kwild HTTP listen address (default "localhost:8080")
+      --app.private-key-path string                  Path to the node private key file
+      --app.profile-file string                      kwild profile output file path (e.g. cpu.pprof)
+      --app.profile-mode string                      kwild profile mode (http, cpu, mem, mutex, or block)
+      --app.rpctls                                   Use TLS on the user gRPC server
+      --app.sqlite-file-path string                  kwild sqlite file path (default "data/kwild.db")
+      --app.tls-cert-file string                     TLS certificate file path for RPC Server
+      --app.tls-key-file string                      TLS key file path for RPC Server
+      --chain.consensus.timeout-commit duration      Chain consensus timeout commit (default 6s)
+      --chain.consensus.timeout-precommit duration   Chain consensus timeout precommit (default 2s)
+      --chain.consensus.timeout-prevote duration     Chain consensus timeout prevote (default 2s)
+      --chain.consensus.timeout-propose duration     Chain consensus timeout propose (default 3s)
+      --chain.mempool.cache-size int                 Chain mempool cache size (default 10000)
+      --chain.mempool.max-tx-bytes int               chain mempool maximum single transaction size in bytes (default 4194304)
+      --chain.mempool.max-txs-bytes int              chain mempool maximum total transactions in bytes (default 536870912)
+      --chain.mempool.size int                       Chain mempool size (default 5000)
+      --chain.moniker string                         Node moniker
+      --chain.p2p.addr-book-strict                   Chain P2P address book strict
+      --chain.p2p.allow-duplicate-ip                 Chain P2P allow multiple peers with the same IP address (default true)
+      --chain.p2p.external-address string            Chain P2P external address to advertise
+      --chain.p2p.listen-addr string                 Chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.max-num-inbound-peers int          Chain P2P maximum number of inbound peers (default 40)
+      --chain.p2p.max-num-outbound-peers int         Chain P2P maximum number of outbound peers (default 10)
+      --chain.p2p.persistent-peers string            Chain P2P persistent peers
+      --chain.p2p.unconditional-peer-ids string      Chain P2P unconditional peer IDs
+      --chain.rpc.listen-addr string                 Chain RPC listen address (default "tcp://127.0.0.1:26657")
+  -g, --genesis string                               path to genesis file
+  -h, --help                                         help for peer
+      --log.format string                            kwild log format (default "json")
+  -l, --log.level string                             kwild log level (default "info")
+      --log.output-paths strings                     kwild log output paths (default [stdout])
+      --log.time-format string                       kwild time log format (default "epochfloat")
+  -r, --root-dir string                              kwild root directory for config and data (default "~/.kwild")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
+

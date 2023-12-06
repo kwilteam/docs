@@ -1,0 +1,213 @@
+---
+sidebar_position: 2
+sidebar_label: "Quickstart"
+id: extensions-quickstart
+title: Extensions Introduction
+description: A step-by-step guide to creating and using extensions.
+slug: /extensions/quickstart
+---
+
+This page contains a step-by-step guide for creating and using your first Kwil extension.  It will walk through the following steps:
+
+1. Creating a valid Kwil Extension
+2. Creating a Docker Image for the Extension
+3. Using Docker Compose to run the extension with Kwil
+
+**You will need to install [Docker](<https://www.docker.com/products/docker-desktop/>) and [log in](<https://docs.docker.com/engine/reference/commandline/login/>) to complete this guide.**
+
+## Creating a valid Kwil Extension
+
+Kwil currently supports libraries for building extensions in both [TypeScript/JavaScript](./packages/js-ts) and [Golang](./packages/go).
+
+We will use either of these libraries to create a gRPC server that can be used as a Kwil extension.
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+<TabItem value="typescript" label="TypeScript / JavaScript" default>
+
+To build an extension server in TypeScript/JavaScript, we will be referencing the example found [here](./packages/js-ts).
+
+### Initalize Repository
+
+Create a new repository and install the `kwil-extensions` package:
+
+```bash
+npm init -y
+npm install kwil-extensions
+npm install -D ts-node
+```
+
+### Implementing the Extension
+
+To create a valid extension server:
+
+1. Create a file called `index.js` or `index.ts`
+2. Paste the example code from the [JavaScript Extension Example](./packages/js-ts#example-of-building-an-extenstion) into the file, or write your own extension.
+
+To test that it is working properly, run:
+
+```bash
+ts-node index.ts
+```
+
+</TabItem>
+<TabItem value="golang" label="Golang">
+
+To build an extension server in Golang, we will be referencing the example found [here](./packages/go)
+
+### Creating the go.mod
+
+Create a new repository and run the following command to create a new go.mod file:
+
+```bash
+go mod init github.com/<your_github_username>/<repository_name>
+```
+    
+### Implementing the Extension
+
+To create a valid extension server:
+
+1. Create a file called `main.go`
+2. Paste the example code from the [Golang Extension Example](./packages/go#example-of-building-an-extension) into the file, or write your own extension.
+
+To test that it is working properly, run:
+
+```bash
+go run main.go
+```
+
+</TabItem>
+</Tabs>
+
+## Creating a Docker Image
+
+To create a Docker image for your extension, you will need to create a Dockerfile in the root of your repository.  This process will be slightly different
+depending on whether you are using TypeScript/JavaScript or Golang.
+
+In the root directory of your application, create a file called `Dockerfile` and paste the following:
+
+<Tabs>
+<TabItem value="typescript" label="TypeScript / JavaScript" default>
+
+```dockerfile title="Dockerfile"
+# First stage: build the application
+FROM node:14
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the source from the current directory to the working directory inside the container
+COPY . .
+
+# Build the application
+RUN npm run build
+
+# Expose port
+EXPOSE 50051
+
+# Command to run the application
+CMD ["node", "dist/index.js"]
+```
+</TabItem>
+<TabItem value="golang" label="Go">
+
+```dockerfile title="Dockerfile"
+# First stage: build the application
+FROM golang:1.20 AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+
+# Download all dependencies
+RUN go mod download
+
+# Copy the source from the current directory to the working directory inside the container
+COPY . .
+
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# Second stage: create the Docker image
+FROM alpine:latest
+
+# Set working directory
+WORKDIR /root/
+
+# Copy the binary from the first stage
+COPY --from=builder /app/main .
+
+# Expose port
+EXPOSE 50051
+
+# Command to run the application
+CMD ["./main"]
+```
+
+</TabItem>
+</Tabs>
+
+Now that you have a Dockerfile, you can build the image by running:
+
+```bash
+docker build -t my-extension-name .
+```
+
+## Running the Extension with Kwil using Docker Compose
+
+Now that you have built your extension as a Docker image, you can run it with Kwil using Docker Compose.
+
+To do this, we will be using the [Kwil extension deployment template](<https://github.com/kwilteam/extension-deployment-template>):
+
+```bash
+git clone https://github.com/kwilteam/extension-deployment-template.git
+```
+
+Once you have cloned the repository, open the `docker-compose.yaml`.  Under `services:extensions-1:name`, replace "<your_image_here>" with the name of your Docker image:
+
+```yaml title="docker-compose.yaml"
+version: '3'
+services:
+  extension-1:
+    image: <your_image_here>
+    ports:
+      - 50055:50051
+    restart: on-failure
+```
+
+Now, simply use the Makefile to download Kwil and run both Kwil and your extension. This will make the database accessible on http://localhost:8080.
+
+```bash
+make download-and-run
+```
+
+:::tip
+
+To access the KwilProvider https://localhost:8080 in browser from the Kuneiform IDE, you may need to disable some browser security protections. 
+
+For Brave Browser, disable the shields for ide.kwil.com by clicking the lion icon in the top right corner of the browser.
+
+:::
+
+**And that's it!**  You have successfully shipped your first Kwil extension alongside a Kwil database!
+
+## Video Tutorial (TypeScript)
+
+Check out the video below for a step-by-step guide to creating your first Kwil Extension with TypeScript.
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/yRek7O5h7qM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+## Next Steps
+
+To get started using the extension within Kuneiform, check out the [Kuneiform Guide for extensions](./kuneiform).  Or, if you're curious to learn how to build more
+complex extensions, check out the guide to the structure of extensions [here](./implementation).

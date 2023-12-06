@@ -1,0 +1,54 @@
+---
+sidebar_position: 2
+sidebar_label: "init"
+id: "kwil-admin-setup-init"
+title: "kwil-admin setup init"
+description: "The `init` command facilitates quick setup of an isolated Kwil node."
+slug: /ref/kwil-admin/setup/init
+---
+
+## kwil-admin setup init
+
+The `init` command facilitates quick setup of an isolated Kwil node.
+
+### Synopsis
+
+The `init` command facilitates quick setup of an isolated Kwil node on a fresh network in which that node is the single validator.
+This permits rapid prototyping and evaluation of Kwil functionality. An output directory can be specified using the `--output-dir`" flag.
+If no output directory is specified, the node will be initialized `./testnet`.
+
+```
+kwil-admin setup init [flags]
+```
+
+### Examples
+
+```
+# Initialize a node, with a new network, in the directory ~/.kwil-new
+kwil-admin setup init -o ~/.kwild-new
+```
+
+### Options
+
+```
+      --alloc allocFlag           account=amount pairs of genesis account allocations (default map[])
+  -i, --block-interval duration   shortest block interval in seconds (default 6s)
+      --chain-id string           chain ID to use for the genesis file
+      --gas                       enable gas
+  -h, --help                      help for init
+      --join-expiry int           number of blocks before a join request expires (default 14400)
+  -o, --output-dir string         generated node parent directory (default "./.testnet")
+      --without-nonces            disable account nonces
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
+

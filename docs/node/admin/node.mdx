@@ -1,0 +1,101 @@
+---
+sidebar_position: 5
+sidebar_label: "Node RPC"
+id: admin-node
+title: Administration of a Running Node
+description: Controlling a running node on the authenticated RPC service with the validator command
+slug: /admin/node
+---
+
+The `node` command is used to control a running Kwil node via its authenticated
+RPC service.
+
+The subcommands share the following syntax:
+
+```
+kwil-admin node [--rpcserver RPCSERVER] [--authrpc-cert AUTHRPC-CERT]
+  [--tlskey TLSKEY] [--tlscert TLSCERT] <command> [<args>]
+```
+
+## Setup
+
+:::warning
+The assumption is that the user of `kwil-admin` is the node
+operator. Access must not be granted to untrusted parties.
+:::
+
+There are two ways that `kwil-admin` may communicate with a running node:
+- Via a local UNIX socket
+- Via a remote TCP connection
+
+The local UNIX socket is the default, and requires no additional setup. The
+remote TCP connection requires additional setup, but is more flexible.
+
+### TCP Setup
+
+When using TCP, communication between `kwil-admin` and `kwild` is both encrypted and
+mutually-authenticated. Each side has their own key pair, where the node's is
+used to encrypt the communications, and the client's is used to authenticate
+itself with the node. Thus, setup involves generating client credentials, and
+setting them as an authorized RPC client on the node.
+
+Use of the `node` commands requires the following:
+
+- The node's TLS (encrypted transport) certificate, specified with
+  `--authrpc-cert`. The default is "kwild.cert". This would be retrieved from
+  the node where it is located at `~/.kwild/rpc.cert` by default.
+- RPC client credentials. This is a key pair used to authenticate `kwil-admin`
+  (the client) with `kwild` (the server).  The key and certificate parts are
+  specified by `--tlskey` and `--tlscert`.
+- Adding the client certificate to the node's allowed clients, which is locate
+  on the node machine as `~/.kwild/clients.pem` by default.
+- Configure the Kwil node's `admin_listen_addr` so the service is accessible to
+  `kwil-admin`. See [Kwil Node Configuration](/docs/category/configuration) for more
+  information.
+
+The `kwild` process may be running locally, on a remote host, or inside a Docker
+container. Set and expose the admin RPC service ports as required.
+
+:::note
+Rapidly evolving procedures here. This is all likely to change soon.
+:::
+
+Described below are two ways to generate and set client credentials.
+
+### Generation of Credentials on the Node
+
+The node will generate its own TLS key and certificate, which is used encrypt
+the communications on its authenticated RPC server. If the `--autogen` flag is
+provided, the node will also generate new *client* credentials on start up if
+the file `~/.kwild/clients.pem` does not exist. The corresponding
+`auth.{cert,key}` files may then be used by the operator with `kwil-admin node`
+commands for remote access to the node.
+
+:::note
+This approach is intended for "quickstart" workflows. The following method using
+`kwil-admin` for generation is preferred.
+:::
+
+## Generation of Credentials by `kwil-admin`
+
+The `kwil-admin node gen-auth-key` command may be used to generate new
+credentials to `~/.kwil-admin/auth.{cert,key}`.
+
+With this method, the contents of the `auth.cert` file must be appended to the
+node's `clients.pem` file. Specifically,
+
+1. Generate credentials with `kwil-admin node gen-auth-key`
+2. Securely copy the `~/.kwil-admin/auth.cert` file to the machine where `kwild`
+   is running, if it is not the same host.
+3. Append the contents of the copied `auth.cert` to the node's `clients.pem` file.
+
+  ```bash
+  cat auth.cert >> ~/.kwild/clients.pem
+  ```
+
+If `kwil-admin` is being used on the same machine as `kwild`, you would skip the
+copy step and do:
+
+```bash
+cat ~/.kwil-admin/auth.cert >> ~/.kwild/clients.pem
+```

@@ -1,0 +1,168 @@
+---
+sidebar_position: 2
+sidebar_label: "Reading and Writing Data"
+id: 'read-write-data'
+title: "Reading and Writing Data"
+description: Write data to a database and read it back.
+---
+
+In this tutorial, we will use the JavaScript SDK to write and read data from a database.
+**We will using the schema we created in the [schema tutorial](create-a-database).**
+
+Full SDK documentation can be found [here](../sdks/js-ts/overview).
+
+## Install the SDK
+
+First, install the SDK using npm:
+
+```bash
+npm install @kwilteam/kwil-js
+```
+
+## Initialization
+
+In order to read and write data, we first must initialize the SDK, and get the database ID for our deployed database.
+
+Kwil has different initialization logic for Web and NodeJS.
+
+### Kwil Class
+
+The Kwil class is the main class for interacting with Kwil. It is used to initialize the SDK, and to execute actions.
+
+```typescript
+import { WebKwil } from '@kwilteam/kwil-js';
+
+const kwil = new WebKwil({
+    kwilProvider: "https://provider.kwil.com",
+    chainId: "kwil-public-testnet-2",
+});
+```
+
+### Signer
+
+The signer is used to sign transactions going to the Kwil network.
+
+```typescript
+import { BrowserProvider } from 'ethers';
+import { KwilSigner } from '@kwilteam/kwil-js';
+
+async function getSigner() {
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    const ethAddress = await ethSigner.getAddress();
+    return new KwilSigner(ethSigner, ethAddress);
+}
+```
+
+### DBID
+
+DBIDs are network-wide unique identifiers for databases.  They are derived from the database owner's wallet address and the database name.
+
+```typescript
+import { Utils } from '@kwilteam/kwil-js';
+
+const dbid = Utils.generateDBID('wallet_address', 'social_media');
+```
+
+## Write Data
+
+To write data, we can use the `execute()` method to execute an action:
+
+```typescript
+async function createUser(id, username, age) {
+    const kwilSigner = await getSigner();
+
+    const result = await kwil.execute({
+        dbid,
+        action: "create_user",
+        inputs: [
+            {
+                id: id,
+                username: username,
+                age: age
+            }
+        ]
+    }, kwilSigner);
+
+    return result.data;
+}
+```
+
+## Read Data
+
+To read data, we will call a `view` action on the schema.  This will return the data that was written to the database.
+
+```typescript
+async function getUser(username) {
+    const result = await kwil.call({
+        dbid,
+        action: "get_user",
+        inputs: [
+            {
+                username: username
+            }
+        ]
+    });
+
+    return result.data;
+}
+```
+
+## Full Example
+
+Below is a full example of writing and reading data from a database:
+
+<details>
+  <summary> read-and-write.js </summary>
+
+```typescript showLineNumbers
+import { BrowserProvider } from 'ethers';
+import { WebKwil, KwilSigner, Utils } from '@kwilteam/kwil-js';
+
+const kwil = new WebKwil({
+    kwilProvider: "https://provider.kwil.com",
+    chainId: "kwil-public-testnet-2",
+});
+
+const dbid = Utils.generateDBID('wallet_address', 'social_media');
+
+async function getSigner() {
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    return new KwilSigner(ethSigner);
+}
+
+async function createUser(id, username, age) {
+    const kwilSigner = await getSigner();
+
+    const result = await kwil.execute({
+        dbid,
+        action: "create_user",
+        inputs: [
+            {
+                id: id,
+                username: username,
+                age: age
+            }
+        ]
+    }, kwilSigner);
+
+    return result.data;
+}
+
+async function getUser(username) {
+    const result = await kwil.call({
+        dbid,
+        action: "get_user",
+        inputs: [
+            {
+                username: username
+            }
+        ]
+    });
+
+    return result.data;
+}
+```
+
+</details>

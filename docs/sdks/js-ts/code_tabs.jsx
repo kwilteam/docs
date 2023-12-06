@@ -17,36 +17,27 @@ function CodeTabs({ tabsData }) {
     );
 }
 
-const initJsWeb = `import { BrowserProivder } from 'ethers'; //can use Web3Provider for Ethers v5
-import { WebKwil, Utils } from 'kwil';
+const initJsWeb = `import { BrowserProvider } from 'ethers';
+import { WebKwil } from '@kwilteam/kwil-js';
 
-// provider and dbid are initialized here since they are used throughout the examples
 // to be used for funding and signing transactions
 const provider = new BrowserProvider(window.ethereum)
 
-// dbid is a unique database identifier generated from a database deployer and name
-const dbid = Utils.generateDBID("deployer_public_key", "database_name")
-
 const kwil = new WebKwil({
-    kwilProvider: "https://provider.kwil.com",
-    chainId: "your_chain_id"
+    kwilProvider: "kwil_provider_endpoint",
+    chainId: "your_kwil_chain_id"
 });`
 
-const initJsNode = `const { Wallet, JsonRpcProvider } = require('ethers');
-const kwiljs = require('kwil');
-const Utils = kwiljs.Utils;
+const initJsNode = `const { Wallet } = require('ethers');
+const kwiljs = require('@kwilteam/kwil-js');
 
-// provider and dbid are initialized here since they are used throughout the examples
-// to be used for funding and signing transactions
+// to be used for signing transactions
 // instead of a provider, nodeJS requires a wallet
-const provider = new Wallet("ethereum_private_key", new JsonRpcProvider("https://mainnet.infura.io..."))
-
-// dbid is a unique database identifier generated from a database deployer and name
-const dbid = Utils.generateDBID("deployer_public_key", "database_name")
+const wallet = new Wallet("my_ethereum_private_key")
 
 const kwil = new kwiljs.NodeKwil({
-    kwilProvider: "https://provider.kwil.com",
-    chainId: "your_chain_id"
+    kwilProvider: "kwil_provider_endpoint",
+    chainId: "your_kwil_chain_id"
 });`
 
 export function InitTabs() {

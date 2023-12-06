@@ -1,0 +1,155 @@
+---
+sidebar_position: 2
+sidebar_label: "Tutorial"
+id: "node-tutorial"
+title: "Tutorial: Creating and Joining a Network"
+description: Create a Kwil network, and add another node as a validator
+slug: /node/tutorial
+---
+
+In this tutorial, we will:
+1. Create a node and start a new network;
+2. Create a second node and configure it to join the network;
+3. Add the second node to the network as a non-validating peer;
+4. Upgrade the second node to a validator.
+
+:::tip
+In order to do this tutorial, you will need to [install the `kwild` and `kwil-admin` binaries](<https://github.com/kwilteam/binary-releases/releases>).
+:::
+
+## Creating The First Node
+
+### Creating The Node's Files
+
+To create the node's configuration files, a new `genesis.json`, and a new keypair, we will use the `kwil-admin` tool:
+
+```bash
+kwil-admin setup init -o ./testnet/node0
+```
+
+### Running The Node
+
+Using the `kwild` binary, we can begun running the network with this single node:
+
+```bash
+kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock
+```
+
+The command then runs the local Kwil network, and begins producing blocks.
+
+### Getting The Node's Info
+
+In order to allow other nodes to join, we will need to expose our node's information publicly. Other operators can then set us as a peer,
+and request to join the network as a validator.
+
+To get our node's information, we can use the `kwil-admin` tool, specifying the UNIX socket that our admin RPC is listening on:
+
+```bash
+$ kwil-admin node status --rpcserver unix:///tmp/node0.sock
+{
+  "node": {
+    "chain_id": "kwil-chain-WfnGxpWd",
+    "name": "MacBook-Pro-7.local",
+    # highlight-next-line
+    "node_id": "b624b3395f22f8cb57cf86d58cbcd6b355d12e18", # node ID
+    "proto_ver": 8,
+    "app_ver": 0,
+    "block_ver": 11,
+    # highlight-next-line
+    "listen_addr": "tcp://127.0.0.1:26656", # p2p address
+    "rpc_addr": "tcp://127.0.0.1:26657"
+  },
+  "sync": {
+    "app_hash": "",
+    "best_block_hash": "",
+    "best_block_height": 0,
+    "best_block_time": "1969-12-31T18:00:00-06:00",
+    "syncing": false
+  },
+  "validator": {
+    "pubkey": "22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c",
+    "power": 1
+  }
+}
+```
+
+The `node.node_id` and `node.listen_addr` fields can be given to the second node as a persistent peer, in the format: `node-id@p2p-address`.
+For the above node, we would have `b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656`.
+
+## Creating A Second Peer Node
+
+Using the `kwil-admin` tool to create the second node's directories and configs, we can specify where to find the genesis file and any
+peers that it should try to connect to when starting up. Since both nodes are running locally, we need to specify
+new addresses for the different endpoints, so that the second node does not conflict with the first node:
+
+```bash
+kwil-admin setup init --output-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
+--app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
+--app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
+--chain.p2p.listen-addr=tcp://127.0.0.1:26655
+```
+
+Start the second node to verify that it was created correctly:
+
+```bash
+kwild --root-dir=./testnet/node1
+```
+
+If done correctly, you should be able to see the second node's logs, and it should be able to read the network logs.
+
+## Upgrading The Second Node To A Validator
+
+To upgrade the second node to a validator, we will use the `kwil-admin` tool to:
+1. Request to join the network as a validator, from the second node
+2. Approve the request, from the first node
+
+We will use the configured UNIX socket to communicate with the nodes.
+
+### Requesting To Upgrade
+
+To request to join from the second node:
+
+```bash
+kwil-admin validators join --rpcserver unix:///tmp/node1.sock
+```
+
+To check that the request was successful, we can get a list of pending join requests:
+
+```bash
+$ kwil-admin validators list-join-requests --rpcserver unix:///tmp/node0.sock
+Pending join requests (1 approval needed):
+ Candidate                                                         | Power | Approvals | Expiration
+-------------------------------------------------------------------+-------+-----------+------------
+ a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794  |     1 |         0 | 16728
+```
+
+### Approving The Request
+
+The first node must vote to approve the second node's join request. Using the `kwil_admin` tool, the first node can
+vote to approve the second node by running the `kwil-admin validators approve` command and passing the second node's public key:
+
+```bash
+kwil-admin validators approve a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794 \
+--rpcserver unix:///tmp/node0.sock
+```
+
+:::tip
+If the requesting node's public key is unknown, all pending requests and their public keys can be retrieved with the `kwil-admin validators list-join-requests` command.
+:::
+
+And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
+
+```bash
+$ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
+Current validator set:
+  0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
+  1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}
+```
+
+## Conclusion
+
+In this tutorial, we have:
+1. Created a node and started a network;
+2. Created a second node and configured it to join the network;
+3. Added the second node to the network as a non-validating peer;
+4. Upgraded the second node to a validator.

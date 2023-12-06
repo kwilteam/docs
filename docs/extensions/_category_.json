@@ -1,9 +1,0 @@
-{
-    "label": "Extensions",
-    "position": 9,
-    "link": {
-      "type": "generated-index",
-      "description": "How to build and use extensions for Kwil"
-    },
-    "collapsed": true
-}

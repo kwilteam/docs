@@ -1,0 +1,44 @@
+---
+sidebar_position: 2
+sidebar_label: "transfer"
+id: "kwil-cli-account-transfer"
+title: "kwil-cli account transfer"
+description: "Transfer value to an account"
+slug: /ref/kwil-cli/account/transfer
+---
+
+## kwil-cli account transfer
+
+Transfer value to an account
+
+### Synopsis
+
+Transfers value to an account.
+
+```
+kwil-cli account transfer [flags]
+```
+
+### Options
+
+```
+  -h, --help        help for transfer
+  -N, --nonce int   nonce override (-1 means request from server) (default -1)
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes             Assume yes for all prompts
+      --chain-id string        the expected/intended Kwil Chain ID
+      --kwil-provider string   the Kwil provider gRPC endpoint (default "127.0.0.1:50051")
+      --output string          the format for command output - either 'text' or 'json' (default "text")
+      --private-key string     the private key of the wallet that will be used for signing
+  -S, --silence                Silence logs
+      --tls-cert-file string   the path to the TLS certificate (if the provider endpoint is using TLS)
+```
+
+### SEE ALSO
+
+* [kwil-cli account](/docs/ref/kwil-cli/account)	 - Account related commands.
+

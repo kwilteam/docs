@@ -16,7 +16,7 @@ In Kuneiform, you can define specific SQL queries to execute against your databa
 ```typescript
 action add_user($id, $name, $username) public {
     INSERT INTO users (id, name, username, wallet)
-    VALUES ($id, $name, $username, address(@caller));
+    VALUES ($id, $name, $username, @caller);
 }
 ```
 
@@ -25,7 +25,7 @@ action add_user($id, $name, $username) public {
 Naming an action starts with an action declaration followed by your preferred name:
 
 ```typescript
-action <your_desired_name>() <privacy> {}
+action <your_desired_name>() <public | private> {}
 ```
 
 ## Defining Action Parameters
@@ -54,7 +54,7 @@ The SQL queries to be executed when the action is called can be defined within t
 // the following queries will be executed transactionally.
 action add_user($id, $name, $username) public {
     INSERT INTO users (id, name, username, wallet)
-    VALUES ($id, $name, $username, address(@caller));
+    VALUES ($id, $name, $username, @caller);
 
     INSERT INTO ... // some other query
 }
@@ -94,7 +94,7 @@ action is_admin() private {
             ELSE null
         END
     FROM user_roles
-    WHERE user_roles.address = address(@caller);
+    WHERE user_roles.address = @caller;
 }
 
 // some action that only users of role 'admin' can access
@@ -116,8 +116,6 @@ A list of supported variables will be kept here:
 
 | Variable | Description                                           |
 |----------|-------------------------------------------------------|
-| @caller  | A blob containing the key type, address format, and public key of the caller executing the action. This should be used in conjuction with functions like [`public_key()`](/docs/scalar-functions#public_keyx-public_keyxy) and [`address()`](/docs/scalar-functions#addressx). |
-| @action  | The name of the action being executed |
-| @dataset | The DBID of the dataset that is being used |
+| @caller  | A string containing the identifier for a caller's wallet.  For Ethereum wallets, this is the 0x address. |
 
 This concludes the overview of action declarations in Kuneiform Language, offering insights on naming actions, setting parameters, managing query privacy, crafting SQL queries within actions, and utilizing modifiers for specific inputs.

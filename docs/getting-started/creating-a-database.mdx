@@ -1,0 +1,189 @@
+---
+sidebar_position: 1
+sidebar_label: "Create a Database"
+id: create-a-database
+title: Create a Database
+description: Creating and deploying a Kuneiform schema.
+---
+
+In this tutorial, we will create a database using Kuneiform.  We will be deploying the database using the [Kwil CLI](/docs/category/cli),
+however you can also deploy your database using the [Kuneiform IDE](<https://ide.kwil.com>).
+
+
+## Naming the Database
+
+Schemas are named using a database declaration at the top of the Kuneiform file.  Database names are unique to the account that deployed them.
+
+```sql title="social_media.kf"
+database social_media;
+```
+
+## Defining Tables
+
+Tables are defined using a table declaration.  Tables are named using table declarations at the top of the Kuneiform file.  Table names are unique to the database that contains them.
+
+```sql title="social_media.kf"
+// table for storing application users
+table users {
+    id int primary,
+    username text notnull unique minlen(5) maxlen(32),
+    age int notnull max(120),
+    address text notnull unique // user wallet addresses
+}
+
+// table for storing posts
+table posts {
+    id int primary,
+    title text notnull maxlen(300),
+    content text notnull maxlen(10000),
+    author_id int notnull,
+    post_date text notnull
+}
+```
+
+## Using Actions
+
+To define how users can interact with your database, you can define actions.  Actions contain SQL statements that are executed when an end user calls an action.
+
+Inputs are defined using a `$` symbol, followed by the variable name.  Contextual values, such as the wallet address calling your action, are specified using the `@` symbol, followed by the contextual value name.
+
+To learn more about the support SQL syntax, see [Kuneiform's supported DML](../kuneiform/dml.md).
+
+```sql title="social_media.kf"
+// a public action for creating a user
+// it will automatically include the wallet address
+// of the caller in the "address" column
+action create_user ($id, $username, $age) public {
+    INSERT INTO users (id, ysername, age, address)
+    VALUES ($id, $username, $age, @caller);
+}
+
+// a public action for updating mutable user data
+action update_user ($username, $age) public {
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+
+// a public action for creating a post
+// it will automatically include the account id
+// of the caller in the "author_id" column
+action create_post ($id, $title, $content, $date_string) public {
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, (
+        SELECT id
+        FROM users
+        WHERE address=@caller
+    ), $date_string);
+}
+```
+
+## Creating Read-Only Actions
+
+Data can be read back from actions using read-only actions.  To specify a read-only action, use the `view` access modifier.
+`view` actions do not require the caller to submit a transaction to the Kwil network, making them free to call.
+
+```sql title="social_media.kf"
+// action get_user will get a user by their username
+action get_user ($username) view {
+    SELECT *
+    FROM users
+    WHERE username=$username;
+}
+
+// get_posts will get the posts for a given user
+action get_posts ($user_id) view {
+    SELECT *
+    FROM posts
+    WHERE author_id=$user_id;
+}
+```
+
+## Full Example
+The full Kuneiform schema we created can be found in the dropdown below:
+
+<details>
+  <summary> social_media.kf </summary>
+
+```sql showLineNumbers
+database social_media;
+
+// table for storing application users
+table users {
+    id int primary,
+    username text notnull unique minlen(5) maxlen(32),
+    age int notnull max(120),
+    address text notnull unique // user wallet addresses
+}
+
+// table for storing posts
+table posts {
+    id int primary,
+    title text notnull maxlen(300),
+    content text notnull maxlen(10000),
+    author_id int notnull,
+    post_date text notnull
+}
+
+// a public action for creating a user
+// it will automatically include the wallet address
+// of the caller in the "address" column
+action create_user ($id, $username, $age) public {
+    INSERT INTO users (id, ysername, age, address)
+    VALUES ($id, $username, $age, @caller);
+}
+
+// a public action for updating mutable user data
+action update_user ($username, $age) public {
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+
+// a public action for creating a post
+// it will automatically include the account id
+// of the caller in the "author_id" column
+action create_post ($id, $title, $content, $date_string) public {
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, (
+        SELECT id
+        FROM users
+        WHERE address=@caller
+    ), $date_string);
+}
+
+action get_user ($username) view {
+    SELECT *
+    FROM users
+    WHERE username=$username;
+}
+
+// get_posts will get the posts for a given user
+action get_posts ($user_id) view {
+    SELECT *
+    FROM posts
+    WHERE author_id=$user_id;
+}
+```
+</details>
+
+# Deploying the Database
+
+To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To deploy the database, run the following command:
+
+```bash
+# highlight-next-line
+$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://provider.kwil.com' --private-key=5331ae5e0fd371797e4fa9ee029f99cb8ebab069e8ce5d33829882d79fc7d345
+TxHash: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
+```
+
+To check if the deployment is successful, we can query the status of the transaction using the `tx status` command:
+
+```bash
+# highlight-next-line
+$ kwil-cli utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://provider.kwil.com'
+Transaction ID: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
+Status: success
+Height: 4777
+Log: success
+```

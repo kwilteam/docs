@@ -1,0 +1,170 @@
+---
+sidebar_position: 3
+sidebar_label: "Write Access Control"
+id: 'write-access-control'
+title: "Write Access Control"
+description: Set access control rules for writing to your database.
+---
+
+In this tutorial, we will modify the schema in the first [schema tutorial](/docs/getting-started/create-a-database) to add write access control rules.
+
+Out of the box, Kwil supports a variety of access control capabilities. If you wish to implement more advances access control logic than what is natively available, you can do so by adding an [Extension](/docs/getting-started/using-extensions) to your network.
+
+## Action Privacy
+
+Action privacy can enforce whether an action can be called externally or not. This is useful for actions that should only be called by other actions and not by users.
+
+```sql title="social_media.kf"
+// private action to get user id
+action get_user_id() private {
+  SELECT id
+  FROM users 
+  WHERE address=@caller;
+}
+
+// call the private action within a public action
+// it will automatically include the account id
+// of the caller in the "author_id" column
+action create_post ($id, $title, $content, $date_string) public {
+    $author_id = get_user_id();
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, $author_id, $date_string);
+}
+```
+
+## Raising Errors
+
+In an action, you can use SQL `CASE` statements to raise errors if certain conditions are not met. If an error is raised, the transaction will fail entirely, and data will not be written to the network.
+
+```sql title="social_media.kf"
+// create a new balances table to track user balances
+table balances {
+    id int primary notnull,
+    author_id int notnull,
+    balance int notnull
+}
+
+// private action to check balance
+action check_balance($author_id, $amount) private {
+    SELECT
+        CASE
+            WHEN balance < $amount THEN ERROR('Insufficient funds')
+            ELSE null
+        END
+    FROM balances
+    WHERE author_id = $author_id;
+}
+
+// call the private action within a public view action, and require that the balance is at least 10
+action get_posts($user_id) public view {
+    check_balance($user_id, 10);
+    SELECT * FROM posts WHERE author_id = $user_id;
+}
+```
+
+## Owner-only Actions
+
+Actions can be given an `owner` privacy level, which means that only the owner of the database can call the action. This is useful for actions that should only be called by the database owner, such as admin operations.
+
+```sql title="social_media.kf"
+// owner only action to delete a user
+action delete_user($user_id) owner {
+    DELETE FROM users WHERE id = $user_id;
+}
+```
+
+## Full Example
+
+The full Kuneiform schema for this tutorial can be found in the dropdown below.
+
+<details>
+  <summary> social_media.kf </summary>
+
+```sql showLineNumbers
+database social_media;
+
+// table for storing application users
+table users {
+    id int primary,
+    username text notnull unique minlen(5) maxlen(32),
+    age int notnull max(120),
+    address text notnull unique // user wallet addresses
+}
+
+// table for storing posts
+table posts {
+    id int primary,
+    title text notnull maxlen(300),
+    content text notnull maxlen(10000),
+    author_id int notnull,
+    post_date text notnull
+}
+
+// table to track user balances
+table balances {
+    id int primary notnull,
+    author_id int notnull,
+    balance int notnull
+}
+
+// a public action for creating a user
+// it will automatically include the wallet address
+// of the caller in the "address" column
+action create_user ($id, $username, $age) public {
+    INSERT INTO users (id, ysername, age, address)
+    VALUES ($id, $username, $age, @caller);
+}
+
+// a public action for updating mutable user data
+action update_user ($username, $age) public {
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+
+// private action to get user id
+action get_user_id() private {
+  SELECT id
+  FROM users 
+  WHERE address=@caller;
+}
+
+// a public action for creating a post
+// it will automatically include the account id
+// of the caller in the "author_id" column
+action create_post ($id, $title, $content, $date_string) public {
+    $author_id = get_user_id();
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES ($id, $title, $content, $author_id, $date_string);
+}
+
+action get_user ($username) view {
+    SELECT *
+    FROM users
+    WHERE username=$username;
+}
+
+// private action to check balance
+action check_balance($author_id, $amount) private {
+    SELECT
+        CASE
+            WHEN balance < $amount THEN ERROR('Insufficient funds')
+            ELSE null
+        END
+    FROM balances
+    WHERE author_id = $author_id;
+}
+
+// get_posts will get the posts for a given user
+// call the private action within a public view action, and require that the balance is at least 10
+action get_posts($user_id) public view {
+    check_balance($user_id, 10);
+    SELECT * FROM posts WHERE author_id = $user_id;
+}
+
+// owner only action to delete a user
+action delete_user($user_id) owner {
+    DELETE FROM users WHERE id = $user_id;
+}
+```
+</details>

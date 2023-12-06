@@ -1,0 +1,92 @@
+---
+sidebar_position: 2
+sidebar_label: "Usage"
+id: admin-use
+title: Using the Kwil admin tool
+description: How to use the Kwil admin tool
+slug: /admin/usage
+---
+
+`kwil-admin` provides several functions for node setup and administration that
+are accessible through sub-commands.
+
+To show `kwil-admin` usage and all of the available top level commands, provide
+the `-h` or `--help` flag:
+
+```
+$ kwil-admin -h
+The Kwil node admin tool.
+
+Usage:
+  kwil-admin [command]
+
+Available Commands:
+  completion  Generate the autocompletion script for the specified shell
+  help        Help about any command
+  key         The `key` command provides subcommands for private key generation and inspection.
+  node        The `node` command is used to get information about a running Kwil node.
+  setup       The `setup` command provides functions for creating and managing node configuration and data.
+  utils       The `utils` command is used to get information about a running Kwil node.
+  validators  The `validators` command provides functions for creating and broadcasting validator-related transactions.
+  version     Displays the cli version information.
+
+Flags:
+  -h, --help          help for kwil-admin
+      --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
+
+Use "kwil-admin [command] --help" for more information about a command.
+```
+
+With the exception of `help` and `version`, each of the commands must be used
+with a sub-command. For example, to list the `key` sub-commands:
+
+```
+The `key` command provides subcommands for private key generation and inspection. These are the private keys that identify the node on the network and provide validator transaction signing capability.
+
+Usage:
+  kwil-admin key [command]
+
+Available Commands:
+  gen         Generate ed25519 keys for usage in validators.
+  info        Display information about a private key.
+
+Flags:
+  -h, --help   help for key
+
+Global Flags:
+      --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
+
+Use "kwil-admin key [command] --help" for more information about a command.
+```
+
+To see usage of the `key info` sub command:
+
+```
+Display information about a private key.
+
+The private key can either be passed as a key file path, or as a hex-encoded string.
+
+Usage:
+  kwil-admin key info [flags]
+
+Examples:
+# Using a key file
+kwil-admin key info --key-file ~/.kwild/private_key
+
+# Using a hex-encoded string
+kwil-admin key info 381d28cf348c9efbf7d26ea54b647e2cb646d3b98cdeec0f1053a5ff599a036a0aa381bd4aad1670a39977d5416bfac7bd060765adc58a4bb16bbbafeefbae34
+
+Flags:
+  -h, --help              help for info
+  -o, --key-file string   file containing the private key to display
+
+Global Flags:
+      --output text   the format for command output - either text or `json` (default "text")
+  -S, --silence       Silence logs
+```
+
+The following sections will describe each of the commands provided by
+`kwil-admin`, but always reference the syntax and full set of options shown by
+appending the `-h` (or `--help`) flag to the full command in question.
