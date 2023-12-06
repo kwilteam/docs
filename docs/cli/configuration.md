@@ -42,7 +42,7 @@ Below is a table containing the available configs, their flags, an example value
 
 | Config | Flag | Example | Description |
 |-|-|-|-|
-| gRPC URL | `--kwil-provider` | `provider.kwil.com:80`<br/>`localhost:50051`  | The gRPC endpoint of a Kwil node, which will be used for accessing data on the node's network. |
+| gRPC URL | `--kwil-provider` | `testnet.kwil.com:80`<br/>`localhost:50051`  | The gRPC endpoint of a Kwil node, which will be used for accessing data on the node's network. |
 | Kwil Chain ID | `--chain-id` | `kwil-test-chain` | The chain ID of the Kwil network to use. Can be left blank to trust a server-provided value. |
 |Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br/>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
 | TLS Cert File Path| `--tls-cert-file` | `~/certs/kwil_provider.pem` | The filepath to be used for the TLS cert to be used over gRPC.  If empty, communication will be unencrypted. |
