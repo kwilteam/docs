@@ -1,10 +1,17 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 sidebar_label: "configure"
 id: "kwil-cli-configure"
 title: "kwil-cli configure"
 description: "Configure the Kwil CLI with persistent global settings."
+slug: /ref/kwil-cli/configure
 ---
+
+## kwil-cli configure
+
+Configure the Kwil CLI with persistent global settings.
+
+### Synopsis
 
 Configure the Kwil CLI with persistent global settings.
 
@@ -15,20 +22,14 @@ This command will prompt you for the following settings:
 - Kwil RPC TLS certificate path: the path to the TLS certificate of the Kwil node you wish to connect to.  This is only required if the Kwil node is using TLS.
 - Private Key: the private key to use for signing transactions.  If left empty, the Kwil CLI will not sign transactions.
 
-### Usage
-
 ```
 kwil-cli configure [flags]
 ```
 
-### Example
+### Examples
 
 ```
-$ kwil-cli configure
-✔ Kwil RPC URL localhost:50051
-✔ Kwil Chain ID (leave empty to trust a server-provided value) 
-✔ Private Key f1aa5a7966c3863ccde3047f6a1e266cdc0c76b399e256b8fede92b1c69e4f4e
-✔ Kwil RPC TLS certificate path
+kwil-cli configure
 ```
 
 ### Options
@@ -40,10 +41,16 @@ $ kwil-cli configure
 ### Options inherited from parent commands
 
 ```
+  -Y, --assume-yes             Assume yes for all prompts
       --chain-id string        the expected/intended Kwil Chain ID
       --kwil-provider string   the Kwil provider gRPC endpoint (default "127.0.0.1:50051")
-      --output text            the format for command output - either text or `json` (default "text")
+      --output string          the format for command output - either 'text' or 'json' (default "text")
       --private-key string     the private key of the wallet that will be used for signing
+  -S, --silence                Silence logs
       --tls-cert-file string   the path to the TLS certificate (if the provider endpoint is using TLS)
 ```
+
+### SEE ALSO
+
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
 

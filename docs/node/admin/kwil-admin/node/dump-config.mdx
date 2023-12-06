@@ -4,17 +4,22 @@ sidebar_label: "dump-config"
 id: "kwil-admin-node-dump-config"
 title: "kwil-admin node dump-config"
 description: "Gets the current config from the node."
+slug: /ref/kwil-admin/node/dump-config
 ---
+
+## kwil-admin node dump-config
 
 Gets the current config from the node.
 
-### Usage
+### Synopsis
+
+Gets the current config from the node.
 
 ```
 kwil-admin node dump-config [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Get the current config from the node.
@@ -26,15 +31,19 @@ kwil node dump-config --rpcserver unix:///tmp/kwil_admin.sock
 ```
       --authrpc-cert string   kwild's TLS certificate
   -h, --help                  help for dump-config
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock]
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert]
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key]
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin node](/docs/ref/kwil-admin/node)	 - The `node` command is used to get information about a running Kwil node.
 

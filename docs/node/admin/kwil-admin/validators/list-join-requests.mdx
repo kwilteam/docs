@@ -4,20 +4,25 @@ sidebar_label: "list-join-requests"
 id: "kwil-admin-validators-list-join-requests"
 title: "kwil-admin validators list-join-requests"
 description: "List all pending join requests."
+slug: /ref/kwil-admin/validators/list-join-requests
 ---
+
+## kwil-admin validators list-join-requests
+
+List all pending join requests.
+
+### Synopsis
 
 Command `list-join-requests` lists all pending join requests.
 	
 Join requests are created when a validator wants to join the validator set. The validator must be approved by 2/3 of the current validator set to be added to the validator set.
 Each join request has an expiration block height, after which it is no longer valid.
 
-### Usage
-
 ```
 kwil-admin validators list-join-requests [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # List all pending join requests
@@ -34,10 +39,14 @@ kwil-admin validators list-join-requests
 
 ```
       --authrpc-cert string   kwild's TLS certificate
-      --output text           the format for command output - either text or `json` (default "text")
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
   -S, --silence               Silence logs
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
 

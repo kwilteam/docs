@@ -4,18 +4,23 @@ sidebar_label: "peer"
 id: "kwil-admin-setup-peer"
 title: "kwil-admin setup peer"
 description: "The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node."
+slug: /ref/kwil-admin/setup/peer
 ---
+
+## kwil-admin setup peer
+
+The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node.
+
+### Synopsis
 
 The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node.
 It will automatically generate required directories and keypairs, and can be given a genesis file and peer list for an existing network.
-
-### Usage
 
 ```
 kwil-admin setup peer [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Initialize a node as a peer to an existing network
@@ -67,7 +72,11 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
 

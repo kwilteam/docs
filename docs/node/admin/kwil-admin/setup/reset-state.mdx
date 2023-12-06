@@ -4,17 +4,22 @@ sidebar_label: "reset-state"
 id: "kwil-admin-setup-reset-state"
 title: "kwil-admin setup reset-state"
 description: "Delete blockchain state files."
+slug: /ref/kwil-admin/setup/reset-state
 ---
+
+## kwil-admin setup reset-state
 
 Delete blockchain state files.
 
-### Usage
+### Synopsis
+
+Delete blockchain state files.
 
 ```
 kwil-admin setup reset-state [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Delete blockchain state files
@@ -32,7 +37,11 @@ kwil-admin setup reset-state --root-dir "~/.kwild"
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
 

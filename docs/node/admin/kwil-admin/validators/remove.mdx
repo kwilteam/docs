@@ -4,17 +4,22 @@ sidebar_label: "remove"
 id: "kwil-admin-validators-remove"
 title: "kwil-admin validators remove"
 description: "Command `remove` votes to remove a validator from the validator set."
+slug: /ref/kwil-admin/validators/remove
 ---
 
-Command `remove` votes to remove a validator from the validator set. If enough validators vote to remove the validator, the validator will be removed from the validator set.
+## kwil-admin validators remove
 
-### Usage
+Command `remove` votes to remove a validator from the validator set.
+
+### Synopsis
+
+Command `remove` votes to remove a validator from the validator set. If enough validators vote to remove the validator, the validator will be removed from the validator set.
 
 ```
 kwil-admin validators remove <validator> [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Remove a validator from the validator set, by hex public key
@@ -31,10 +36,14 @@ kwil-admin validators remove e16141e4def3a7f2dfc5bbf40d50619b4d7bc9c9f670fcad983
 
 ```
       --authrpc-cert string   kwild's TLS certificate
-      --output text           the format for command output - either text or `json` (default "text")
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
   -S, --silence               Silence logs
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
 

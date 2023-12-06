@@ -1,24 +1,24 @@
 ---
-sidebar_position: 5
-sidebar_label: "version"
-id: "kwil-cli-version"
-title: "kwil-cli version"
-description: "Displays the cli version information."
-slug: /ref/kwil-cli/version
+sidebar_position: 0
+sidebar_label: "account"
+id: "kwil-cli-account"
+title: "kwil-cli account"
+description: "Account related commands."
+slug: /ref/kwil-cli/account
 ---
 
-## kwil-cli version
+## kwil-cli account
 
-Displays the cli version information.
+Account related commands.
 
-```
-kwil-cli version [flags]
-```
+### Synopsis
+
+Commands related to Kwil account, such as balance checks and transfers.
 
 ### Options
 
 ```
-  -h, --help   help for version
+  -h, --help   help for account
 ```
 
 ### Options inherited from parent commands
@@ -36,4 +36,6 @@ kwil-cli version [flags]
 ### SEE ALSO
 
 * [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
+* [kwil-cli account balance](/docs/ref/kwil-cli/account/balance)	 - Gets an account's balance and nonce
+* [kwil-cli account transfer](/docs/ref/kwil-cli/account/transfer)	 - Transfer value to an account
 

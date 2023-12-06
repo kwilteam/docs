@@ -4,17 +4,22 @@ sidebar_label: "join-status"
 id: "kwil-admin-validators-join-status"
 title: "kwil-admin validators join-status"
 description: "Query the status of a pending validator join request."
+slug: /ref/kwil-admin/validators/join-status
 ---
+
+## kwil-admin validators join-status
 
 Query the status of a pending validator join request.
 
-### Usage
+### Synopsis
+
+Query the status of a pending validator join request.
 
 ```
 kwil-admin validators join-status <joiner> [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Query the status of a pending validator join request, by hex public key
@@ -31,10 +36,14 @@ kwil-admin validators join-status 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd
 
 ```
       --authrpc-cert string   kwild's TLS certificate
-      --output text           the format for command output - either text or `json` (default "text")
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
   -S, --silence               Silence logs
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
 

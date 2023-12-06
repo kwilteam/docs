@@ -1,24 +1,29 @@
 ---
-sidebar_position: 5
-sidebar_label: "version"
-id: "kwil-cli-version"
-title: "kwil-cli version"
-description: "Displays the cli version information."
-slug: /ref/kwil-cli/version
+sidebar_position: 2
+sidebar_label: "transfer"
+id: "kwil-cli-account-transfer"
+title: "kwil-cli account transfer"
+description: "Transfer value to an account"
+slug: /ref/kwil-cli/account/transfer
 ---
 
-## kwil-cli version
+## kwil-cli account transfer
 
-Displays the cli version information.
+Transfer value to an account
+
+### Synopsis
+
+Transfers value to an account.
 
 ```
-kwil-cli version [flags]
+kwil-cli account transfer [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for version
+  -h, --help        help for transfer
+  -N, --nonce int   nonce override (-1 means request from server) (default -1)
 ```
 
 ### Options inherited from parent commands
@@ -35,5 +40,5 @@ kwil-cli version [flags]
 
 ### SEE ALSO
 
-* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
+* [kwil-cli account](/docs/ref/kwil-cli/account)	 - Account related commands.
 

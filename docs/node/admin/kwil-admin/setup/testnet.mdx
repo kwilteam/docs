@@ -4,7 +4,14 @@ sidebar_label: "testnet"
 id: "kwil-admin-setup-testnet"
 title: "kwil-admin setup testnet"
 description: "The `testnet` command is used to create multiple node configurations, all with the same genesis config, and pre-configured to connect to each other."
+slug: /ref/kwil-admin/setup/testnet
 ---
+
+## kwil-admin setup testnet
+
+The `testnet` command is used to create multiple node configurations, all with the same genesis config, and pre-configured to connect to each other.
+
+### Synopsis
 
 The `testnet` command is used to create multiple node configurations, all with the same genesis config,
 and pre-configured to connect to each other. It will generate a directory for each node, with the necessary files to run each node.
@@ -18,13 +25,11 @@ each with necessary files to start the new network. The genesis file includes li
 NOTE: strict routability for addresses is turned off in the config file so that
 the test network of nodes can run on a LAN.
 
-### Usage
-
 ```
 kwil-admin setup testnet [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Generate a network with 4 validators and 4 non-validators with the IPs
@@ -41,27 +46,29 @@ kwil-admin setup testnet -v 4 -o ./output --hostnames 192.168.10.2 192.168.10.3 
 ### Options
 
 ```
-  -i, --block-interval duration   shortest block interval in seconds (timeout_commit) [default: 6s] (default 6s)
-      --chain-id string           chain ID to use for the genesis file (default: random)
+  -i, --block-interval duration   shortest block interval in seconds (default 6s)
+      --chain-id string           chain ID to use for the genesis file
       --config string             path to a config file to use as a template for all nodes
   -h, --help                      help for testnet
       --hostname-prefix string    prefix for hostnames of nodes
       --hostname-suffix string    suffix for hostnames of nodes
       --hostnames strings         override all hostnames of the nodes (list of hostnames must be the same length as the number of nodes)
-      --join-expiry int           number of blocks before a join request expires [default: 14400] (default 14400)
-      --node-dir-prefix string    prefix for the node directories (node results in node0, node1, ...)
-  -n, --non-validators int        number of non-validators to generate [defaukt: 3]
-  -o, --output-dir string         parent directory for all of generated node folders [default: ./testnet] (default "./testnet")
-  -p, --p2p-port int              p2p port for nodes (default 26656)
+      --join-expiry int           number of blocks before a join request expires (default 14400)
+      --node-dir-prefix string    prefix for the node directories (node results in node0, node1, ...) (default "node")
+  -n, --non-validators int        number of non-validators to generate
+  -o, --output-dir string         parent directory for all of generated node folders (default "./.testnet")
       --starting-ip string        starting IP address for nodes (default "172.10.100.2")
-  -v, --validators int            number of validators to generate (default 1)
-      --without-nonces            disable account nonces
+  -v, --validators int            number of validators to generate (default 3)
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
 

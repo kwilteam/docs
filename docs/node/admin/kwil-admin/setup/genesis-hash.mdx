@@ -4,20 +4,25 @@ sidebar_label: "genesis-hash"
 id: "kwil-admin-setup-genesis-hash"
 title: "kwil-admin setup genesis-hash"
 description: "Compute genesis hash from SQLite files, and optionally update `genesis.json`."
+slug: /ref/kwil-admin/setup/genesis-hash
 ---
+
+## kwil-admin setup genesis-hash
+
+Compute genesis hash from SQLite files, and optionally update `genesis.json`.
+
+### Synopsis
 
 Compute genesis hash from SQLite files, and optionally update `genesis.json`.
 It takes one argument, which is the path containing the SQLite files to be included in the genesis hash.
 
 By default, it will print the genesis hash to stdout. To specify a genesis file to update as well, use the `--genesis` flag.
 
-### Usage
-
 ```
 kwil-admin setup genesis-hash [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Compute genesis hash from SQLite files, and add it to a genesis file
@@ -34,7 +39,11 @@ kwil-admin setup genesis-hash "~/.kwild/data/kwil.db" --genesis "~/.kwild/abci/c
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
 

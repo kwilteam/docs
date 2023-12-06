@@ -4,17 +4,22 @@ sidebar_label: "approve"
 id: "kwil-admin-validators-approve"
 title: "kwil-admin validators approve"
 description: "A current validator may approve an active join request for a candidate validator using the `approve` subcommand."
+slug: /ref/kwil-admin/validators/approve
 ---
 
-A current validator may approve an active join request for a candidate validator using the `approve` subcommand. If enough validators approve the join request, the candidate validator will be added to the validator set.
+## kwil-admin validators approve
 
-### Usage
+A current validator may approve an active join request for a candidate validator using the `approve` subcommand.
+
+### Synopsis
+
+A current validator may approve an active join request for a candidate validator using the `approve` subcommand. If enough validators approve the join request, the candidate validator will be added to the validator set.
 
 ```
 kwil-admin validators approve <joiner> [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Approve a join request for a candidate validator
@@ -31,10 +36,14 @@ kwil-admin validators approve 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702f
 
 ```
       --authrpc-cert string   kwild's TLS certificate
-      --output text           the format for command output - either text or `json` (default "text")
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock] (default "unix:///tmp/kwil_admin.sock")
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
   -S, --silence               Silence logs
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert] (default "auth.cert")
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key] (default "auth.key")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
+
+### SEE ALSO
+
+* [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
 

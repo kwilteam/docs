@@ -4,7 +4,14 @@ sidebar_label: "batch"
 id: "kwil-cli-database-batch"
 title: "kwil-cli database batch"
 description: "Batch execute an action using inputs from a CSV file."
+slug: /ref/kwil-cli/database/batch
 ---
+
+## kwil-cli database batch
+
+Batch execute an action using inputs from a CSV file.
+
+### Synopsis
 
 Batch executes an action on a database using inputs from a CSV file.
 
@@ -19,13 +26,11 @@ You can either specify the database to execute this against with the `--name` an
 flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
 flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
 
-### Usage
-
 ```
 kwil-cli database batch [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Given a CSV file with the following contents:
@@ -55,10 +60,16 @@ kwil-cli database batch --path ./users.csv --action create_user --name mydb --ow
 ### Options inherited from parent commands
 
 ```
+  -Y, --assume-yes             Assume yes for all prompts
       --chain-id string        the expected/intended Kwil Chain ID
       --kwil-provider string   the Kwil provider gRPC endpoint (default "127.0.0.1:50051")
-      --output text            the format for command output - either text or `json` (default "text")
+      --output string          the format for command output - either 'text' or 'json' (default "text")
       --private-key string     the private key of the wallet that will be used for signing
+  -S, --silence                Silence logs
       --tls-cert-file string   the path to the TLS certificate (if the provider endpoint is using TLS)
 ```
+
+### SEE ALSO
+
+* [kwil-cli database](/docs/ref/kwil-cli/database)	 - The database command is a parent command containing subcommands for interacting with databases.
 

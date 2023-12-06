@@ -4,17 +4,22 @@ sidebar_label: "peers"
 id: "kwil-admin-node-peers"
 title: "kwil-admin node peers"
 description: "Print a list of the node's peers, with their public information."
+slug: /ref/kwil-admin/node/peers
 ---
+
+## kwil-admin node peers
 
 Print a list of the node's peers, with their public information.
 
-### Usage
+### Synopsis
+
+Print a list of the node's peers, with their public information.
 
 ```
 kwil-admin node peers [flags]
 ```
 
-### Example
+### Examples
 
 ```
 # Print a list of the node's peers
@@ -26,15 +31,19 @@ kwil-admin node peers --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc.c
 ```
       --authrpc-cert string   kwild's TLS certificate
   -h, --help                  help for peers
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) [default: unix:///tmp/kwil_admin.sock]
-      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us [default: auth.cert]
-      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection [default: auth.key]
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
 
 ### Options inherited from parent commands
 
 ```
-      --output text   the format for command output - either text or `json` (default "text")
-  -S, --silence       Silence logs
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -S, --silence         Silence logs
 ```
+
+### SEE ALSO
+
+* [kwil-admin node](/docs/ref/kwil-admin/node)	 - The `node` command is used to get information about a running Kwil node.
 
