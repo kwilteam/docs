@@ -17,7 +17,7 @@ Configure the Kwil CLI with persistent global settings.
 
 This command will prompt you for the following settings:
 
-- Kwil RPC URL: the RPC URL of the Kwil node you wish to connect to.
+- Kwil RPC URL: the gRPC URL of the Kwil node you wish to connect to.
 - Kwil Chain ID: the chain ID of the Kwil node you wish to connect to.  If left empty, the Kwil node will provide this value.
 - Kwil RPC TLS certificate path: the path to the TLS certificate of the Kwil node you wish to connect to.  This is only required if the Kwil node is using TLS.
 - Private Key: the private key to use for signing transactions.  If left empty, the Kwil CLI will not sign transactions.
@@ -43,7 +43,7 @@ kwil-cli configure
 ```
   -Y, --assume-yes             Assume yes for all prompts
       --chain-id string        the expected/intended Kwil Chain ID
-      --kwil-provider string   the Kwil provider gRPC endpoint (default "127.0.0.1:50051")
+      --kwil-provider string   the Kwil provider HTTP endpoint (default "http://localhost:8080")
       --output string          the format for command output - either 'text' or 'json' (default "text")
       --private-key string     the private key of the wallet that will be used for signing
   -S, --silence                Silence logs
