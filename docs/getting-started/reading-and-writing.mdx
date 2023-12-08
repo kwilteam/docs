@@ -33,8 +33,8 @@ The Kwil class is the main class for interacting with Kwil. It is used to initia
 import { WebKwil } from '@kwilteam/kwil-js';
 
 const kwil = new WebKwil({
-    kwilProvider: "https://provider.kwil.com",
-    chainId: "kwil-public-testnet-2",
+    kwilProvider: "https://testnet.kwil.com",
+    chainId: "kwil-chain-testnet-0.6",
 });
 ```
 
@@ -120,8 +120,8 @@ import { BrowserProvider } from 'ethers';
 import { WebKwil, KwilSigner, Utils } from '@kwilteam/kwil-js';
 
 const kwil = new WebKwil({
-    kwilProvider: "https://provider.kwil.com",
-    chainId: "kwil-public-testnet-2",
+    kwilProvider: "https://testnet.kwil.com",
+    chainId: "kwil-chain-testnet-0.6",
 });
 
 const dbid = Utils.generateDBID('wallet_address', 'social_media');
