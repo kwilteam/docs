@@ -9,6 +9,11 @@ description: Creating and deploying a Kuneiform schema.
 In this tutorial, we will create a database using Kuneiform.  We will be deploying the database using the [Kwil CLI](/docs/category/cli),
 however you can also deploy your database using the [Kuneiform IDE](<https://ide.kwil.com>).
 
+## Prerequisites
+
+To complete this tutorial, you will need a balance on the testnet. You can get testnet tokens from the [Kwil Faucet](https://faucet.kwil.com).
+
+You will need to use the Ethereum private key to sign for the account you want to deploy the database from.
 
 ## Naming the Database
 
@@ -169,11 +174,11 @@ action get_posts ($user_id) view {
 
 # Deploying the Database
 
-To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To deploy the database, run the following command:
+To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To deploy the database, run the following command. Make sure to replace the `your-private-key` with your private key to sign the transaction:
 
 ```bash
 # highlight-next-line
-$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://provider.kwil.com' --private-key=5331ae5e0fd371797e4fa9ee029f99cb8ebab069e8ce5d33829882d79fc7d345
+$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://testnet.kwil.com' --chain-id 'kwil-chain-testnet-0.6' --private-key 'your-private-key'
 TxHash: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
 ```
 
@@ -181,7 +186,7 @@ To check if the deployment is successful, we can query the status of the transac
 
 ```bash
 # highlight-next-line
-$ kwil-cli utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://provider.kwil.com'
+$ kwil-cli utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://testnet.kwil.com' --chain-id 'kwil-chain-testnet-0.6'
 Transaction ID: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
 Status: success
 Height: 4777
