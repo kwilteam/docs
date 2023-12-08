@@ -9,7 +9,7 @@ slug: /faq
 
 ## Is there an incentivized testnet?
 
-Currently, there is no incentivized Kwil testnet. A handful of node operators run a testnet for builders to test Kwil development experience.
+Currently, there is no incentivized Kwil testnet. A handful of node operators run a testnet for builders to test Kwil development experience. The details to connect to the testnet are [here](/docs/links).
 
 ## Is there a Kwil token?
 
