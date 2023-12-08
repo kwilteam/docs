@@ -25,7 +25,7 @@ To signal to the Kwil Gateway that an action requires authentication, and an ann
 ```sql title="social_media.kf"
 // authentication required view action to reveal a user profile
 @kgw(authn='true')
-action get_profile () view {
+action get_profile () public view {
     SELECT *
     FROM users
     WHERE address = @caller;
@@ -153,7 +153,7 @@ action create_post ($id, $title, $content, $date_string) public {
     VALUES ($id, $title, $content, $author_id, $date_string);
 }
 
-action get_user ($username) view {
+action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;
@@ -184,7 +184,7 @@ action delete_user($user_id) owner {
 
 // authentication required view action to reveal a user profile
 @kgw(authn='true')
-action get_profile () view {
+action get_profile () public view {
     SELECT *
     FROM users
     WHERE address = @caller;
