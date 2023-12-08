@@ -138,7 +138,7 @@ action create_post ($id, $title, $content, $date_string) public {
     VALUES ($id, $title, $content, $author_id, $date_string);
 }
 
-action get_user ($username) view {
+action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;

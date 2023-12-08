@@ -90,14 +90,14 @@ Data can be read back from actions using read-only actions.  To specify a read-o
 
 ```sql title="social_media.kf"
 // action get_user will get a user by their username
-action get_user ($username) view {
+action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;
 }
 
 // get_posts will get the posts for a given user
-action get_posts ($user_id) view {
+action get_posts ($user_id) public view {
     SELECT *
     FROM posts
     WHERE author_id=$user_id;
@@ -157,14 +157,14 @@ action create_post ($id, $title, $content, $date_string) public {
     ), $date_string);
 }
 
-action get_user ($username) view {
+action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;
 }
 
 // get_posts will get the posts for a given user
-action get_posts ($user_id) view {
+action get_posts ($user_id) public view {
     SELECT *
     FROM posts
     WHERE author_id=$user_id;
