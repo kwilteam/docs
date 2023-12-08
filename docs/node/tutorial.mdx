@@ -56,7 +56,7 @@ $ kwil-admin node status --rpcserver unix:///tmp/node0.sock
     "app_ver": 0,
     "block_ver": 11,
     # highlight-next-line
-    "listen_addr": "tcp://127.0.0.1:26656", # p2p address
+    "listen_addr": "tcp://0.0.0.0:26656", # p2p address
     "rpc_addr": "tcp://127.0.0.1:26657"
   },
   "sync": {
@@ -74,7 +74,7 @@ $ kwil-admin node status --rpcserver unix:///tmp/node0.sock
 ```
 
 The `node.node_id` and `node.listen_addr` fields can be given to the second node as a persistent peer, in the format: `node-id@p2p-address`.
-For the above node, we would have `b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656`.
+For the above node, we would have `b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656`.  We change `0.0.0.0` to an IP address that the second node can reach: `127.0.0.1`.
 
 ## Creating A Second Peer Node
 
@@ -82,8 +82,11 @@ Using the `kwil-admin` tool to create the second node's directories and configs,
 peers that it should try to connect to when starting up. Since both nodes are running locally, we need to specify
 new addresses for the different endpoints, so that the second node does not conflict with the first node:
 
+**Ensure that you replace `b624b3395f22f8cb57cf86d58cbcd6b355d12e18` with your own node's ID.**
+
 ```bash
-kwil-admin setup init --output-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
+kwil-admin setup peer --root-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
+--chain.p2p.persistent-peers b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656 \
 --app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
 --app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
 --chain.p2p.listen-addr=tcp://127.0.0.1:26655
@@ -140,7 +143,7 @@ If the requesting node's public key is unknown, all pending requests and their p
 And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
 ```bash
-$ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
+$ kwil-admin validators list-validators --rpcserver unix:///tmp/node0.sock
 Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}
