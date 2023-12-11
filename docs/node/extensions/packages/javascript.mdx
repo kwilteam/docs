@@ -12,7 +12,7 @@ Kwil offers an easy-to-use SDK for building extensions in JavaScript or TypeScri
 ## Installation
 
 ```bash
-npm install kwil-extensions
+npm install @kwilteam/extensions
 ```
 
 ## Creating Extension
@@ -91,7 +91,7 @@ A logger function consumes all logs emitted from the server. If not specificed, 
 Below is an example of a logger function that sends logs to a file:
 
 ```typescript
-const logger: logFn = (log: string) => {
+const logger: LogFn = (log: string) => {
     fs.appendFileSync('logs.txt', log);
 }
 ```
@@ -101,7 +101,7 @@ const logger: logFn = (log: string) => {
 Below is an example of how to build a fully functional extension called `math` that provides a method called `divide` that divides two numbers:
 
 ```typescript
-import { ExtensionBuilder, MethodFn, InitializeFn, logFn } from "kwil-extensions";
+import { ExtensionBuilder, MethodFn, InitializeFn, LogFn } from "@kwilteam/extensions";
 import * as fs from 'fs';
 
 const initialize: InitializeFn = async (metadata: Record<string, string>): Promise<Record<string, string>> => {
@@ -127,7 +127,7 @@ const divide: MethodFn = async ({ metadata, inputs }) => {
     }
 }
 
-const logger: logFn = (log: string) => {
+const logger: LogFn = (log: string) => {
     fs.appendFileSync('logs.txt', log);
 }
 

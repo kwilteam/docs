@@ -31,12 +31,13 @@ To build an extension server in TypeScript/JavaScript, we will be referencing th
 
 ### Initalize Repository
 
-Create a new repository and install the `kwil-extensions` package:
+Create a new repository and install the `@kwilteam/extensions` package:
 
 ```bash
 npm init -y
-npm install kwil-extensions
-npm install -D ts-node
+npm install @kwilteam/extensions
+npm install -D ts-node typescript
+tsc --init
 ```
 
 ### Implementing the Extension
@@ -51,6 +52,8 @@ To test that it is working properly, run:
 ```bash
 ts-node index.ts
 ```
+
+This should start a gRPC server on port 50051.
 
 </TabItem>
 <TabItem value="golang" label="Golang">
@@ -86,7 +89,7 @@ go run main.go
 To create a Docker image for your extension, you will need to create a Dockerfile in the root of your repository.  This process will be slightly different
 depending on whether you are using TypeScript/JavaScript or Golang.
 
-In the root directory of your application, create a file called `Dockerfile` and paste the following:
+In the root directory of your application, create a `Dockerfile` and paste the following:
 
 <Tabs>
 <TabItem value="typescript" label="TypeScript / JavaScript" default>
@@ -114,10 +117,20 @@ RUN npm run build
 EXPOSE 50051
 
 # Command to run the application
-CMD ["node", "dist/index.js"]
+CMD ["node", "index.js"]
+```
+
+Add a build script to your `package.json`:
+
+```json title="package.json"
+{
+  "scripts": {
+    "build": "tsc"
+  }
+}
 ```
 </TabItem>
-<TabItem value="golang" label="Go">
+<TabItem value="golang" label="Golang">
 
 ```dockerfile title="Dockerfile"
 # First stage: build the application
@@ -173,13 +186,13 @@ To do this, we will be using the [Kwil extension deployment template](<https://g
 git clone https://github.com/kwilteam/extension-deployment-template.git
 ```
 
-Once you have cloned the repository, open the `docker-compose.yaml`.  Under `services:extensions-1:name`, replace "<your_image_here>" with the name of your Docker image:
+Once you have cloned the repository, open `docker-compose.yaml`.  Under `services:extensions-1:name`, replace `<your_extension_here>` with the name of your Docker image:
 
 ```yaml title="docker-compose.yaml"
 version: '3'
 services:
   extension-1:
-    image: <your_image_here>
+    image: <your_extension_here>
     ports:
       - 50055:50051
     restart: on-failure
@@ -191,6 +204,11 @@ Now, simply use the Makefile to download Kwil and run both Kwil and your extensi
 make download-and-run
 ```
 
+To check the `chain_id` of the Kwil node, run:
+
+```bash
+curl http://localhost:8080/api/v1/chain_info
+```
 :::tip
 
 To access the KwilProvider https://localhost:8080 in browser from the Kuneiform IDE, you may need to disable some browser security protections. 
@@ -199,7 +217,7 @@ For Brave Browser, disable the shields for ide.kwil.com by clicking the lion ico
 
 :::
 
-**And that's it!**  You have successfully shipped your first Kwil extension alongside a Kwil database!
+**And that's it!**  You have successfully shipped your first Kwil extension alongside a Kwil node!
 
 ## Video Tutorial (TypeScript)
 

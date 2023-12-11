@@ -35,7 +35,7 @@ service ExtensionService {
 ## When Extensions are Used
 
 Extensions can be used when deploying your own dedicated Kwil network / daemon.  This can be conceptually thought of as a very particular type of app-chain,
-except the app-chain logic (within the extension) should be stateless, as all state is handled by the SQL database.
+except the app-chain logic (within the extension) should be stateless and deterministic, as all state is handled by the SQL database.
 
 While extensions can be run as distributed infrastructure, **it is recommended to run them as containerized sidecars**. Running them as sidecars helps prevent
 transient errors that can occur when running them as distributed infrastructure.  Containerization forces extensions to run with sandboxed resources, preventing
@@ -51,10 +51,10 @@ request made by the Kuneiform schema to the extension.
 
 ### In Kuneiform
 
-```typescript
+```sql
 use <extension_name> {
-    // metadata_key_1: metadata_value_1
-    // metadata_key_2: metadata_value_2
+    // metadata_key_1: 'metadata_value_1'
+    // metadata_key_2: 'metadata_value_2'
     // ...
 } as <extension_alias>;
 ```
