@@ -38,7 +38,7 @@ The `@kgw(authn='true')` annotation will only require the user to authenticate I
 
 ## Authenticating a User
 
-Using the JavaScript SDK and the [KwilSigner](/docs/getting-started/read-write-data#signer), a user can authenticate with the Kwil Gateway. In Browser, the cookie will be stored in the browser's cookie store. In Node.js, the cookie will be returned and then must be passed to the Kwil class.
+Using the JavaScript SDK and the [KwilSigner](/docs/getting-started/read-write-data#signer), a user can authenticate with the Kwil Gateway. When calling the `call` method, the Kwil SDK will check if the gateway is enforcing authentication. If authentication is enforced, the gateway will prompt the user to sign a message with their account keys. Once the signature is verified, the SDK will include a cookie to be passed with all subsequent requests.
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
@@ -61,9 +61,13 @@ const kwil = new WebKwil({
     chainId: "kwil-chain-testnet-0.6",
 });
 
-async function authenticateUser() {
-    const kwilSigner = await getSigner();
-    return await kwil.authenticate(kwilSigner);
+async function authenticatedAction() {
+    const payload = {
+        action: "get_profile",
+        dbid: 'x123abc...'
+    }
+
+    return await kwil.call(payload, kwilSigner); // user will be prompted to authenticate
 }
 ```
 
@@ -78,10 +82,13 @@ const kwil = new NodeKwil({
     chainId: "kwil-chain-testnet-0.6",
 });
 
-async function authenticateUser() {
-    const kwilSigner = await getSigner();
-    const res = await kwil.authenticate(kwilSigner);
-    kwil.setCookie(res.data.cookie);
+async function authenticatedAction() {
+    const payload = {
+        action: "get_profile",
+        dbid: 'x123abc...'
+    }
+
+    return await kwil.call(payload, kwilSigner); // user will be prompted to authenticate
 }
 ```
 

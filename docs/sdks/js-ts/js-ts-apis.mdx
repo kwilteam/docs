@@ -39,22 +39,6 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 
 A new instance of the Kwil class.
 
-### authenticate()
-
-Authenticates the user with a Kwil Gateway. This method will throw an error if your Kwil Network does not have a Kwil Gateway.
-
-```typescript
-async authenticate(signer: KwilSigner): Promise<GenericResponse<AuthSuccess>>
-```
-
-#### Parameters
-
--   `signer`: The signer for the authentication transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
-
-#### Returns
-
-A promise that resolves to the authentication success or failure. If using NodeKwil, the return will also include a cookie to be passed to the [`.setCookie()`](#setcookie) method.
-
 ### call()
 
 ```typescript
@@ -70,7 +54,7 @@ interface ActionBody {
 type Entries = { [key: string]: string | number | null };
 ```
 
-Calls a `view` action on the network.
+Calls a `view` action on the network. If authentication for the view action is enforced by a Kwil Gateway, a `kwilSigner` must be provided. The call method will prompt the user to authenticate if they have not already done so, and will retain a cookie to authenticate with the Kwil Gateway for all subsequent calls.
 
 #### Parameters
 
