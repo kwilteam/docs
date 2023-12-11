@@ -342,56 +342,19 @@ const res = await kwil.getAccount("account_identifier")
 
 ## Kwil Gateway Authentication
 
-Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries. If your Kwil network used a Kwil Gateway, you can use the `kwil.authenticate()` method to authenticate users.
+Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view actions. If your Kwil network used a Kwil Gateway, you should pass a `KwilSigner` to the `kwil.call()` method. If the user is not authenticated, the user will be prompted to sign a message to authenticate, and the SDK will automatically include the authentication cookie in each subsequent request.
 
 :::tip
 The Kwil Gateway is still in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
 :::
 
-<Tabs
-    defaultValue="js-web"
-    values={[
-        { label: 'Web', value: 'js-web', },
-        { label: 'NodeJS', value: 'js-node', },
-    ]}
->
-<TabItem value="js-web">
-
 ```javascript
-// pass the kwilSigner to the authenticate method
-const res = await kwil.authenticate(kwilSigner);
+// pass KwilSigner to the call method
+const res = await kwil.call(actionBody, kwilSigner);
 
 /*
-    res = {
-        status: 200,
-        data: {
-            result: "success"
-        }
+    res.data = {
+        result: [ query results ],
     }
 */
 ```
-
-</TabItem>
-<TabItem value="js-node">
-
-``` javascript
-// pass the kwilSigner to the authenticate method
-const res = await kwil.authenticate(kwilSigner);
-
-/*
-    res = {
-        status: 200,
-        data: {
-            result: "success",
-            cookie: "some_cookie"
-        },
-        
-    }
-*/
-
-// pass the cookie to the kwil class
-kwil.setCookie(res.data.cookie)
-```
-
-</TabItem>
-</Tabs>
