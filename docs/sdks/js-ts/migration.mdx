@@ -99,6 +99,8 @@ const tx = await kwil
     .concat([ 'inputs', 'inputs' ])
     .signer(signer)
     .buildTx();
+
+const res = await kwil.broadcast(tx);
 ```
 
 #### New Version
