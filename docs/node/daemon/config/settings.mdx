@@ -52,15 +52,15 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
    ### [chain.consensus]
 
-      This section provides configurations for managing blockchain consensus.
+      This section provides configurations for managing blockchain consensus. These are only important for validators. They should be set according to the network configuration.
 
       - `timeout_propose`: This variable specifies the time to wait for a proposal block before prevoting nil. Default timeout is 3s.
 
-      - `timeout_prevote`: This variable specifies the time to wait after receiving +2/3 prevotes. Default timeout is 1s.
+      - `timeout_prevote`: This variable specifies the time to wait after receiving +2/3 prevotes. Default timeout is 2s.
 
-      - `timeout_precommit`: This variable specifies the time to wait after receiving +2/3 precommits. Default timeout is 1s.
+      - `timeout_precommit`: This variable specifies the time to wait after receiving +2/3 precommits. Default timeout is 2s.
 
-      - `timeout_commit`: This variable specifies the time to wait after committing a block before starting on the new height. Default timeout is 1s.
+      - `timeout_commit`: This variable specifies the time to wait after committing a block before starting on the new height. Default timeout is 6s.
 
    ### [chain.p2p]
 
@@ -110,16 +110,14 @@ Here is an example of a `config.toml` file with complete configuration:
 
 # Root Directory Structure:
 # RootDir/
-#   |- config.toml    (app and chain configuration for running the kwild node)
+#   |- config.toml   (app and chain configuration for running the kwild node)
+#   |- genesis.json  (genesis file for the network)
 #   |- private_key   (node's private key)
 #   |- abci/
-#   |   |- config/
-#   |   |   |- genesis.json   (genesis file for the network)
-#   |   |   |- addrbook.json  (peer routable addresses for the kwild node)
-#   |   |- data/
-#   |   |   |- blockchain db files/dir (blockstore.db, state.db, etc)
+#   |   |- addrbook.json  (peer routable addresses for the kwild node)
+#   |   |- data/          (blockchain files: blockstore.db, state.db, etc)
 #   |   |- info/
-#   |- application/wal
+#   |- application/
 #   |- data
 #   |   |- kwild.db/
 #   |- signing/
@@ -131,6 +129,7 @@ Here is an example of a `config.toml` file with complete configuration:
 ###                    Logging Config Options                       ###
 #######################################################################
 [log]
+
 # Output level for logging, default is "info". Other options are "debug", "error", "warn", "trace"
 level = "info"
 
@@ -148,6 +147,7 @@ time_format = "epochfloat"
 #######################################################################
 
 [app]
+
 # Node's Private key
 private_key_path = "private_key"
 
@@ -213,15 +213,15 @@ listen_addr = "tcp://127.0.0.1:26657"
 timeout_propose = "3s"
 
 # How long we wait after receiving +2/3 prevotes for “anything” (ie. not a single block or nil)
-timeout_prevote = "1s"
+timeout_prevote = "2s"
 
 # How long we wait after receiving +2/3 precommits for “anything” (ie. not a single block or nil)
-timeout_precommit = "1s"
+timeout_precommit = "2s"
 
 # How long we wait after committing a block, before starting on the new
 # height (this gives us a chance to receive some more precommits, even
 # though we already have +2/3).
-timeout_commit = "1s"
+timeout_commit = "6s"
 
 #######################################################
 ###           P2P Configuration Options             ###
@@ -262,13 +262,17 @@ allow_duplicate_ip = true
 ###          Mempool Configuration Options          ###
 #######################################################
 [chain.mempool]
+
 # Maximum number of transactions in the mempool
 size = 5000
 
 # Limit the total size of all txs in the mempool.
 # This only accounts for raw transactions (e.g. given 1MB transactions and
 # max_txs_bytes=5MB, mempool will only accept 5 transactions).
-#max_txs_bytes = xx .ChainCfg.Mempool.MaxTxsBytes xx
+max_txs_bytes = 536870912
+
+# Limit the size of any one transaction in mempool.
+max_tx_bytes = 4194304
 
 # Size of the cache (used to filter transactions we saw earlier) in transactions
 cache_size = 10000
@@ -286,17 +290,17 @@ The structure of `config.toml` is hierarchical, using sections and subsections. 
 :::note Translation rules
 ```toml title=config.toml
 [section]
-   field1 = "val1"
+field = "val"
+
 [section.subsection]
-   field2 = "val2"
+other_field = "val"
 ```
 
-The corresponding command line flags and environment variables for `field1` and
-`field2` are as follows:
+The corresponding command line flags and environment variables for `field` and
+`other_field` are as follows:
 
 | Flag                               | Environment Variable                   |
 |------------------------------------|----------------------------------------|
-| `--section.field1`                 | `KWILD_SECTION_FIELD1`                 |
-| `--section.subsection.field2-name` | `KWILD_SECTION_SUBSECTION_FIELD2_NAME` |
-
+| `--section.field`                  | `KWILD_SECTION_FIELD`                  |
+| `--section.subsection.other-field` | `KWILD_SECTION_SUBSECTION_OTHER_FIELD` |
 :::

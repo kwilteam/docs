@@ -13,7 +13,7 @@ The `kwild` command starts the blockchain and the database services of the Kwil 
 
 This is the default directory to store all the configuration and data such as blockchain data, SQL database data, signed messages, etc, unless specified otherwise.
 
-```
+```text
 home_dir/
    |- genesis.json 
    |- config.toml
@@ -31,13 +31,14 @@ Quickstart mode can be used to swiftly deploy a node without delving into the co
 ```bash
 kwild --autogen
 ```
-This command will auto-generate the necessary configuration in the root directory and starts the node using this configuration. This also create a new private chain with the initialized node as its sole member and validator. 
 
-It's crucial to note, however, that the node operates under a default configuration in the quickstart mode. For production deployments, it's highly recommended to tailor the configuration to your specific needs, as discussed in subsequent sections. 
+This command will auto-generate the necessary configuration in the root directory and starts the node using this configuration. This also create a new private chain with the initialized node as its sole member and validator.
+
+It's crucial to note, however, that the node operates under a default configuration in the quickstart mode. For production deployments, it's highly recommended to tailor the configuration to your specific needs, as discussed in subsequent sections.
 
 ## Configuration
 
-Running a Kwil node requires `genesis.json`, `config.toml` and `private_key` files. All these configuration files must be present under the root directory. This section describes in detail on how to initialize the root directory with these configuration files. 
+Running a Kwil node requires `genesis.json`, `config.toml` and `private_key` files. All these configuration files must be present under the root directory. This section describes in detail on how to initialize the root directory with these configuration files.
 
 ### Private Keys
 
@@ -73,10 +74,10 @@ Configure `chain.p2p.persistent-peers` to establish and maintain persistent conn
 
 Refer to the [configuration specification](./config/settings) for more options on tuning a Kwil application.
 
-### Configuration Override 
+### Configuration Override
 
 The Kwil application supports the ability to override the configuration at node startup through the command line flags and environment variables.
-Use `--help or -h` for detailed information on all the parameters that can be overwritten through command line flags. 
+Use `--help or -h` for detailed information on all the parameters that can be overwritten through command line flags.
 
 For instance, to modify the log level and chain RPC address during the node startup, you can use one of the following methods:
 
@@ -97,10 +98,14 @@ KWILD_CHAIN_RPC_LISTEN_ADDRESS="tcp://127.0.0.1:26656"
 
 kwild --root-dir "path/to/root/dir" --log.level "info" --chain.rpc.listen-addr "tcp://192.168.1.20:30000"
 ```
+
 If both flags and env variables are set, flags take precedence over environment variables. Therefore, in this example, the Kwil application uses `info` log level and RPC listen address as `tcp://192.168.1.20:30000`.
 
-Refer to the [translation guide](./config/settings#config-override) for more information on mapping the config parameters to the command line flags and environment variables.
+:::tip
+Option names in the TOML configuration file and environment variables use underscores ("_") to separate words within the name, while the command line flags use dashes ("-").
+:::
 
+Refer to the [translation guide](./config/settings#config-override) for more information on mapping the config parameters to the command line flags and environment variables.
 
 ## Deploy a Kwil Network
 
@@ -109,10 +114,10 @@ A private Kwil network with a standalone node can be deployed by running `kwild`
 ```bash
 kwild --root-dir "path/to/root/dir"
 ```
-The root directory must have the required configuration for the node to start successfully. If you are using [quickstart mode](./kwild#quickstart), this root directory will be generated for you if it does not exist. 
+
+The root directory must have the required configuration for the node to start successfully. If you are using [quickstart mode](./kwild#quickstart), this root directory will be generated for you if it does not exist.
 
 Whether this node starts as a validator or a non-validator is determined by its presence in the initial validator list within the genesis file.
-
 
 ## Connecting To A Kwil Network
 
