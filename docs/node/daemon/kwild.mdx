@@ -66,11 +66,16 @@ To connect a node to an existing network, obtain the genesis file from the desir
 
 ### Config File (config.toml)
 
-Copy the sample [config.toml](./config/settings#sample-configtoml) into `root_dir/config.toml` and update the configuration as required. 
+Copy the sample [config.toml](./config/settings#sample-configtoml) into `root_dir/config.toml` and update the configuration as required.
 
 Notable options include the RPC and HTTP server settings such as `app.grpc-listen-addr`, `app.http-listen-addr`, `chain.rpc.listen-addr` and `chain.p2p.listen-addr`.
 
-Configure `chain.p2p.persistent-peers` to establish and maintain persistent connections with other nodes in the network. This field can be empty if the network is made up of a standalone node. 
+There are two settings related to establishing connections to other network nodes:
+
+- `chain.p2p.persistent-peers` is used to maintain persistent connections with certain nodes.
+- `chain.p2p.seeds` specifies special seed nodes or services from which additional peer addresses are obtained.
+
+The above fields can be empty if the network is made up of a standalone node.
 
 Refer to the [configuration specification](./config/settings) for more options on tuning a Kwil application.
 
@@ -122,10 +127,14 @@ Whether this node starts as a validator or a non-validator is determined by its 
 ## Connecting To A Kwil Network
 
 To connect to an existing Kwil network during startup:
-- Obtain the `genesis.json` for the desired network from another participant, and ensure that it is placed properly in your `root_dir`.
-- Update the `chain.p2p.persistent_peers` with the network peer addresses and start the node. `persistent_peers` is a comma-separated string of `nodeid@ip:port` of peers to establish and maintain connections upon startup.
 
-  ```bash title="Command line flag:  --chain.p2p.persistent_peers"
+- Obtain the `genesis.json` for the desired network from a network authority, and ensure that it is placed in your `root-dir`.
+- Set `chain.p2p.seeds` and/or `chain.p2p.persistent-peers`. `seeds` is a comma-separated list of `nodeid@ip:port` seed nodes used to obtain initial peer addresses, while `persistent-peers` are peers to stay connected to.
+- Start `kwild`.
+
+  In the following examples, we are setting `persistent-peers` to two known network nodes with which `kwild` should maintain persistent connections.
+
+  ```bash title="Command line flag:  --chain.p2p.persistent-peers"
   kwild --root-dir "path/to/root/dir" --chain.p2p.persistent-peers "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
   ```
 
@@ -133,7 +142,7 @@ To connect to an existing Kwil network during startup:
   KWILD_CHAIN_P2P_PERSISTENT_PEERS="d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
 
   kwild --root-dir "path/to/root/dir"
-  ```    
+  ```
 
   ```bash title="persistent_peers option in config.toml"
   [chain.p2p]
@@ -142,7 +151,7 @@ To connect to an existing Kwil network during startup:
   kwild --root-dir "path/to/root/dir"
   ```
 
-4. Note that, this node joins the network by default as a non-validator. Please refer to the [Validator Guide](/docs/node/tutorial) for more information on becoming a validator node.
+- Note that this node joins the network by default as a non-validator. Please refer to the [Validator Guide](/docs/node/tutorial) for more information on becoming a validator node.
 
 ## Kwil Admin Tools
 

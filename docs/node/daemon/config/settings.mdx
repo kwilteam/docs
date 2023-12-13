@@ -70,7 +70,13 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `external_address`: This variable specifies the address for peers to connect to. If left empty, it defaults to the same port as the `listen_addr` and will introspect based on the listener.
 
-      - `persistent_peers`: This variable specifies a comma-separated list of nodes to consistently connect to. This configuration is crucial for a new node intending to connect to the existing nodes in the Kwil network.
+      - `persistent_peers`: This variable specifies a comma-separated list of nodes to consistently connect to.
+
+      - `pex`: A toggle to enable peer exchange, an ongoing function of the node used to share known peers with other nodes.
+
+      - `seeds`: This variable specifies a comma-separated list of seed nodes or dedicated seeders services used to provide peer addresses when bootstrapping. This is unused if there are entries in the address book.
+
+      - `seed_mode`: A toggle to run in a special "seed mode" where kwild constantly crawls the network to obtain a large address book, which it shares with incoming nodes before disconnecting them. A node running with this setting would be used only to bootstrap other nodes via their `seeds` setting. This is not appropriate for a validator or an RPC service provider.
 
       - `addr_book_strict`: A toggle for enforcing strict address routability rules. By default, nodes with routable addresses are considered for connection. However, if this setting is disabled, non-routable IP addresses, like addresses in a private network can be added to the address book.
 
@@ -238,7 +244,7 @@ listen_addr = "tcp://0.0.0.0:26656"
 # example: 159.89.10.97:26656
 external_address = ""
 
-# Comma separated list of nodes to keep persistent connections to (used for bootstrapping)
+# Comma separated list of nodes to keep persistent connections to
 # Example: "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
 persistent_peers = ""
 
@@ -257,6 +263,23 @@ unconditional_peer_ids = ""
 
 # Toggle to disable guard against peers connecting from the same ip.
 allow_duplicate_ip = true
+
+# Enable gossiping of peer information
+pex = true
+
+# Seed nodes used to obtain peer addresses. Only used if the peers in the
+# address book are unreachable.
+seeds = ""
+
+# Seed mode, in which the node constantly crawls the network and looks for
+# peers. If another node asks it for addresses, it responds and disconnects.
+# This function is not for validator or sentry nodes. A seed node is to be
+# operated to support other nodes via their `seeds` config.
+#
+# It is recommended to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
+#
+# Requires peer-exchange to be enabled.
+seed_mode = false
 
 #######################################################
 ###          Mempool Configuration Options          ###
