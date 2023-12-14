@@ -30,7 +30,6 @@ The Kwil CLI can be configured with a persistent configuration file.  This file 
       --output string          the format for command output - either 'text' or 'json' (default "text")
       --private-key string     the private key of the wallet that will be used for signing
   -S, --silence                Silence logs
-      --tls-cert-file string   the path to the TLS certificate (if the provider endpoint is using TLS)
 ```
 
 ### SEE ALSO
