@@ -11,7 +11,7 @@ slug: /introduction
 
 ## Web3 Native Decentralized Database Networks
 
-Kwil is a framework for leveraging relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical Byzantine Fault Tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
+Kwil is a framework for leveraging relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical byanztine fault tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
 
 Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine how, where, and by whom nodes are run in their blockchain
 
@@ -37,4 +37,4 @@ Smart contract platforms enable developers to code with programmable money.  In 
 
 ### Consensus
 
-The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for Practical Byzantine Fault Tolerant (pBFT) consensus. CometBFT is the most mature BFT consensus engine in existence. For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.37/)
+The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for Practical Byzantine Fault Tolerant (pBFT) consensus. CometBFT is the most mature BFT consenus engine in existence. For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.37/)
