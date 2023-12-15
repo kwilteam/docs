@@ -39,4 +39,3 @@ The Kwil CLI can be configured with a persistent configuration file.  This file 
 * [kwil-cli database](/docs/ref/kwil-cli/database)	 - The database command is a parent command containing subcommands for interacting with databases.
 * [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
 * [kwil-cli version](/docs/ref/kwil-cli/version)	 - Displays the cli version information.
-
