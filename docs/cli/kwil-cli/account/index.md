@@ -36,6 +36,6 @@ Commands related to Kwil account, such as balance checks and transfers.
 
 * [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
 * [kwil-cli account balance](/docs/ref/kwil-cli/account/balance)	 - Gets an account's balance and nonce
-* [kwil-cli account id](/docs/ref/kwil-cli/account/i)	 - Show the account ID.
+* [kwil-cli account id](/docs/ref/kwil-cli/account/id)	 - Show the account ID.
 * [kwil-cli account transfer](/docs/ref/kwil-cli/account/transfer)	 - Transfer value to an account
 
