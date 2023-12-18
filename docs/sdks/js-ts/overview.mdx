@@ -47,6 +47,7 @@ const kwil = new WebKwil({
     kwilProvider: 'https://testnet.kwil.com';
     chainId: 'kwil-chain-testnet-0.6';
     // optional configuration
+    unconfirmedNonce?: boolean; // sends transactions and returns getAccount with unconfirmed nonce, default false
     timeout?: number; // timeout for requests, default 30000
     logging?: boolean; // enable logging, default false
     logger?: Function // custom logger, default console.log
