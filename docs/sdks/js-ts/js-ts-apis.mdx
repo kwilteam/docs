@@ -20,11 +20,10 @@ constructor(config: Config): Kwil
 interface Config {
     kwilProvider: string;
     chainId: string;
+    unconfirmedNonce?: boolean;
     timeout?: number;
-    apiKey?: string;
     logging?: boolean;
     logger?: Function;
-    network?: string;
     cache?: seconds;
 }
 ```
@@ -34,6 +33,13 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 #### Parameters
 
 -   `config`: The configuration object for the Kwil class.
+-   `config.kwilProvider`: The URL of the Kwil provider.
+-   `config.chainId`: The chain ID of the Kwil network.
+-   `config.unconfirmedNonce`: (optional) If true, the SDK will use the unconfirmed nonce for the account. If false, the SDK will use the confirmed nonce for the account. Default is false. This is useful when sending multiple transactions in parallel.
+-   `config.timeout`: (optional) The timeout for the Kwil provider. Default is 10000ms.
+-   `config.logging`: (optional) If true, the SDK will log debug messages to the console. Default is false.
+-   `config.logger`: (optional) A custom logger function. If provided, the SDK will use this function to log debug messages.
+-   `config.cache`: (optional) The TTL cache for the SDK. Default is 600 seconds (10 minutes). See the [TTL Cache](./overview#optional-configuration) section for more information.
 
 #### Returns
 
