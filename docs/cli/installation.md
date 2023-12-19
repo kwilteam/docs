@@ -27,4 +27,4 @@ kwil-cli version
 
 If installed correctly, it should display the version info match your downloaded version.
 
-Continue to the [Configuration](./configuration) page to setup.
+Continue to the [Configuration](/docs/cli/configuration.md)page to setup.
