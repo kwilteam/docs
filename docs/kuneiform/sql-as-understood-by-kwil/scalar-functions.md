@@ -31,8 +31,6 @@ The glob(X,Y) function is equivalent to the expression "Y GLOB X". Note that the
 name GLOB '*helium*'
 glob('*helium*',name) 
 ```
-    name GLOB '*helium*'
-	glob('*helium*',name) 
 
 ### hex(_X_)
 
