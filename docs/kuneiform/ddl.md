@@ -92,7 +92,7 @@ The Kuneiform Language not only allows column declarations, but also the creatio
 
 ## Index Declaration
 
-You can declare [three types](./supported-features#indexes) of indexes:
+You can declare [three types](/docs/kuneiform/supported-features#indexes) of indexes:
 
 1. Standard binary tree index: This is a conventional B-tree index applied to the chosen column(s). Here's the syntax:
 
