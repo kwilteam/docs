@@ -58,6 +58,11 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
       --chain.p2p.max-num-inbound-peers int          Chain P2P maximum number of inbound peers (default 40)
       --chain.p2p.max-num-outbound-peers int         Chain P2P maximum number of outbound peers (default 10)
       --chain.p2p.persistent-peers string            Chain P2P persistent peers
+      --chain.p2p.pex                                Enables peer information exchange (default true)
+      --chain.p2p.seed-mode                          Run kwild in a special "seed" mode where it crawls the network for peer addresses,
+                                                     sharing them with incoming peers before immediately disconnecting. It is recommended
+                                                     to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
+      --chain.p2p.seeds string                       Seed nodes for obtaining peer addresses, if address book is empty
       --chain.p2p.unconditional-peer-ids string      Chain P2P unconditional peer IDs
       --chain.rpc.listen-addr string                 Chain RPC listen address (default "tcp://127.0.0.1:26657")
   -g, --genesis string                               path to genesis file
