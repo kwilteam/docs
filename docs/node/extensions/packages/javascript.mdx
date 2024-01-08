@@ -63,7 +63,7 @@ async function initialize(metadata: Record<string, string>): Promise<Record<stri
 
 ### Extension Methods
 
-Extension methods are functions that can be called from within Kuneiform. All extension methods receive an object with a `metadata` and `inputs` property. The `metadata` property is a map of strings that is passed in from Kuneiform and modified by the [Initialize Function](./js-ts#initialize-function). The `inputs` property is a map of strings that are passed when the method is called from Kuneiform.
+Extension methods are functions that can be called from within Kuneiform. All extension methods receive an object with a `metadata` and `inputs` property. The `metadata` property is a map of strings that is passed in from Kuneiform and modified by the [Initialize Function](/docs/extensions/packages/js-ts#initialize-function). The `inputs` property is a map of strings that are passed when the method is called from Kuneiform.
 
 Note that inputs are received as an array of Buffers, **so you must convert them to a string or number with .toString() or .toNumber()**.
 

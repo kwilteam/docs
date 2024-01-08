@@ -38,9 +38,9 @@ action add_user($id, $name, $username) <public | private> {}
 
 ## Setting Action Privacy
 
-Privacy levels can be set for your action using [access tags](./supported-features#access-tags). Similar to public / private in [TypeScript](https://www.tutorialsteacher.com/typescript/data-modifiers), private actions can only be called by other actions in the Kuneiform schema. Public actions can be called by any external database user.  Other modifiers can be added to enforce other restrictions on the action.  In the below example, we add an `owner` modifier, which makes the action only callable by the database deployer
+Privacy levels can be set for your action using [access tags](/docs/kuneiform/supported-features#access-tags). Similar to public / private in [TypeScript](https://www.tutorialsteacher.com/typescript/data-modifiers), private actions can only be called by other actions in the Kuneiform schema. Public actions can be called by any external database user.  Other modifiers can be added to enforce other restrictions on the action.  In the below example, we add an `owner` modifier, which makes the action only callable by the database deployer
 
-A full list of supported privacy levels can be found [here](./supported-features#access-tags).
+A full list of supported privacy levels can be found [here](/docs/kuneiform/supported-features#access-tags).
 
 ```typescript
 action add_user($id, $name, $username) public owner {}
@@ -48,7 +48,7 @@ action add_user($id, $name, $username) public owner {}
 
 ## Defining SQL Queries in an Action
 
-The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with `$`.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing. All query statements **must** end with a semicolon. If queries return results, the final query statement will be returned to the client.  Queries that return data must use the [`view`](./supported-features#access-tags) tag.
+The SQL queries to be executed when the action is called can be defined within the action's body. Parameters within the SQL query must be prefixed with `$`.  Multiple queries can be included in the same action.  The two queries will be executed within one transaction, with either all succeeding or all failing. All query statements **must** end with a semicolon. If queries return results, the final query statement will be returned to the client.  Queries that return data must use the [`view`](/docs/kuneiform/supported-features#access-tags) tag.
 
 ```typescript
 // the following queries will be executed transactionally.
