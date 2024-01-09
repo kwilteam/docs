@@ -34,8 +34,10 @@ kwil-cli database deploy --path ./schema.kf
 
 ```
   -h, --help          help for deploy
+  -n, --name string   set the name of the database, overriding the name in the schema file
   -N, --nonce int     nonce override (-1 means request from server) (default -1)
   -p, --path string   path to the database definition file (required)
+      --sync          synchronous broadcast (wait for it to be included in a block)
   -t, --type string   file type of the database definition file (kf or json) (default "kf")
 ```
 

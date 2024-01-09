@@ -16,7 +16,7 @@ Transfer value to an account
 Transfers value to an account.
 
 ```
-kwil-cli account transfer [flags]
+kwil-cli account transfer <recipient> <amount> [flags]
 ```
 
 ### Options
@@ -24,6 +24,7 @@ kwil-cli account transfer [flags]
 ```
   -h, --help        help for transfer
   -N, --nonce int   nonce override (-1 means request from server) (default -1)
+      --sync        synchronous broadcast (wait for it to be included in a block)
 ```
 
 ### Options inherited from parent commands

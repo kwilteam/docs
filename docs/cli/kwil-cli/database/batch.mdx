@@ -54,6 +54,7 @@ kwil-cli database batch --path ./users.csv --action create_user --name mydb --ow
   -N, --nonce int            nonce override (-1 means request from server) (default -1)
   -o, --owner string         the database owner
   -p, --path string          path to the CSV file to use
+      --sync                 synchronous broadcast (wait for it to be included in a block)
   -v, --values strings       action parameter mappings applied to all executions (e.g. id:123, name:john)
 ```
 
