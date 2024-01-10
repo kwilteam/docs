@@ -86,7 +86,7 @@ A promise that resolves to a `ChainInfo` object, containing the chain id, latest
 ### deploy()
 
 ```typescript
-async deploy(deployBody: DeployBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+async deploy(deployBody: DeployBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
 
 interface DeployBody {
     schema: CompiledKuneiform;
@@ -102,6 +102,8 @@ Deploys a new database to the Kwil network.
 
 -   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
+-   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+
 #### Returns
 
 A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
@@ -109,7 +111,7 @@ A promise that resolves to the `hash` of the transaction. The status of the tran
 ### drop()
 
 ```typescript
-async drop(dropBody: DropBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+async drop(dropBody: DropBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
 
 interface DropBody {
     dbid: string;
@@ -125,6 +127,8 @@ Drops a database from the Kwil network.
 
 -   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
+-   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+
 #### Returns
 
 A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
@@ -132,7 +136,7 @@ A promise that resolves to the `hash` of the transaction. The status of the tran
 ### execute()
 
 ```typescript
-async execute(actionBody: ActionBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+async execute(actionBody: ActionBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
 
 interface ActionBody {
     name: string;
@@ -151,6 +155,8 @@ Executes a state-changing (Create, Update, Delete) action on the Kwil network.
 -   `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
 
 -   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+-   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
@@ -342,7 +348,7 @@ The funder class is automatically initialized with the Kwil class. It can be acc
 ### transfer()
 
 ```typescript
-async transfer(transferBody: TransferBody, kwilSigner: KwilSigner): Promise<GenericResponse<TxReceipt>>
+async transfer(transferBody: TransferBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
 
 interface TransferBody {
     to: string | Uint8Array;
@@ -356,6 +362,8 @@ interface TransferBody {
 -   `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message.
 
 -   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+-   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
