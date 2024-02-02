@@ -13,6 +13,7 @@ In this tutorial, we will:
 2. Create a second node and configure it to join the network;
 3. Add the second node to the network as a non-validating peer;
 4. Upgrade the second node to a validator.
+5. Deploy a database to the network.
 
 :::tip
 In order to do this tutorial, you will need to [install the `kwild` and `kwil-admin` binaries](<https://github.com/kwilteam/binary-releases/releases>).
@@ -142,7 +143,7 @@ kwil-admin validators approve a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba4
 If the requesting node's public key is unknown, all pending requests and their public keys can be retrieved with the `kwil-admin validators list-join-requests` command.
 :::
 
-And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
+The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
 ```bash
 $ kwil-admin validators list-validators --rpcserver unix:///tmp/node0.sock
@@ -150,6 +151,58 @@ Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}
 ```
+
+## Deploying A Database
+
+To deploy a database to the network, we will need to locate the network chain ID and any of the node's HTTP listen addresses.
+
+### Getting The Chain ID
+
+Use the `kwil-admin node status` command from earlier to get the chain ID:
+
+```bash
+$ kwil-admin node status --rpcserver unix:///tmp/node0.sock
+{
+  "node": {
+    # highlight-next-line
+    "chain_id": "kwil-chain-WfnGxpWd", # chain ID
+    "name": "MacBook-Pro-7.local",
+    ...
+  },
+```
+
+### Getting The Node's HTTP Listen Address
+
+A node's HTTP listen address can be found in its `config.toml` file. To display the config information, use the `kwil-admin node dump-config` command:
+
+```bash
+$ kwil-admin node dump-config --rpcserver unix:///tmp/node0.sock
+RootDir = 'path/to/node0'
+
+[app]
+admin_listen_addr = 'unix:///tmp/node0.sock'
+grpc_listen_addr = 'localhost:50051'
+hostname = ''
+# highlight-next-line
+http_listen_addr = 'localhost:8080' # HTTP listen address
+...
+```
+
+### Deploying The Database
+
+With the chain ID and the node's HTTP listen address, we can use the `kwil-cli` to deploy a database to the network. 
+
+**Make sure that you have a [Kuneiform file](/docs/kuneiform/introduction) to deploy.**
+
+**Replace the `./path/to/kuneiform.kf` with the path to your Kuneiform file and the `--chain-id` and `--kwil-provider` flags with your chain ID and node's HTTP listen address:**
+
+```bash
+$ kwil-cli database deploy -p ./path/to/kuneiform.kf --chain-id kwil-chain-WfnGxpWd --kwil-provider http://localhost:8080
+# Output
+TxHash: 94f44a8d1acbf88523e9a222a3a6a9d3e989bac282effa38379d9f36f62a5e76
+```
+
+And that is it! Assuming the transaction was successful, the database should now be deployed to the network. You can query each node's HTTP listen address to verify that the database was deployed correctly and has been propagated to the network.
 
 ## Conclusion
 
@@ -159,3 +212,4 @@ In this tutorial, we have:
 2. Created a second node and configured it to join the network;
 3. Added the second node to the network as a non-validating peer;
 4. Upgraded the second node to a validator.
+5. Deployed a database to the network.
