@@ -3,18 +3,18 @@ sidebar_position: 1
 sidebar_label: "Installation"
 id: daemon-installation
 title: Installation
-description: How to install the Kwil Daemon tool
+description: How to install the Kwil daemon
 slug: /daemon/installation
 ---
 
-Until the main Kwil DB repository is open source, the `kwild` command line
-application may be downloaded from the Kwil binary release repository.
+The Kwil command line applications may be downloaded from the
+[latest GitHub release](https://github.com/kwilteam/kwil-db/releases/latest).
 
 ## Download the `kwild` Executable
 
-The Kwil Daemon (`kwild`) will be packaged together with Kwil Admin Tool (`kwil-admin`) and Kwil Cli (`kwil-cli`).
+The Kwil daemon (`kwild`) will be packaged together with Kwil node admin tool (`kwil-admin`) and Kwil CLI (`kwil-cli`).
 Download the [latest release](https://github.com/kwilteam/binary-releases/releases)
-for your platform.  Extract the `kwild` file from the archive and put it
+for your platform.  Extract these three executable files from the archive and put it
 into a folder that is in your `PATH` environment.
 
 ## Verify Installation
@@ -25,6 +25,116 @@ Open a terminal and run the following at the command prompt:
 kwild --version
 ```
 
-If installed correctly, it should display the version info match your downloaded version.
+If installed correctly, the displayed version info should match your downloaded version.
+
+## PostgreSQL
+
+Kwil DB is built on PostgreSQL, and requires an external PostgreSQL host running and configured for `kwild`.
+
+`kwild` can connect to `postgres`, the PostgreSQL process, using either TCP/IP or a UNIX socket.
+
+Kwil currently requires PostgreSQL 16, from at least v16.1. Support for future
+major versions will require an update to Kwil.
+
+### PostgreSQL Installation
+
+Standard PostgreSQL installers and operating system packages are supported,
+given a supported version. We provide Docker Compose service definitions with
+the required settings, roles, and databases pre-configured for ease of
+deployment and evaluation.
+
+The recommended options are as follows.
+
+1. System installation of `postgres`. This requires some manual configuration.
+2. The `postgres` Docker Compose service provided in the
+   `deployments/compose/postgres` folder in the [`kwil-db` source code repository](https://github.com/kwilteam/kwil-db).
+   This is pre-configured for `kwild` and is convenient for quick setup, but
+   may be less reliable or secure than a manually configured `postgres` instance.
+3. The `kwil` Docker Compose services provided in
+   `deployments/compose/kwil`. This launches both a `postgres` service
+   and a `kwild` service in "quickstart" mode with the `--autogen` flag. This is
+   only for testing and evaluation as it uses new randomly generate chain ID and
+   validator private key.
+
+Docker Engine and the Docker Compose plugin (or just Docker Desktop) are required for
+the two Docker options. With the Docker daemon running, either service may be
+started by running the following from the appropriate folder in the repository:
+
+```sh
+$ docker compose up -d
+```
+
+With the `-d` option, the service(s) will be started as background processes. To
+stop them or view logs, use the `docker container` commands or the Docker
+Desktop dashboard.
+
+:::info
+If a user-provided installation of PostgreSQL, such as an operating system
+`postgres` package, is used, the configuration must be changed as described in [PostgreSQL Configuration](#postgresql-configuration).
+:::
+
+
+#### System Install
+
+An operator may use a system installation of `postgres` from one of the
+[official PostgreSQL installers](https://www.postgresql.org/download/) or
+operating system packages managers.
+
+:::tip
+It is recommended to use a postgresql.org repository, such as the "pgdg" Ubuntu
+Apt Repository rather than the operating system's own packages.
+:::
+
+Be sure to install version-specific packages, such as `postgresql-16`, rather than
+a metapackage that will automatically install the latest major version, which may
+not be supported by Kwil.
+
+Finally, a system install of `postgres` requires making some configuration
+changes to support `kwild`. These are described in the [PostgreSQL Configuration](#postgresql-configuration) section.
+
+#### Docker Service
+
+In the [`kwil-db` source code repository](https://github.com/kwilteam/kwil-db),
+the `deployments/compose/postgres` folder contains a Docker Compose definition
+for a `postgres` service. This is convenient for quick setup of a Kwil node,
+but is less configurable than a system service.
+
+This service is pre-configured for `kwild`, and automatically creates a
+`"kwild"` database owned by a `"kwild"` role that will work with the default
+`kwild` settings.  However, this requires the Docker engine running and
+configured so that the `postgres` service has sufficient disk, CPU, and memory
+resources for demand of the application.
+
+:::note
+This service exposes `postgres` on port 5432 of the *host* machine so that it
+may be accessed for administrative purposes from the host machine via `psql`.
+This means that it will fail to start if there is a process on the host machine
+already listening on port 5432.
+:::
+
+A persistent Docker volume called `postgres_kwildb` will be created. If
+resetting `kwild`'s data folders, it is also necessary to delete this volume.
+
+#### Combined Quickstart Docker Services
+
+The `deployments/compose/postgres/kwil` folder of the `kwil-db` repository
+contains another Docker Compose service definition that is geared toward "quick
+start" use cases and development.  This services for both `kwild` and
+`postgres`, configured so that they will work together out-of-the-box with no
+additional configuration changes.
+
+With this approach, `kwild` is started with the `--autogen` flag, as used in the
+Quickstart guide for demonstrating Kwil DB use. This creates a new randomly
+generate chain, and is not intended for production use. However, the service
+definition may be used as a basis for a customized deployment.
+
+On start, this service definition will create a `testnode` folder in the same
+location as the `docker-compose.yml` file, and a persistent Docker volume called
+`kwil_pgkwil` for the `postgres` database cluster files.
+
+## PostgreSQL Configuration
+
+
+## Running `kwild`
 
 Continue to the [Using Kwild](/docs/daemon/kwild) page for running Kwil node.

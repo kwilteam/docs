@@ -15,7 +15,12 @@ In this tutorial, we will:
 4. Upgrade the second node to a validator.
 
 :::tip
-In order to do this tutorial, you will need to [install the `kwild` and `kwil-admin` binaries](<https://github.com/kwilteam/binary-releases/releases>).
+
+In order to do this tutorial, you will need to [install the `kwild` and
+`kwil-admin` binaries](<https://github.com/kwilteam/binary-releases/releases>),
+and ensure that a `postgres` instance is running and properly configured.
+See .. for setup instructions.
+
 :::
 
 ## Creating The First Node
@@ -28,6 +33,9 @@ To create the node's configuration files, a new `genesis.json`, and a new keypai
 kwil-admin setup init -o ./testnet/node0
 ```
 
+The `./testnet/node0` folder will be the "root" directory for `kwild` that
+contains the configuration files, including `genesis.json` and `config.toml`.
+
 ### Running The Node
 
 Using the `kwild` binary, we can begin running the network with this single node:
@@ -37,6 +45,11 @@ kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock
 ```
 
 The command then runs the local Kwil network, and begins producing blocks.
+
+:::note
+We override the default `app.admin-listen-addr` since for the purposes
+of this tutorial we will run two nodes on the same machine.
+:::
 
 ### Getting The Node's Info
 
@@ -145,7 +158,7 @@ If the requesting node's public key is unknown, all pending requests and their p
 And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
 ```bash
-$ kwil-admin validators list-validators --rpcserver unix:///tmp/node0.sock
+$ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
 Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}

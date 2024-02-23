@@ -12,6 +12,10 @@ slug: /node/quickstart
 To run either a single Kwil node, or a network of nodes, you will need to download the binaries.  Kwil releases
 binaries on [Github](<https://github.com/kwilteam/binary-releases/releases>).
 
+Kwil also requires a dedicate PostgreSQL host configured for `kwild`.
+
+See the Installation (link!) page for details.
+
 ## Single Node
 
 To run a single node, simply use the `kwild` binary with the `--autogen` flag.  This will automatically generate a
@@ -20,6 +24,12 @@ genesis file, private key, and more in the `~/.kwild` directory.
 ```bash
 kwild --autogen
 ```
+
+:::note
+The `--autogen` flag generates a random chain ID, which is the network's identity, as well as a new initial validator private key.
+The node will be the one initial validator.
+As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set.
+:::
 
 ## Multi-Node
 
@@ -32,6 +42,9 @@ To generate the configs for 3 validators in `./kwil-testnet`, run:
 ```bash
 kwil-admin setup testnet -v 3 --hostnames "localhost,localhost,localhost" --output-dir ./kwil-testnet
 ```
+
+This creates three nodes that can run on the same host for evaluation.
+A production network would comprise nodes on different machines, but with the same `genesis.json` file.
 
 ### Run Nodes
 
