@@ -7,6 +7,8 @@ description: Create a Kwil network, and add another node as a validator
 slug: /node/tutorial
 ---
 
+This tutorial will demonstrate how to create a local Kwil network on the same machine.
+
 In this tutorial, we will:
 
 1. Create a node and start a new network;
@@ -38,6 +40,12 @@ kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock
 ```
 
 The command then runs the local Kwil network, and begins producing blocks.
+
+:::tip
+The `--app.admin-listen-addr` flag is used to specify the UNIX socket that the admin RPC server will listen on. This is used to communicate with the node using the `kwil-admin` tool.
+
+By default the admin RPC server listens on `unix:///tmp/kwil_admin.sock`. This tutorial uses a different socket to avoid conflicts when running multiple nodes on the same machine (multiple nodes cannot use the same socket).
+:::
 
 ### Getting The Node's Info
 
@@ -158,34 +166,20 @@ To deploy a database to the network, we will need to locate the network chain ID
 
 ### Getting The Chain ID
 
-Use the `kwil-admin node status` command from earlier to get the chain ID:
+Get the chain ID from the node0 `genesis.json` file:
 
 ```bash
-$ kwil-admin node status --rpcserver unix:///tmp/node0.sock
-{
-  "node": {
-    # highlight-next-line
-    "chain_id": "kwil-chain-WfnGxpWd", # chain ID
-    "name": "MacBook-Pro-7.local",
-    ...
-  },
+$ grep chain_id ./testnet/node0/genesis.json
+  "chain_id": "kwil-chain-...",
 ```
 
 ### Getting The Node's HTTP Listen Address
 
-A node's HTTP listen address can be found in its `config.toml` file. To display the config information, use the `kwil-admin node dump-config` command:
+A node's HTTP listen address can be found in its `config.toml` file. To retrieve:
 
 ```bash
-$ kwil-admin node dump-config --rpcserver unix:///tmp/node0.sock
-RootDir = 'path/to/node0'
-
-[app]
-admin_listen_addr = 'unix:///tmp/node0.sock'
-grpc_listen_addr = 'localhost:50051'
-hostname = ''
-# highlight-next-line
-http_listen_addr = 'localhost:8080' # HTTP listen address
-...
+$ grep http_listen_addr  ./testnet/node0/config.toml
+http_listen_addr = "localhost:8080"
 ```
 
 ### Deploying The Database
