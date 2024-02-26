@@ -39,7 +39,7 @@ task tools # if you haven't already installed kwil-db dependencies
 mkdir extensions/sum
 ```
 
-In the new directory, paste the example code from the [Action Extensions Example] ##ADD LINK## into a new file called `sum.go`, or write your own extension.
+In the new directory, paste the example code from the [Action Extensions Example](/docs/extensions/actions/Tutorial#step-2-create-the-action-extension) into a new file called `sum.go`, or write your own extension.
 
 Your extension should look something like this:
 
@@ -63,16 +63,17 @@ const name = "sumext"
 
 To ensure that the extension is included in the compiled Kwil binary, you must import the extension into the `extensions/register.go` file. Add the following line to the `import` section of the file.
 
-Make sure to replace `YOUR_ORG_NAME` with your GitHub username or organization name you cloned the repository under:
+Make sure to replace `YOUR_ORG_NAME` with your GitHub username or organization name you cloned the repository under.
 
 ```go title="extensions/registry.go"
- package extensions
+package extensions
 
-import _ "github.com/kwilteam/YOUR_ORG_NAME/extensions/sum"
+// replace below with your extension path
+import _ "github.com/kwilteam/YOUR_ORG_NAME/extensions/sum" 
 ```
 
 :::tip
-For other types of extensions (e.g. authentication, oracle, resolution), you will also import the extension into this same `registry.go` file.
+For other types of extensions (e.g. authentication, oracle, resolution), you will also import the extension into this same `register.go` file.
 :::
 
 Next, compile the Kwil binary with the build command:
@@ -105,8 +106,17 @@ docker compose -f ./deployments/compose/postgres/docker-compose.yml up
 .build/kwild --autogen --app.pg_db_host localhost
 ```
 
-The Kwil node will start with the extension included! You can see how to call the action extension in the [Action Extensions Example] ##ADD LINK##.
+The Kwil node will start with the extension included!
 
 ## Conclusion
 
-You've successfully created and compiled a Kwil action extension! This process follows the same pattern for all extensions, so you can use this guide to create any type of extension you need. For more information on the different types of extensions, see the [Extensions Overview] ##ADD LINK##.
+You have successfully created and compiled a Kwil action extension! This process follows the same pattern for all extensions, so you can use this guide to create any type of extension you need.
+
+### Next Steps
+
+Dive into any of the below guides to learn more about how to build and use different types of extensions:
+
+- [Action Extensions](/docs/extensions/actions/overview)
+- [Authentication Extensions](/docs/extensions/authentication/overview)
+- [Oracle Extensions Overview](/extensions/oracle-extensions)
+- [Resolution Extensions Overview](/extensions/resolution-extensions)

@@ -3,7 +3,7 @@
     "position": 3,
     "link": {
       "type": "generated-index",
-      "description": "Packages for building extensions in different languages"
+      "description": "Learn how to write an action extension in Go and call it in Kuneiform."
     },
     "collapsed": true
 }

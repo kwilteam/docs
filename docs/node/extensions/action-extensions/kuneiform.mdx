@@ -13,7 +13,7 @@ To learn how to compile a Kwil node with an extension, refer to the [extension b
 
 ## Example
 
-As an example, we will be referring to a hypothetical `hello_world` extension. This extension has one method, `sayHello`, which takes a string as an argument and returns a string.
+As an example, we will refer to a hypothetical `hello_world` extension. This extension has one method, `sayHello`, which takes a string as an argument and returns a string.
 
 ## Importing The Extension
 
@@ -57,7 +57,7 @@ action insert_default_hello($id, $name) public {
 The above actions will call the `sayHello` method on the `good_afternoon` and `default_hello` extensions, passing the `$name` variable as the first argument.  The result of these calls will be stored in the `$message` variable, and can be used in the rest of the action.
 
 :::tip
-The reason why `good_afteroon` and `default_hello` provide different messages is because they were initialized with different values. This was configured in the extensions original [`ExtensionInitializer`](http://localhost:3000/docs/extensions/actions/overview#example) function.
+The reason why `good_afteroon` and `default_hello` provide different messages is because they were initialized with different values. This logic for this is in the extensions original [`ExtensionInitializer`](/docs/extensions/actions/overview#extensioninitializer) function.
 :::
 
 
