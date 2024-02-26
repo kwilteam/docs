@@ -1,0 +1,326 @@
+---
+sidebar_position: 2
+sidebar_label: "Example"
+id: oracles-ext-example
+title: Building Oracles
+description: Overview of the Oracles Extension
+slug: /extensions/oracles/example
+---
+
+In this tutorial, we will build a simple oracle that listens to EVM events, and credits an account when a log is heard.
+The oracle will be configured to listen to a specific contract address, and will listen to the EVM event signature `Credit(address,uint256)`
+
+This tutorial relies on the `credit_account` resolution type, which is supported in Kwil by default. A tutorial on how to recreate this resolution
+type from scratch can be found [here](/docs/node/extensions/resolutions/example).
+
+**This tutorial is for example purposes only, and should not be used in production.** Production implementations should account for transient network failures,
+subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation, please refer to the [Kwil EVM Oracle](<https://github.com/kwilteam/kwil-db/tree/main/extensions/oracles/eth_deposits>) that is
+included in all Kwil nodes by default.
+
+## Querying Ethereum
+
+To get started, we will first need a way to query the Ethereum blockchain for new events. We will use the popular `go-ethereum` library, which is the
+core implementation of Ethereum.
+
+```go
+package eth_credit
+
+import (
+	"context"
+	"math/big"
+	"strings"
+
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/kwilteam/kwil-db/extensions/oracles"
+	"github.com/kwilteam/kwil-db/extensions/resolutions/credit"
+)
+
+// processBlock gets all credit events for a range of blocks and processes them.
+// it will broadcast the credit events to the Kwil network.
+func processBlock(ctx context.Context, eventstore oracles.EventStore, client *ethclient.Client, blockNumber int64, contract ethcommon.Address) error {
+	// query the logs for the credit event
+	logs, err := client.FilterLogs(ctx, ethereum.FilterQuery{
+		ToBlock:   big.NewInt(blockNumber),
+		FromBlock: big.NewInt(blockNumber),
+		Addresses: []ethcommon.Address{contract},
+		Topics:    [][]ethcommon.Hash{{creditEventSignature}},
+	})
+	if err != nil {
+		return err
+	}
+
+	// get the abi, so that we can decode the logs+
+	eventABI, err := abi.JSON(strings.NewReader(contractABIStr))
+	if err != nil {
+		return err
+	}
+
+	for _, log := range logs {
+		data, err := eventABI.Unpack("Credit", log.Data)
+		if err != nil {
+			return err
+		}
+
+		// data[0] is the address of the account to credit
+		// data[1] is the amount to credit the account
+
+		account := data[0].(ethcommon.Address)
+		amount := data[1].(*big.Int)
+
+		resolution := credit.AccountCreditResolution{
+			Account: account.Bytes(),
+			Amount:  amount,
+            TxHash:  log.TxHash.Bytes(),
+		}
+
+		bts, err := resolution.MarshalBinary()
+		if err != nil {
+			return err
+		}
+
+		err = eventstore.Broadcast(ctx, credit.CreditAccountEventType, bts)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+```
+
+## Listening to Ethereum
+
+In order to listen to Ethereum, we will need to read in our local node's configuration, create a client, and listen for new blocks.
+If the configuration is not set, or if the configuration is invalid, we will immediately shut down the oracle. We will also stop the oracle
+if the context is cancelled.
+
+```go
+package eth_credit
+
+import (
+	"context"
+
+	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/kwilteam/kwil-db/extensions/oracles"
+)
+
+// EthOracle is an oracle that listens to ethereum events and broadcasts corresponding
+// account credits to the Kwil network.
+func EthOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
+	// we will first get the configs that the local node has for the eth_oracle extension
+	config, ok := service.ExtensionConfigs["eth_oracle"]
+	if !ok {
+		fmt.Println("eth_oracle: config not found")
+		return
+	}
+
+	rpcProvider, ok := config["rpc_provider"]
+	if !ok {
+		fmt.Println("eth_oracle: rpc_provider not found in config")
+		return
+	}
+
+	contractAddressStr, ok := config["contract_address"]
+	if !ok {
+		fmt.Println("eth_oracle: contract_address not found in config")
+		return
+	}
+	contractAddress := ethcommon.HexToAddress(contractAddressStr)
+
+	// we will now use go-ethereum to subscribe to new blocks
+	client, err := ethclient.Dial(rpcProvider)
+	if err != nil {
+		fmt.Println("eth_oracle: failed to connect to ethereum client:", err)
+		return
+	}
+	defer client.Close()
+
+	headers := make(chan *types.Header)
+	sub, err := client.SubscribeNewHead(ctx, headers)
+	if err != nil {
+		fmt.Println("eth_oracle: failed to subscribe to new block headers:", err)
+		return
+	}
+	defer sub.Unsubscribe()
+
+	// we will now listen for new blocks and process them
+	// if the context is cancelled, we will stop listening
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case err := <-sub.Err():
+			fmt.Println("eth_oracle: subscription error:", err)
+			return
+		case header := <-headers:
+			err := processBlock(ctx, eventstore, client, header.Number.Int64(), contractAddress)
+			if err != nil {
+				fmt.Println("eth_oracle: failed to process block:", err)
+			}
+		}
+	}
+}
+```
+
+## Configuration
+
+In order to run the oracle, each Kwil node will need to configure an Ethereum RPC provider and smart contract address to listen to.
+This can be done in each node's local `config.toml` file:
+
+```toml title="config.toml"
+# ...
+[app.extensions.eth_oracle]
+rpc_provider = "https://mainnet.infura.io/v3/YOUR_INFURA_API_KEY"
+contract_address = "0xYOUR_CONTRACT_ADDRESS"
+# ...
+```
+
+The values set here will be read in by the oracle, and used to connect to the Ethereum network and listen to the specified contract address.
+
+## Full Example
+
+<details>
+    <summary>credit.go</summary>
+
+```go
+package eth_credit
+
+import (
+	"context"
+	"fmt"
+	"math/big"
+	"strings"
+
+	"github.com/ethereum/go-ethereum"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	ethcommon "github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/kwilteam/kwil-db/common"
+	"github.com/kwilteam/kwil-db/extensions/oracles"
+	"github.com/kwilteam/kwil-db/extensions/resolutions/credit"
+)
+
+// EthOracle is an oracle that listens to ethereum events and broadcasts corresponding
+// account credits to the Kwil network.
+func EthOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
+	// we will first get the configs that the local node has for the eth_oracle extension
+	config, ok := service.ExtensionConfigs["eth_oracle"]
+	if !ok {
+		fmt.Println("eth_oracle: config not found")
+		return
+	}
+
+	rpcProvider, ok := config["rpc_provider"]
+	if !ok {
+		fmt.Println("eth_oracle: rpc_provider not found in config")
+		return
+	}
+
+	contractAddressStr, ok := config["contract_address"]
+	if !ok {
+		fmt.Println("eth_oracle: contract_address not found in config")
+		return
+	}
+	contractAddress := ethcommon.HexToAddress(contractAddressStr)
+
+	// we will now use go-ethereum to subscribe to new blocks
+	client, err := ethclient.Dial(rpcProvider)
+	if err != nil {
+		fmt.Println("eth_oracle: failed to connect to ethereum client:", err)
+		return
+	}
+	defer client.Close()
+
+	headers := make(chan *types.Header)
+	sub, err := client.SubscribeNewHead(ctx, headers)
+	if err != nil {
+		fmt.Println("eth_oracle: failed to subscribe to new block headers:", err)
+		return
+	}
+	defer sub.Unsubscribe()
+
+	// we will now listen for new blocks and process them
+	// if the context is cancelled, we will stop listening
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case err := <-sub.Err():
+			fmt.Println("eth_oracle: subscription error:", err)
+			return
+		case header := <-headers:
+			err := processBlock(ctx, eventstore, client, header.Number.Int64(), contractAddress)
+			if err != nil {
+				fmt.Println("eth_oracle: failed to process block:", err)
+			}
+		}
+	}
+}
+
+// contractABIStr is the ABI of the smart contract the oracle listens to.
+// It follows the Ethereum ABI JSON format, and matches the `Credit(address,uint256)` event signature.
+const contractABIStr = `[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"_from","type":"address"},{"indexed":false,"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"Credit","type":"event"}]`
+
+// creditEventSignature is the EVM event signature the oracle listens to.
+var creditEventSignature ethcommon.Hash = crypto.Keccak256Hash([]byte("Credit(address,uint256)"))
+
+// processBlock gets all credit events for a range of blocks and processes them.
+// it will broadcast the credit events to the network.
+func processBlock(ctx context.Context, eventstore oracles.EventStore, client *ethclient.Client, blockNumber int64, contract ethcommon.Address) error {
+	// query the logs for the credit event
+	logs, err := client.FilterLogs(ctx, ethereum.FilterQuery{
+		ToBlock:   big.NewInt(blockNumber),
+		FromBlock: big.NewInt(blockNumber),
+		Addresses: []ethcommon.Address{contract},
+		Topics:    [][]ethcommon.Hash{{creditEventSignature}},
+	})
+	if err != nil {
+		return err
+	}
+
+	// get the abi, so that we can decode the logs+
+	eventABI, err := abi.JSON(strings.NewReader(contractABIStr))
+	if err != nil {
+		return err
+	}
+
+	for _, log := range logs {
+		data, err := eventABI.Unpack("Credit", log.Data)
+		if err != nil {
+			return err
+		}
+
+		// data[0] is the address of the account to credit
+		// data[1] is the amount to credit the account
+
+		account := data[0].(ethcommon.Address)
+		amount := data[1].(*big.Int)
+
+		resolution := credit.AccountCreditResolution{
+			Account: account.Bytes(),
+			Amount:  amount,
+            TxHash:  log.TxHash.Bytes(),
+		}
+
+		bts, err := resolution.MarshalBinary()
+		if err != nil {
+			return err
+		}
+
+		err = eventstore.Broadcast(ctx, credit.CreditAccountEventType, bts)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+```
+
+</details>
