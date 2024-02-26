@@ -11,25 +11,13 @@ This tutorial will guide you through the process of creating an action extension
 
 ## Prerequisites
 
-Before you start, make sure you have the following installed:
-
-- [Docker](https://docs.docker.com/get-docker/)
-- [Go](https://golang.org/doc/install)
-- [Taskfile](https://taskfile.dev/#/installation)
-- Export `GOPATH/bin` to your `PATH` environment variable
-
-```bash
-export PATH=$PATH:$GOPATH/bin
-```
+Before you start, make sure you follow the [cloned kwil-db](/docs/extensions/quickstart#prerequisites) and have all the necessary tools installed.
 
 ## Step 1: Clone the repository
 
-Clone the [kwil-db] repository, install the dependencies, and create a new directory in the `extensions` directory.
+In your cloned `kwil-db` repository, create a new directory called `extensions/sum`.
 
 ```bash
-git clone
-cd kwil-db
-task tools
 mkdir extensions/sum
 ```
 
@@ -110,7 +98,7 @@ Follow the instructions in the extension [build quickstart](/docs/extensions/qui
 
 ## Step 4: Test the action extension
 
-To test the action extension, you can use the [kwil-cli](/docs/cli/overview) to deploy a schema with the action extension and call the `add` method.
+To test the action extension, you can use the [kwil-cli](/docs/category/cli) to deploy a schema with the action extension and call the `add` method.
 
 The kwil-cli was built when you ran the `task build` command in the previous step. You can find the binary in the `build` directory.
 
@@ -119,7 +107,7 @@ The kwil-cli was built when you ran the `task build` command in the previous ste
 By default the node is running on `http://localhost:8080`. First, you need to retrieve the chain-id for the network you are running.
 
 ```bash
-.build/kwil-cli utils chain-info
+.build/kwil-cli utils chain-info --kwil-provider http://localhost:8080
 # highlight-next-line
 Chain ID: kwil-chain-xxxxx
 ```
@@ -205,6 +193,6 @@ You are now ready to create action extensions!
 
 To learn more about the other extension types, check out the following documentation:
 
-- [Authentication Extensions](/extensions/authentication-extensions)
-- [Oracle Extensions](/extensions/oracle-extensions)
-- [Resolution Extensions](/extensions/resolution-extensions)
+- [Authentication Extensions](/docs/extensions/authentication/overview)
+- [Oracle Extensions](/docs/extensions/oracle/overview)
+- [Resolution Extensions](/docs/extensions/resolution/overview)
