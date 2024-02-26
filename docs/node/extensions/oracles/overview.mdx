@@ -57,8 +57,41 @@ Data can be written to the network using the `oracles.EventStore` interface. Dat
 The `Set`, `Get`, and `Delete` methods can be used to store and retrieve metadata about the data source. The `Set`, `Get`, and `Delete` methods
 are purely for the convenience of the oracle implementer, and in no way affect the network state.
 
+```go
+package oracles
+
+import "context"
+
+// EventStore is an interface that allows oracles to persist events, and track
+// arbitrary metadata about its external source. It should be used to signal
+// to the local Kwil node that the validator has seen an event, and that the
+// event should be broadcast to the network.
+// Events should be broadcast to the network using the Broadcast method.
+// The KV store data is never forwarded to the network, and is simply
+// for the convenience of the oracle implementer to persist metadata about
+// the data source.
+type EventStore interface {
+	// Broadcast broadcasts an event seen by the local node to the network.
+	// The eventType is a string that identifies the network should interpret the data.
+	// The eventType should directly correspond to a "resolution" type, implemented in
+	// the resolutions package. The data argument will be passed to the resolution's
+	// ResolveFunc if enough nodes vote on the resolution.
+	Broadcast(ctx context.Context, eventType string, data []byte) error
+
+	// Set sets a key-value pair in the KV store.
+	// The data is scoped to the local node, and is not broadcast to the network.
+	Set(ctx context.Context, key []byte, value []byte) error
+	// Get gets a value from the local node's KV store.
+	Get(ctx context.Context, key []byte) ([]byte, error)
+	// Delete deletes a value from the local node's KV store.
+	// The data is scoped to the local node, and is not broadcast to the network.
+	Delete(ctx context.Context, key []byte) error
+}
+
+```
+
 Data broadcasted must match a registered resolution type, found in `extensions/resolutions`. For more information on available resolutions, as well
-as how to register custom resolutions, see the Resolution Extensions section. TODO: link to resolution extensions once it exists.
+as how to register custom resolutions, see the [Resolution Extensions section](/docs/node/extensions/resolutions/overview).
 
 ```go
 package custom_oracle
@@ -89,7 +122,7 @@ func myOracle(ctx context.Context, service *common.Service, eventstore oracles.E
 
 Local configurations set by each individual node operator can be used to control the behavior of the oracle. This can be used to set RPC endpoints,
 API keys, or simply to enable or disable the oracle. Local configurations can be set in each node operator's `config.toml`.
-More information on how to set local node configurations can be found [here](<google.com>) TODO: add link.
+More information on how to set local node configurations can be found [here](</docs/daemon/config/settings>).
 
 Given the following `config.toml`:
 
