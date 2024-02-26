@@ -1,0 +1,132 @@
+---
+sidebar_position: 1
+sidebar_label: "Overview"
+id: oracles-ext-overview
+title: Building Oracles
+description: Overview of the Oracles Extension
+slug: /extensions/oracles/overview
+---
+
+Kwil nodes can be programmed to act as network oracles, automatically triggering network changes based on external events.
+This can be used to enforce payments from tokens originating on other networks, dictate validator weight based on an external staking system,
+or verifiably synchronize data from other networks within the Kwil network.
+
+## Oracle Function Signature
+
+Oracles can be implemented using the `OracleFunc` function signature defined in the `extensions/oracles` package. Each registered oracle function is called exactly once during
+startup, and is expected to block indefinitely. It will not be called if the local node is not a validator, or if it is still syncing with the network. If a non-validator
+node is promoted to a validator, the oracle function will be called immediately.
+
+The oracle function should clean up any resources and return when the context is canceled. The context is cancelled when the node is shutting down,
+or when the node is demoted from a validator.
+
+```go
+package custom_oracle
+
+import (
+    "context"
+
+    "github.com/kwilteam/kwil-db/extensions/oracles"
+    "github.com/kwilteam/kwil-db/common"
+)
+
+func init() {
+    err := oracles.RegisterOracle("my-oracle", myOracle)
+    if err != nil {
+        panic(err)
+    }
+}
+
+func myOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        // other logic
+        }
+    }
+}
+```
+
+_An example oracle capable of crediting native Kwil accounts from EVM events
+can be found [here](<https://github.com/kwilteam/kwil-db/tree/main/extensions/oracles/eth_deposits>)._
+
+## EventStore
+
+Data can be written to the network using the `oracles.EventStore` interface. Data is broadcasted using the `Broadcast` method.
+The `Set`, `Get`, and `Delete` methods can be used to store and retrieve metadata about the data source. The `Set`, `Get`, and `Delete` methods
+are purely for the convenience of the oracle implementer, and in no way affect the network state.
+
+Data broadcasted must match a registered resolution type, found in `extensions/resolutions`. For more information on available resolutions, as well
+as how to register custom resolutions, see the Resolution Extensions section. TODO: link to resolution extensions once it exists.
+
+```go
+package custom_oracle
+
+import (
+    "context"
+
+    "github.com/kwilteam/kwil-db/extensions/oracles"
+    "github.com/kwilteam/kwil-db/common"
+)
+
+func myOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
+    for {
+        select {
+        case <-ctx.Done():
+            return
+        case <-time.After(5 * time.Second):
+            err := eventstore.Broadcast(ctx, "event-type", []byte("hello world"))
+            if err != nil {
+                log.Println(err)
+            }
+        }
+    }
+}
+```
+
+## Configuration
+
+Local configurations set by each individual node operator can be used to control the behavior of the oracle. This can be used to set RPC endpoints,
+API keys, or simply to enable or disable the oracle. Local configurations can be set in each node operator's `config.toml`.
+More information on how to set local node configurations can be found [here](<google.com>) TODO: add link.
+
+Given the following `config.toml`:
+
+```toml title="config.toml"
+# ...
+[app.extensions.my_oracle]
+rpc_endpoint = "https://my-rpc-endpoint.com"
+# ...
+```
+
+Configurations can be accessed in the `common.Service` struct:
+
+```go
+package custom_oracle
+
+import (
+    "context"
+
+    "github.com/kwilteam/kwil-db/extensions/oracles"
+    "github.com/kwilteam/kwil-db/common"
+)
+
+func myOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
+    myOracleConfig, ok := service.ExtensionConfigs["my_oracle"]
+    if !ok {
+        // if no configuration is set, don't run the oracle
+        log.Println("my_oracle not configured")
+        return
+    }
+
+    rpcEndpoint, ok := myOracleConfig["rpc_endpoint"]
+    if !ok {
+        // if no rpc_endpoint is set, don't run the oracle
+        log.Println("rpc_endpoint not configured")
+        return
+    }
+
+    // other logic
+}
+```

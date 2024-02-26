@@ -1,0 +1,9 @@
+{
+    "label": "Resolution Extensions",
+    "position": 5,
+    "link": {
+      "type": "generated-index",
+      "description": "Building custom network resolution extensions"
+    },
+    "collapsed": true
+}
