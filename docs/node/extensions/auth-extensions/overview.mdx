@@ -11,15 +11,64 @@ Authentication Extensions allow you to customize the digital signature type used
 
 Authentication extensions are useful because they allow you to build Kwil networks that are compatible with multiple different blockchain ecosystems. For example, you could build a Kwil network that supports Ethereum signatures, Solana signatures, and Arweave signatures.
 
-Authentication extensions are written in Go and use the [`auth`](https://github.com/kwilteam/kwil-db/tree/main/extensions/auth) package in the `extensions/auth` directory.
+Authentication extensions use the `extensions/auth` package in kwil-db.
 
-## `auth` Package
+## Authentication Extension Overview
 
 To build an authentication extension, you must call the `RegisterAuthenticator` function and pass the extension name and a struct that implements the `auth.Authenticator` interface.
 
+### RegisterAuthenticator
+
+The `RegisterAuthenticator` function is used to register an authentication extension. It takes the extension name and a struct that implements the `auth.Authenticator` interface.
+
+```go title="ed25519_example.go"
+package ed25519
+
+import (
+    "crypto/ed25519"
+
+    "github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+const (
+    // Name is the name of the extension
+    Name = "ed25519_example"
+    // Singature size
+    SignatureSize = ed25519.SignatureSize
+)
+
+type Ed25519Authenticator struct{}
+
+func init() {
+    err := auth.RegisterAuthenticator(Name, Ed25519Authenticator{})
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+#### API Reference
+
+<details>
+<summary>RegisterAuthenticator API Reference</summary>
+
+```go
+func RegisterAuthenticator(name string, auth auth.Authenticator) error {}
+```
+
+- `name` is the name of the extension.
+- `authenticator` is a struct that implements the `auth.Authenticator` interface.
+
+</details>
+
 ### auth.Authenticator
 
+`auth.Authenticator` is an interface from the `kwil-db/core` directory that is used to verify signatures and get the identifier of a message sender. It is passed to the [`RegisterAuthenticator`](#registerauthenticator) function.
+
 The `auth.Authenticator` interface has two methods: `Verifier` and `Identifier`.
+
+<details>
+<summary>auth.Authenticator API Reference</summary>
 
 ```go
 type Authenticator interface {
@@ -30,36 +79,21 @@ type Authenticator interface {
 }
 ```
 
+</details>
+
 #### Verifier
 
 The `Verifier` interface has one method: `Verify`. Verifier is used to verify a signature against a public key and message.
 
-```go
-type Verifier interface {
-	Verify(sender, msg, signature []byte) error
-}
-```
-
-- `sender` is the public key of the signer in bytes.
-- `msg` is the message that was signed in bytes.
-- `signature` is the signature of the message in bytes.
-
-##### Example
-
 :::note
 The example below implements the Ed25519 signature type, which is already supported by Kwil. This is just an example to show you how to implement the `auth.Authenticator` interface.
 :::
-
-<details>
-<summary>ed25519_example.go</summary>
 
 ```go title="ed25519_example.go"
 package ed25519
 
 import (
     "crypto/ed25519"
-    "errors"
-    "fmt"
 
     "github.com/kwilteam/kwil-db/extensions/auth"
 )
@@ -74,6 +108,10 @@ const (
 type Ed25519Authenticator struct{}
 
 func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
+    if len(sender) != PublicKeySize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", sender, len(sender))
+    }
+
     if len(signature) != SignatureSize {
         return fmt.Errorf("invalid signature size. expected %d, got %d", SignatureSize, len(signature))
     }
@@ -86,6 +124,21 @@ func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
 }
 ```
 
+##### API Reference
+
+<details>
+<summary>Verifier API Reference</summary>
+
+```go
+type Verifier interface {
+	Verify(sender, msg, signature []byte) error
+}
+```
+
+- `sender` is the public key of the signer in bytes.
+- `msg` is the message that was signed in bytes.
+- `signature` is the signature of the message in bytes.
+
 </details>
 
 #### Identifier
@@ -94,27 +147,13 @@ The `Identifier` method returns the string identifier for a message sender.
 
 The identifier is the unique identifier for the signer. Identifiers are usually public keys, although they are not required to be. For example, for Ethereum, the identifier is the wallet address in hex format (not the Secp256k1 public key).
 
-```go
-Identifier(sender []byte) (string, error)
-```
-
-- `sender` is the public key of the signer in bytes.
-
-##### Example
-
-<details>
-<summary>ed25519_example.go</summary>
-
 ```go title="ed25519_example.go"
 package ed25519
 
 import (
-    "crypto/ed25519"
-    "errors"
-    "fmt"
-    "hex"
-
-    "github.com/kwilteam/kwil-db/extensions/auth"
+	"crypto/ed25519"
+	"encoding/hex"
+	"fmt"
 )
 
 const (
@@ -124,11 +163,7 @@ const (
     SignatureSize = ed25519.SignatureSize
 )
 
-...
-/*
-    Code from the previous example
-*/
-...
+type Ed25519Authenticator struct{}
 
 func (Ed25519Authenticator) Identifier(publicKey []byte) (string, error) {
     if(len(publicKey) != ed25519.PublicKeySize) {
@@ -137,58 +172,18 @@ func (Ed25519Authenticator) Identifier(publicKey []byte) (string, error) {
 
     return hex.EncodeToString(publicKey), nil
 }
-
 ```
 
-</details>
-
-### RegisterAuthenticator
-
-The `RegisterAuthenticator` function is used to register an authentication extension. It takes the extension name and a struct that implements the `auth.Authenticator` interface.
-
-```go
-func RegisterAuthenticator(name string, auth auth.Authenticator) error {}
-```
-
-- `name` is the name of the extension.
-- `authenticator` is a struct that implements the `auth.Authenticator` interface.
-
-#### Example
+##### API Reference
 
 <details>
-<summary>ed25519_example.go</summary>
+<summary>Identifier API Reference</summary>
 
-```go title="ed25519_example.go"
-package ed25519
-
-import (
-    "crypto/ed25519"
-    "errors"
-    "fmt"
-    "hex"
-
-    "github.com/kwilteam/kwil-db/extensions/auth"
-)
-
-const (
-    // Name is the name of the extension
-    Name = "ed25519_example"
-    // Singature size
-    SignatureSize = ed25519.SignatureSize
-)
-
-...
-/*
-    Code from the previous examples
-*/
-
-func init() {
-    err := auth.RegisterAuthenticator(Name, Ed25519Authenticator{})
-    if err != nil {
-        panic(err)
-    }
-}
+```go
+Identifier(sender []byte) (string, error)
 ```
+
+- `sender` is the public key of the signer in bytes.
 
 </details>
 

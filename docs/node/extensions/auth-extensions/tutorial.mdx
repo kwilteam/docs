@@ -11,25 +11,19 @@ This tutorial will guide you through the process of creating and using an authen
 
 ## Prerequisites
 
-Before you start, make sure you follow the [kwil-db clone](/docs/extensions/quickstart#prerequisites) instructions and have all the necessary tools installed.
+Make sure you follow the [kwil-db clone](/docs/extensions/quickstart#prerequisites) instructions and have all the necessary tools installed.
 
 Additionally, you will need:
 
 - [Node.js](https://nodejs.org/en/download/) - v18 or higher
 
-## Step 1: Make ed25519 directory
+## Step 1: Create the extension
 
-In your cloned `kwil-db` repository, create a new directory called `extensions/ed25519_demo`.
+Create a new directory in the `kwil-db/extensions` directory called `ed25519_demo`, and add a new file called `ed25519_example.go`.
 
-```bash
-mkdir extensions/ed25519_demo
-```
+### Verify ED25519 signatures
 
-## Step 2: Create the extension
-
-In the `extensions/ed25519_demo` directory, create a new file called `ed25519_example.go` and add the following code.
-
-Make sure to replace `YOUR_ORG_NAME` with your organization name or username that you used to clone the repository.
+The first step is to implement the `Verify` method that will verify the ED25519 signature.
 
 ```go title="ed25519_example.go"
 package ed25519_demo
@@ -37,9 +31,123 @@ package ed25519_demo
 import (
     "crypto/ed25519"
     "fmt"
-	"encoding/hex"
+	  "encoding/hex"
 
-    "github.com/YOUR_ORG_NAME/kwil-db/extensions/auth"
+    "github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+const (
+    // Public Key Size
+    PublicKeySize = ed25519.PublicKeySize
+    // Signature Size
+    SignatureSize = ed25519.SignatureSize
+)
+
+type Ed25519Authenticator struct{}
+
+func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
+    if len(sender) != PublicKeySize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", sender, len(sender))
+    }
+
+    if len(signature) != SignatureSize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", SignatureSize, len(signature))
+    }
+
+    if !ed25519.Verify(sender, msg, signature) {
+        return fmt.Errorf("signature verification failed")
+    }
+
+    return nil
+}
+```
+
+### Identifier
+
+The next step is to implement the `Identifier` method that will return a unique identifier for the signer. For ED25519, we will use the public key as the identifier.
+
+```go title="ed25519_example.go"
+package ed25519_demo
+
+import (
+    "crypto/ed25519"
+	"fmt"
+)
+
+const (
+    // Name is the name of the extension
+    Name = "ed25519_example"
+    // Singature size
+    SignatureSize = ed25519.SignatureSize
+	// Public key size
+	PublicKeySize = ed25519.PublicKeySize
+)
+
+type Ed25519Authenticator struct{}
+
+func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
+    if len(sender) != PublicKeySize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", sender, len(sender))
+    }
+
+    if len(signature) != SignatureSize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", SignatureSize, len(signature))
+    }
+
+    if !ed25519.Verify(sender, msg, signature) {
+        return fmt.Errorf("signature verification failed")
+    }
+
+    return nil
+}
+```
+
+### Register the extension
+
+The final step is to register the extension with the `auth` package. This is called in the `init` function of the ed25519_demo package.
+
+```go title="ed25519_example.go"
+package ed25519_demo
+
+import (
+    "crypto/ed25519"
+    "fmt"
+	  "encoding/hex"
+
+    "github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+const (
+    // Name is the name of the extension
+    Name = "ed25519_example"
+)
+
+type Ed25519Authenticator struct{}
+
+func init() {
+    err := auth.RegisterAuthenticator(Name, Ed25519Authenticator{})
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+### Full Example
+
+Below is the full example of the `ed25519_example.go` to create the extension. You can copy and paste this example for the build process in the next step.
+
+<details>
+<summary>ed25519_example.go</summary>
+
+```go title="ed25519_example.go"
+package ed25519_demo
+
+import (
+    "crypto/ed25519"
+    "fmt"
+	  "encoding/hex"
+
+    "github.com/kwilteam/kwil-db/extensions/auth"
 )
 
 const (
@@ -85,11 +193,13 @@ func (Ed25519Authenticator) Identifier(publicKey []byte) (string, error) {
 }
 ```
 
-## Step 3: Compile and Start Node
+</details>
+
+## Step 2: Compile and Start Node
 
 Follow the instructions in the extension [build quickstart](/docs/extensions/quickstart#compiling-the-extension) to compile the extension and start the node.
 
-## Step 4: Use the extension in client app
+## Step 3: Use the extension in client app
 
 ### Repo setup
 

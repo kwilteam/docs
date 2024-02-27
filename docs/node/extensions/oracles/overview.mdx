@@ -11,9 +11,48 @@ Kwil nodes can be programmed to act as network oracles, automatically triggering
 This can be used to enforce payments from tokens originating on other networks, dictate validator weight based on an external staking system,
 or verifiably synchronize data from other networks within the Kwil network.
 
-## Oracle Function Signature
+Oracle extensions use the `extensions/oracles` package in kwil-db.
 
-Oracles can be implemented using the `OracleFunc` function signature defined in the `extensions/oracles` package. Each registered oracle function is called exactly once during
+## Oracle Extension Overview
+
+To build an oracle extension, you must implement the `OracleFunc` function signature, and register the oracle using the `RegisterOracle` function.
+
+### RegisterOracle Function
+
+Oracles are registered using the `RegisterOracle` in the package's init function. The first argument is the unique name for the oracle, and the second argument is the [oracle function](#oracle-function-signature).
+
+```go
+package custom_oracle
+
+import (
+    "github.com/kwilteam/kwil-db/extensions/oracles"
+)
+
+func init() {
+    err := oracles.RegisterOracle("my-oracle", myOracle)
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+#### API Reference
+
+<details>
+<summary>RegisterOracle API Reference</summary>
+
+```go
+func RegisterOracle(name string, oracle OracleFunc) error {}
+```
+
+- `name` (string): The unique name for the oracle.
+- `oracle` (OracleFunc): The oracle function to be called when the node is promoted to a validator.
+
+</details>
+
+## Oracle Function
+
+Oracles can be implemented using the `OracleFunc` function signature. Each registered oracle function is called exactly once during
 startup, and is expected to block indefinitely. It will not be called if the local node is not a validator, or if it is still syncing with the network. If a non-validator
 node is promoted to a validator, the oracle function will be called immediately.
 
@@ -30,13 +69,6 @@ import (
     "github.com/kwilteam/kwil-db/common"
 )
 
-func init() {
-    err := oracles.RegisterOracle("my-oracle", myOracle)
-    if err != nil {
-        panic(err)
-    }
-}
-
 func myOracle(ctx context.Context, service *common.Service, eventstore oracles.EventStore) {
     for {
         select {
@@ -50,6 +82,21 @@ func myOracle(ctx context.Context, service *common.Service, eventstore oracles.E
 
 _An example oracle capable of crediting native Kwil accounts from EVM events
 can be found [here](<https://github.com/kwilteam/kwil-db/tree/main/extensions/oracles/eth_deposits>)._
+
+#### API Reference
+
+<details>
+<summary>OracleFunc API Reference</summary>
+
+```go
+type OracleFunc func(ctx context.Context, service *common.Service, eventstore EventStore)
+```
+
+- `ctx` (context.Context): The Go context type.
+- `service` (*common.Service): The service struct, which provides access to general application information to extensions (e.g. logger).
+- `eventstore` (EventStore): The [event store interface](#eventstore), which allows oracles to persist events and track arbitrary metadata about its external source.
+
+</details>
 
 ## EventStore
 
