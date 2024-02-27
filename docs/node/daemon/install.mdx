@@ -14,7 +14,7 @@ The Kwil command line applications may be downloaded from the
 
 The Kwil daemon (`kwild`) will be packaged together with Kwil node admin tool (`kwil-admin`) and Kwil CLI (`kwil-cli`).
 Download the [latest release](https://github.com/kwilteam/binary-releases/releases)
-for your platform.  Extract these three executable files from the archive and put it
+for your platform.  Extract these three executable files from the archive and put them
 into a folder that is in your `PATH` environment.
 
 ## Verify Installation
@@ -31,16 +31,14 @@ If installed correctly, the displayed version info should match your downloaded 
 
 Kwil DB is built on PostgreSQL, and requires an external PostgreSQL host running and configured for `kwild`.
 
-`kwild` can connect to `postgres`, the PostgreSQL process, using either TCP/IP or a UNIX socket.
-
-Kwil currently requires PostgreSQL 16, from at least v16.1. Support for future
-major versions will require an update to Kwil.
+`kwild` currently requires PostgreSQL 16, from at least v16.1. Future major
+versions will require an update to Kwil.
 
 ### PostgreSQL Installation
 
 Standard PostgreSQL installers and operating system packages are supported,
-given a supported version. We provide Docker Compose service definitions with
-the required settings, roles, and databases pre-configured for ease of
+given a supported version. We also provide Docker Compose service definitions
+with the required settings, roles, and databases pre-configured for ease of
 deployment and evaluation.
 
 The recommended options are as follows.
@@ -73,6 +71,9 @@ If a user-provided installation of PostgreSQL, such as an operating system
 `postgres` package, is used, the configuration must be changed as described in [PostgreSQL Configuration](#postgresql-configuration).
 :::
 
+If you start the Docker service from `deployments/compose/postgres`, you may
+skip to [Running `kwild`](#running-kwild).
+
 
 #### System Install
 
@@ -80,14 +81,20 @@ An operator may use a system installation of `postgres` from one of the
 [official PostgreSQL installers](https://www.postgresql.org/download/) or
 operating system packages managers.
 
-:::tip
-It is recommended to use a postgresql.org repository, such as the "pgdg" Ubuntu
-Apt Repository rather than the operating system's own packages.
-:::
-
 Be sure to install version-specific packages, such as `postgresql-16`, rather than
 a metapackage that will automatically install the latest major version, which may
 not be supported by Kwil.
+
+:::tip
+It is recommended to use a postgresql.org repository, such as the ["pgdg" Ubuntu
+Apt Repository](https://wiki.postgresql.org/wiki/Apt) rather than the operating system's own packages.
+
+Also, be sure any unattended upgrades exclude the PostgreSQL package to prevent
+it from restarting while in used. For instance, on Debian-based systems,
+configure
+[`Unattended-Upgrade::Package-Blacklist`](https://help.ubuntu.com/community/AutomaticSecurityUpdates#Using_the_.22unattended-upgrades.22_package).
+with an entry for `"postgresql-*"`.
+:::
 
 Finally, a system install of `postgres` requires making some configuration
 changes to support `kwild`. These are described in the [PostgreSQL Configuration](#postgresql-configuration) section.
@@ -115,9 +122,9 @@ already listening on port 5432.
 A persistent Docker volume called `postgres_kwildb` will be created. If
 resetting `kwild`'s data folders, it is also necessary to delete this volume.
 
-#### Combined Quickstart Docker Services
+#### Unified `kwild` + `postgres` Quickstart Services
 
-The `deployments/compose/postgres/kwil` folder of the `kwil-db` repository
+The `deployments/compose/kwil` folder of the `kwil-db` repository
 contains another Docker Compose service definition that is geared toward "quick
 start" use cases and development.  This services for both `kwild` and
 `postgres`, configured so that they will work together out-of-the-box with no
@@ -132,8 +139,75 @@ On start, this service definition will create a `testnode` folder in the same
 location as the `docker-compose.yml` file, and a persistent Docker volume called
 `kwil_pgkwil` for the `postgres` database cluster files.
 
-## PostgreSQL Configuration
+### PostgreSQL Configuration
 
+When using one of the Docker Compose service definitions described in the
+previous section, no changes to the `postgres` process configuration are
+required, **skip this section** and proceed to [Running `kwild`](#running-kwild).
+
+If using any other installation of PostgreSQL such as from an operating system
+package manager, it is necessary to change a few settings in the
+`postgresql.conf` file. Once reconfigured, it may also be necessary to create a
+new database and "role" to match the `kwild`'d configuration.
+
+#### PostgreSQL Settings
+
+`kwild` requires some changes to the default `postgres` configuration:
+
+- `wal_level` set to `"logical"` to enable logical replication functionality
+- `max_wal_senders` at least `10`
+- `max_replication_slots` at least `10`
+- `max_prepared_transactions` at least 2 for two-phase commit capability
+
+In addition to the above non-default settings, `kwild` will also verify the
+following settings, which are satisfied by `postgres` defaults:
+
+- `synchronous_commit = on`
+- `fsync = on`
+- `max_connections` at least `50` (the default is usually 100)
+
+:::tip
+It is recommended to enable data checksums on the database cluster.
+See the [documentation](https://www.postgresql.org/docs/current/checksums.html) for more information.
+The provided Docker Compose services do this automatically.
+:::
+
+#### PostgreSQL Initialization
+
+Depending on `kwild` configuration, is may be necessary to create a `postgres`
+[role](https://www.postgresql.org/docs/16/user-manag.html) and
+[database](https://www.postgresql.org/docs/16/manage-ag-overview.html).
+
+The relevant `kwild` settings are:
+
+- `app.pg-db-host` is the host name for the `postgres` server. Default is
+  127.0.0.1, but may also be a path to a UNIX socket such as `/var/run/postgresql`.
+  Most PostgreSQL packages are configured to listen on both by default.
+- `app.pg_db_port` is the TCP port for the `postgres` server. Default is 5432.
+  This setting is ignored if a UNIX socket is used for `app.pg-db-host`.
+- `app.pg_db_user` is the name of the role (like a user). Default is `kwild`.
+- `app.pg_db_pass` is the password for the role specified by `app.pg_db_user`.
+  Default is unset. Required if a password is set for the role, and not using
+  "trust" authentication.
+
+Use the `psql` command to connect to `postgres` and create the specified role and
+database. For example, to create a "superuser" role named `"kwild"` with the
+password `"kwild"`, and a database called `"kwild"` owned by that role:
+
+```sql
+CREATE USER kwild WITH PASSWORD 'kwild' SUPERUSER REPLICATION;
+CREATE DATABASE kwild OWNER kwild;
+```
+
+:::warning
+`kwild` currently requires a "superuser" role to perform various
+tasks that require elevated privileges, such as creating triggers and
+publications for logical replication. The `postgres` database cluster
+should be dedicated to `kwild`, and should not be used for any other purpose.
+:::
+
+For more information about authentication configuration please see
+the official [PostgreSQL documentation](https://www.postgresql.org/docs/16/auth-pg-hba-conf.html).
 
 ## Running `kwild`
 
