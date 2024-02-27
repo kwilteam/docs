@@ -27,7 +27,15 @@ This section holds configurations specific to the Kwil application's operation.
 
 - `admin_listen_addr`: This variable specifies the address where the daemon's admin gRPC server listens for connections. The default is `localhost:50151`.
 
-- `sqlite_file_path`: This variable specifies the path for SQLite files. If left unspecified, it defaults to `data/kwil.db/` relative to the root directory.
+- `pg_db_host`: PostgreSQL database host (UNIX socket path or IP address with no port). The default is `/var/run/postgresql`.
+
+- `pg_db_port`: PostgreSQL database port (may be omitted for UNIX socket hosts). The default is `5432`.
+
+- `pg_db_user`: PostgreSQL database user (should be a "superuser"). The default is `kwild`.
+
+- `pg_db_pass`: PostgreSQL database pass (may be omitted for some pg_hba.conf configurations).
+
+- `pg_db_name`: PostgreSQL database name (override database name). The default is `kwild`.
 
 - `private_key_path`: This variable specifies the path for node's private key. If left unspecified, it defaults to `./private_key` relative to the root directory.
 
@@ -124,8 +132,6 @@ Here is an example of a `config.toml` file with complete configuration:
 #   |   |- data/          (blockchain files: blockstore.db, state.db, etc)
 #   |   |- info/
 #   |- application/
-#   |- data
-#   |   |- kwild.db/
 #   |- signing/
 
 # Required files: config.toml, private_key, and genesis files
@@ -169,8 +175,20 @@ admin_listen_addr = "localhost:50151"
 # List of Extension endpoints to be enabled ex: ["localhost:50052", "169.198.102.34:50053"]
 extension_endpoints = []
 
-# KWILD Sqlite database file path
-sqlite_file_path = "data/kwild.db"
+# PostgreSQL database host (UNIX socket path or IP address with no port)
+pg_db_host = "/var/run/postgresql"
+
+# PostgreSQL database port (may be omitted for UNIX socket hosts)
+pg_db_port = "5432"
+
+# PostgreSQL database user (should be a "superuser")
+pg_db_user = "kwild"
+
+# PostgreSQL database pass (may be omitted for some pg_hba.conf configurations)
+pg_db_pass = ""
+
+# PostgreSQL database name (override database name, default is "kwild")
+pg_db_name = "kwild"
 
 # The path to a file containing certificate that is used to enable TLS on the gRPC server.
 # Might be either absolute path or path related to the kwild root directory.
