@@ -54,6 +54,9 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 
  `app_hash`: The app hash is a hash generated from the initial application state.
 
+### Genesis Allocs
+ `alloc`: This field specifies the Kwil accounts and their initial balances at the genesis. The `alloc` field is optional and is used to pre-fund Kwil accounts with balance. This is a JSON dictionary object where the keys are account `identifiers` of type hexadecimal bytes and the values are the account balances. The Kwil account corresponding to an ethereum account is it's address without the "0x" prefix, whereas for ed25519 accounts, it is the public key in hex format.
+
 ## Advanced Configurations
 
 ### Consensus Params
@@ -92,6 +95,10 @@ Below is an example of a genesis file with complete configuration:
   "genesis_time": "2023-08-28T22:24:04.513472Z",
   "chain_id": "kwil-chain-RQMl2F",
   "initial_height": "0",
+  "alloc": {
+    "247620d8b3e92ac21b74bbda3e51d59de5b9a210b740bba0d3683579ddf6d8dd": 10000000000000000000000,
+    "c89d42189f0450c2b2c3c61f58ec5d628176a1e7": 10000000000000000000000,
+  }
   "consensus_params": {
     "block": {
       "max_bytes": "22020096",
