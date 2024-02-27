@@ -9,32 +9,53 @@ slug: /extensions/actions/overview
 
 Action extensions allow you to implement arbitrary logic directly into Kwil's smart contract language, [Kuneiform](/docs/category/kuneiform). This allows you to implement custom logic that is executed with each action that is performed on a Kwil database.
 
-Action extensions are implemented using the `extensions/actions` package in the [`kwilteam/kwil-db`](https://github.com/kwilteam/kwil-db/blob/main/extensions/actions/actions.go) repo.
+Action extensions use the `extensions/actions` package in kwil-db.
 
-## `actions` package
+## Actions Extension Overview
 
-To build an action extension, you must call the `ExtensionInitializer` function that returns the `ExtensionNamespace` interface to the `RegisterExtension` function.
+To build an action extension, you must pass an `ExtensionInitializer` function that returns the `ExtensionNamespace` interface to the `RegisterExtension` function.
+
+### RegisterExtension
+
+Action extensions are registered using the `RegisterExtension` function in the `extensions/actions` package. The first argument is the name of the extension, and the second argument is the `ExtensionInitializer` function.
+
+```go title="hello_world.go"
+package helloWorld
+
+import (
+    "github.com/kwilteam/kwil-db/extensions/actions"
+)
+
+const name = "hello_world"
+
+func init() {
+    err := actions.RegisterExtension(name, InitializeHelloWorld)
+    if err != nil {
+        panic(err)
+    }
+}
+
+```
+
+#### API Reference
+
+<details>
+<summary>RegisterExtension API Reference</summary>
+
+```go
+func RegisterExtension(name string, ext ExtensionInitializer) error {}
+```
+
+Register extension is the API to register an action extension with the Kwil Daemon.
+
+- `name` - The name of the extension.
+- `ext` - The [`ExtensionInitializer`](#extensioninitializer) function.
+
+</details>
 
 ### ExtensionInitializer
 
-```go
-type ExtensionInitializer func(ctx *DeploymentContext, service *common.Service, metadata map[string]string) (ExtensionNamespace, error)
-```
-
-ExtensionInitializer is a function that initializes an extension.
-
-- `ctx` - The [DeploymentContext](#deploymentcontext). Includes information about the schema the extension is being used in.
-- `service` - The [Service](#commonservice). Provides access to general application information to extensions (e.g. logger).
-- `metadata` - The metadata for the extension.
-
-Returns the extension namespace and an error if the extension fails to initialize.
-
-#### Example
-
-An example implementation of an `ExtensionInitializer` function is below:
-
-<details>
-    <summary>hello_world.go</summary>
+ExtensionInitializer handles extension metadata and returns the extension namespace. Extension initializer is called each time the extension is used in a schema and each time a node is started. Metadata can be used to pass a variable from the schema to the extension (e.g. a database identifier, smart contract address, etc). 
 
 ```go title="hello_world.go"
 package helloworld
@@ -45,6 +66,12 @@ import (
     "github.com/kwilteam/kwil-db/extensions/actions"
     "github.com/kwilteam/kwil-db/common"
 )
+
+...
+/*
+    Code from other examples
+*/
+...
 
 type HelloWorldExtension struct {
     greeting string
@@ -63,35 +90,30 @@ func InitializeHelloWorld(ctx *actions.DeploymentContext, service *common.Servic
 }
 ```
 
+:::tip
+To see how this initialize function is called in Kuneiform, see the [in Kuneiform](/docs/extensions/actions/kuneiform#importing-the-extension) section.
+:::
+
+#### API Reference
+
+<details>
+<summary>ExtensionInitializer API Reference</summary>
+
+```go
+type ExtensionInitializer func(ctx *DeploymentContext, service *common.Service, metadata map[string]string) (ExtensionNamespace, error)
+```
+
+- `ctx` - The [DeploymentContext](#deploymentcontext). Includes information about the schema the extension is being used in.
+- `service` - The [Service](#commonservice). Provides access to general application information to extensions (e.g. logger).
+- `metadata` - The metadata for the extension.
+
+Returns the extension namespace and an error if the extension fails to initialize.
+
 </details>
 
 ### ExtensionNamespace
 
-```go
-type ExtensionNamespace interface {
-	// Call executes the requested method of the extension.
-	// It is up to the extension instance implementation to determine
-	// if a method is valid, and to subsequently decode the arguments.
-	// The arguments passed in as args, as well as returned, are scalar values.
-	Call(scoper *ProcedureContext, app *common.App, method string, inputs []any) ([]any, error)
-}
-```
-
-ExtensionNamespace is the shape of the interface that the `ExtensionInitializer` function should return.
-
-- `Call` - Executes the requested method of the extension. It is up to the extension instance implementation to determine if a method is valid, and to subsequently decode the arguments. 
-    - `scoper` - The [`ProcedureContext`](#procedurecontext). Contrains information about the action caller, the DBID, etc.
-    - `app` - The [`App`](#commonapp). Provides access to the database to query and/or modify data.
-    - `method` - The method to call.
-    - `inputs` - The inputs to the method.
-
-
-#### Example
-
-An example implementation of an `ExtensionNamespace` interface is below:
-
-<details>
-    <summary>hello_world.go</summary>
+ExtensionNamespace is the interface that the `ExtensionInitializer` function should return. It has one method, `Call`, which is called each time an extension method is called in a [Kuneiform action](/docs/kuneiform/dml#action-declaration-in-kuneiform-language).
 
 ```go title="hello_world.go"
 package helloWorld
@@ -102,12 +124,6 @@ import (
     "github.com/kwilteam/kwil-db/extensions/actions"
     "github.com/kwilteam/kwil-db/common"
 )
-
-...
-/*
-    Code from the previous example
-*/
-...
 
 func (h *HelloWorldExtension) Call(scoper *actions.ProcedureContext, app *common.App, method string, inputs []any) ([]any, error) {
     switch method {
@@ -138,57 +154,32 @@ func (h *HelloWorldExtension) sayHello(inputs []any) ([]any, error) {
 }
 ```
 
-</details>
-
-
-
-### RegisterExtension
-
-```go
-func RegisterExtension(name string, ext ExtensionInitializer) error {}
-```
-
-Register extension registers an extension with the given name and extension initializer.
-
-- `name` - The name of the extension.
-- `ext` - The [`ExtensionInitializer`](#extensioninitializer) function.
-
-Returns an error if the extension is already registered.
-
-#### Example
-
-An example of registering an extension is below:
+#### API Reference
 
 <details>
-    <summary>hello_world.go</summary>
+<summary>ExtensionNamespace API Reference</summary>
 
-```go title="hello_world.go"
-package helloWorld
-
-import (
-    "github.com/kwilteam/kwil-db/extensions/actions"
-)
-
-...
-/*
-    Code from the previous examples
-*/
-
-const name = "hello_world"
-
-func init() {
-    err := actions.RegisterExtension(name, InitializeHelloWorld)
-    if err != nil {
-        panic(err)
-    }
+```go
+type ExtensionNamespace interface {
+	// Call executes the requested method of the extension.
+	// It is up to the extension instance implementation to determine
+	// if a method is valid, and to subsequently decode the arguments.
+	// The arguments passed in as args, as well as returned, are scalar values.
+	Call(scoper *ProcedureContext, app *common.App, method string, inputs []any) ([]any, error)
 }
 ```
 
+- `Call` - Executes the requested method of the extension. It is up to the extension instance implementation to determine if a method is valid, and to subsequently decode the arguments. 
+    - `scoper` - The [`ProcedureContext`](#procedurecontext). Contrains information about the action caller, the DBID, etc.
+    - `app` - The [`App`](#commonapp). Provides access to the database to query and/or modify data.
+    - `method` - The name method to call.
+    - `inputs` - The inputs to the method.
+
 </details>
 
-## Misc Types
+## Actions Types
 
-Below are the types that are used in the `actions` package. 
+Below are additional references for types that are used in the `actions` package. 
 
 Additional types that are nested within the below types can be found in the [actions package](https://github.com/kwilteam/kwil-db/blob/main/extensions/actions/actions.go).
 

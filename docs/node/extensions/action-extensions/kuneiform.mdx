@@ -17,8 +17,10 @@ As an example, we will refer to a hypothetical `hello_world` extension. This ext
 
 ## Importing The Extension
 
-To import an extension in a Kuneiform schema, you need to use its declared name (which is defined in the extension itself).  With this, you can pass any initialization values, as well
+To import an extension in a Kuneiform schema, you need to use its declared name (which is defined in the extension itself).  With this, you can pass any metadata values, as well
 as an alias for this instance of the extension.
+
+The metadata values are handled in the extension's [`ExtensionInitializer`](/docs/extensions/actions/overview#extensioninitializer) function.  
 
 ```typescript
 use hello_world {

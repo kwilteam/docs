@@ -13,17 +13,14 @@ This tutorial will guide you through the process of creating an action extension
 
 Before you start, make sure you follow the [cloned kwil-db](/docs/extensions/quickstart#prerequisites) and have all the necessary tools installed.
 
-## Step 1: Clone the repository
+## Step 1: Create the action extension
 
-In your cloned `kwil-db` repository, create a new directory called `extensions/sum`.
+In the `extensions` directory, create a new directory and file called `sum/sum.go` and add the following code.
 
 ```bash
-mkdir extensions/sum
+mkdir -p extensions/sum
+touch extensions/sum/sum.go
 ```
-
-## Step 2: Create the action extension
-
-In the `extensions/sum` directory, create a new file called `sum.go` and add the following code.
 
 Make sure to replace `YOUR_ORG_NAME` with your organization name or username that you used to clone the repository.
 
@@ -33,8 +30,8 @@ package sum
 import (
     "fmt"
 
-    "github.com/YOUR_ORG_NAME/kwil-db/common"
-    "github.com/YOUR_ORG_NAME/kwil-db/extensions/actions"
+    "github.com/kwilteam/kwil-db/common"
+    "github.com/kwilteam/kwil-db/extensions/actions"
 )
 
 // name of the extension
@@ -92,11 +89,11 @@ func (e *SumExtension) add(values ...interface{}) ([]interface{}, error) {
 }
 ```
 
-## Step 3: Compile and Start Node
+## Step 2: Compile and Start Node
 
 Follow the instructions in the extension [build quickstart](/docs/extensions/quickstart#compiling-the-extension) to compile the extension and start the node.
 
-## Step 4: Test the action extension
+## Step 3: Test the action extension
 
 To test the action extension, you can use the [kwil-cli](/docs/category/cli) to deploy a schema with the action extension and call the `add` method.
 

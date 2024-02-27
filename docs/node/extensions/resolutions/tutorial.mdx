@@ -1,23 +1,29 @@
 ---
 sidebar_position: 2
-sidebar_label: "Example"
-id: resolutions-ext-example
-title: Resolution Credit Example
+sidebar_label: "Tutorial"
+id: resolutions-ext-tutorial
+title: Resolution Credit Tutorial
 description: A resolution that can be used to credit user accounts.
-slug: /extensions/resolutions/example
+slug: /extensions/resolutions/tutorial
 ---
 
-In this example, we will create a resolution that can credit accounts with the networks native gas token. This example is based off of the
+In this tutorial, we will create a resolution that can credit accounts with the networks native gas token. This example is based off of the
 `credit_account` resolution found in the default Kwil implementation. It is purely for example purposes, since the default implementation
-is already available in the Kwil network. It can be found [here](<https://github.com/kwilteam/kwil-db/blob/main/extensions/resolutions/credit/credit.go>).
+is already available in the Kwil network. The default implementation can be found [here](<https://github.com/kwilteam/kwil-db/blob/main/extensions/resolutions/credit/credit.go>).
 
-## Credit Struct
+## Prerequisites
+
+Make sure you follow the [kwil-db clone](/docs/extensions/quickstart#prerequisites) instructions and have all the necessary tools installed.
+
+## Step 1. Credit Struct
 
 We will first define a struct to hold the information about our credit. This struct will be deterministically serializable, allowing it to be
 passed to stored in Kwil's resolution store. We will use Kwil's `serialize` package, which implements a deterministic and compact serialization
 format based on Ethereum's RLP encoding.
 
-```go
+Create a new directory in the `kwil-db/extensions` directory called `resolution_credit`, and create a new file called `credit.go`.
+
+```go title="credit.go"
 package credit
 
 import (
@@ -61,14 +67,14 @@ func (a *AccountCreditResolution) UnmarshalBinary(data []byte) error {
 }
 ```
 
-## Resolution Config
+## Step 2. Resolution Config
 
 We will now define the configuration for our resolution. This informs the Kwil network about the rules for our resolution, and
 how it should be processed. We will register this resolution using Golang's `init` function. This is a special function called by
 Golang when the package is imported, and will be run before any other code. This allows our `kwild` node to access the resolution
 config when it starts up.
 
-```go
+```go title="credit.go"
 package credit
 
 import (
@@ -133,9 +139,31 @@ var resolutionConfig = resolutions.ResolutionConfig{
 }
 ```
 
+## Step 3. Register the Resolution
+
+The last step is to register the resolution extension with the Kwil node. This is done by calling the `RegisterResolution` function in the package's `init` function.
+
+```go title="credit.go"
+package credit
+
+import (
+	"github.com/kwilteam/kwil-db/extensions/resolutions"
+)
+
+const CreditAccountEventType = "credit_account"
+
+func init() {
+	// calling RegisterResolution will make the resolution available on startup
+	err := resolutions.RegisterResolution(CreditAccountEventType, resolutionConfig)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
 ## Resolution Usage
 
-To use the resolution, please see the [oracles example](/docs/extensions/oracles/example) for an oracle capable of reading EVM event logs
+Resolution extensions can only be called from oracles. If you intend to use the resolution, please see the [oracles example](/docs/extensions/oracles/tutorial) for an oracle capable of reading EVM event logs
 and creating credit resolutions.
 
 ## Full Example
@@ -244,3 +272,5 @@ var resolutionConfig = resolutions.ResolutionConfig{
 ```
 
 </details>
+
+To build and run the resolution extension example, follow the standard [extension build and run](/docs/extensions/quickstart) process. Make sure that you also have the [oracle example extension](/docs/extensions/oracles/tutorial) running, as the resolution can only be called from oracles.

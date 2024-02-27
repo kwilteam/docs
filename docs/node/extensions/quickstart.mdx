@@ -1,15 +1,15 @@
 ---
 sidebar_position: 2
-sidebar_label: "Quickstart - Build"
+sidebar_label: "Build Instructions"
 id: extensions-quickstart
-title: Extensions Introduction
+title: Extensions Build Instructions
 description: A step-by-step guide to creating and using extensions.
 slug: /extensions/quickstart
 ---
 
 This page containse a step-by-step guide for how to build and compile a Kwil extension into a single Kwil binary.  It will walk through the following steps:
 
-1. Creating an action extension that sums two numbers
+1. Importing an extension into the `kwil-db` repository
 2. Compiling the extension into a Kwil binary
 3. Running the Kwil binary to start a Kwil node with the extension
 
@@ -26,38 +26,19 @@ Before you begin, you'll need to have the following installed:
 export PATH=$PATH:$GOPATH/bin
 ```
 
-## Creating an Action Extension
+## Importing an Extension
 
 All extensions are written and Go and compiled with the rest of the Kwil codebase. 
 
-If you have not done so already, fork the `kwilteam/kwil-db` repository and create a new directory in the `extensions` directory.
+If you have not done so already, fork the `kwilteam/kwil-db` repository and install the necessary dependencies.
 
 ```bash
 git clone https://github.com/kwilteam/kwil-db.git
 cd kwil-db
 task tools # if you haven't already installed kwil-db dependencies
-mkdir extensions/sum
 ```
 
-In the new directory, paste the example code from the [Action Extensions Example](/docs/extensions/actions/Tutorial#step-2-create-the-action-extension) into a new file called `sum.go`, or write your own extension.
-
-Your extension should look something like this:
-
-```go title="extensions/sum/sum.go"
-package sum
-
-import (
-    "fmt"
-
-    "github.com/YOUR_ORG_NAME/kwil-db/common"
-    "github.com/YOUR_ORG_NAME/kwil-db/extensions/actions"
-)
-
-// name of the extension
-const name = "sumext"
-
-... // the rest of the extension code
-```
+In the new directory within the extensions repository (e.g. extensions/sum), paste the example code from the [Action Extensions Example](/docs/extensions/actions/Tutorial#step-2-create-the-action-extension) into a new file called `sum.go`, or write your own extension.
 
 ## Compiling the Extension
 
@@ -110,7 +91,7 @@ The Kwil node will start with the extension included!
 
 ## Conclusion
 
-You have successfully created and compiled a Kwil action extension! This process follows the same pattern for all extensions, so you can use this guide to create any type of extension you need.
+You have successfully created and compiled a Kwil extension! This process follows the same pattern for all extensions, so you can use this guide to create any type of extension you need.
 
 ### Next Steps
 
@@ -118,5 +99,5 @@ Dive into any of the below guides to learn more about how to build and use diffe
 
 - [Action Extensions](/docs/extensions/actions/overview)
 - [Authentication Extensions](/docs/extensions/authentication/overview)
-- [Oracle Extensions Overview](/extensions/oracle-extensions)
-- [Resolution Extensions Overview](/extensions/resolution-extensions)
+- [Oracle Extensions](/docs/extensions/oracles/overview)
+- [Resolution Extensions](/docs/extensions/resolutions/overview)
