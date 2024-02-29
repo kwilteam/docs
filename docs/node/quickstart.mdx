@@ -7,6 +7,11 @@ description: Quickstart guide for running a node
 slug: /node/quickstart
 ---
 
+This page demonstrates Kwil DB in both single node and multi-node configurations
+using new randomly generated chains and validator keys. Use this to evaluate and
+test `kwild`. To prepare a production deployment, see
+[Installation](/docs/daemon/installation) and [Running a Kwil Node](/docs/daemon/kwild)
+
 ## Installation
 
 To run either a single Kwil node, or a network of nodes, you will need to download the binaries.  Kwil releases
@@ -18,8 +23,17 @@ See the [Installation](/docs/daemon/installation) page for details.
 
 ## Single Node
 
-To run a single node, simply use the `kwild` binary with the `--autogen` flag.  This will automatically generate a
-genesis file, private key, and more in the `~/.kwild` directory.
+First ensure that PostgreSQL is running and configured for `kwild`. See
+[Installation](/docs/daemon/installation) for details. For the quickstart, just:
+
+```bash
+docker run -p 5432:5432 -v kwil-pgdata:/var/lib/postgresql/data --shm-size 256m \
+    -e "POSTGRES_HOST_AUTH_METHOD=trust" kwildb/postgres:latest
+```
+
+To run a single node, simply use the `kwild` binary with the `--autogen` flag.
+This will automatically generate a genesis file, private key, and more in the
+`~/.kwild` directory.
 
 ```bash
 kwild --autogen
@@ -30,6 +44,9 @@ The `--autogen` flag generates a random chain ID, which is the network's identit
 The node will be the one initial validator.
 As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set.
 :::
+
+To clean up when done testing, delete the `~/.kwild` folder and the
+`kwil-pgdata` Docker volume.
 
 ## Multi-Node
 
@@ -48,20 +65,51 @@ A production network would comprise nodes on different machines, but with the sa
 
 ### Run Nodes
 
+First start `postgres` containers for each of the nodes. Use the following
+commands to start all three running in the background, with different named
+volumes, and listening on ports 5440-5442.
+
+```bash
+docker run -p 5440:5432 -v kwil0-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
+    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node0 -d kwildb/postgres:latest
+docker run -p 5441:5432 -v kwil1-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
+    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node1 -d kwildb/postgres:latest
+docker run -p 5442:5432 -v kwil2-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
+    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node2 -d kwildb/postgres:latest
+```
+
+:::tip
+Use `docker container ls` to check the `postgres` container status. When done testing
+`kwild`, use `docker container rm -f node0 node1 node2` and
+`docker volume rm kwil0-testnet-pgdata kwil1-testnet-pgdata kwil2-testnet-pgdata`
+to stop and delete them.
+:::
+
 To run the nodes, we can use the `kwild` binary in 3 separate terminals.  We will need to specify the `--root_dir` flag to
 point to the directory where the node config is located.
 
 ```bash title="Terminal 1"
-kwild --root-dir ./kwil-testnet/node0
+kwild --root-dir ./kwil-testnet/node0 --app.pg-db-port 5440
 ```
 
 ```bash title="Terminal 2"
-kwild --root-dir ./kwil-testnet/node1
+kwild --root-dir ./kwil-testnet/node1 --app.pg-db-port 5441
 ```
 
 ```bash title="Terminal 3"
-kwild --root-dir ./kwil-testnet/node2
+kwild --root-dir ./kwil-testnet/node2 --app.pg-db-port 5442
 ```
 
 Once the nodes are running, they will begin mining blocks.  You can now connect to their gRPC and HTTP
 endpoints to interact with your local network.
+
+## For Developers
+
+Given a clone of the source code repository and development tooling, there are
+other automated options for starting nodes for testing in the
+[README](https://github.com/kwilteam/kwil-db/blob/main/README.md). In
+particular, a Docker Compose service is defined in `deployments/compose/kwil`
+that automatically starts containers for both a single node with `--autogen` and
+a separate container for `postgres`. For a multi-node development environment,
+the command `task dev:testnet:up` will start several nodes in a network
+configuration.
