@@ -7,19 +7,8 @@ description: An introduction to building and using extensions in Kwil.
 slug: /extensions/introduction
 ---
 
-Extensions are designed to allow developers to customize their Kwil network to fit their specific use case. Rather than having to fork the entire Kwil codebase, developers can simply build an extension to add the desired functionality.
-
-Extensions are written in Golang and compiled with the rest of the Kwil codebase into a single binary.
-
-There are four types of extensions that can be implemented:
-
-1. **Action Extensions** - Action extensions allow developers to run arbitrary logic with each action that is performed on a Kwil database. Action extensions are called in [Kuneiform](/docs/category/kuneiform), Kwil's smart contract language.
-
-2. **Authentication Extensions** - Authentication extensions allow developers to add additional digital signature schemes to their Kwil network. By default, Kwil supports secp256k1 and ed25519. Developers can add additional signature schemes such as RSA, NEP413, etc.
-
-3. **Oracle Extensions** - Oracle extensions allow nodes to read and agree on data from external systems (e.g.checking a user's balance on another blockchain or checking a user's access level in an external system).
-
-4. **Resolution Extensions** - Resolution extensions allow nodes to agree to execute a state changes on the Kwil Network (e.g. adjusting a balance, adjusting validator power, editing the database, etc). Resolution extensions are usually used in conjunction with oracle extensions (e.g. a user's balance on another blockchain is checked, and then a resolution extension is used to adjust the user's balance on Kwil).
+Kwil features an extensions system that enables developers to run arbitrary applications alongside their database.  This allows developers to build
+business logic, access control, and value accrual mechanisms directly into their decentralized database.
 
 :::info
 Extensions are currently in alpha, and are subject to change.  **We are actively looking for feedback on the extensions system.**
@@ -29,19 +18,23 @@ Extensions are currently in alpha, and are subject to change.  **We are actively
 
 To get started using extensions, check out one of the following resources:
 
-- [Building Extensions Overview / Tutorial](/docs/extensions/quickstart)
-- Extension Overviews:
-    - [Action Extensions](/docs/extensions/actions/overview)
-    - [Authentication Extensions](/docs/extensions/authentication/overview)
-    - [Oracle Extensions Overview](/extensions/oracle-extensions)
-    - [Resolution Extensions Overview](/extensions/resolution-extensions)
+- [Step-by-step on building and running extensions](/docs/extensions/quickstart)
+- [Building extensions in TypeScript / JavaScript](/docs/extensions/packages/js-ts)
+- [Calling extensions in Kuneiform](/docs/extensions/kuneiform)
+
+## What are extensions for?
+
+Extensions were designed to allow developers to utilize arbitrary logic in their databases.  Unlike traditional databases, there is often a need to directly
+couple certain logic to data when using a decentralized database (e.g. token gating).  Due to the nature of decentralized networks, it is often difficult to
+enforce these restrictions at a separate layer.  With extensions, developers are able to directly tie their logic and data, deploying them as one single protocol.
 
 ### Examples
 
-1. **Action: Credit Score Calcuation** - Developers can build an extension that calculates a user's credit score based on their data on the Kwil network, and then writes the data back to the database.
+1. **Token Gating** - Developers can token gate access to federated Kwil databases using extensions.  This can be done by building an extension to read data from another
+blockchain before a SELECT statement is processed.
 
-2. **Authentication: DB compatibility with Ethereum, Solana, and Arweave** - Developers can build an extension that allows users to sign with wallets from multiple ecosystems (e.g. Ethereum, Arweave, Solana, NEAR, etc).
+2. **Access Control** - Developers can build access control measures that utilize external systems to authenticate users.  This can be done by building an extension
+that reads data from an external system before some action is performed.
 
-3. **Oracle: Agreeing on validator stake in Ethereum Smart Contract** - Developers can build an extension that agrees on the amount of stake a validator has in an Ethereum smart contract.
-
-4. **Resolution: Adjusting validator power** - Developers can build an extension that adjusts the power of a Kwil validator based on some external data (e.g. the amount of stake a validator has in an Ethereum smart contract).
+3. **Stateless Functions** - Developers can build stateless functions that can be called from within a Kwil database.  This can be done by building an extension
+containing the desired functionality, and calling that from within a Kwil database.
