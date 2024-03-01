@@ -91,7 +91,7 @@ After you’ve tested your changes:
 
 Return to the Kwil docs home page in GitHub and navigate to [Pull Requests](https://github.com/kwilteam/docs/pulls).
 
-Click the Compare and pull request button, add a brief description of the changes made, including a motivation for why this will benefit the Kwil community, and then finally click the Create pull request button.
+Click the create pull request button, add a brief description of the changes made, including a motivation for why this will benefit the Kwil community, and then finally click the Create pull request button.
 
 All pull requests will be reviewed as soon as possible, and if accepted, will be merged and published.
 
