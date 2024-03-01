@@ -7,150 +7,329 @@ description: Syntax Diagrams
 slug: /syntax-diagrams
 ---
 
-## sql-stmt
+### statements
 
-![sql-stmt](../sql-as-understood-by-kwil/svg/sql-stmt.svg)
+![statements](diagram/statements.svg)
 
-References: [common-table-expression](#common-table-expression) [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
+### sql_stmt_list
 
-### column-name-list
+![sql_stmt_list](diagram/sql_stmt_list.svg)
 
-![column-name-list](../sql-as-understood-by-kwil/svg/column-name-list.svg)
+referenced by: [statements](#statements)
 
-Used By: [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
+### sql_stmt
 
-### common-table-expression
+![sql_stmt](diagram/sql_stmt.svg)
 
-![common-table-expression](../sql-as-understood-by-kwil/svg/common-table-expression.svg)
+referenced by: [sql_stmt_list](#sql_stmt_list)
 
-Used By: [sql-stmt](#sql-stmt) 
+### indexed_column
 
-References: [select-stmt](#select-stmt)
+![indexed_column](diagram/indexed_column.svg)
 
-### compound-operator
+referenced by: [upsert_clause](#upsert_clause)
 
-![compound-operator](../sql-as-understood-by-kwil/svg/compound-operator.svg)
+### cte_table_name
 
-Used By: [select-stmt](#select-stmt)
+![cte_table_name](diagram/cte_table_name.svg)
 
-### delete-stmt
+referenced by: [common_table_expression](#common_table_expression)
 
-![delete-stmt](../sql-as-understood-by-kwil/svg/delete-stmt.svg)
+### common_table_expression
 
-Used By: [sql-stmt](#sql-stmt)
+![common_table_expression](diagram/common_table_expression.svg)
 
-Referances: [common-table-expression](#common-table-expression) [expr](#expr) [qualified-table-name](#qualified-table-name) [returning-clause](#returning-clause)
+referenced by: [common_table_stmt](#common_table_stmt)
+
+### common_table_stmt
+
+![common_table_stmt](diagram/common_table_stmt.svg)
+
+referenced by: [delete_stmt](#delete_stmt), [insert_stmt](#insert_stmt), [select_stmt](#select_stmt), [update_stmt](#update_stmt)
+
+### delete_stmt
+
+![delete_stmt](diagram/delete_stmt.svg)
+
+referenced by: [sql_stmt](#sql_stmt)
+
+### variable
+
+![variable](diagram/variable.svg)
+
+referenced by: [expr](#expr)
+
+### function_call
+
+![function_call](diagram/function_call.svg)
+
+referenced by: [expr](#expr)
+
+### column_ref
+
+![column_ref](diagram/column_ref.svg)
+
+referenced by: [expr](#expr)
+
+### when_clause
+
+![when_clause](diagram/when_clause.svg)
+
+referenced by: [expr](#expr)
 
 ### expr
 
-![expr](../sql-as-understood-by-kwil/svg/expr.svg)
+![expr](diagram/expr.svg)
 
-Used By: [delete-stmt](#delete-stmt) [indexed-column](#indexed-column) [insert-stmt](#insert-stmt) [join-constraint](#join-constraint) [ordering-term](#ordering-term) [result-column](#result-column) [returning-clause](#returning-clause) [select-stmt](#select-stmt) [table-or-subquery](#table-or-subquery) [update-stmt](#update-stmt) [upsert-clause](#upsert-clause)
+referenced by: [delete_stmt](#delete_stmt), [expr](#expr), [expr_list](#expr_list), [function_call](#function_call), [join_constraint](#join_constraint), [limit_stmt](#limit_stmt), [ordering_term](#ordering_term), [result_column](#result_column), [returning_clause_result_column](#returning_clause_result_column), [select_core](#select_core), [update_set_subclause](#update_set_subclause), [update_stmt](#update_stmt), [upsert_clause](#upsert_clause), [upsert_update](#upsert_update), [value_row](#value_row), [when_clause](#when_clause)
 
-References: [literal-value](#literal-value) [select-stmt](#select-stmt)
+### subquery
 
-### indexed-column
+![subquery](diagram/subquery.svg)
 
-![indexed-column](../sql-as-understood-by-kwil/svg/indexed-column.svg)
+referenced by: [expr](#expr)
 
-Used By: [upsert-clause](#upsert-clause)
+### expr_list
 
-References: [expr](#expr)
+![expr_list](diagram/expr_list.svg)
 
-### insert-stmt
+referenced by: [expr](#expr)
 
-![insert-stmt](../sql-as-understood-by-kwil/svg/insert-stmt.svg)
 
-Used By: [sql-stmt](#sql-stmt)
+### comparison_operator
 
-References: [common-table-expression](#common-table-expression) [expr](#expr) [returning-clause](#returning-clause) [select-stmt](#select-stmt) [upsert-clause](#upsert-clause)
+![comparison_operator](diagram/comparison_operator.svg)
 
-### join-clause
+referenced by: [expr](#expr)
 
-![join-clause](../sql-as-understood-by-kwil/svg/join-clause.svg)
+### cast_type
 
-Used By: [select-stmt](#select-stmt) [table-or-subquery](#table-or-subquery) [update-stmt](#update-stmt)
+![cast_type](diagram/cast_type.svg)
 
-References: [join-constraint](#join-constraint) [join-operator](#join-operator) [table-or-subquery](#table-or-subquery)
+referenced by: [type_cast](#type_cast)
 
-### join-constraint
+### type_cast
 
-![join-constraint](../sql-as-understood-by-kwil/svg/join-constraint.svg)
+![type_cast](diagram/type_cast.svg)
 
-Used By: [join-clause](#join-clause)
+referenced by: [expr](#expr)
 
-References: [expr](#expr)
+### boolean_value
 
-### join-operator
+![boolean_value](diagram/boolean_value.svg)
 
-![join-operator](../sql-as-understood-by-kwil/svg/join-operator.svg)
+referenced by: [expr](#expr), [literal](#literal)
 
-Used By: [join-clause](#join-clause)
+### string_value
 
-### literal-value
+![string_value](diagram/string_value.svg)
 
-![literal-value](../sql-as-understood-by-kwil/svg/literal-value.svg)
+referenced by: [literal](#literal)
 
-Used By: [expr](#expr)
+### numeric_value
 
-### ordering-term
+![numeric_value](diagram/numeric_value.svg)
 
-![ordering-term](../sql-as-understood-by-kwil/svg/ordering-term.svg)
+referenced by: [literal](#literal)
 
-Used By: [select-stmt](#delete-stmt) 
+### literal
 
-References: [expr](#expr)
+![literal](diagram/literal.svg)
 
-### qualified-table-name
+referenced by: [expr](#expr)
 
-![qualified-table-name](../sql-as-understood-by-kwil/svg/qualified-table-name.svg)
+### value_row
 
-Used By: [delete-stmt](#delete-stmt) [update-stmt](#update-stmt)
+![value_row](diagram/value_row.svg)
 
-### result-column
+referenced by: [values_clause](#values_clause)
 
-![result-column](../sql-as-understood-by-kwil/svg/result-column.svg)
+### values_clause
 
-Used By: [select-stmt](#delete-stmt) 
+![values_clause](diagram/values_clause.svg)
 
-References: [expr](#expr)
+referenced by: [insert_stmt](#insert_stmt)
 
-### returning-clause
+### insert_stmt
 
-![returning-clause](../sql-as-understood-by-kwil/svg/returning-clause.svg)
+![insert_stmt](diagram/insert_stmt.svg)
 
-Used By: [delete-stmt](#delete-stmt) [insert-stmt](#insert-stmt) [update-stmt](#update-stmt) 
+referenced by: [sql_stmt](#sql_stmt)
 
-References: [expr](#expr)
+### returning_clause
 
-### select-stmt
+![returning_clause](diagram/returning_clause.svg)
 
-![select-stmt](../sql-as-understood-by-kwil/svg/select-stmt.svg)
+referenced by: [delete_stmt](#delete_stmt), [insert_stmt](#insert_stmt), [update_stmt](#update_stmt)
 
-Used By: [common-table-expression](#common-table-expression) [expr](#expr) [insert-stmt](#insert-stmt) [sql-stmt](#sql-stmt) [table-or-subquery](#table-or-subquery)
+### upsert_update
 
-References: [common-table-expression](#common-table-expression) [compound-operator](#compound-operator) [expr](#expr) [join-clause](#join-clause) [ordering-term](#ordering-term) [result-column](#result-column) [table-or-subquery](#table-or-subquery)
+![upsert_update](diagram/upsert_update.svg)
 
-### table-or-subquery
+referenced by: [upsert_clause](#upsert_clause)
 
-![table-or-subquery](../sql-as-understood-by-kwil/svg/table-or-subquery.svg)
+### upsert_clause
 
-Used By: [join-clause](#join-clause) [select-stmt](#select-stmt) [update-stmt](#update-stmt)
+![upsert_clause](diagram/upsert_clause.svg)
 
-References: [expr](#expr) [join-clause](#join-clause) [select-stmt](#select-stmt)
+referenced by: [insert_stmt](#insert_stmt)
 
-### update-stmt
+### select_stmt_core
 
-![update-stmt](../sql-as-understood-by-kwil/svg/update-stmt.svg)
+![select_stmt_core](diagram/select_stmt_core.svg)
 
-Used By: [sql-stmt](#sql-stmt)
+referenced by: [common_table_expression](#common_table_expression), [select_stmt](#select_stmt), [subquery](#subquery), [table_or_subquery](#table_or_subquery)
 
-References: [column-name-list](#column-name-list) [common-table-expression](#common-table-expression) [expr](#expr) [join-clause](#join-clause) [qualified-table-name](#qualified-table-name) [returning-clause](#returning-clause) [table-or-subquery](#table-or-subquery)
+### select_stmt
 
-### upsert-clause
+![select_stmt](diagram/select_stmt.svg)
 
-![upsert-clause](../sql-as-understood-by-kwil/svg/upsert-clause.svg)
+referenced by: [sql_stmt](#sql_stmt)
 
-Used By: [insert-stmt](#insert-stmt)
+### join_clause
 
-References: [column-name-list](#column-name-list) [expr](#expr) [indexed-column](#indexed-column) 
+![join_clause](diagram/join_clause.svg)
+
+referenced by: [select_core](#select_core), [update_stmt](#update_stmt)
+
+### select_core
+
+![select_core](diagram/select_core.svg)
+
+referenced by: [select_stmt_core](#select_stmt_core)
+
+### table_or_subquery
+
+![table_or_subquery](diagram/table_or_subquery.svg)
+
+referenced by: [join_clause](#join_clause), [select_core](#select_core), [update_stmt](#update_stmt)
+
+### result_column
+
+![result_column](diagram/result_column.svg)
+
+referenced by: [select_core](#select_core)
+
+### returning_clause_result_column
+
+![returning_clause_result_column](diagram/returning_clause_result_column.svg)
+
+referenced by: [returning_clause](#returning_clause) 
+
+### join_operator
+
+![join_operator](diagram/join_operator.svg)
+
+referenced by: [join_clause](#join_clause)
+
+### join_constraint
+
+![join_constraint](diagram/join_constraint.svg)
+
+referenced by: [join_clause](#join_clause)
+
+### compound_operator
+
+![compound_operator](diagram/compound_operator.svg)
+
+referenced by: [select_stmt_core](#select_stmt_core)
+
+### update_set_subclause
+
+![update_set_subclause](diagram/update_set_subclause.svg)
+
+referenced by: [update_stmt](#update_stmt)
+
+### update_stmt
+
+![update_stmt](diagram/update_stmt.svg)
+
+referenced by: [sql_stmt](#sql_stmt)
+
+### column_name_list
+
+![column_name_list](diagram/column_name_list.svg)
+
+referenced by: [update_set_subclause](#update_set_subclause), [upsert_update](#upsert_update)
+
+### qualified_table_name
+
+![qualified_table_name](diagram/qualified_table_name.svg)
+
+referenced by: [delete_stmt](#delete_stmt), [update_stmt](#update_stmt)
+
+### order_by_stmt
+
+![order_by_stmt](diagram/order_by_stmt.svg)
+
+referenced by: [select_stmt_core](#select_stmt_core)
+
+### limit_stmt
+
+![limit_stmt](diagram/limit_stmt.svg)
+
+referenced by: [select_stmt_core](#select_stmt_core)
+
+### ordering_term
+
+![ordering_term](diagram/ordering_term.svg)
+
+referenced by: [order_by_stmt](#order_by_stmt)
+
+### asc_desc
+
+![asc_desc](diagram/asc_desc.svg)
+
+referenced by: [ordering_term](#ordering_term)
+
+### function_keyword
+
+![function_keyword](diagram/function_keyword.svg)
+
+referenced by: [function_name](#function_name)
+
+### function_name
+
+![function_name](diagram/function_name.svg)
+
+referenced by: [function_call](#function_call)
+
+### table_name
+
+![table_name](diagram/table_name.svg)
+
+referenced by: [column_ref](#column_ref), [cte_table_name](#cte_table_name), [insert_stmt](#insert_stmt), [qualified_table_name](#qualified_table_name), [result_column](#result_column), [table_or_subquery](#table_or_subquery)
+
+### table_alias
+
+![table_alias](diagram/table_alias.svg)
+
+referenced by: [insert_stmt](#insert_stmt), [qualified_table_name](#qualified_table_name), [table_or_subquery](#table_or_subquery)
+
+### column_name
+
+![column_name](diagram/column_name.svg)
+
+referenced by: [column_name_list](#column_name_list), [column_ref](#column_ref), [cte_table_name](#cte_table_name), [indexed_column](#indexed_column), [insert_stmt](#insert_stmt), [update_set_subclause](#update_set_subclause), [upsert_update](#upsert_update)
+
+### column_alias
+
+![column_alias](diagram/column_alias.svg)
+
+referenced by: [result_column](#result_column), [returning_clause_result_column](#returning_clause_result_column)
+
+### collation_name
+
+![collation_name](diagram/collation_name.svg)
+
+referenced by: [expr](#expr)
+
+### index_name
+
+![index_name](diagram/index_name.svg)
+
+### EOF
+
+![EOF](diagram/EOF.svg)
+
+referenced by: [statements](#statements)
