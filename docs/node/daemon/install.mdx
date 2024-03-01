@@ -34,6 +34,17 @@ Kwil DB is built on PostgreSQL, and requires an external PostgreSQL host running
 `kwild` currently requires PostgreSQL 16, from at least v16.1. Future major
 versions will require an update to Kwil.
 
+### Quickstart PostgreSQL
+
+For quick usage, Kwil provides a Docker image with a properly configured
+PostgreSQL instance. This is convenient for quick setup of a Kwil node, but is
+less configurable than a system service. The following command will pull and
+start a new container:
+
+```bash
+docker run -e POSTGRES_HOST_AUTH_METHOD=trust -p 5432:5432 kwildb/postgres
+```
+
 ### PostgreSQL Installation
 
 Standard PostgreSQL installers and operating system packages are supported,
