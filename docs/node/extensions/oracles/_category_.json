@@ -1,0 +1,9 @@
+{
+    "label": "Oracle Extensions",
+    "position": 4,
+    "link": {
+      "type": "generated-index",
+      "description": "Building Oracle Extensions"
+    },
+    "collapsed": true
+}

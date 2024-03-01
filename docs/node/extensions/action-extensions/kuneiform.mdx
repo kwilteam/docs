@@ -1,0 +1,95 @@
+---
+sidebar_position: 2
+sidebar_label: In Kuneiform
+id: action-ext-kuneiform
+title: Action Extensions in Kuneiform
+description: Invoking actions extensions in Kuneiform
+slug: /extensions/actions/kuneiform
+---
+
+To use an action extension in Kuneiform, the Kwil node you are using must have been compiled with the extension.
+
+To learn how to compile a Kwil node with an extension, refer to the [extension build quickstart](/docs/extensions/quickstart) guide.
+
+## Example
+
+As an example, we will refer to a hypothetical `hello_world` extension. This extension has one method, `sayHello`, which takes a string as an argument and returns a string.
+
+## Importing The Extension
+
+To import an extension in a Kuneiform schema, you need to use its declared name (which is defined in the extension itself).  With this, you can pass any metadata values, as well
+as an alias for this instance of the extension.
+
+The metadata values are handled in the extension's [`ExtensionInitializer`](/docs/extensions/actions/overview#extensioninitializer) function.  
+
+```typescript
+use hello_world {
+    greeting: "Good afternoon, "
+} as good_afternoon;
+```
+
+The same extension can be imported several times:
+
+```typescript
+use hello_world {
+    greeting: "Good afternoon, "
+} as good_afternoon;
+
+use hello_world as default_hello;
+```
+
+## Calling Methods
+
+To call a method on an extension, you need to use the alias you gave it when importing it.  You can then call the desired method, and pass any arguments it requires:
+
+```typescript
+action insert_good_afternoon($id, $name) public {
+    $message = good_afternoon.sayHello($name);
+    // stores "Good afternoon, $name" in the database
+    INSERT INTO greetings (id, message) VALUES ($id, $message);
+}
+
+action insert_default_hello($id, $name) public {
+    $message = default_hello.sayHello($name);
+    // stores "Hello, $name" in the database
+    INSERT INTO greetings (id, message) VALUES ($id, $message);
+}
+```
+
+The above actions will call the `sayHello` method on the `good_afternoon` and `default_hello` extensions, passing the `$name` variable as the first argument.  The result of these calls will be stored in the `$message` variable, and can be used in the rest of the action.
+
+:::tip
+The reason why `good_afteroon` and `default_hello` provide different messages is because they were initialized with different values. This logic for this is in the extensions original [`ExtensionInitializer`](/docs/extensions/actions/overview#extensioninitializer) function.
+:::
+
+
+## Full Schema
+
+Below is a full example of a Kuneiform schema that uses the above hypothetical `hello_world` extension:
+
+```typescript
+database hello_world;
+
+use hello_world {
+    greeting: "Good afternoon, "
+} as good_afternoon;
+
+use hello_world as default_hello;
+
+table greetings {
+    id int primary,
+    message text
+}
+
+action insert_good_afternoon($id, $name) public {
+    $message = good_afternoon.sayHello($name);
+    // stores "Good afternoon, $name" in the database
+    INSERT INTO greetings (id, message) VALUES ($id, $message);
+}
+
+action insert_default_hello($id, $name) public {
+    $message = default_hello.sayHello($name);
+    // stores "Hello, $name" in the database
+    INSERT INTO greetings (id, message) VALUES ($id, $message);
+}
+```

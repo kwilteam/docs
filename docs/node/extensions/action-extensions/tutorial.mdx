@@ -1,0 +1,195 @@
+---
+sidebar_position: 3
+sidebar_label: "Tutorial"
+id: action-ext-tutorial
+title: Action Extensions Tutorial
+description: Full tutorial on how to create an action extension
+slug: /extensions/actions/Tutorial
+---
+
+This tutorial will guide you through the process of creating an action extension that sums two numbers. This extension will build on the interfaces and concepts introduced in the [Action Extensions Overview](/docs/extensions/actions/overview) documentation.
+
+## Prerequisites
+
+Before you start, make sure you follow the [cloned kwil-db](/docs/extensions/quickstart#prerequisites) and have all the necessary tools installed.
+
+## Step 1: Create the action extension
+
+In the `extensions` directory, create a new directory and file called `sum/sum.go` and add the following code.
+
+```bash
+mkdir -p extensions/sum
+touch extensions/sum/sum.go
+```
+
+Make sure to replace `YOUR_ORG_NAME` with your organization name or username that you used to clone the repository.
+
+```go title="extensions/sum/sum.go"
+package sum
+
+import (
+    "fmt"
+
+    "github.com/kwilteam/kwil-db/common"
+    "github.com/kwilteam/kwil-db/extensions/actions"
+)
+
+// name of the extension
+const name = "sumext"
+
+// register the extension
+func init() {
+    err := actions.RegisterExtension(name, InitializeSumExtension)
+    if err != nil {
+        panic(err)
+    }
+}
+
+type SumExtension struct{}
+
+func InitializeSumExtension(ctx *actions.DeploymentContext, service *common.Service, metadata map[string]string) (actions.ExtensionNamespace, error) {
+    // if any metadata is passed, return an error
+    if len(metadata) > 0 {
+        return nil, fmt.Errorf("sum: no metadata expected")
+    }
+    return &SumExtension{}, nil
+}
+
+func (e *SumExtension) Call(ctx *actions.ProcedureContext, app *common.App, method string, inputs []interface{}) ([]interface{}, error) {
+    // switch on the method
+    switch method {
+    // if the method is "add", call the add method
+    case "add":
+        return e.add(inputs...)
+    default:
+        // if the method is not found, return an error
+        return nil, fmt.Errorf("method %s not found", method)
+    }
+}
+
+func (e *SumExtension) add(values ...interface{}) ([]interface{}, error) {
+    // if the length of the values is not 2, return an error
+    if len(values) != 2 {
+        return nil, fmt.Errorf("expected 2 values for method Add, got %d", len(values))
+    }
+
+    // retrieve the two values and check if they are integers
+    val1, ok0 := values[0].(int64)
+    val2, ok1 := values[1].(int64)
+
+    if !ok0 || !ok1 {
+        return nil, fmt.Errorf("expected 2 int64 for method Add, got %T and %T", values[0], values[1])
+    }
+
+    // if the round value is true, sum the two numbers and round up to the nearest integer.
+    // otherwise, round down to the nearest integer
+    var results []any
+    results = append(results, val1+val2)
+    return results, nil
+}
+```
+
+## Step 2: Compile and Start Node
+
+Follow the instructions in the extension [build quickstart](/docs/extensions/quickstart#compiling-the-extension) to compile the extension and start the node.
+
+## Step 3: Test the action extension
+
+To test the action extension, you can use the [kwil-cli](/docs/category/cli) to deploy a schema with the action extension and call the `add` method.
+
+The kwil-cli was built when you ran the `task build` command in the previous step. You can find the binary in the `build` directory.
+
+### Configure the kwil-cli
+
+By default the node is running on `http://localhost:8080`. First, you need to retrieve the chain-id for the network you are running.
+
+```bash
+.build/kwil-cli utils chain-info --kwil-provider http://localhost:8080
+# highlight-next-line
+Chain ID: kwil-chain-xxxxx
+```
+
+Then, configure the kwil-cli to use the chain-id and the node URL.
+
+```bash
+.build/kwil-cli configure
+Kwil RPC URL: http://localhost:8080
+Kwil Chain ID: kwil-chain-xxxxx
+Private Key: eth_private_key #for signing transactions on Kwil
+```
+
+### Create Schema
+
+Create a new [kuneiform schema](/docs/category/kuneiform) with the action extension.
+
+```bash
+touch extension-test.kf
+```
+
+Add the following code to the `extension-test.kf` file:
+
+```sql title="extension-test.kf"
+database extension_test;
+
+use sumext as extension_sum;
+
+table numbers {
+    id int primary notnull,
+    num1 int notnull,
+    num2 int notnull,
+    sum_result int notnull
+}
+
+action sum_numbers ($id, $num1, $num2) public {
+    $result = extension_sum.add($num1, $num2);
+    INSERT INTO numbers (id, num1, num2, sum_result)
+    VALUES ($id, $num1, $num2, $result);
+}
+```
+
+### Deploy the schema
+
+Deploy the schema to the node you started in step 3.
+
+```bash
+.build/kwil-cli database deploy -p ./extension-test.kf --sync
+```
+
+You will receive a success response if the schema is deployed successfully.
+
+### Execute the action
+
+Execute the `sum_numbers` action to sum two numbers.
+
+```bash
+.build/kwil-cli database execute id:1 num1:5 num2:4 -a sum_numbers -n extension_test --sync
+```
+
+You will receive a success response if the action is executed successfully.
+
+### Query the result
+
+Query the `numbers` table to retrieve the result of the action.
+
+```bash
+.build/kwil-cli database query 'select * from numbers' -n extension_test
+| id | num1 | num2 | sum_result |
++----+------+------+------------+
+|  1 |    5 |    4 |          9 |
+```
+
+If you see the result `9`, then the `add` method was called successfully and the extension works as expected.
+
+## Conclusion
+
+This tutorial has guided you through the process of creating an action extension that sums two numbers. You have learned how to create an action extension, compile and start the node, and test the action extension using the kwil-cli.
+
+You are now ready to create action extensions!
+
+### Next Steps
+
+To learn more about the other extension types, check out the following documentation:
+
+- [Authentication Extensions](/docs/extensions/authentication/overview)
+- [Oracle Extensions](/docs/extensions/oracle/overview)
+- [Resolution Extensions](/docs/extensions/resolution/overview)

@@ -1,0 +1,9 @@
+{
+    "label": "Auth Extensions",
+    "position": 4,
+    "link": {
+      "type": "generated-index",
+      "description": "Learn how to write authentication extensions in Go and use them in your Kwil Network."
+    },
+    "collapsed": true
+}
