@@ -37,4 +37,4 @@ Smart contract platforms enable developers to code with programmable money.  In 
 
 ### Consensus
 
-The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for Practical Byzantine Fault Tolerant (pBFT) consensus. CometBFT is the most mature BFT consensus engine in existence. For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.37/)
+The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for Practical Byzantine Fault Tolerant (pBFT) consensus. CometBFT is the most mature BFT consensus engine in existence. For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.38/)
