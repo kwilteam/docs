@@ -1,0 +1,128 @@
+---
+sidebar_position: 4
+sidebar_label: Implementation
+id: extensions-implementation
+title: Extension Implementation
+description: The implementation of an extension
+slug: /extensions/implementation
+---
+
+Very simply, extensions are gRPC servers that have 4 rpc methods (not to be confused with the arbitrary methods that the extension provides):
+
+- `Name` - Returns the name of the extension.  This name is used when importing the extension into a Kuneiform schema.
+- `ListMethods` - Returns a list of usable extensions methods that the extension implements.
+- `Execute` - Executes a method on the extension.  This is called from within a Kuneiform action.
+- `Initialize` - Initializes a new instance of the extension.  This occurs once each time a Kuneiform schema using the extension is deployed (or when the Kwil daemon is rebooted).
+
+The protobuf interface for Kwil extensions can be found [here](<https://github.com/kwilteam/kwil-extensions/blob/main/proto/extension.proto>):
+
+```javascript
+service ExtensionService {
+    // Name is used to get the name of the extension.
+    rpc Name(NameRequest) returns (NameResponse) {}
+
+    // ListMethods is used to list the methods which the extension provides.
+    rpc ListMethods(ListMethodsRequest) returns (ListMethodsResponse) {}
+
+    // Execute is used to execute a method provided by the extension.
+    rpc Execute(ExecuteRequest) returns (ExecuteResponse) {}
+
+    // Initialize is used to create a new extension instance
+    rpc Initialize(InitializeRequest) returns (InitializeResponse) {}
+}
+```
+
+## When Extensions are Used
+
+Extensions can be used when deploying your own dedicated Kwil network / daemon.  This can be conceptually thought of as a very particular type of app-chain,
+except the app-chain logic (within the extension) should be stateless and deterministic, as all state is handled by the SQL database.
+
+While extensions can be run as distributed infrastructure, **it is recommended to run them as containerized sidecars**. Running them as sidecars helps prevent
+transient errors that can occur when running them as distributed infrastructure.  Containerization forces extensions to run with sandboxed resources, preventing
+them from crashing the daemon (which can cause database corruption).
+
+## Initialization
+
+When a new Kuneiform schema is deployed, it calls the provided `Initialize` method on each extension it imports, for each time it is imported.  This creates a
+new extension "instance"; essentially, a connection to the extension with its own metadata.  This allows the same extension to be used any number of times.
+
+The `Initialize` method takes a map of initialization variables, and can validate, modify, or add to them.  The returned map is then included in every subsequent
+request made by the Kuneiform schema to the extension.
+
+### In Kuneiform
+
+```sql
+use <extension_name> {
+    // metadata_key_1: 'metadata_value_1'
+    // metadata_key_2: 'metadata_value_2'
+    // ...
+} as <extension_alias>;
+```
+
+The `initialize` function could then perform validation logic on the passed values, add additional variables to the metadata map, or fire off some other process.  If an error is
+returned during the `initialize` function, it will cause the deployment of the Kuneiform schema to fail.
+
+### Corresponding Typescript Implementation
+
+```typescript
+import { InitializeFn } from "@kwil/extensions";
+
+const initialize: InitializeFn = async (metadata: Record<string, string>): Promise<Record<string, string>> => {
+    // metadata = {
+    //      metadata_key_1: metadata_value_1
+    //      metadata_key_2: metadata_value_2
+    // }
+    // ...
+
+    // here, you can validate, modify, or add to the metadata
+
+    return metadata;
+}
+```
+
+The map returned from the above function would be included in each subsequent message (shown in the next section).
+
+## Methods
+
+When an action using an extension is executed, the `Execute` method is called on the extension.  The `Execute` method takes the map of variables returned from the `Initialize` function, an array of scalar values (either strings or integers), and returns an array of scalar values.
+**Methods should be case insensitive**.
+
+### In Kuneiform
+
+```typescript
+action use_my_extension($input1) public {
+    $returned_value_1, $returned_value_2 = extension_alias.method_name($input1, 'constant input');
+    // ...
+}
+```
+
+Below is the corresponding Typescript extension method.  The comments show how the inputs and outputs are mapped from the Kuneiform action to the extension method.
+
+### Corresponding Typescript Implementation
+
+```typescript
+import { MethodFn } from "@kwil/extensions";
+
+const method_name: MethodFn = async ({ metadata, inputs }) => {
+    // metadata = {
+    //      metadata_key_1: metadata_value_1
+    //      metadata_key_2: metadata_value_2
+    // }
+
+    const input1 = inputs[0]?.toNumber();
+    // input1 = $input1
+    const input2 = inputs[1]?.toString();
+    // input2 = 'constant input'`
+
+    // business logic here
+    // throwing an error will cause the calling action to fail
+
+
+    return ["return_value_1", 2];
+    // $returned_value_1 = "return_value_1"
+    // $returned_value_2 = 2
+}
+```
+
+Within a method, you have access to both the initialized metadata as well as the inputs provided by the action.  You can return any number
+of scalar values (strings or ints).  If an error is thrown, it will rollback and end the action execution.
