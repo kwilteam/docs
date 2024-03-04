@@ -8,7 +8,7 @@ description: Enforce restrictions on reading data from a network.
 
 In this tutorial, we will cover how to authenticate a user to enforce read access control. This tutorial expands on the schema created in the [Write Access Control](/docs/getting-started/write-access-control) tutorial.
 
-In Kwil, data is primarily read with `view` actions. For executing `view` actions, the same general access control rules are available as for [`write` actions](/docs/getting-started/write-access-control). However, because data stored on nodes are default public, Kwil networks running in permissioned or federated environments can use the Kwil Gateway to enforce user authentication and stronger read access control.
+In Kwil, data is primarily read with `view` actions. For executing `view` actions, the same general access control rules are available as for [write actions](/docs/getting-started/write-access-control). However, because data stored on nodes are default public, Kwil networks running in permissioned or federated environments can use the Kwil Gateway to enforce user authentication and stronger read access control.
 
 :::tip
 Setting view action privacy is done using the Kwil Gateway.  The gateway is still in private beta.  If you would like access, please contact our team.
@@ -122,18 +122,11 @@ table posts {
     post_date text notnull
 }
 
-// table to track user balances
-table {
-    id int primary notnull,
-    author_id int notnull,
-    balance int notnull
-}
-
 // a public action for creating a user
 // it will automatically include the wallet address
 // of the caller in the "address" column
 action create_user ($id, $username, $age) public {
-    INSERT INTO users (id, ysername, age, address)
+    INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
@@ -144,44 +137,33 @@ action update_user ($username, $age) public {
     WHERE address=@caller;
 }
 
-// private action to get user id
-action get_user_id() private {
-  SELECT id
-  FROM users 
-  WHERE address=@caller;
+// private action to check if user exists
+action check_user() private view {
+    SELECT
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM users WHERE address=@caller) THEN ERROR('User does not exist')
+            ELSE null
+        END as user_status;
 }
 
-// a public action for creating a post
-// it will automatically include the account id
-// of the caller in the "author_id" column
+// before creating a post, check if the user exists
+// will raise an error if the user does not exist
 action create_post ($id, $title, $content, $date_string) public {
-    $author_id = get_user_id();
+    check_user();
     INSERT INTO posts (id, title, content, author_id, post_date)
-    VALUES ($id, $title, $content, $author_id, $date_string);
+    VALUES (
+        $id, 
+        $title, 
+        $content,
+        (SELECT id FROM users WHERE address=@caller), 
+        $date_string
+    );
 }
 
 action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;
-}
-
-// private action to check balance
-action check_balance($author_id, $amount) private {
-    SELECT
-        CASE
-            WHEN balance < $amount THEN ERROR('Insufficient funds')
-            ELSE null
-        END
-    FROM balances
-    WHERE author_id = $author_id;
-}
-
-// get_posts will get the posts for a given user
-// call the private action within a public view action, and require that the balance is at least 10
-action get_posts($user_id) public view {
-    check_balance($user_id, 10);
-    SELECT * FROM posts WHERE author_id = $user_id;
 }
 
 // owner only action to delete a user

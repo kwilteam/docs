@@ -13,10 +13,10 @@ Full SDK documentation can be found [here](../sdks/js-ts/overview).
 
 ## Install the SDK
 
-First, install the SDK using npm:
+First, install the Kwil SDK and the ethers library:
 
 ```bash
-npm install @kwilteam/kwil-js
+npm install @kwilteam/kwil-js ethers
 ```
 
 ## Initialization
@@ -58,10 +58,12 @@ async function getSigner() {
 
 DBIDs are network-wide unique identifiers for databases.  They are derived from the database owner's wallet address and the database name.
 
+Make sure to replace `your_wallet_here` with your wallet address.
+
 ```typescript
 import { Utils } from '@kwilteam/kwil-js';
 
-const dbid = Utils.generateDBID('wallet_address', 'social_media');
+const dbid = Utils.generateDBID('your_wallet_here', 'social_media');
 ```
 
 ## Write Data
@@ -77,9 +79,9 @@ async function createUser(id, username, age) {
         action: "create_user",
         inputs: [
             {
-                id: id,
-                username: username,
-                age: age
+                $id: id,
+                $username: username,
+                $age: age
             }
         ]
     }, kwilSigner);
@@ -99,7 +101,7 @@ async function getUser(username) {
         action: "get_user",
         inputs: [
             {
-                username: username
+                $username: username
             }
         ]
     });
@@ -110,7 +112,9 @@ async function getUser(username) {
 
 ## Full Example
 
-Below is a full example of writing and reading data from a database:
+Below is a full example of writing and reading data from a database.
+
+Make sure to replace `your_wallet_here` with your wallet address.
 
 <details>
   <summary> read-and-write.js </summary>
@@ -124,12 +128,13 @@ const kwil = new WebKwil({
     chainId: "kwil-chain-testnet-0.6",
 });
 
-const dbid = Utils.generateDBID('wallet_address', 'social_media');
+const dbid = Utils.generateDBID('your_wallet_here', 'social_media');
 
 async function getSigner() {
     const provider = new BrowserProvider(window.ethereum);
     const ethSigner = await provider.getSigner();
-    return new KwilSigner(ethSigner);
+    const ethAddress = await ethSigner.getAddress();
+    return new KwilSigner(ethSigner, ethAddress);
 }
 
 async function createUser(id, username, age) {
@@ -140,9 +145,9 @@ async function createUser(id, username, age) {
         action: "create_user",
         inputs: [
             {
-                id: id,
-                username: username,
-                age: age
+                $id: id,
+                $username: username,
+                $age: age
             }
         ]
     }, kwilSigner);
@@ -156,7 +161,7 @@ async function getUser(username) {
         action: "get_user",
         inputs: [
             {
-                username: username
+                $username: username
             }
         ]
     });

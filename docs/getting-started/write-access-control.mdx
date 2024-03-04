@@ -10,55 +10,50 @@ In this tutorial, we will modify the schema in the first [schema tutorial](/docs
 
 Out of the box, Kwil supports a variety of access control capabilities. If you wish to implement more advances access control logic than what is natively available, you can do so by adding an [Extension](/docs/getting-started/using-extensions) to your network.
 
-## Action Privacy
-
-Action privacy can enforce whether an action can be called externally or not. This is useful for actions that should only be called by other actions and not by users.
-
-```sql title="social_media.kf"
-// private action to get user id
-action get_user_id() private {
-  SELECT id
-  FROM users 
-  WHERE address=@caller;
-}
-
-// call the private action within a public action
-// it will automatically include the account id
-// of the caller in the "author_id" column
-action create_post ($id, $title, $content, $date_string) public {
-    $author_id = get_user_id();
-    INSERT INTO posts (id, title, content, author_id, post_date)
-    VALUES ($id, $title, $content, $author_id, $date_string);
-}
-```
-
 ## Raising Errors
 
 In an action, you can use SQL `CASE` statements to raise errors if certain conditions are not met. If an error is raised, the transaction will fail entirely, and data will not be written to the network.
 
 ```sql title="social_media.kf"
-// create a new balances table to track user balances
-table balances {
-    id int primary notnull,
-    author_id int notnull,
-    balance int notnull
-}
-
-// private action to check balance
-action check_balance($author_id, $amount) private {
+// private action to check if user exists
+action check_user() private view {
     SELECT
         CASE
-            WHEN balance < $amount THEN ERROR('Insufficient funds')
+            WHEN NOT EXISTS (SELECT 1 FROM users WHERE address=@caller) THEN ERROR('User does not exist')
+            ELSE null
+        END as user_status;
+}
+```
+
+
+## Action Privacy
+
+Action privacy enforces whether an action can be called by a user or not. Public actions can be called by users. Private actions can only be called by other actions.
+
+The distinction between public and private actions are similar to the distinction between public and private methods in object-oriented programming, where public methods are accessible from outside the class, and private methods are only accessible from within the class.
+
+```sql title="social_media.kf"
+// private action to check if user exists
+action check_user() private {
+    SELECT
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM users WHERE address=@caller) THEN ERROR('User does not exist')
             ELSE null
         END
-    FROM balances
-    WHERE author_id = $author_id;
+    FROM users;
 }
 
-// call the private action within a public view action, and require that the balance is at least 10
-action get_posts($user_id) public view {
-    check_balance($user_id, 10);
-    SELECT * FROM posts WHERE author_id = $user_id;
+// before creating a post, check if the user exists
+action create_post ($id, $title, $content, $date_string) public {
+    check_user();
+    INSERT INTO posts (id, title, content, author_id, post_date)
+    VALUES (
+        $id, 
+        $title, 
+        $content,
+        (SELECT id FROM users WHERE address=@caller), 
+        $date_string
+    );
 }
 ```
 
@@ -100,18 +95,11 @@ table posts {
     post_date text notnull
 }
 
-// table to track user balances
-table balances {
-    id int primary notnull,
-    author_id int notnull,
-    balance int notnull
-}
-
 // a public action for creating a user
 // it will automatically include the wallet address
 // of the caller in the "address" column
 action create_user ($id, $username, $age) public {
-    INSERT INTO users (id, ysername, age, address)
+    INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
@@ -122,44 +110,33 @@ action update_user ($username, $age) public {
     WHERE address=@caller;
 }
 
-// private action to get user id
-action get_user_id() private {
-  SELECT id
-  FROM users 
-  WHERE address=@caller;
+// private action to check if user exists
+action check_user() private view {
+    SELECT
+        CASE
+            WHEN NOT EXISTS (SELECT 1 FROM users WHERE address=@caller) THEN ERROR('User does not exist')
+            ELSE null
+        END as user_status;
 }
 
-// a public action for creating a post
-// it will automatically include the account id
-// of the caller in the "author_id" column
+// before creating a post, check if the user exists
+// will raise an error if the user does not exist
 action create_post ($id, $title, $content, $date_string) public {
-    $author_id = get_user_id();
+    check_user();
     INSERT INTO posts (id, title, content, author_id, post_date)
-    VALUES ($id, $title, $content, $author_id, $date_string);
+    VALUES (
+        $id, 
+        $title, 
+        $content,
+        (SELECT id FROM users WHERE address=@caller), 
+        $date_string
+    );
 }
 
 action get_user ($username) public view {
     SELECT *
     FROM users
     WHERE username=$username;
-}
-
-// private action to check balance
-action check_balance($author_id, $amount) private {
-    SELECT
-        CASE
-            WHEN balance < $amount THEN ERROR('Insufficient funds')
-            ELSE null
-        END
-    FROM balances
-    WHERE author_id = $author_id;
-}
-
-// get_posts will get the posts for a given user
-// call the private action within a public view action, and require that the balance is at least 10
-action get_posts($user_id) public view {
-    check_balance($user_id, 10);
-    SELECT * FROM posts WHERE author_id = $user_id;
 }
 
 // owner only action to delete a user
