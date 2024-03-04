@@ -35,10 +35,17 @@ contains the configuration files, including `genesis.json` and `config.toml`.
 
 ### Running The Node
 
-Using the `kwild` binary, we can begin running the network with this single node:
+To run the first node, we will need to start a properly configured PostgreSQL instance. We will use a default pre-configured image provided by
+Kwil, but information on the proper configuration can be found in the [PostgreSQL configuration](/docs/daemon/installation#postgresql-configuration) section.
+Once the PostgreSQL instance is running, we can start the node using the `kwild` binary:
 
-```bash
-kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock
+```shell
+# Run Postgres
+docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+kwildb/postgres:latest
+
+# Run the node
+kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock --app.pg-db-port 5432
 ```
 
 The command then runs the local Kwil network, and begins producing blocks.
@@ -106,7 +113,12 @@ kwil-admin setup peer --root-dir ./testnet/node1 --genesis ./testnet/node0/genes
 Start the second node to verify that it was created correctly:
 
 ```bash
-kwild --root-dir=./testnet/node1
+# Run Postgres
+docker run -d -p 5431:5432 --name kwil-postgres-1 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+kwildb/postgres:latest
+
+# Run the node
+kwild --root-dir=./testnet/node1 --app.pg-db-port 5431
 ```
 
 If done correctly, you should be able to see the second node's logs, and it should be able to read the network logs.
@@ -159,6 +171,25 @@ $ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
 Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}
+```
+
+## Cleanup
+
+If you wish to reset this tutorial, you will need to stop the nodes and Postgres containers, remove the `testnet` directory, and remove the Postgres container:
+
+```bash
+# Stop the nodes using Ctrl+C
+
+# Stop the Postgres containers
+docker stop kwil-postgres
+docker stop kwil-postgres-1
+
+# Remove the Postgres containers
+docker rm kwil-postgres
+docker rm kwil-postgres-1
+
+# Remove the testnet directory
+rm -rf ./testnet
 ```
 
 ## Conclusion

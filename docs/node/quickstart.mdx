@@ -15,20 +15,21 @@ test `kwild`. To prepare a production deployment, see
 ## Installation
 
 To run either a single Kwil node, or a network of nodes, you will need to download the binaries.  Kwil releases
-binaries on [Github](<https://github.com/kwilteam/binary-releases/releases>).
+binaries on [Github](<https://github.com/kwilteam/kwil-db/releases>).
 
-Kwil also requires a dedicate PostgreSQL host configured for `kwild`.
+Kwil also requires a dedicated PostgreSQL host configured for `kwild`.
 
 See the [Installation](/docs/daemon/installation) page for details.
 
 ## Single Node
 
-First ensure that PostgreSQL is running and configured for `kwild`. See
-[Installation](/docs/daemon/installation) for details. For the quickstart, just:
+### Start
+
+First ensure that PostgreSQL is running and configured for `kwild`. For the quickstart, just:
 
 ```bash
 docker run -p 5432:5432 -v kwil-pgdata:/var/lib/postgresql/data --shm-size 256m \
-    -e "POSTGRES_HOST_AUTH_METHOD=trust" kwildb/postgres:latest
+   --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" kwildb/postgres:latest
 ```
 
 To run a single node, simply use the `kwild` binary with the `--autogen` flag.
@@ -45,8 +46,19 @@ The node will be the one initial validator.
 As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set.
 :::
 
-To clean up when done testing, delete the `~/.kwild` folder and the
-`kwil-pgdata` Docker volume.
+### Cleanup
+
+To clean up when done testing, delete the `~/.kwild` folder, the postgres container, and the
+`kwil-pgdata` Docker volume:
+
+```shell
+# Remove kwild node data
+rm ~/.kwild -rf
+
+# Stop and remove the postgres container & volume
+docker container rm -f kwil-postgres
+docker volume rm kwil-pgdata
+```
 
 ## Multi-Node
 
