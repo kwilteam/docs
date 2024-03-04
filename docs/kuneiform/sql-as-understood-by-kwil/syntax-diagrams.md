@@ -1,4 +1,5 @@
 ---
+hide_table_of_contents: true
 sidebar_position: 1
 sidebar_label: "Syntax Diagrams"
 id: syntax-diagrams
@@ -7,7 +8,15 @@ description: Syntax Diagrams
 slug: /syntax-diagrams
 ---
 
-### statements
+### Kuneiform DML
+
+<iframe
+  width="100%"
+  height="800"
+  src="https://kwilteam.github.io/sql-grammar/"
+></iframe>
+
+<!-- ### statements
 
 ![statements](diagram/statements.svg)
 
@@ -332,4 +341,4 @@ referenced by: [expr](#expr)
 
 ![EOF](diagram/EOF.svg)
 
-referenced by: [statements](#statements)
+referenced by: [statements](#statements) -->
