@@ -11,13 +11,13 @@ however you can also deploy your database using the [Kuneiform IDE](<https://ide
 
 ## Prerequisites
 
-To complete this tutorial, you will need a balance on the testnet. You can get testnet tokens from the [Kwil Faucet](https://faucet.kwil.com).
-
-You will need to use the Ethereum private key to sign for the account you want to deploy the database from.
+- [Kwil CLI](https://github.com/kwilteam/binary-releases/releases) - Download from the Kwil Binary Releases.
+- [Ethereum Wallet](https://privatekeys.pw/keys/ethereum/random) - You will need an Ethereum private key to sign the transaction.
+- [Testnet Tokens](https://faucet.kwil.com) - Get testnet tokens from the Kwil Faucet for your associated Ethereum address.
 
 ## Naming the Database
 
-Schemas are named using a database declaration at the top of the Kuneiform file.  Database names are unique to the account that deployed them.
+Schemas are named using a database declaration at the top of the Kuneiform file.  Database names are unique to the account that deployed them (i.e. you cannot have two databases with the same name deployed by the same account).
 
 ```sql title="social_media.kf"
 database social_media;
@@ -25,7 +25,7 @@ database social_media;
 
 ## Defining Tables
 
-Tables are defined using a table declaration.  Tables are named using table declarations at the top of the Kuneiform file.  Table names are unique to the database that contains them.
+Tables are defined using a table declaration.  Tables are named using table declarations under the database declaration. Table names are unique to the database that contains them.
 
 ```sql title="social_media.kf"
 // table for storing application users
@@ -59,7 +59,7 @@ To learn more about the support SQL syntax, see [Kuneiform's supported DML](/doc
 // it will automatically include the wallet address
 // of the caller in the "address" column
 action create_user ($id, $username, $age) public {
-    INSERT INTO users (id, ysername, age, address)
+    INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
@@ -85,8 +85,8 @@ action create_post ($id, $title, $content, $date_string) public {
 
 ## Creating Read-Only Actions
 
-Data can be read back from actions using read-only actions.  To specify a read-only action, use the `view` access modifier.
-`view` actions do not require the caller to submit a transaction to the Kwil network, making them free to call.
+Data is read back from actions using read-only actions.  To specify a read-only action, use the `view` access modifier.
+`view` actions are not processed in network consensus, and therefore are gasless and return results immediately.
 
 ```sql title="social_media.kf"
 // action get_user will get a user by their username
@@ -134,7 +134,7 @@ table posts {
 // it will automatically include the wallet address
 // of the caller in the "address" column
 action create_user ($id, $username, $age) public {
-    INSERT INTO users (id, ysername, age, address)
+    INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
@@ -174,21 +174,13 @@ action get_posts ($user_id) public view {
 
 # Deploying the Database
 
-To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To deploy the database, run the following command. Make sure to replace the `your-private-key` with your private key to sign the transaction:
+To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To deploy the database, run the following command. Make sure to replace `./path/to/social_media.kf` with the path to your Kuneiform file and `your-private-key` with your private key.
 
 ```bash
 # highlight-next-line
-$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://testnet.kwil.com' --chain-id 'kwil-chain-testnet-0.6' --private-key 'your-private-key'
-TxHash: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
-```
-
-To check if the deployment is successful, we can query the status of the transaction using the `tx status` command:
-
-```bash
-# highlight-next-line
-$ kwil-cli utils query-tx a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba --kwil-provider='https://testnet.kwil.com' --chain-id 'kwil-chain-testnet-0.6'
-Transaction ID: a84f6775888bcd516cb93cc5c6e15f497143df87089151404e2653925388afba
+$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://testnet.kwil.com' --chain-id 'kwil-chain-testnet-0.6' --private-key 'your-private-key' --sync
+TxHash: 53018a450101d07f096e767fc6bc11374addf7f5a5a9788d8ad69ed6f1a24f49
 Status: success
-Height: 4777
+Height: 587740
 Log: success
 ```
