@@ -14,7 +14,7 @@ For minor edits to the existing Kwil docs, e.g., fixing typos, or adding small p
 
 - Use GitHub to edit the page to which you wish to contribute, using markdown
 
-- Push the changes to a new branch 
+- Push the changes to a new branch
 
 - Issue a pull request into the Kwil docs repository
 
@@ -38,13 +38,13 @@ If you use git https:
 
 where `GITUSERNAME` is your git profile handle.
 
-### Install Node v16.14 or Above
+### Install Node 20.9 or Above
 
-Docusaurus requires Node v16.14 or above.
+Docusaurus requires Node v20.9 or above.
 
 Kwil recommends you use [nvm](https://github.com/nvm-sh/nvm) to manage your node.js environments.
 
-`nvm install 16.14`
+`nvm install 20`
 
 ### Use NPM to fetch package dependencies
 
@@ -64,7 +64,7 @@ This step should start the node development server and launch a web browser to t
 
 ## Adding your contribution to Kwil docs
 
-You will need to familiarize yourself with the Docusaurus file layout, categorization, and other features. 
+You will need to familiarize yourself with the Docusaurus file layout, categorization, and other features.
 Docusaurus provide an interactive [sandbox Playground](https://docusaurus.io/docs/playground) that will help you get up to speed.
 
 When ready, use your favourite Node.js IDE tooling, e.g., VS Code, to add new pages, React.js scripts, CSS styles etc., in accordance with Docusaurus guidelines.
@@ -77,7 +77,9 @@ After you’ve tested your changes:
 
 `git add .`
 
-- Commit your changes to a new branch. 
+  Note that the above command will add all untracked files, so check for unintended additions.  Otherwise, use `git add -u`, and add new files explicitly.
+
+- Commit your changes to a new branch.
 
 `git commit -m "Add new section for new feature XYZ"`
 
@@ -89,10 +91,8 @@ After you’ve tested your changes:
 
 Return to the Kwil docs home page in GitHub and navigate to [Pull Requests](https://github.com/kwilteam/docs/pulls).
 
-Click the Compare and pull request button, add a brief description of the changes made, including a motivation for why this will benefit the Kwil community, and then finally click the Create pull request button. 
+Click the create pull request button, add a brief description of the changes made, including a motivation for why this will benefit the Kwil community, and then finally click the Create pull request button.
 
 All pull requests will be reviewed as soon as possible, and if accepted, will be merged and published.
 
 Thank you for your contribution!
-
-
