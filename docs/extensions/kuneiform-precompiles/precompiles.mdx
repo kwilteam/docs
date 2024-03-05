@@ -1,0 +1,137 @@
+---
+sidebar_position: 1
+sidebar_label: "Precompiles"
+id: precompiles
+title: Kuneiform Precompiles
+description: Extend Kuneiform with custom precompiles.
+slug: /extensions/precompiles
+---
+
+Kuneiform precompiles are custom libraries that can be imported and called in Kuneiform schemas.
+By implementing custom action precompiles, developers can add support for new functionality to their Kwil network's Kuneiform language.
+These functionalities are wide ranging, and can include anything from performing hashing algorithms to directly calling the active Postgres connection.
+
+## How Precompiles Work
+
+Action precompiles are implemented as Go libraries that are loaded into the Kwil node at startup. All precompiles are globally available to all Kuneiform schemas.
+There are two distinct steps in an action precompile's lifecycle:
+
+1. **Initialize**: The action precompile is imported into a Kuneiform schema. It is given a set of initialization values, and a name by which it can be called. Initialize is called
+_each time_ the precompile is imported into a schema. If a node is restarted, all precompiles for all persisted schemas are re-initialized.
+
+2. **Call**: The action precompile is called by its name (given during initialization), and is given a method name and a set of arguments.
+It then performs the requested action and returns a result. This can only be done after the precompile has been initialized.
+
+Precompiles must match the following function signature and interface. For more information on the available types, see the reference documententation for the common
+and action precopmiles packages. TODO: Add link to reference documentation.
+
+```go title="https://github.com/kwilteam/kwil-db/blob/main/extensions/actions/actions.go"
+package actions
+
+// Initializer initializes a new instance of a precompile.
+// It is called when a Kuneiform schema is deployed that calls "use <precompile> {key: "value"} as <name>".
+// It is also called when the node starts up, if a database is already deployed that uses the precompile.
+// The key/value pairs are passed as the metadata parameter.
+// When initialize is called, the dataset is not yet accessible.
+type Initializer func(ctx *DeploymentContext, service *common.Service, metadata map[string]string) (Instance, error)
+
+// Instance is a named initialized instance of a precompile.
+// It is returned from the precompile initialization, as specified by the PrecompileInitializer.
+// It will exist for the lifetime of the deployed dataset, and a single
+// dataset can have multiple instances of the same precompile.
+type Instance interface {
+	// Call executes the requested method of the precompile.
+	// It is up to the instance implementation to determine
+	// if a method is valid, and to subsequently decode the arguments.
+	// The arguments passed in as args, as well as returned, are scalar values.
+	Call(scoper *ProcedureContext, app *common.App, method string, inputs []any) ([]any, error)
+}
+```
+
+## Using Precompiles in Kuneiform
+
+### Import and Call
+
+Precompiles can be used in Kuneiform by importing them at the top of a schema file. They can then be called in actions, and can be passed parameters
+from the schema. Precompiles can be given initialization values when imported. This is done by passing a set of key-value pairs to the `use` statement. This
+creates an instance of the precompile with the given name. Multiple instances of the same precompile can be imported and used in the same schema.
+
+```sql title="schema.kf"
+database mydb;
+
+use custom_extension {
+	key1: "value1"
+	key2: "value2"
+} as ext1;
+
+use custom_extension {
+	key1: "value3"
+	key2: "value4"
+} as ext2;
+
+action some_action($arg1) public {
+	$result1 = ext1.method_1($arg1);
+	$result2 = ext2.method_2($arg1);
+	// ...
+}
+```
+
+### Corresponding Implementation
+
+The corresponding Go implementation for the above schema would look something like this:
+
+```go title="custom_extension.go"
+package main
+
+import (
+	"fmt"
+
+	"github.com/kwilteam/kwil-db/common"
+	"github.com/kwilteam/kwil-db/extensions/actions"
+)
+
+func init() {
+	// Register the precompile with the node
+	// "custom_extension" is the name of the precompile that
+	// is used in the Kuneiform schema
+	actions.RegisterPrecompile("custom_extension", initialize)
+}
+
+// initialize is called when the "use custom_extension" statement is called in the Kuneiform schema.
+// For the above schema, it would be called twice, once for each instance of the precompile.
+func initialize(ctx *actions.DeploymentContext, service *common.Service, metadata map[string]string) (actions.Instance, error) {
+	// first instance:
+	// 	metadata == map[string]string{
+	//		"key1": "value1",
+	//		"key2": "value2",
+	//	}
+	//
+	// second instance:
+	// 	metadata == map[string]string{
+	//		"key1": "value3",
+	//		"key2": "value4",
+	//	}
+
+	return &instance{}, nil
+}
+
+// a struct that implements the actions.Instance interface
+type instance struct {}
+
+// Call is called when the precompile is called in the Kuneiform schema.
+// It is called once for each call to the precompile.
+// In the above schema, it would be called twice, once for each instance of the precompile.
+func (h *helloWorldInstance) Call(scoper *actions.ProcedureContext, app *common.App, method string, inputs []any) ([]any, error) {
+	// first instance:
+	// 	method == "method_1"
+	// 	inputs == []any{"arg1"}
+	//
+	// second instance:
+	// 	method == "method_2"
+	// 	inputs == []any{"arg1"}
+
+	// returns exactly one result,
+	// stored as $result1 and $result2 in the Kuneiform schema
+	return []any{"result"}, nil
+}
+```

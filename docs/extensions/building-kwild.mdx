@@ -1,0 +1,161 @@
+---
+sidebar_position: 2
+sidebar_label: "Building kwild With Extensions"
+id: building-kwild-with-extensions
+title: Building kwild With Extensions
+description: Build a custom kwild binary with your own extensions
+slug: /extensions/building-kwild-with-extensions
+---
+
+In order to use extensions in Kwil, users need to build custom `kwild` binaries that include the extensions they want to use.
+This guide will walk users through the process of building a custom `kwild` binary with extensions.
+
+## Prerequisites
+
+Before building a custom `kwild` binary, users need to have the following installed:
+- [Go 1.21+](https://golang.org/doc/install)
+- [Docker](https://docs.docker.com/get-docker/)
+
+## Step 1: Setting up the environment
+
+Users should start by setting up the repo for building the custom `kwild` binary. This will be a standard Go ewpo setup.
+
+Create a new directory for the custom `kwild` binary and navigate to it:
+
+```shell
+mkdir custom-kwild
+cd custom-kwild
+```
+
+Initialize a new Go module:
+
+```shell
+go mod init custom-kwild
+```
+
+Install the Kwil SDK:
+    
+```shell
+go get github.com/kwilteam/kwil-db@v0.7.0
+```
+
+## Step 2: Set up main.go
+
+Create a new file called `main.go` in the root of the project directory:
+
+```shell
+touch main.go
+```
+
+Add the following code to `main.go`:
+
+```go title="main.go"
+package main
+
+import (
+	"fmt"
+	"os"
+
+	"github.com/kwilteam/kwil-db/cmd/kwild/root"
+)
+
+func main() {
+	if err := root.RootCmd().Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+```
+
+## Step 3: Add a custom extension
+
+In the same directory as `main.go`, create a new file called `custom_extension.go`:
+
+```shell
+touch custom_extension.go
+```
+
+Add the following code to `custom_extension.go`. For this example, we will add a custom authenticator extension.
+
+:::tip
+All extensions can be added in the same way, via calling their respective `Register` function
+in the `init` function of the extension file.
+Examples on how to implement each type of extensions can be found in their respective sections.
+:::
+
+:::warning
+This example is for demonstration purposes only and should not be used in a production environment.
+For a production-ready Ed25519 authenticator, please refer to the [Ed25519 authenticator guide](/docs/extensions/example-ed25519).
+:::
+
+```go title="custom_extension.go"
+import (
+    "crypto/ed25519"
+    "fmt"
+    "encoding/hex"
+
+    "github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+// init registers the Ed25519Authenticator with the Kwil node
+func init() {
+    err := auth.RegisterAuthenticator("ed25519_example", Ed25519Authenticator{})
+    if err != nil {
+        panic(err)
+    }
+}
+
+type Ed25519Authenticator struct{}
+
+// Verify verifies the signature of a message
+func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
+    if !ed25519.Verify(sender, msg, signature) {
+        return fmt.Errorf("signature verification failed")
+    }
+
+    return nil
+}
+
+// Identifier returns the hex encoding of the public key
+func (Ed25519Authenticator) Identifier(sender []byte) (string, error) {
+    return hex.EncodeToString(sender), nil
+}
+```
+
+## Step 4: Build the custom `kwild` binary
+
+Build the custom `kwild` binary. This will compile all the files in the project directory, as well as any that are imported:
+
+```shell
+go build -o kwild
+```
+
+## Step 5: Run the custom `kwild` binary
+
+To run the custom `kwild` binary, we will first have to run Postgres. The Kwil team has provided a default image
+with the necessary configurations. For more information on how to run Postgres, please refer to the [Postgres setup guide](/docs/daemon/installation#postgresql).
+
+```shell
+docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \ 
+    kwildb/postgres:latest
+```
+
+After running Postgres, we can run the custom `kwild` binary. The `--autogen` flag will automatically generate a new node key and a new wallet key:
+
+```shell
+./kwild --autogen
+```
+
+## Conclusion
+
+In this guide, we walked through the process of building a custom `kwild` binary with extensions.
+Users can now use the custom `kwild` binary to run a Kwil node with the custom extension.
+For more information on how to use the custom extension, please refer to the respective extension documentation.
+
+## Next Steps
+
+- [Build a proper Ed25519 authenticator](/docs/extensions/example-ed25519)
+- [Build a custom Kuneiform SHA precompile](/docs/extensions/precompiles/sha)
+
+TODO: add more links to other extension guides
