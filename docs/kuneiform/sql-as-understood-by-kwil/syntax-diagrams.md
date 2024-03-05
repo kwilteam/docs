@@ -11,7 +11,8 @@ slug: /syntax-diagrams
 ### Kuneiform DML
 
 <iframe
-  width="100%"
-  height="800"
+  id="diagram-iframe"
   src="https://kwilteam.github.io/sql-grammar/"
+  width="1133"
+  height="14250"
 ></iframe>
