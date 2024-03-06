@@ -26,7 +26,7 @@ class KwilSigner {
 ```
 
 - `signer` is a callback function that takes a message and returns a signature.
-- `publicKey` is the public key of the signer. It can be passed as a hex string or a Uint8Array.
+- `identifier` is the unique account identifier (e.g. public key or wallet address) of the signer. It can be passed as a hex string or a Uint8Array.
 - `signatureType` is the name of the signature extension. This is the `name` that is passed to the [`RegisterExtension`](/docs/extensions/authenticators#register) function in the extension.
 
 The `KwilSigner` class can be passed to any API that requires a signer. For example, it can be passed to the `execute` function of the `WebKwil` class:
