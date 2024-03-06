@@ -37,7 +37,8 @@ import (
 )
 
 func init() {
-	// Register the precompile with the name "hash" and the initialize function
+	// Register the precompile with the name "hash" and the
+	// initialize function
 	err := actions.RegisterPrecompile("hash", initializeHash)
 	if err != nil {
 		panic(err)
@@ -61,8 +62,8 @@ func initializeHash(ctx *actions.DeploymentContext, service *common.Service, met
 	}, nil
 }
 
-// HashExtension is an extension that is not registered with the extension registry.
-// It allows hashing of strings in the engine.
+// HashExtension is an extension that is not registered with the
+// extension registry. It allows hashing of strings in the engine.
 type HashExtension struct {
 	algorithm string
 }

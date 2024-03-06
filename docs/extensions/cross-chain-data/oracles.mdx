@@ -1,0 +1,17 @@
+---
+sidebar_position: 1
+sidebar_label: "Oracles"
+id: oracles
+title: Oracles
+description: Build custom network oracles
+slug: /extensions/oracles
+---
+
+Oracles allow nodes to listen to external systems and automatically create and vote on resolutions. This is primarily used for syncing data from
+external event-driven systems, such as Ethereum. It can also be used to poll external APIs for data, as long as the exact data can eventually be agreed upon
+by the requisite threshold for
+the resolution to pass.
+
+## How it works
+
+In Kwil, an oracle is a long-running process that can inform the node of when some resolution can be voted on

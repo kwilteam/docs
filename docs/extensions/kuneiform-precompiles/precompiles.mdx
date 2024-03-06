@@ -29,21 +29,24 @@ and action precopmiles packages. TODO: Add link to reference documentation.
 package actions
 
 // Initializer initializes a new instance of a precompile.
-// It is called when a Kuneiform schema is deployed that calls "use <precompile> {key: "value"} as <name>".
-// It is also called when the node starts up, if a database is already deployed that uses the precompile.
-// The key/value pairs are passed as the metadata parameter.
-// When initialize is called, the dataset is not yet accessible.
+// It is called when a Kuneiform schema is deployed that calls
+// "use <precompile> {key: "value"} as <name>". It is also called
+// when the node starts up, if a database is already deployed that
+// uses the precompile. The key/value pairs are passed as the
+// metadata parameter. When initialize is called, the dataset is not
+// yet accessible.
 type Initializer func(ctx *DeploymentContext, service *common.Service, metadata map[string]string) (Instance, error)
 
-// Instance is a named initialized instance of a precompile.
-// It is returned from the precompile initialization, as specified by the PrecompileInitializer.
-// It will exist for the lifetime of the deployed dataset, and a single
-// dataset can have multiple instances of the same precompile.
+// Instance is a named initialized instance of a precompile. It is
+// returned from the precompile initialization, as specified by the
+// Initializer. It will exist for the lifetime of the deployed
+// dataset, and a single dataset can have multiple instances of the
+// same precompile.
 type Instance interface {
-	// Call executes the requested method of the precompile.
-	// It is up to the instance implementation to determine
-	// if a method is valid, and to subsequently decode the arguments.
-	// The arguments passed in as args, as well as returned, are scalar values.
+	// Call executes the requested method of the precompile. It is up
+	// to the instance implementation to determine if a method is
+	// valid, and to subsequently decode the arguments. The arguments
+	// passed in as args, as well as returned, are scalar values.
 	Call(scoper *ProcedureContext, app *common.App, method string, inputs []any) ([]any, error)
 }
 ```
@@ -97,8 +100,9 @@ func init() {
 	actions.RegisterPrecompile("custom_extension", initialize)
 }
 
-// initialize is called when the "use custom_extension" statement is called in the Kuneiform schema.
-// For the above schema, it would be called twice, once for each instance of the precompile.
+// initialize is called when the "use custom_extension" statement is
+// called in the Kuneiform schema. For the above schema, it would be
+// called twice, once for each instance of the precompile.
 func initialize(ctx *actions.DeploymentContext, service *common.Service, metadata map[string]string) (actions.Instance, error) {
 	// first instance:
 	// 	metadata == map[string]string{
@@ -118,9 +122,10 @@ func initialize(ctx *actions.DeploymentContext, service *common.Service, metadat
 // a struct that implements the actions.Instance interface
 type instance struct {}
 
-// Call is called when the precompile is called in the Kuneiform schema.
-// It is called once for each call to the precompile.
-// In the above schema, it would be called twice, once for each instance of the precompile.
+// Call is called when the precompile is called in the Kuneiform
+// schema. It is called once for each call to the precompile. In
+// the above schema, it would be called twice, once for each instance
+// of the precompile.
 func (h *helloWorldInstance) Call(scoper *actions.ProcedureContext, app *common.App, method string, inputs []any) ([]any, error) {
 	// first instance:
 	// 	method == "method_1"
