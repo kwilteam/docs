@@ -19,7 +19,7 @@ around a signer function that takes a message and returns a signature. It can be
 class KwilSigner {
     constructor(
         signer: (msg: Uint8Array) => Promise<Uint8Array>,
-        publicKey: HexString | Uint8Array,
+        identifier: HexString | Uint8Array,
         signatureType: SignatureType
     )
 }
