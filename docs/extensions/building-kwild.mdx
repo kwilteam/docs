@@ -130,7 +130,7 @@ Build the custom `kwild` binary. This will compile all the files in the project 
 go build -o kwild
 ```
 
-## Step 5: Run the custom `kwild` binary
+## Step 5: Run Postgres
 
 Before running the custom `kwild` binary, you will have to start Postgres. The Kwil team has provided a default image
 with the necessary configurations. For more information on how to configure your own Postgres database, please
@@ -141,7 +141,10 @@ docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=tr
     kwildb/postgres:latest
 ```
 
-After running Postgres, you can run the custom `kwild` binary. The `--autogen` flag will automatically generate a new node key and a new wallet key:
+## Step 6: Run the custom `kwild` binary
+
+After running Postgres, you can run the custom `kwild` binary. The `--autogen` flag will automatically generate a new node key, a network genesis file, and a default
+node configuration:
 
 ```shell
 ./kwild --autogen

@@ -20,7 +20,7 @@ There are two distinct steps in an action precompile's lifecycle:
 _each time_ the precompile is imported into a schema. If a node is restarted, all precompiles for all persisted schemas are re-initialized.
 
 2. **Call**: The action precompile is called by its name (given during initialization), and is given a method name and a set of arguments.
-It then performs the requested action and returns a result. This can only be done after the precompile has been initialized.
+It then performs the requested action and returns a result to the caller. This can only be done after the precompile has been initialized.
 
 Precompiles must match the following function signature and interface. For more information on the available types, see the reference documententation for the [common](/docs/extensions/api-reference/common)
 and [action precompiles](/docs/extensions/api-reference/precompiles) packages.

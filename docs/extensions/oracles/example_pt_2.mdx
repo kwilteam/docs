@@ -3,17 +3,17 @@ sidebar_position: 5
 sidebar_label: "Example Pt. 2: Ethereum Event Listener"
 id: oracle-example-part-2
 title: "Example Pt. 2: Ethereum Event Listener"
-description: "Create a simple oracle that listens to EVM events, and credits an account when a log is heard."
+description: "Create a simple event listener that listens to EVM events, and credits an account when a log is heard."
 slug: /extensions/oracle-example-part-2
 ---
 
-In this tutorial, we will build a simple oracle that listens to EVM events, and credits an account when a log is heard.
-The oracle will be configured to listen to a specific contract address, and will listen to the EVM event signature `Credit(address,uint256)`
+In this tutorial, we will build a simple event listener that listens to EVM events, and credits an account when a log is heard.
+The listener will be configured to listen to a specific contract address, and will listen to the EVM event signature `Credit(address,uint256)`
 
 This tutorial uses concepts and code from the resolution extension introduced in this [part 1: example Kwil credits](/docs/extensions/oracle-example-part-1).
 
 **This tutorial is for example purposes only, and should not be used in production.** Production implementations should account for transient network failures,
-subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation of this oracle, please refer to the [Kwil EVM Oracle](<https://github.com/kwilteam/kwil-db/tree/main/extensions/listeners/eth_deposits>) that is
+subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation of this event listener, please refer to the [Kwil EVM Deposits Listener](<https://github.com/kwilteam/kwil-db/tree/main/extensions/listeners/eth_deposits>) that is
 included in all Kwil nodes by default.
 
 ## Prerequisites
@@ -48,11 +48,11 @@ import (
 	"github.com/kwilteam/kwil-db/extensions/resolutions/credit"
 )
 
-// contractABIStr is the ABI of the smart contract the oracle listens to.
+// contractABIStr is the ABI of the smart contract the listener listens to.
 // It follows the Ethereum ABI JSON format, and matches the `Credit(address,uint256)` event signature.
 const contractABIStr = `[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"_from","type":"address"},{"indexed":false,"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"Credit","type":"event"}]`
 
-// creditEventSignature is the EVM event signature the oracle listens to.
+// creditEventSignature is the EVM event signature the listener listens to.
 var creditEventSignature ethcommon.Hash = crypto.Keccak256Hash([]byte("Credit(address,uint256)"))
 
 // processBlock gets all credit events for a range of blocks and processes them.
@@ -113,7 +113,7 @@ func processBlock(ctx context.Context, eventstore listeners.EventStore, client *
 ## Step 2. Listening to Ethereum
 
 In order to listen to Ethereum, we will need to read in our local node's configuration, create a client, and listen for new blocks.
-If the configuration is not set, or if the configuration is invalid, we will immediately shut down the oracle. We will also stop the oracle
+If the configuration is not set, or if the configuration is invalid, we will immediately shut down the listener. We will also stop the listener
 if the context is cancelled.
 
 ```go title="credit_listener.go"
@@ -127,38 +127,38 @@ import (
 	"github.com/kwilteam/kwil-db/extensions/listeners"
 )
 
-// EthOracle is an oracle that listens to ethereum events and broadcasts corresponding
+// EthListener is an event listener that listens to ethereum events and broadcasts corresponding
 // account credits to the Kwil network.
-func EthOracle(ctx context.Context, service *common.Service, eventstore listeners.EventStore) error {
-	// we will first get the configs that the local node has for the eth_oracle extension
-	config, ok := service.ExtensionConfigs["eth_oracle"]
+func EthListener(ctx context.Context, service *common.Service, eventstore listeners.EventStore) error {
+	// we will first get the configs that the local node has for the eth_listener extension
+	config, ok := service.ExtensionConfigs["eth_listener"]
 	if !ok {
-		service.Logger.Info("eth_oracle: no config found. skipping...")
+		service.Logger.Info("eth_listener: no config found. skipping...")
 		return nil
 	}
 
 	rpcProvider, ok := config["rpc_provider"]
 	if !ok {
-		return fmt.Errorf("eth_oracle: rpc_provider not found in config")
+		return fmt.Errorf("eth_listener: rpc_provider not found in config")
 	}
 
 	contractAddressStr, ok := config["contract_address"]
 	if !ok {
-		return fmt.Errorf("eth_oracle: contract_address not found in config")
+		return fmt.Errorf("eth_listener: contract_address not found in config")
 	}
 	contractAddress := ethcommon.HexToAddress(contractAddressStr)
 
 	// we will now use go-ethereum to subscribe to new blocks
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
-		return fmt.Errorf("eth_oracle: failed to connect to ethereum client: %w", err)
+		return fmt.Errorf("eth_listener: failed to connect to ethereum client: %w", err)
 	}
 	defer client.Close()
 
 	headers := make(chan *types.Header)
 	sub, err := client.SubscribeNewHead(ctx, headers)
 	if err != nil {
-		return fmt.Errorf("eth_oracle: failed to subscribe to new block headers: %w", err)
+		return fmt.Errorf("eth_listener: failed to subscribe to new block headers: %w", err)
 	}
 	defer sub.Unsubscribe()
 
@@ -169,11 +169,11 @@ func EthOracle(ctx context.Context, service *common.Service, eventstore listener
 		case <-ctx.Done():
 			return nil
 		case err := <-sub.Err():
-			return fmt.Errorf("eth_oracle: subscription error: %w", err)
+			return fmt.Errorf("eth_listener: subscription error: %w", err)
 		case header := <-headers:
 			err := processBlock(ctx, eventstore, client, header.Number.Int64(), contractAddress)
 			if err != nil {
-				return fmt.Errorf("eth_oracle: failed to process block: %w", err)
+				return fmt.Errorf("eth_listener: failed to process block: %w", err)
 			}
 		}
 	}
@@ -182,22 +182,22 @@ func EthOracle(ctx context.Context, service *common.Service, eventstore listener
 
 ## Step 3. Configuration
 
-In order to run the oracle, each Kwil node will need to configure an Ethereum RPC provider and smart contract address to listen to.
+In order to run the listener, each Kwil node will need to configure an Ethereum RPC provider and smart contract address to listen to.
 This can be done in each node's local `config.toml` file:
 
 ```toml title="config.toml"
 # ...
-[app.extensions.eth_oracle]
+[app.extensions.eth_listener]
 rpc_provider = "https://mainnet.infura.io/v3/YOUR_INFURA_API_KEY"
 contract_address = "0xYOUR_CONTRACT_ADDRESS"
 # ...
 ```
 
-The oracle will read in the values set in `config.toml`, using them to connect to the Ethereum network and listen to the specified contract address.
+The listener will read in the values set in `config.toml`, using them to connect to the Ethereum network and listen to the specified contract address.
 
 ## Step 4. Register the Event Listener
 
-Register the oracle with the Kwil node. This is done by calling the `RegisterListener` function in the package's `init` function.
+Register the event listener with the Kwil node. This is done by calling the `RegisterListener` function in the package's `init` function.
 
 ```go title="credit_listener.go"
 package main
@@ -207,7 +207,7 @@ import (
 )
 
 func init() {
-	err := listeners.RegisterListener("eth_oracle", EthOracle)
+	err := listeners.RegisterListener("eth_listener", EthListener)
 	if err != nil {
 		panic(err)
 	}
@@ -216,7 +216,7 @@ func init() {
 
 ## Full Example
 
-The full example of the oracle extension implemented in this tutorial is shown below:
+The full example of the event listener extension implemented in this tutorial is shown below:
 
 <details>
     <summary>credit_listener.go</summary>
@@ -241,38 +241,38 @@ import (
 	"github.com/kwilteam/kwil-db/extensions/resolutions/credit"
 )
 
-// EthOracle is an oracle that listens to ethereum events and broadcasts corresponding
+// EthListener is an event listener that listens to ethereum events and broadcasts corresponding
 // account credits to the Kwil network.
-func EthOracle(ctx context.Context, service *common.Service, eventstore listeners.EventStore) error {
-	// we will first get the configs that the local node has for the eth_oracle extension
-	config, ok := service.ExtensionConfigs["eth_oracle"]
+func EthListener(ctx context.Context, service *common.Service, eventstore listeners.EventStore) error {
+	// we will first get the configs that the local node has for the eth_listener extension
+	config, ok := service.ExtensionConfigs["eth_listener"]
 	if !ok {
-		service.Logger.Info("eth_oracle: no config found. skipping...")
+		service.Logger.Info("eth_listener: no config found. skipping...")
 		return nil
 	}
 
 	rpcProvider, ok := config["rpc_provider"]
 	if !ok {
-		return fmt.Errorf("eth_oracle: rpc_provider not found in config")
+		return fmt.Errorf("eth_listener: rpc_provider not found in config")
 	}
 
 	contractAddressStr, ok := config["contract_address"]
 	if !ok {
-		return fmt.Errorf("eth_oracle: contract_address not found in config")
+		return fmt.Errorf("eth_listener: contract_address not found in config")
 	}
 	contractAddress := ethcommon.HexToAddress(contractAddressStr)
 
 	// we will now use go-ethereum to subscribe to new blocks
 	client, err := ethclient.Dial(rpcProvider)
 	if err != nil {
-		return fmt.Errorf("eth_oracle: failed to connect to ethereum client: %w", err)
+		return fmt.Errorf("eth_listener: failed to connect to ethereum client: %w", err)
 	}
 	defer client.Close()
 
 	headers := make(chan *types.Header)
 	sub, err := client.SubscribeNewHead(ctx, headers)
 	if err != nil {
-		return fmt.Errorf("eth_oracle: failed to subscribe to new block headers: %w", err)
+		return fmt.Errorf("eth_listener: failed to subscribe to new block headers: %w", err)
 	}
 	defer sub.Unsubscribe()
 
@@ -283,21 +283,21 @@ func EthOracle(ctx context.Context, service *common.Service, eventstore listener
 		case <-ctx.Done():
 			return nil
 		case err := <-sub.Err():
-			return fmt.Errorf("eth_oracle: subscription error: %w", err)
+			return fmt.Errorf("eth_listener: subscription error: %w", err)
 		case header := <-headers:
 			err := processBlock(ctx, eventstore, client, header.Number.Int64(), contractAddress)
 			if err != nil {
-				return fmt.Errorf("eth_oracle: failed to process block: %w", err)
+				return fmt.Errorf("eth_listener: failed to process block: %w", err)
 			}
 		}
 	}
 }
 
-// contractABIStr is the ABI of the smart contract the oracle listens to.
+// contractABIStr is the ABI of the smart contract the listener listens to.
 // It follows the Ethereum ABI JSON format, and matches the `Credit(address,uint256)` event signature.
 const contractABIStr = `[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"address","name":"_from","type":"address"},{"indexed":false,"internalType":"uint256","name":"_amount","type":"uint256"}],"name":"Credit","type":"event"}]`
 
-// creditEventSignature is the EVM event signature the oracle listens to.
+// creditEventSignature is the EVM event signature the listener listens to.
 var creditEventSignature ethcommon.Hash = crypto.Keccak256Hash([]byte("Credit(address,uint256)"))
 
 // processBlock gets all credit events for a range of blocks and processes them.
@@ -353,7 +353,7 @@ func processBlock(ctx context.Context, eventstore listeners.EventStore, client *
 }
 
 func init() {
-	err := listeners.RegisterListener("eth_oracle", EthOracle)
+	err := listeners.RegisterListener("eth_listener", EthListener)
 	if err != nil {
 		panic(err)
 	}
@@ -362,4 +362,4 @@ func init() {
 
 </details>
 
-To build and run the oracle extension example, follow the standard [`kwild` build and run](/docs/extensions/building-kwild-with-extensions) process.
+To build and run the event listener extension example, follow the standard [`kwild` build and run](/docs/extensions/building-kwild-with-extensions) process.

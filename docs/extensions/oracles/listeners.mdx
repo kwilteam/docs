@@ -65,7 +65,7 @@ func listenFunc(ctx context.Context, service *common.Service, eventstore listene
 
 ### EventStore
 
-The `EventStore` allows oracles to persist seen events on their local node. Once persisted, the local node will broadcast the event to the network when appropriate.
+The `EventStore` allows event listeners to persist seen events on their local node. Once persisted, the local node will broadcast the event to the network when appropriate.
 The `EventStore` also provides `Set`, `Get`, and `Delete` methods for storing key-value metadata. **None of the data stored in `Set` or `Delete` will be broadcast to the network.**
 The methods merely exist to aid the listener in keeping track of local state in case of a crash or restart.
 

@@ -27,7 +27,7 @@ type Authenticator interface {
 	Verify(sender, msg, signature []byte) error
 
 	// Identifier returns a string identifier for a given sender. This string identifier is
-	// used to identify the sender when interacting with the Kuneiform engine, and will
+	// used to identify the sender when interacting with the database engine, and will
 	// be used as the `@caller` variable in the engine.
 	Identifier(sender []byte) (string, error)
 }
@@ -71,7 +71,7 @@ When implementing a custom authenticator, there are a few security consideration
 - It is critically important to avoid collisions in the `sender` field of the `Verify` method. Any `Verify` that returns `nil` will allow the sender to perform any action on the user's behalf.
 This will give them access to the user's funds and schemas. It is important to ensure that the `sender` field is unique for each user.
 - Care must be taken to avoid collisions in the string identifier returned from the `Identifier()` method.
-If two different senders produce the same string identifier, it will be impossible to distinguish between them in the database. They will be treated as the same user in the Kuneiform
+If two different senders produce the same string identifier, it will be impossible to distinguish between them in the database. They will be treated as the same user in the database
 engine.
 - State should not be stored in any custom authenticator struct. Nodes do not call `Verify` or `Identifier` in a deterministic way, and may call them at any time.
 
