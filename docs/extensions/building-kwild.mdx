@@ -132,7 +132,7 @@ go build -o kwild
 
 ## Step 5: Run the custom `kwild` binary
 
-To run the custom `kwild` binary, you will first have to run Postgres. The Kwil team has provided a default image
+Before running the custom `kwild` binary, you will have to start Postgres. The Kwil team has provided a default image
 with the necessary configurations. For more information on how to configure your own Postgres database, please
 refer to the [Postgres setup guide](/docs/daemon/installation#postgresql).
 
@@ -155,7 +155,8 @@ For more information on how to use the custom extension, please refer to the res
 
 ## Next Steps
 
-- [Build a proper Ed25519 authenticator](/docs/extensions/example-ed25519)
-- [Build a custom Kuneiform SHA precompile](/docs/extensions/precompiles/sha)
-
-TODO: add more links to other extension guides
+Additional extension types and tutorials found below:
+- **Authenticators**: [Build a proper Ed25519 authenticator](/docs/extensions/example-ed25519)
+- **Kuneiform Precompiles**: [Build a SHA Kuneiform precompile](/docs/extensions/precompiles/sha)
+- **Resolutions**: [Build account credit resolution](/docs/extensions/oracle-example-part-1)
+- **Event Listeners**: [Build Ethereum event listener](/docs/extensions/oracle-example-part-2)

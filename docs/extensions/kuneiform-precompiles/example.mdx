@@ -7,7 +7,7 @@ description: Implementing a precompile for SHA hash functions
 slug: /extensions/precompiles/sha
 ---
 
-The following example demonstrates how to implement a precompile for the SHA256 hash function.
+The following example demonstrates how to implement a precompile for the SHA256 and SHA512 hash functions.
 
 ## Prerequisites
 
@@ -108,9 +108,9 @@ func (h *HashExtension) Call(scoper *actions.ProcedureContext, app *common.App, 
 
 ## Step 2: Use The Precompile
 
-The precompile can be used in a Kuneiform schema. The following example demonstrates how to use the precompile in a Kuneiform schema.
-It will have two actions: "SHA256" and "SHA512". Each action will take a single input, which will be a string of the data to hash.
-The action will return the hex encoded hash of the input data. Since no data is being stored, the actions will both be public and view.
+The next step is to call the precompile in a Kuneiform schema. The following example demonstrates how to use the precompile in a Kuneiform schema.
+The schema will have two actions: "SHA256" and "SHA512". Each action will take a single input, which will be a string of the data to hash.
+The action will return the hex encoded hash of the input data. Since the actions do not store data, they will be public and view.
 
 ```sql title="schema.kf"
 database mydb;

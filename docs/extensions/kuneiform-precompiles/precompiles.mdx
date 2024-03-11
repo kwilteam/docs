@@ -16,14 +16,14 @@ These functionalities are wide ranging, and can include anything from performing
 Action precompiles are implemented as Go libraries that are loaded into the Kwil node at startup. All precompiles are globally available to all Kuneiform schemas.
 There are two distinct steps in an action precompile's lifecycle:
 
-1. **Initialize**: The action precompile is imported into a Kuneiform schema. It is given a set of initialization values, and a name by which it can be called. Initialize is called
+1. **Initialize**: The action precompile is imported into a Kuneiform schema. It is given a set of initialization values, and an alias by which it can be called. Initialize is called
 _each time_ the precompile is imported into a schema. If a node is restarted, all precompiles for all persisted schemas are re-initialized.
 
 2. **Call**: The action precompile is called by its name (given during initialization), and is given a method name and a set of arguments.
 It then performs the requested action and returns a result. This can only be done after the precompile has been initialized.
 
-Precompiles must match the following function signature and interface. For more information on the available types, see the reference documententation for the common
-and action precompiles packages. TODO: Add link to reference documentation.
+Precompiles must match the following function signature and interface. For more information on the available types, see the reference documententation for the [common](/docs/extensions/api-reference/common)
+and [action precompiles](/docs/extensions/api-reference/precompiles) packages.
 
 ```go title="https://github.com/kwilteam/kwil-db/blob/main/extensions/actions/actions.go"
 package actions
@@ -55,13 +55,14 @@ type Instance interface {
 
 ### Import and Call
 
-Precompiles can be used in Kuneiform by importing them at the top of a schema file. They can then be called in actions, and can be passed parameters
-from the schema. Precompiles can be given initialization values when imported. This is done by passing a set of key-value pairs to the `use` statement. This
+Precompiles are used in Kuneiform by importing them at the top of a schema file. They are then called in actions, and can receive parameters
+from the action. Precompiles can receive initialization values when imported via passing a set of key-value pairs to the `use` statement. This
 creates an instance of the precompile with the given name. Multiple instances of the same precompile can be imported and used in the same schema.
 
 ```sql title="schema.kf"
 database mydb;
 
+// import extension and pass initialization values
 use custom_extension {
 	key1: "value1"
 	key2: "value2"
@@ -72,6 +73,7 @@ use custom_extension {
 	key2: "value4"
 } as ext2;
 
+// call extension within action
 action some_action($arg1) public {
 	$result1 = ext1.method_1($arg1);
 	$result2 = ext2.method_2($arg1);

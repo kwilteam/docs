@@ -10,8 +10,7 @@ slug: /extensions/oracle-example-part-2
 In this tutorial, we will build a simple oracle that listens to EVM events, and credits an account when a log is heard.
 The oracle will be configured to listen to a specific contract address, and will listen to the EVM event signature `Credit(address,uint256)`
 
-This tutorial builds on the concepts introduced in this tutorial's [part 1](/docs/extensions/oracle-example-part-1),
-and uses the resolution created there.
+This tutorial uses concepts and code from the resolution extension introduced in this [part 1: example Kwil credits](/docs/extensions/oracle-example-part-1).
 
 **This tutorial is for example purposes only, and should not be used in production.** Production implementations should account for transient network failures,
 subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation of this oracle, please refer to the [Kwil EVM Oracle](<https://github.com/kwilteam/kwil-db/tree/main/extensions/listeners/eth_deposits>) that is
@@ -30,7 +29,7 @@ This tutorial assumes that the user is familiar with the following concepts:
 To get started, we will first need a way to query the Ethereum blockchain for new events. We will use the popular `go-ethereum` library, which is the
 main implementation of Ethereum. We will use this library to connect to an Ethereum node, subscribe to new blocks, and query for logs.
 
-The below code relies on the `AccountCreditResolution` struct and the `CreditAccountEventType` constant from [part 1](/docs/extensions/oracle-example-part-1).
+The code below relies on the `AccountCreditResolution` struct and the `CreditAccountEventType` constant from [part 1](/docs/extensions/oracle-example-part-1).
 
 ```go title="credit_listener.go"
 package main
@@ -194,11 +193,11 @@ contract_address = "0xYOUR_CONTRACT_ADDRESS"
 # ...
 ```
 
-The values set here will be read in by the oracle, and used to connect to the Ethereum network and listen to the specified contract address.
+The oracle will read in the values set in `config.toml`, using them to connect to the Ethereum network and listen to the specified contract address.
 
-## Step 4. Register the Oracle
+## Step 4. Register the Event Listener
 
-Register the oracle with the Kwil node. This is done by calling the `RegisterOracle` function in the package's `init` function.
+Register the oracle with the Kwil node. This is done by calling the `RegisterListener` function in the package's `init` function.
 
 ```go title="credit_listener.go"
 package main

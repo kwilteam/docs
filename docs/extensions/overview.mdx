@@ -16,29 +16,29 @@ when implementing an extension. These are outlined in each extension types page.
 
 ## Types of Extensions
 
-There are four types of extensions that can be implemented. Each extension has its own set of interfaces that must be implemented, as well as their
+There are four types of extensions. Each extension has its own set of interfaces that must be implemented, as well as their
 own set of rules and restrictions that must be followed.
 
 ### [Authenticators](/docs/extensions/authenticators)
 
-Authenticators are custom asymmetric signature algorithms that can be used to sign and verify transactions. By implementing custom authenticators,
+Authenticators are custom asymmetric signature algorithms used to sign and verify transactions. By implementing custom authenticators,
 developers can add support for new signature algorithms to their Kwil network. Any wallet with a corresponding authenticator can be used to
 deploy schemas, hold and transfer native gas tokens, or perform any other action that requires a signed transaction.
 
 ### [Kuneiform Precompiles](/docs/extensions/precompiles)
 
-Kuneiform precompiles are custom libraries that can be imported and called in Kuneiform schemas. By implementing custom Kuneiform precompiles, developers
+Kuneiform precompiles are custom libraries that are imported and called in Kuneiform schemas. By implementing custom Kuneiform precompiles, developers
 can add new Kuneiform functionality to their Kwil network. These functionalities are wide ranging, and can include anything from performing hashing
 algorithms to directly calling the active Postgres connection.
 
-### Resolutions
+### [Resolutions](/docs/extensions/resolutions)
 
 Resolutions are custom governance proposals that can be implemented in a Kwil network. Custom resolutions allow developers to build types of
 governance proposals that can be proposed and voted on by all stakeholders in the network. Implementations can specify the required voting
 threshold, the maximum duration of the proposal, and the subsequent state changes that will be applied if the proposal is approved.
 
-### Oracles
+### [Event Listeners](/docs/extensions/event-listeners)
 
-Oracles allow nodes to listen to external systems and automatically create and vote on resolutions. This is primarily used for syncing data from
+Event Listeners allow nodes to listen to external systems and automatically create and vote on resolutions. This is primarily used for syncing data from
 external event-driven systems, such as Ethereum. It can also be used to poll external APIs for data, as long as the exact data can eventually be agreed upon
 by the requisite threshold for the resolution to pass.

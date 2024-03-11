@@ -8,8 +8,8 @@ slug: /extensions/oracle-example-part-1
 ---
 
 In this tutorial, we will create a resolution that can credit accounts with the networks native gas token. This example is based off of the
-`credit_account` resolution found in the default Kwil implementation. It is purely for example purposes, since the default implementation
-is already available in the Kwil network. The default implementation can be found [here](<https://github.com/kwilteam/kwil-db/blob/main/extensions/resolutions/credit/credit.go>).
+`credit_account` resolution found in the [default Kwil implementation](https://github.com/kwilteam/kwil-db/blob/main/extensions/resolutions/credit/credit.go). It is purely for example purposes, since the default implementation
+is already available in the Kwil network.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ We will first define a struct to hold the information about our credit. This str
 passed to stored in Kwil's resolution store. We will use Kwil's `serialize` package, which implements a deterministic and compact serialization
 format based on Ethereum's RLP encoding.
 
-Create a new directory in the `kwil-db/extensions` directory called `resolution_credit`, and create a new file called `credit.go`.
+Create a new directory in the `kwil-db/extensions` directory called `resolution_credit`, and create a new file called `credit_resolution.go`.
 
 ```go title="credit_resolution.go"
 package main
@@ -71,7 +71,7 @@ func (a *AccountCreditResolution) UnmarshalBinary(data []byte) error {
 
 We will now define the configuration for our resolution. This informs the Kwil network about the rules for our resolution, and
 how it should be processed. We will register this resolution using Golang's `init` function. This is a special function called by
-Golang when the package is imported, and will be run before any other code. This allows our `kwild` node to access the resolution
+Golang when the package is imported, and will run before any other code. This allows our `kwild` node to access the resolution
 config when it starts up.
 
 ```go title="credit_resolution.go"
