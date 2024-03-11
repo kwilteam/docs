@@ -1,17 +1,53 @@
 ---
 sidebar_position: 1
-sidebar_label: "Oracles"
-id: oracles
+sidebar_label: "Overview"
+id: oracles-overview
 title: Oracles
-description: Build custom network oracles
-slug: /extensions/oracles
+description: Build custom event-driven oracles.
+slug: /extensions/oracles-overview
 ---
 
-Oracles allow nodes to listen to external systems and automatically create and vote on resolutions. This is primarily used for syncing data from
-external event-driven systems, such as Ethereum. It can also be used to poll external APIs for data, as long as the exact data can eventually be agreed upon
-by the requisite threshold for
-the resolution to pass.
+Kwil networks have the ability to come to consensus on external system events, and trigger subsequent state changes based on the result of those events. This allows for network changes to be automatically triggered by external systems, such as other blockchain networks.
 
-## How it works
+Example usecases for Kwil oracles include:
 
-In Kwil, an oracle is a long-running process that can inform the node of when some resolution can be voted on
+- Giving users native network gas when they burn an ERC20 token on Ethereum.
+- Updating a validator's power when they stake an SPL token on Solana.
+- Automatically syncing data from another Kwil network.
+
+## Anatomy of an Oracle
+
+Oracles are made up of two distinct components: event listeners, and resolutions.
+
+[Event Listeners](/docs/extensions/cross-chain-data/listeners.mdx) are responsible for observing external systems and storing information about the events that occur. When an event listener detects an event, it stores the event in its local database. The node will then broadcast information about the event to the rest of the network, until the event is recognized by a majority of the network.
+
+[Resolutions](/docs/extensions/cross-chain-data/resolutions.mdx) are responsible for taking the information about the event from the event listener, and using it to trigger a state change in the network. When a resolution is triggered, it will broadcast information about the state change to the rest of the network, until the state change is recognized by a majority of the network.
+
+## Event Lifecycle
+
+The process by which the network agrees on external events can be broken down into the following steps:
+
+1. Nodes observe an event in an external system, and broadcast this information to the rest of the network. The hash of the observed event, with the node it was observed by, is mined into a block.
+2. A node who has seen the event has become a block proposer. They will include the full event data in the proposed block.
+3. Once enough nodes have acknowledged the event, and the full event data has been included, the corresponding changes will be made to the network state.
+
+### Step 1: Observing an Event
+
+When an event is observed by a node, the node will store the event in its local database. The node will immediately broadcast the ID of the event to the rest of the network.
+The ID is a hash of the event body and the resolution type (which specifies the resulting changes to the network state when the event passes).
+The ID and the node that observed the event is mined into a block. All nodes will vote for events as they are observed:
+
+![Node Observes Event](/img/oracles/vote.png)
+
+### Step 2: Providing Full Event Data
+
+Once a node that has observed the event becomes a block proposer, it will include the full event data in the proposed block. By providing the full event data,
+we can be sure that every node has the same information about the event, even if they didn't observe it themselves.
+
+![Event Proposal](/img/oracles/propose.png)
+
+### Step 3: State Change
+
+Once enough nodes have acknowledged the event, and the full event data has been shared with the network, each node will execute the state changes corresponding to the event.
+State changes for all newly confirmed resolutions are executed in a deterministic order at the end of each block, and proofs of the state changes are included
+in the block's hash.

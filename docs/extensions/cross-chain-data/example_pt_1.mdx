@@ -1,10 +1,10 @@
 ---
-sidebar_position: 2
-sidebar_label: "Tutorial"
-id: resolutions-ext-tutorial
-title: Resolution Credit Tutorial
-description: A resolution that can be used to credit user accounts.
-slug: /extensions/resolutions/tutorial
+sidebar_position: 4
+sidebar_label: "Example Pt. 1: Kwil Account Credits"
+id: oracle-example-part-1
+title: "Example Pt. 1: Kwil Account Credits"
+description: "Create a resolution that credits a Kwil account with the chain's native gas token."
+slug: /extensions/oracle-example-part-1
 ---
 
 In this tutorial, we will create a resolution that can credit accounts with the networks native gas token. This example is based off of the
@@ -13,7 +13,9 @@ is already available in the Kwil network. The default implementation can be foun
 
 ## Prerequisites
 
-Make sure you follow the [kwil-db clone](/docs/extensions/quickstart#prerequisites) instructions and have all the necessary tools installed.
+This tutorial assumes that the user is familiar with the following concepts:
+- [Building a custom Kwil node with extensions](/docs/extensions/building-kwild-with-extensions)
+- [Running a Kwil node locally](/docs/node/quickstart#single-node)
 
 ## Step 1. Credit Struct
 
@@ -23,13 +25,11 @@ format based on Ethereum's RLP encoding.
 
 Create a new directory in the `kwil-db/extensions` directory called `resolution_credit`, and create a new file called `credit.go`.
 
-```go title="credit.go"
-package credit
+```go title="credit_resolution.go"
+package main
 
 import (
 	"math/big"
-
-	"github.com/kwilteam/kwil-db/common/functions"
 )
 
 // AccountCreditResolution is a resolution that allows accounts to be credited with a given amount.
@@ -74,8 +74,8 @@ how it should be processed. We will register this resolution using Golang's `ini
 Golang when the package is imported, and will be run before any other code. This allows our `kwild` node to access the resolution
 config when it starts up.
 
-```go title="credit.go"
-package credit
+```go title="credit_resolution.go"
+package main
 
 import (
 	"context"
@@ -88,7 +88,7 @@ import (
 	"github.com/kwilteam/kwil-db/extensions/resolutions"
 )
 
-const CreditAccountEventType = "credit_account"
+const CreditAccountEventType = "credit_eth_account"
 
 // use golang's init function, which runs before main, to register the extension
 // see more here: https://www.digitalocean.com/community/tutorials/understanding-init-in-go
@@ -143,8 +143,8 @@ var resolutionConfig = resolutions.ResolutionConfig{
 
 The last step is to register the resolution extension with the Kwil node. This is done by calling the `RegisterResolution` function in the package's `init` function.
 
-```go title="credit.go"
-package credit
+```go title="credit_resolution.go"
+package main
 
 import (
 	"github.com/kwilteam/kwil-db/extensions/resolutions"
@@ -161,19 +161,18 @@ func init() {
 }
 ```
 
-## Resolution Usage
+## Next Steps
 
-Resolution extensions can only be called from oracles. If you intend to use the resolution, please see the [oracles example](/docs/extensions/oracles/tutorial) for an oracle capable of reading EVM event logs
-and creating credit resolutions.
+This example is a resolution that can be called by an oracle. To see how to create an oracle that can call this resolution, see the [oracle example part 2](/docs/extensions/oracle-example-part-2).
 
 ## Full Example
 
 <details>
-    <summary>credit.go</summary>
+    <summary>credit_resolution.go</summary>
 
 ```go
-// package credit implements a credit resolution, allowing accounts to be credited with a given amount.
-package credit
+// package main implements a credit resolution, allowing accounts to be credited with a given amount.
+package main
 
 import (
 	"context"
@@ -186,7 +185,7 @@ import (
 	"github.com/kwilteam/kwil-db/extensions/resolutions"
 )
 
-const CreditAccountEventType = "credit_account"
+const CreditAccountEventType = "credit_eth_account"
 
 // use golang's init function, which runs before main, to register the extension
 // see more here: https://www.digitalocean.com/community/tutorials/understanding-init-in-go
@@ -272,5 +271,3 @@ var resolutionConfig = resolutions.ResolutionConfig{
 ```
 
 </details>
-
-To build and run the resolution extension example, follow the standard [extension build and run](/docs/extensions/quickstart) process. Make sure that you also have the [oracle example extension](/docs/extensions/oracles/tutorial) running, as the resolution can only be called from oracles.

@@ -1,11 +1,17 @@
 ---
-sidebar_position: 3
+sidebar_position: 5
 sidebar_label: "Eth Deposits"
 id: eth-deposits-oracle
 title: Eth Deposits Oracle
 description: Using the Eth Deposits Oracle
 slug: /extensions/oracles/eth-deposits
 ---
+
+Kwil supports the ability to give users Kwil gas in response to events emitted on the Ethereum network. This is achieved through the `eth-deposits` oracle,
+which listens for events emitted by a specific contract address and credits the accounts on the Kwil network upon attestation by a super-majority
+(two-thirds) of validators confirming the occurrence of this event.
+
+## Tutorial
 
 In this tutorial, we will learn how to use the `eth-deposits` oracle to acquire Kwil gas. The `eth-deposits` oracle is a built-in oracle extension designed to credit accounts on a Kwil network in response to events emitted on the Ethereum network. It listens for events of signature `Credit(address,uint256)` emitted by a specific contract address and credits the accounts on the Kwil network upon attestation by a super-majority (two-thirds) of validators confirming the occurrence of this event.
 
@@ -29,8 +35,6 @@ Below is an example of a smart contract that emits the `Credit(address,uint256)`
 ```sol
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
-
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract EthDeposits {
     // Credit event containing the address of the user and the amount of tokens deposited
@@ -78,4 +82,6 @@ Once configured, the `eth-deposits` oracle begins monitoring for `Credit` events
 
 ## Credit accounts on the Kwil network
 
-In the [example smart contract](#implement-smart-contract-with-credit-event) defined above, the `deposit` method emits the `Credit` event. Therefore, users can obtain Kwil gas by executing a `deposit` transaction on the Ethereum network. To check whether the account has been credited with the deposited amount, you can use the `kwil-cli account balance` command. For more information, refer to the documentation on the [kwil-cli account balance](/docs/ref/kwil-cli/account/balance) command.
+In the smart contract defined above, the `deposit` method emits the `Credit` event. When called, nodes will credit a native account with Kwil gas.
+To check whether the account has been credited with the deposited amount, you can use the `kwil-cli account balance` command. For more information,
+refer to the documentation on the [kwil-cli account balance](/docs/ref/kwil-cli/account/balance) command.

@@ -1,0 +1,89 @@
+---
+sidebar_position: 6
+sidebar_label: "Utilities"
+id: extension-utils
+title: "Utilities"
+description: Utilities for working with extensions
+slug: /extensions/utils
+---
+
+Kwil provides utilities for altering core network state from within extensions. With a database connection, you can use these utilities to get user balances,
+transfer tokens, update validator power, and more. These can be accessed in the "github.com/kwilteam/kwil-db/common/functions" package. For example, to credit
+an Ethereum address with 100 tokens, you can use the `Credit` function.
+
+```go
+package main
+
+import (
+	"context"
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/kwilteam/kwil-db/common/functions"
+	"github.com/kwilteam/kwil-db/common/sql"
+)
+
+func someExtensionFunction(ctx context.Context, db sql.DB) error {
+    // Ethereum address to credit
+	address := common.HexToAddress("0xB7E2d6DABaf3B0038cFAaf09688Fa104f4409697")
+
+	// Credit an account with 100 tokens
+	err := functions.Accounts.Credit(ctx, db, address.Bytes(), big.NewInt(100))
+	if err != nil {
+		return err
+	}
+	return nil
+}
+```
+
+## Accounts
+
+### Credit
+
+Credit an account with a given amount of tokens.
+
+```go
+func Credit(ctx context.Context, db sql.DB, account []byte, amount *big.Int) error
+```
+
+### Transfer
+
+Transfer tokens from one account to another.
+
+```go
+func Transfer(ctx context.Context, db sql.DB, from, to []byte, amount *big.Int) error
+```
+
+### GetAccount
+
+Get the balance and nonce of an account.
+
+```go
+func GetAccount(ctx context.Context, db sql.DB, account []byte) (*types.Account, error)
+```
+
+## Validators
+
+### GetValidatorPower
+
+Get the power of a validator.
+
+```go
+func GetValidatorPower(ctx context.Context, db sql.DB, account []byte) (*big.Int, error)
+```
+
+### GetValidators
+
+Get a list of all validators and their powers.
+
+```go
+func GetValidators(ctx context.Context, db sql.DB) ([]*types.Validator, error)
+```
+
+### SetValidatorPower
+
+Set the power of a validator. If the account is not a validator, it will be added to the validator set. If the power is set to 0, the account will be removed from the validator set.
+
+```go
+func SetValidatorPower(ctx context.Context, db sql.DB, account []byte, power int64) error
+```

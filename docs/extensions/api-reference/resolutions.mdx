@@ -1,21 +1,24 @@
 ---
-sidebar_position: 2
+sidebar_position: 4
 sidebar_label: "Resolutions"
-id: resolutions
-title: Resolutions
-description: Build custom network resolutions
-slug: /extensions/resolutions
+id: api-reference-resolutions
+title: "Kuneiform Resolution Extension APIs"
+description:  "Kuneiform Resolution Extension APIs"
+slug: /extensions/api-reference/resolutions
 ---
 
-Resolutions are custom governance proposals that can be implemented in a Kwil network. Custom resolutions allow developers to build types of
-governance proposals that can be proposed and voted on by all stakeholders in the network. Implementations can specify the required voting
-threshold, the maximum duration of the proposal, and the subsequent state changes that will be applied if the proposal is approved.
+The following can be found in package `github.com/kwilteam/kwil-db/resolutions`.
 
-## Defining a Resolution
-
-Resolutions are defined using a `ResolutionConfig`:
+## ResolutionConfig
 
 ```go
+import (
+    "context"
+    "math/big"
+
+    "github.com/kwilteam/kwil-db/common"
+)
+
 // ResolutionConfig is a configuration for a type of resolution.
 // It can be used to define resolutions that a Kwil network can vote
 // on, and define the resulting logic if the resolution receives the
@@ -59,29 +62,47 @@ type ResolutionConfig struct {
 }
 ```
 
-`ResolutionConfig` structs should be registered in an `init` function, to ensure that they are available to the network when it starts:
+## Resolution
 
 ```go
-package main
-
 import (
-	"math/big"
-
-	"github.com/kwilteam/kwil-db/extensions/resolutions"
-	"github.com/kwilteam/kwil-db/common"
+    "github.com/kwilteam/kwil-db/core/types"
 )
-func init() {
-	// Register the resolution with the network
-	err := resolutions.RegisterResolution("my_resolution", &resolutions.ResolutionConfig{
-		RefundThreshold:       big.NewRat(1, 3), // 1/3rds threshold
-		ConfirmationThreshold: big.NewRat(2, 3), // 2/3rds threshold
-		ExpirationPeriod:      14400,
-		ResolveFunc:           func(ctx context.Context, app *common.App, resolution *resolutions.Resolution) error {
-			// Implement the resolution logic here
-		},
-	})
-	if err != nil {
-		panic(err)
-	}
+
+// Resolution contains information for a resolution that can be voted
+// on.
+type Resolution struct {
+	// ID is the unique identifier for the resolution. It is a UUID
+	// that is deterministically generated from the body of the
+	// resolution.
+	ID types.UUID
+	// Body is the content of the resolution. It can hold any
+	// arbitrary data that is relevant to the resolution.
+	Body []byte
+	// Type is the type of the resolution. It is used to determine
+	// the logic for the resolution.
+	Type string
+	// ExpirationHeight is the block height at which the resolution
+	// is set to expire, if it has not received the required number
+	// of votes.
+	ExpirationHeight int64
+	// ApprovedPower is the total power of the voters that have
+	// approved the resolution.
+	ApprovedPower int64
+	// Voters is a list of voters that have voted on the resolution.
+	// This includes the proposer of the resolution.
+	Voters []*types.Validator
+	// Proposer is the voter that proposed the resolution body.
+	// The power of the proposer can be found in the Voters list.
+	Proposer []byte
+	// DoubleProposerVote indicates whether or not the proposer voted
+	// twice on the resolution. This tracks a special case in the
+	// Kwil voting process where a resolution can be voted on before
+	// it has been officially proposed. If a validator votes on a
+	// resolution and later proposes the same resolution, this will
+	// be true. The proposer's power is not counted twice in the
+	// resolution's ApprovedPower. Most applications can ignore this
+	// field.
+	DoubleProposerVote bool
 }
 ```

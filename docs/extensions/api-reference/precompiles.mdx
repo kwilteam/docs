@@ -6,3 +6,87 @@ title: "Kuneiform Precompile Extension APIs"
 description:  "Kuneiform Precompile Extension APIs"
 slug: /extensions/api-reference/precompiles
 ---
+
+The following can be found in package `github.com/kwilteam/kwil-db/extensions`.
+
+## Initializer
+
+```go
+import (
+    "github.com/kwilteam/kwil-db/common"
+)
+
+// Initializer initializes a new instance of a precompile.
+// It is called when a Kuneiform schema is deployed that calls
+// "use <precompile> {key: "value"} as <name>". It is also called
+// when the node starts up, if a database is already deployed that
+// uses the precompile. The key/value pairs are passed as the
+// metadata parameter. When initialize is called, the dataset is not
+// yet accessible.
+type Initializer func(ctx *DeploymentContext, service *common.Service, metadata map[string]string) (Instance, error)
+```
+
+## Instance
+
+```go
+import (
+    "github.com/kwilteam/kwil-db/common"
+)
+
+// Instance is a named initialized instance of a precompile. It is
+// returned from the precompile initialization, as specified by the
+// Initializer. It will exist for the lifetime of the deployed
+// dataset, and a single dataset can have multiple instances of the
+// same precompile.
+type Instance interface {
+	// Call executes the requested method of the precompile. It is up
+	// to the instance implementation to determine if a method is
+	// valid, and to subsequently decode the arguments. The arguments
+	// passed in as args, as well as returned, are scalar values.
+	Call(scoper *ProcedureContext, app *common.App, method string, inputs []any) ([]any, error)
+}
+```
+
+## DeploymentContext
+
+```go
+import (
+    "context"
+    "github.com/kwilteam/kwil-db/common"
+)
+
+// DeploymentContext is the context for a dataset deployment
+// transaction.
+type DeploymentContext struct {
+	Ctx    context.Context
+	Schema *common.Schema
+}
+```
+
+## ProcedureContext
+
+```go
+// ProcedureContext is the context for a procedure execution.
+type ProcedureContext struct {
+	// Ctx is the context of the current execution.
+	Ctx context.Context
+	// Signer is the address or public key of the caller.
+	Signer []byte
+	// Caller is the string identifier of the signer.
+	Caller string
+
+	// values are the variables that are available to the execution.
+	values map[string]any // note: bind $args or @caller
+
+	// DBID is the database identifier for the current scope.
+	// if calling a precompile instance instead of a procedure, it
+	// will be the last used DBID.
+	DBID string
+	// Procedure is the Procedure identifier for the current scope.
+	// if calling a precompile instance instead of a Procedure, it
+	// will be the last used Procedure.
+	Procedure string
+	// Result is the result of the most recent SQL query.
+	Result *sql.ResultSet
+}
+```
