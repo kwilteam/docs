@@ -276,18 +276,6 @@ Performs a SELECT query on a database. The query must be a read-only query.
 
 A promise that resolves to an array of objects of database records.
 
-### setCookie()
-
-```typescript
-kwil.setCookie(cookie: string): void
-```
-
-Sets the cookie for the Kwil Gateway. This method is only available in NodeJS.
-
-#### Parameters
-
--   `cookie`: The cookie to set.
-
 ### txInfo()
 
 ```typescript
@@ -313,7 +301,7 @@ The `KwilSigner` is a class that is used to sign transactions and messages on Kw
 ```typescript
 constructor(signer: EthSigner, identifier: HexString | Uint8Array): KwilSigner;
 
-constructor(signer: (msg: Uint8Array, ...args: any[]) => Promise<Uint8Array>, publicKey: HexString | Uint8Array, signatureType: SignatureType): KwilSigner;
+constructor(signer: (msg: Uint8Array) => Promise<Uint8Array>, publicKey: HexString | Uint8Array, signatureType: SignatureType): KwilSigner;
 ```
 
 Creates a new instance of the KwilSigner class.
