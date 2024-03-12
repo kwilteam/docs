@@ -39,6 +39,12 @@ Install the Kwil SDK:
 go get github.com/kwilteam/kwil-db@v0.7.0
 ```
 
+You may have to run `go mod tidy` to ensure all dependencies are installed.
+
+```shell
+go mod tidy
+```
+
 ## Step 2: Set up main.go
 
 Create a new file called `main.go` in the root of the project directory:
@@ -89,6 +95,8 @@ For a production-ready Ed25519 authenticator, please refer to the [Ed25519 authe
 :::
 
 ```go title="custom_extension.go"
+package main
+
 import (
     "crypto/ed25519"
     "fmt"
@@ -137,7 +145,7 @@ with the necessary configurations. For more information on how to configure your
 refer to the [Postgres setup guide](/docs/daemon/installation#postgresql).
 
 ```shell
-docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \ 
+docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \
     kwildb/postgres:latest
 ```
 
