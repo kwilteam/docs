@@ -19,9 +19,9 @@ Example use cases for Kwil oracles include:
 
 Oracles are made up of two distinct components: event listeners, and resolutions.
 
-[**Event Listeners**](/docs/extensions/cross-chain-data/listeners.mdx) are responsible for observing external systems and storing information about the events that occur. When an event listener detects an event, it stores the event in its local database. The node will then broadcast information about the event to the rest of the network, until the event is recognized by a majority of the network.
+[**Event Listeners**](/docs/extensions/event-listeners) are responsible for observing external systems and storing information about the events that occur. When an event listener detects an event, it stores the event in its local database. The node will then broadcast information about the event to the rest of the network, until the event is recognized by a majority of the network.
 
-[**Resolutions**](/docs/extensions/cross-chain-data/resolutions.mdx) are responsible for taking the information about the event from the event listener, and using it to trigger a state change in the network. When a resolution is triggered, it will broadcast information about the state change to the rest of the network, until the state change is recognized by a majority of the network.
+[**Resolutions**](/docs/extensions/resolutions) are responsible for taking the information about the event from the event listener, and using it to trigger a state change in the network. When a resolution is triggered, it will broadcast information about the state change to the rest of the network, until the state change is recognized by a majority of the network.
 
 ## Event Lifecycle
 

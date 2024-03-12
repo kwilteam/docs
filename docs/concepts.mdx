@@ -65,4 +65,4 @@ Each node has a public / private ED25519 keypair that is used to sign transactio
 
 ## Extensions
 
-[Extensions](/docs/category/extensions) are stateless applications that run on each [Kwil Node](#kwil-node) in a [Kwil Network](#kwil-network). Extensions sit next to the database engine and can be used to implement arbitrary logic, access control, and value accrual mechanisms directly into the databases. Extensions are written in Go or TypeScript.
+[Extensions](/docs/extensions/overview) are modules that customize the behavior of a Kwil Network. Extensions can be used to customize the cyrptographic signature used for verifying [accounts](#accounts), import libraries into [Kuneiform](#kuneiform), and implement built-in network oracles and governance rules. Extensions are written in Go and compiled with the Kwild binary.
