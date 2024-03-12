@@ -21,14 +21,14 @@ own set of rules and restrictions that must be followed.
 
 ### [Authenticators](/docs/extensions/authenticators)
 
-Authenticators are custom asymmetric signature algorithms used to sign and verify transactions. By implementing custom authenticators,
-developers can add support for new signature algorithms to their Kwil network. Any wallet with a corresponding authenticator can be used to
+Authenticators allow custom cryptographic signatures for signing and verifying transactions. By implementing custom authenticators,
+developers can add support for new asymmetric signatures to their Kwil network. Any wallet with a corresponding authenticator can be used to
 deploy schemas, hold and transfer native gas tokens, or perform any other action that requires a signed transaction.
 
 ### [Kuneiform Precompiles](/docs/extensions/precompiles)
 
-Kuneiform precompiles are custom libraries that are imported and called in Kuneiform schemas. By implementing custom Kuneiform precompiles, developers
-can add new Kuneiform functionality to their Kwil network. These functionalities are wide ranging, and can include anything from performing hashing
+Kuneiform precompiles are custom libraries that are imported and called in Kuneiform schemas. By implementing precompiles, developers
+can add new Kuneiform functionality to their Kwil network. These functionalities are wide ranging, and can include anything from hashing
 algorithms to directly calling the active Postgres connection.
 
 ### [Resolutions](/docs/extensions/resolutions)

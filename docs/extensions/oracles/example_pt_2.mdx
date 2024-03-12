@@ -13,7 +13,7 @@ The listener will be configured to listen to a specific contract address, and wi
 This tutorial uses concepts and code from the resolution extension introduced in this [part 1: example Kwil credits](/docs/extensions/oracle-example-part-1).
 
 **This tutorial is for example purposes only, and should not be used in production.** Production implementations should account for transient network failures,
-subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation of this event listener, please refer to the [Kwil EVM Deposits Listener](<https://github.com/kwilteam/kwil-db/tree/main/extensions/listeners/eth_deposits>) that is
+subscription disconnections, Ethereum reorgs, and other edge cases. For a production-ready implementation of this event listener, please refer to the [Kwil EVM Deposits Listener](<https://github.com/kwilteam/kwil-db/tree/v0.7.0/extensions/listeners/eth_deposits>) that is
 included in all Kwil nodes by default.
 
 ## Prerequisites
@@ -22,7 +22,7 @@ This tutorial assumes that the user is familiar with the following concepts:
 - [The account credit resolution tutorial](/docs/extensions/oracle-example-part-1)
 - [Building a custom Kwil node with extensions](/docs/extensions/building-kwild-with-extensions)
 - [Running a Kwil node locally](/docs/node/quickstart#single-node)
-- Deploying a smart contract to Ethereum
+- EVM event logs and contract ABIs
 
 ## Step 1. Querying Ethereum
 
