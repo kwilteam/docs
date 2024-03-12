@@ -110,7 +110,15 @@ In the above example, we create a basic action that can be used to check if the 
 
 ## Using Contextual Variables in Actions
 
-Contextual variables can be used in queries like a user-provided value.  Unlike user-provided values, these values will exist for all queries without the user needing to provide it.
+Contextual variables can be used in queries like a user-provided value.  Unlike user-provided values, these values will exist for all queries without the user needing to provide it. They
+can be used in place of other parameters:
+
+```typescript
+action add_user($id, $name, $username) public {
+    INSERT INTO users (id, name, username, wallet)
+    VALUES ($id, $name, $username, @caller);
+}
+```
 
 A list of supported variables will be kept here:
 

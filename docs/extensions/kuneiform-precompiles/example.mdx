@@ -1,0 +1,141 @@
+---
+sidebar_position: 2
+sidebar_label: "Example: SHA hashing"
+id: precompile-example
+title: "Example: SHA Hashing Precompile"
+description: Implementing a precompile for SHA hash functions
+slug: /extensions/precompiles/sha
+---
+
+The following example demonstrates how to implement a precompile for the SHA256 and SHA512 hash functions.
+
+## Prerequisites
+
+This tutorial assumes that the user is familiar with the following concepts:
+- [Creating a Kuneiform schema](/docs/getting-started/create-a-database)
+- [Building a custom Kwil node with extensions](/docs/extensions/building-kwild-with-extensions)
+- [Running a Kwil node locally](/docs/node/quickstart#single-node)
+
+## Step 1: Implement The Precompile
+
+The first step is to implement the precompile. It will take one initialization key, "algorithm", which will be a
+string that specifies the algorithm to use. The only supported algorithms are "SHA256" and "SHA512". The precompile
+will take a single input, which will be a string of the data to hash. The precompile will return the hex encoded
+hash of the input data.
+
+```go title="hash.go"
+package main
+
+import (
+	"crypto/sha256"
+	"crypto/sha512"
+	"encoding/hex"
+	"fmt"
+
+	"github.com/kwilteam/kwil-db/common"
+	"github.com/kwilteam/kwil-db/extensions/actions"
+)
+
+func init() {
+	// Register the precompile with the name "hash" and the
+	// initialize function
+	err := actions.RegisterPrecompile("hash", initializeHash)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func initializeHash(ctx *actions.DeploymentContext, service *common.Service, metadata map[string]string) (actions.Instance, error) {
+	algorithm, ok := metadata["algorithm"]
+	if !ok {
+		// if not specified, the schema will fail to deploy
+		// and the tx will fail to execute
+		return nil, fmt.Errorf("algorithm must be specified")
+	}
+
+	if algorithm != "sha256" && algorithm != "sha512" {
+		return nil, fmt.Errorf("algorithm must be either 'sha256' or 'sha512'")
+	}
+
+	return &HashExtension{
+		algorithm: algorithm,
+	}, nil
+}
+
+// HashExtension is an extension that is not registered with the
+// extension registry. It allows hashing of strings in the engine.
+type HashExtension struct {
+	algorithm string
+}
+
+// Call executes the requested method of the precompile.
+// It has one method, "hash", which takes a string as an argument,
+// and returns the hex encoded hash of the string.
+func (h *HashExtension) Call(scoper *actions.ProcedureContext, app *common.App, method string, inputs []any) ([]any, error) {
+	// there is only one method, "hash"
+	if method != "hash" {
+		return nil, fmt.Errorf("method %s not found", method)
+	}
+
+	// there should only be one input, and it should be a string
+	if len(inputs) != 1 {
+		return nil, fmt.Errorf("hash: expected 1 string argument, got %d", len(inputs))
+	}
+
+	str, ok := inputs[0].(string)
+	if !ok {
+		return nil, fmt.Errorf("hash: expected string argument, got %T", inputs[0])
+	}
+
+	var hashBytes []byte
+	// hash the string
+	switch h.algorithm {
+	case "sha256":
+		b := sha256.Sum256([]byte(str))
+		hashBytes = b[:]
+	case "sha512":
+		b := sha512.Sum512([]byte(str))
+		hashBytes = b[:]
+	default:
+		// this should never happen
+		return nil, fmt.Errorf("algorithm %s not found", h.algorithm)
+	}
+
+	// return the hash as a string
+	return []any{hex.EncodeToString(hashBytes)}, nil
+}
+```
+
+## Step 2: Use The Precompile
+
+The next step is to call the precompile in a Kuneiform schema. The following example demonstrates how to use the precompile in a Kuneiform schema.
+The schema will have two actions: "SHA256" and "SHA512". Each action will take a single input, which will be a string of the data to hash.
+The action will return the hex encoded hash of the input data. Since the actions do not store data, they will be public and view.
+
+```sql title="schema.kf"
+database mydb;
+
+use hash {
+    algorithm: 'sha256'
+} as sha256;
+
+use hash {
+    algorithm: 'sha512'
+} as sha512;
+
+action sha256($data) public view {
+    $result = sha256.hash($data);
+    SELECT $result::text;
+}
+
+action sha512($data) public view {
+    $result = sha512.hash($data);
+    SELECT $result::text;
+}
+```
+
+## Conclusion
+
+This example demonstrates how to implement a precompile for the SHA hash functions. The precompile takes a single input,
+which is a string of the data to hash, and returns the hex encoded hash of the input data. The precompile can be used in
+a Kuneiform schema to hash data.

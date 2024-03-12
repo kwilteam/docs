@@ -1,0 +1,77 @@
+---
+sidebar_position: 1
+sidebar_label: "Authenticators"
+id: authenticators
+title: Authenticators
+description: Build custom authenticators to authenticate users with your app.
+slug: /extensions/authenticators
+---
+
+Authenticators allow developers to implement custom asymmetric signature schemes that can be used to verify transactions on their network.
+Any wallet with a corresponding authenticator can be used to deploy schemas, hold and transfer native gas tokens, or perform any other
+action that requires a signed transaction.
+
+## Authenticator Interface
+
+Any struct that implements the following interface can be registered as an authenticator:
+
+```go
+// Authenticator is an interface for verifying signatures and deriving a
+// string identifier from the sender bytes. Custom asymmetric signature
+// algorithms may be implemented by developers by implementing this interface.
+type Authenticator interface {
+	// Verify verifies whether a signature is valid for a given message and sender.
+	// It is meant to be used with asymmetric signature algorithms such as ECDSA,
+	// Ed25519 RSA, etc. If the signature is invalid, the method should return an error.
+	// If the signature is valid, the method should return nil.
+	Verify(sender, msg, signature []byte) error
+
+	// Identifier returns a string identifier for a given sender. This string identifier is
+	// used to identify the sender when interacting with the database engine, and will
+	// be used as the `@caller` variable in the engine.
+	Identifier(sender []byte) (string, error)
+}
+```
+
+## Register
+
+To register an authenticator, use the `RegisterAuthenticator` method in the `auth` package. This method takes a string identifier and an authenticator struct as arguments.
+In the example below, we register an authenticator with the string identifier `my-authenticator`:
+
+```go
+package main
+
+import (
+	"github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+func init() {
+	err := auth.RegisterAuthenticator("my-authenticator", customAuthenticator{})
+	if err != nil {
+		panic(err)
+	}
+}
+
+type customAuthenticator struct {}
+
+func(customAuthenticator) Verify(sender, msg, signature []byte) error {
+	// Verify the signature
+}
+
+func(customAuthenticator) Identifier(sender []byte) (string, error) {
+	// Return the string identifier
+}
+```
+
+## Security Considerations
+
+When implementing a custom authenticator, there are a few security considerations to keep in mind:
+
+- Both the `Verify()` and `Identifier()` methods should be deterministic. This means that the same input should always produce the same output.
+- It is critically important to avoid collisions in the `sender` field of the `Verify` method. Any `Verify` that returns `nil` will allow the sender to perform any action on the user's behalf.
+This will give them access to the user's funds and schemas. It is important to ensure that the `sender` field is unique for each user.
+- Care must be taken to avoid collisions in the string identifier returned from the `Identifier()` method.
+If two different senders produce the same string identifier, it will be impossible to distinguish between them in the database. They will be treated as the same user in the database
+engine.
+- State should not be stored in any custom authenticator struct. Nodes do not call `Verify` or `Identifier` in a deterministic way, and may call them at any time.
+

@@ -1,0 +1,189 @@
+---
+sidebar_position: 3
+sidebar_label: "Example: Ed25519"
+id: extensions-example-ed25519
+title: "Example: Ed25519"
+slug: /extensions/example-ed25519
+---
+
+This example demonstrates how to implement Ed25519 signing and verification for a Kwil network. It will first show how to implement
+the `Authenticator` extension in the node, and then create a custom `KwilSigner` that can be used in Kwil-JS.
+
+## Prerequisites
+
+This tutorial assumes that the user is familiar with the following concepts:
+- [Deploying a Kuneiform schema from Kwil-JS](/docs/getting-started/create-a-database)
+- [Building a custom Kwil node with extensions](/docs/extensions/building-kwild-with-extensions)
+- [Running a Kwil node locally](/docs/node/quickstart#single-node)
+
+## Step 1: Implementing the Authenticator extension
+
+The first step is to implement the `Authenticator` extension in the Kwil node. This extension is responsible for verifying signatures
+and assigning a string identifier to the Kwil database engine. The following code snippet shows how to implement the `Authenticator` extension
+for Ed25519.
+
+:::info
+This example is for demonstration purposes only. Ed25519 signatures are already supported in Kwil nodes by default.
+:::
+
+```go
+package main
+
+import (
+    "crypto/ed25519"
+    "fmt"
+    "encoding/hex"
+
+    "github.com/kwilteam/kwil-db/extensions/auth"
+)
+
+// init registers the Ed25519Authenticator with the Kwil node
+func init() {
+    err := auth.RegisterAuthenticator("ed25519_example", Ed25519Authenticator{})
+    if err != nil {
+        panic(err)
+    }
+}
+
+type Ed25519Authenticator struct{}
+
+// Verify verifies the signature of a message
+func (Ed25519Authenticator) Verify(sender, msg, signature []byte) error {
+    if len(sender) != ed25519.PublicKeySize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", sender, len(sender))
+    }
+
+    if len(signature) != ed25519.SignatureSize {
+        return fmt.Errorf("invalid signature size. expected %d, got %d", ed25519.SignatureSize, len(signature))
+    }
+
+    if !ed25519.Verify(sender, msg, signature) {
+        return fmt.Errorf("signature verification failed")
+    }
+
+    return nil
+}
+
+// Identifier returns the hex encoding of the public key
+func (Ed25519Authenticator) Identifier(sender []byte) (string, error) {
+    if(len(sender) != ed25519.PublicKeySize) {
+        return "", fmt.Errorf("invalid public key size. expected %d, got %d", ed25519.PublicKeySize, len(sender))
+    }
+
+    return hex.EncodeToString(sender), nil
+}
+```
+
+## Step 2: Creating the Kwil-JS KwilSigner
+
+The next step is to create a custom `KwilSigner` that can be used in Kwil-JS. In order to do this, the implementer will need:
+- The [chain ID](/docs/daemon/config/genesis#chain-id) of the target Kwil network
+- An RPC endpoint for the target Kwil network
+- The Ed25519 public and private keys.
+
+This example also relies on a parsed Kuneiform schema at the filepath `./schema.json`, which will be deployed with the custom signer.
+One is provided here for your convenience:
+
+<details>
+<summary>schema.json</summary>
+
+```json
+{
+  "owner": "",
+  "name": "hello_ed",
+  "tables": [
+    {
+      "name": "message",
+      "columns": [
+        {
+          "name": "id",
+          "type": "int",
+          "attributes": [
+            {
+              "type": "primary_key"
+            },
+            {
+              "type": "not_null"
+            }
+          ]
+        },
+        {
+          "name": "message",
+          "type": "text",
+          "attributes": [
+            {
+              "type": "not_null"
+            }
+          ]
+        },
+        {
+          "name": "caller",
+          "type": "text",
+          "attributes": [
+            {
+              "type": "not_null"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "name": "insert_record",
+      "inputs": [
+        "$id",
+        "$message"
+      ],
+      "public": true,
+      "mutability": "update",
+      "auxiliaries": null,
+      "statements": [
+        "INSERT INTO message (id, message, caller) VALUES ($id, $message, @caller);"
+      ]
+    }
+  ]
+}
+```
+
+</details>
+
+The following code snippet shows how to create a `KwilSigner` for Ed25519.
+
+```typescript
+import { NodeKwil, KwilSigner } from "@kwilteam/kwil-js";
+import nacl from "tweetnacl";
+import schema from "./schema.json";
+
+const chainId = "my-chain-id"; // Replace with the chain ID of the target Kwil network
+const rpcEndpoint = "http://localhost:8080"; // Replace with the RPC endpoint of the target Kwil network
+const keys = nacl.sign.keyPair(); // Generate a key pair, or load an existing one
+
+// Custom KwilSigner
+const ed25519Signer = new KwilSigner(
+    function(msg: Uint8Array): Promise<Uint8Array> { // Callback for signing messages
+        return nacl.sign.detached(msg, keys.secretKey);
+    },
+    keys.publicKey, // Public key of the key pair
+    "ed25519_example" // Identifier of the authenticator
+)
+
+const kwil = new NodeKwil({
+    kwilProvider: rpcEndpoint,
+    chainId: chainId,
+})
+
+// function to deploy the schema
+async function deploySchema() {
+    const res = await kwil.deploySchema({
+        schema
+    }, ed25519Signer);
+
+    console.log(res);
+}
+```
+
+## Conclusion
+
+This example demonstrates how to implement Ed25519 signing and verification for a Kwil network.
+It first showed how to implement the `Authenticator` extension in the node, and then created a custom `KwilSigner` that can be used in Kwil-JS.

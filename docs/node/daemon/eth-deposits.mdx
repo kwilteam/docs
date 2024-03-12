@@ -1,0 +1,87 @@
+---
+sidebar_position: 5
+sidebar_label: "Eth Deposits"
+id: eth-deposits-oracle
+title: Eth Deposits Oracle
+description: Using the Eth Deposits Oracle
+slug: /extensions/oracles/eth-deposits
+---
+
+Kwil supports the ability to give users Kwil gas in response to events emitted on the Ethereum network. This is achieved through the `eth-deposits` oracle,
+which listens for events emitted by a specific contract address and credits the accounts on the Kwil network upon attestation by a super-majority
+(two-thirds) of validators confirming the occurrence of this event.
+
+## Tutorial
+
+In this tutorial, we will learn how to use the `eth-deposits` oracle to acquire Kwil gas. The `eth-deposits` oracle is a built-in oracle extension designed to credit accounts on a Kwil network in response to events emitted on the Ethereum network. It listens for events of signature `Credit(address,uint256)` emitted by a specific contract address and credits the accounts on the Kwil network upon attestation by a super-majority (two-thirds) of validators confirming the occurrence of this event.
+
+Therefore this oracle can be used in a variety of use cases, such as:
+- Purchase Kwil gas by depositing ERC20 tokens into a smart contract on Ethereum, with the tokens being securely held in the smart contract.
+- Reward minters of NFTs with the Kwil gas as a part of the minting process.
+- Burn ERC20 tokens on Ethereum to acquire Kwil gas.
+
+Follow the steps below to use the Eth Deposits Oracle:
+1. [Implement the smart contract](#implement-smart-contract-with-credit-event) that emits the `Credit(address,uint256)` event.
+2. [Deploy the smart contract](#deploy-the-smart-contract) on an EVM chain.
+3. [Configure Kwil node](#configure-kwil-node) to start the `eth-deposits` oracle.
+4. [Credit accounts on the Kwil network](#credit-accounts-on-the-kwil-network) through `eth-deposits` oracle.
+
+## Implement Smart Contract With Credit Event
+
+The first step on using the `eth-deposits` oracle is to implement a smart contract with methods that emits the `Credit(address,uint256)` event. The `Credit` event should contain the address of the user and the amount of tokens deposited. 
+
+Below is an example of a smart contract that emits the `Credit(address,uint256)` event whenever ERC20 tokens are deposited into the smart contract using the `deposit` method. This is just a sample example showing the usage of the `Credit` event and by no means a complete implementation of the smart contract. 
+
+```sol
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.0;
+
+contract EthDeposits {
+    // Credit event containing the address of the user and the amount of tokens deposited
+    // This event will be listened by the eth-deposits oracle
+    event Credit(address indexed user, uint256 amount);
+
+    // Deposit method emitting the Credit event
+    function deposit(uint256 amount) public {
+        /* Your code */
+        emit Credit(msg.sender, amount);
+    }
+}
+```
+
+## Deploy The Smart Contract
+
+Once the smart contract is implemented, the next step is to deploy the smart contract on an EVM compatible chain. Note the address of the deployed smart contract as it will be used to configure the `eth-deposits` oracle.
+
+## Configure Kwil Node
+
+The next step is to configure the Kwil node to configure the `eth-deposits` oracle. The `eth-deposits` oracle can be started by adding the `app.oracles.eth_deposits` configuration to the `config.toml` file of the Kwil node.
+
+`eth-deposits` currently supports following configuration options:
+1. `rpc_provider`: This variable specifies the WebSocket URL of the EVM node provider. This is a required field and would likely be an Infura or Alchemy URL.
+2. `contract_address`: This variable specifies the address of the deployed smart contract for the oracle to listen to the `Credit` events at. This is a required field.
+3. `starting_height`: This variable specifies the Ethereum block height at which the oracle starts to listen for the `Credit` events. Any events emitted before this block height are ignored. The default value is `0`.
+4. `required_confirmations`: This variable specifies the number of ethereum blocks that must be mined before the oracle creates a deposit event in Kwil. This is to protect against Ethereum network reorgs or soft forks. This is an optional field and defaults to `12` if not configured.
+5. `reconnection_interval`: This variable specifies the amount of time in seconds that the oracle will wait before reconnecting to the Ethereum RPC endpoint if it is disconnected. Long-running RPC subscriptions are prone to being reset by the Ethereum RPC endpoint, so this will allow the oracle to reconnect. This is an optional field and defaults to `60`s if not configured.
+6. `max_retries`: This variable specifies the number of times the oracle will attempt to reconnect to the Ethereum RPC endpoint before giving up. This is an optional field and defaults to `10` if not configured.
+7. `block_sync_chunk_size`: This variable specifies the number of Ethereum blocks requested by oracle from the Ethereum RPC endpoint at a time while catching up to the network. This is an optional field and defaults to `1000000` if not configured.
+
+ Below is an example of the `eth_deposits` specific configuration.
+```yaml
+[app.oracles.eth_deposits]
+
+"rpc_provider": "wss://sepolia.gateway.tenderly.co"
+"contract_address": "0x94e6a0aa8518b2be7abaf9e76bfbb48cab1545ad"
+"starting_height": "83100"
+"required_confirmations": "12"
+"reconnection_interval": "30"
+"max_retries": "10"
+"block_sync_chunk_size": "1000000"
+```
+Once configured, the `eth-deposits` oracle begins monitoring for `Credit` events generated by the smart contract on the Ethereum network.
+
+## Credit accounts on the Kwil network
+
+In the smart contract defined above, the `deposit` method emits the `Credit` event. When called, nodes will credit a native account with Kwil gas.
+To check whether the account has been credited with the deposited amount, you can use the `kwil-cli account balance` command. For more information,
+refer to the documentation on the [kwil-cli account balance](/docs/ref/kwil-cli/account/balance) command.

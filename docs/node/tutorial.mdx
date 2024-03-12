@@ -42,7 +42,7 @@ Once the PostgreSQL instance is running, we can start the node using the `kwild`
 ```shell
 # Run Postgres
 docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \
-kwildb/postgres:latest
+  kwildb/postgres:latest
 
 # Run the node
 kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock --app.pg-db-port 5432
@@ -104,10 +104,10 @@ new addresses for the different endpoints, so that the second node does not conf
 
 ```bash
 kwil-admin setup peer --root-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
---chain.p2p.persistent-peers b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656 \
---app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
---app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
---chain.p2p.listen-addr=tcp://127.0.0.1:26655
+  --chain.p2p.persistent-peers b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656 \
+  --app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
+  --app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
+  --chain.p2p.listen-addr=tcp://127.0.0.1:26655
 ```
 
 Start the second node to verify that it was created correctly:
@@ -115,7 +115,7 @@ Start the second node to verify that it was created correctly:
 ```bash
 # Run Postgres
 docker run -d -p 5431:5432 --name kwil-postgres-1 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
-kwildb/postgres:latest
+  kwildb/postgres:latest
 
 # Run the node
 kwild --root-dir=./testnet/node1 --app.pg-db-port 5431
@@ -157,7 +157,7 @@ vote to approve the second node by running the `kwil-admin validators approve` c
 
 ```bash
 kwil-admin validators approve a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794 \
---rpcserver unix:///tmp/node0.sock
+  --rpcserver unix:///tmp/node0.sock
 ```
 
 :::tip

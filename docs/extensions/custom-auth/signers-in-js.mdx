@@ -1,0 +1,42 @@
+---
+sidebar_position: 2
+sidebar_label: "Kwil-JS Signers"
+id: js-signers
+title: Custom JS Signers
+description: Build custom signers in kwil-js.
+slug: /extensions/js-signers
+---
+
+Similar to how the Kwil node can be configured with custom signature verification, the `kwil-js` client library can be configured with custom signers.
+This allows you to support crypto wallets beyond the default ones supported by `kwil-js`.
+
+## KwilSigner Class
+
+The JS SDK provides a `KwilSigner` class that can be used to sign transactions with custom signers. The `KwilSigner` class is a wrapper
+around a signer function that takes a message and returns a signature. It can be passed to any API that requires a signer.
+
+```typescript 
+class KwilSigner {
+    constructor(
+        signer: (msg: Uint8Array) => Promise<Uint8Array>,
+        identifier: HexString | Uint8Array,
+        signatureType: SignatureType
+    )
+}
+```
+
+- `signer` is a callback function that takes a message and returns a signature.
+- `identifier` is the unique account identifier (e.g. public key or wallet address) of the signer. It can be passed as a hex string or a `Uint8Array`.
+- `signatureType` is the name of the signature extension. This is the `name` that is passed to the [`RegisterExtension`](/docs/extensions/authenticators#register) function in the extension.
+
+The `KwilSigner` class can be passed to any API that requires a signer. For example, it can be passed to the `execute` function of the `WebKwil` class:
+
+```typescript
+import { KwilSigner } from '@kwilteam/kwil-js';
+import { WebKwil } from '@kwilteam/kwil-js';
+
+const customSigner = new KwilSigner(/* signer config */);
+const kwil = new WebKwil(/* kwil config */);
+
+kwil.execute(/* transaction */, customSigner);
+```

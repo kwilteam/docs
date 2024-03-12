@@ -98,3 +98,7 @@
 pre {
   white-space: pre-wrap;
 }
+
+p {
+  font-size: 18px; /* Adjust the size as needed */
+}

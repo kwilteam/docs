@@ -28,8 +28,8 @@ See the [Installation](/docs/daemon/installation) page for details.
 First ensure that PostgreSQL is running and configured for `kwild`. For the quickstart, just:
 
 ```bash
-docker run -p 5432:5432 -v kwil-pgdata:/var/lib/postgresql/data --shm-size 256m \
-   --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" kwildb/postgres:latest
+docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+    kwildb/postgres:latest
 ```
 
 To run a single node, simply use the `kwild` binary with the `--autogen` flag.
@@ -48,16 +48,15 @@ As such, this mode is primarily useful for a quick deployment for evaluation and
 
 ### Cleanup
 
-To clean up when done testing, delete the `~/.kwild` folder, the postgres container, and the
-`kwil-pgdata` Docker volume:
+To clean up when done testing, delete the `~/.kwild` folder and the Postgres container:
 
 ```shell
 # Remove kwild node data
 rm ~/.kwild -rf
 
-# Stop and remove the postgres container & volume
+# Stop and remove the postgres container
+docker container stop kwil-postgres
 docker container rm -f kwil-postgres
-docker volume rm kwil-pgdata
 ```
 
 ## Multi-Node
@@ -82,12 +81,12 @@ commands to start all three running in the background, with different named
 volumes, and listening on ports 5440-5442.
 
 ```bash
-docker run -p 5440:5432 -v kwil0-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
-    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node0 -d kwildb/postgres:latest
-docker run -p 5441:5432 -v kwil1-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
-    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node1 -d kwildb/postgres:latest
-docker run -p 5442:5432 -v kwil2-testnet-pgdata:/var/lib/postgresql/data --shm-size 256m \
-    -e "POSTGRES_HOST_AUTH_METHOD=trust" --name node2 -d kwildb/postgres:latest
+docker run -d -p 5440:5432 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+    --name node0 -d kwildb/postgres:latest
+docker run -d -p 5441:5432 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+    --name node1 -d kwildb/postgres:latest
+docker run -d -p 5442:5432 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
+    --name node2 -d kwildb/postgres:latest
 ```
 
 :::tip
