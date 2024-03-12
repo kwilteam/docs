@@ -8,12 +8,12 @@ slug: /kwil-cli/installation
 ---
 
 Until the main Kwil DB repository is open source, the `kwil-cli` command line
-application may be downloaded from the Kwil binary release repository.
+application may be downloaded from the kwil-db repository.
 
 ## Download the `kwil-cli` Executable
 
 The Kwil Cli (`kwil-cli`) will be packaged together with Kwil Daemon (`kwild`) and Kwil Admin Tool (`kwil-admin`).
-Download the [latest release](https://github.com/kwilteam/binary-releases/releases)
+Download the [latest release](https://github.com/kwilteam/kwil-db/releases)
 for your platform.  Extract the `kwil-cli` file from the archive and put it
 into a folder that is in your `PATH` environment.
 
