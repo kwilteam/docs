@@ -13,6 +13,12 @@ slug: /syntax-diagrams
 <iframe
   id="diagram-iframe"
   src="https://kwilteam.github.io/sql-grammar/"
-  width="1133"
-  height="14250"
+  position="absolute"
+  style={{
+    border: "none",
+    overflow: "hidden",
+    position: "relative",
+    width: "100%",
+    height: "100vh",
+  }}
 ></iframe>
