@@ -1,7 +1,8 @@
 {
   "projects": {
     "default": "kwil-docs",
-    "kwil-docs-prerelease": "prerelease-docs"
+    "kwil-docs-prerelease": "prerelease-docs",
+    "v0.6": "v06-docs"
   },
   "targets": {},
   "etags": {}
