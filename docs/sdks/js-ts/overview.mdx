@@ -32,6 +32,12 @@ Kwil has different initialization logic for Web and NodeJS
 
 The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Ethers v6](https://docs.ethers.org/v6/).
 
+If you do not already have Ethers installed, run:
+
+```bash
+npm install ethers
+```
+
 :::
 
 <InitTabs />
@@ -41,7 +47,7 @@ The Kwil SDK is compatible with [Ethers v5](https://docs.ethers.org/v5/) and [Et
 The `WebKwil` and `NodeKwil` constructors take a configuration object. The only required fields are `kwilProvider` and `chainId`; however, there are additional configuration options available:
 
 ```js
-import { WebKwil, Utils } from 'kwil'; // or NodeKwil
+import { WebKwil, Utils } from '@kwilteam/kwil-js';
 
 const kwil = new WebKwil({
     kwilProvider: 'https://longhorn.kwil.com';
@@ -86,7 +92,7 @@ Certain operations in Kwil require signature authentication from the user (e.g. 
 To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
 
 ```javascript
-import { Utils, KwilSigner } from '@kwilteam/kwil-js';
+import { KwilSigner } from '@kwilteam/kwil-js';
 import { BrowserProvider } from 'ethers';
 
 // get ethers signer
@@ -130,7 +136,7 @@ const kwilSigner = new KwilSigner(customSigner, keys.publicKey, "ed25519");
 
 Any action that executes a CUD operation must be signed and broadcasted to the network through the `kwil.execute()` method.
 
-`.execute()` takes an object that matches the `ActionBody` interface. Action body has two required fields: `dbid` and `action`. You can also optionally add an `inputs` field if the action requires inputs, and a `description` field to customize the signature message.
+`.execute()` takes an object that matches the `ActionBody` interface. Action body has two required fields: `dbid` and `action`. You can also optionally add an `inputs` field if the action requires inputs, and a `description` field to customize the signature message that the user will sign.
 
 <Tabs
     defaultValue="js"
