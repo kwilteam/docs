@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 sidebar_label: "peer"
 id: "kwil-admin-setup-peer"
 title: "kwil-admin setup peer"
@@ -35,11 +35,15 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
       --app.grpc-listen-addr string                  kwild gRPC listen address (default "localhost:50051")
       --app.hostname string                          kwild Server hostname
       --app.http-listen-addr string                  kwild HTTP listen address (default "localhost:8080")
+      --app.pg-db-host string                        PostgreSQL host address (no port) (default "127.0.0.1")
+      --app.pg-db-name string                        PostgreSQL database name (default "kwild")
+      --app.pg-db-pass string                        PostgreSQL password name
+      --app.pg-db-port string                        PostgreSQL port (default "5432")
+      --app.pg-db-user string                        PostgreSQL user name (default "kwild")
       --app.private-key-path string                  Path to the node private key file
       --app.profile-file string                      kwild profile output file path (e.g. cpu.pprof)
       --app.profile-mode string                      kwild profile mode (http, cpu, mem, mutex, or block)
       --app.rpctls                                   Use TLS on the user gRPC server
-      --app.sqlite-file-path string                  kwild sqlite file path (default "data/kwild.db")
       --app.tls-cert-file string                     TLS certificate file path for RPC Server
       --app.tls-key-file string                      TLS key file path for RPC Server
       --chain.consensus.timeout-commit duration      Chain consensus timeout commit (default 6s)
