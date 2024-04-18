@@ -121,7 +121,7 @@ const kwil = new WebKwil({
 
 ### Manually Authenticate
 
-To manually authenticate a user, call the `authenticate` method. In browser, the cookie will automatically be stored in the browser's cookie jar. In NodeJS, the cookie will be returned as a string and must be passed with all subsequent requests.
+To manually authenticate a user, call the `authenticate` method. Kwil-JS will automaticall include the cookie with all subsequent requests.
 
 ```typescript
 async function manualAuthenticate() {
@@ -131,7 +131,7 @@ async function manualAuthenticate() {
 
 ### NodeJS: Manually Pass Cookie
 
-In NodeJS, the cookie returned from the `authenticate` method must be passed with all subsequent requests.
+In NodeJS, you can optionally set the cookie manually. This is useful when you want to implement additional logic around the authentication process.
 
 :::note
 You should not pass the cookie if in browser (WebKwil). The SDK relies on the browser's cookie jar to store the cookie.
