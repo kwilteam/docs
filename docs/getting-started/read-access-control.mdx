@@ -95,3 +95,67 @@ async function authenticatedAction() {
 </TabItem>
 </Tabs>
 
+## Logging Out a User
+
+Before using a new signer, it is important to log out the current user. This will clear the cookie and prompt the new user to sign a new message.
+
+```typescript
+async function logout() {
+    await kwil.auth.logout();
+}
+```
+
+## Advanced Usage
+
+### Disable Auto Authentication
+
+By default, the Kwil SDK will automatically prompt the user to authenticate when calling an action that requires authentication. To disable this behavior, set the `autoAuthenticate` option to `false`.
+
+```typescript
+const kwil = new WebKwil({
+    kwilProvider: "https://longhorn.kwil.com",
+    chainId: "longhorn",
+    autoAuthenticate: false,
+});
+```
+
+### Manually Authenticate
+
+To manually authenticate a user, call the `authenticate` method. In browser, the cookie will automatically be stored in the browser's cookie jar. In NodeJS, the cookie will be returned as a string and must be passed with all subsequent requests.
+
+```typescript
+async function manualAuthenticate() {
+    await kwil.auth.authenticate();
+}
+```
+
+### NodeJS: Manually Pass Cookie
+
+In NodeJS, the cookie returned from the `authenticate` method must be passed with all subsequent requests.
+
+:::note
+You should not pass the cookie if in browser (WebKwil). The SDK relies on the browser's cookie jar to store the cookie.
+:::
+
+```typescript
+const kwil = new NodeKwil({
+    kwilProvider: "https://longhorn.kwil.com",
+    chainId: "longhorn",
+    autoAuthenticate: false,
+});
+
+async function authenticatedAction() {
+    const auth = await kwil.auth.authenticate();
+
+    const cookie = auth.data?.cookie;
+
+    const payload = {
+        action: "get_profile",
+        dbid: 'x123abc...',
+        cookie
+    }
+
+    return await kwil.call(payload); // user will not be prompted to authenticate
+}
+```
+
