@@ -95,106 +95,67 @@ async function authenticatedAction() {
 </TabItem>
 </Tabs>
 
-## Full Example
+## Logging Out a User
 
-The full Kuneiform schema for this tutorial can be found in the dropdown below.
+Before using a new signer, it is important to log out the current user. This will clear the cookie and prompt the new user to sign a new message.
 
-<details>
-  <summary> social_media.kf </summary>
-
-```sql showLineNumbers
-database social_media;
-
-// table for storing application users
-table users {
-    id int primary,
-    username text notnull unique minlen(5) maxlen(32),
-    age int notnull max(120),
-    address text notnull unique // user wallet addresses
-}
-
-// table for storing posts
-table posts {
-    id int primary,
-    title text notnull maxlen(300),
-    content text notnull maxlen(10000),
-    author_id int notnull,
-    post_date text notnull
-}
-
-// table to track user balances
-table {
-    id int primary notnull,
-    author_id int notnull,
-    balance int notnull
-}
-
-// a public action for creating a user
-// it will automatically include the wallet address
-// of the caller in the "address" column
-action create_user ($id, $username, $age) public {
-    INSERT INTO users (id, ysername, age, address)
-    VALUES ($id, $username, $age, @caller);
-}
-
-// a public action for updating mutable user data
-action update_user ($username, $age) public {
-    UPDATE users
-    SET username=$username, age=$age
-    WHERE address=@caller;
-}
-
-// private action to get user id
-action get_user_id() private {
-  SELECT id
-  FROM users 
-  WHERE address=@caller;
-}
-
-// a public action for creating a post
-// it will automatically include the account id
-// of the caller in the "author_id" column
-action create_post ($id, $title, $content, $date_string) public {
-    $author_id = get_user_id();
-    INSERT INTO posts (id, title, content, author_id, post_date)
-    VALUES ($id, $title, $content, $author_id, $date_string);
-}
-
-action get_user ($username) public view {
-    SELECT *
-    FROM users
-    WHERE username=$username;
-}
-
-// private action to check balance
-action check_balance($author_id, $amount) private {
-    SELECT
-        CASE
-            WHEN balance < $amount THEN ERROR('Insufficient funds')
-            ELSE null
-        END
-    FROM balances
-    WHERE author_id = $author_id;
-}
-
-// get_posts will get the posts for a given user
-// call the private action within a public view action, and require that the balance is at least 10
-action get_posts($user_id) public view {
-    check_balance($user_id, 10);
-    SELECT * FROM posts WHERE author_id = $user_id;
-}
-
-// owner only action to delete a user
-action delete_user($user_id) owner {
-    DELETE FROM users WHERE id = $user_id;
-}
-
-// authentication required view action to reveal a user profile
-@kgw(authn='true')
-action get_profile () public view {
-    SELECT *
-    FROM users
-    WHERE address = @caller;
+```typescript
+async function logout() {
+    await kwil.auth.logout();
 }
 ```
-</details>
+
+## Advanced Usage
+
+### Disable Auto Authentication
+
+By default, the Kwil SDK will automatically prompt the user to authenticate when calling an action that requires authentication. To disable this behavior, set the `autoAuthenticate` option to `false`.
+
+```typescript
+const kwil = new WebKwil({
+    kwilProvider: "https://longhorn.kwil.com",
+    chainId: "longhorn",
+    autoAuthenticate: false,
+});
+```
+
+### Manually Authenticate
+
+To manually authenticate a user, call the `authenticate` method. In browser, the cookie will automatically be stored in the browser's cookie jar. In NodeJS, the cookie will be returned as a string and must be passed with all subsequent requests.
+
+```typescript
+async function manualAuthenticate() {
+    await kwil.auth.authenticate();
+}
+```
+
+### NodeJS: Manually Pass Cookie
+
+In NodeJS, the cookie returned from the `authenticate` method must be passed with all subsequent requests.
+
+:::note
+You should not pass the cookie if in browser (WebKwil). The SDK relies on the browser's cookie jar to store the cookie.
+:::
+
+```typescript
+const kwil = new NodeKwil({
+    kwilProvider: "https://longhorn.kwil.com",
+    chainId: "longhorn",
+    autoAuthenticate: false,
+});
+
+async function authenticatedAction() {
+    const auth = await kwil.auth.authenticate();
+
+    const cookie = auth.data?.cookie;
+
+    const payload = {
+        action: "get_profile",
+        dbid: 'x123abc...',
+        cookie
+    }
+
+    return await kwil.call(payload); // user will not be prompted to authenticate
+}
+```
+
