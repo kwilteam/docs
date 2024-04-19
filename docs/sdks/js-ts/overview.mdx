@@ -359,3 +359,13 @@ const res = await kwil.call(actionBody, kwilSigner);
     }
 */
 ```
+
+### Gateway logout
+
+To log out of the Kwil Gateway, you can call the `kwil.auth.logout()` method. This is useful if you want to switch accounts or remove the authentication cookie.
+
+```javascript
+await kwil.auth.logout();
+```
+
+For advanced authentication usage, see [read access control advanced usage](/docs/getting-started/read-access-control#advanced-usage).
