@@ -45,6 +45,14 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 
 A new instance of the Kwil class.
 
+### auth
+
+```typescript
+kwil.auth: Auth
+```
+
+The `auth` property accesses the authentication methods for the Kwil Gateway. See the [Auth](#auth-1) section below for more information.
+
 ### call()
 
 ```typescript
@@ -74,10 +82,19 @@ A promise that resolves to the result of the action / query.
 ### chainInfo()
 
 ```typescript
-async chainInfo(): Promise<GenericResponse<ChainInfo>>
+async chainInfo(opts?: ChainInfoOpts): Promise<GenericResponse<ChainInfo>>
+
+interface ChainInfoOpts {
+    disableWarning?: boolean;
+}
 ```
 
 Retrieves the chain id, latest block height, and latest block hash on the specified Kwil provider.
+
+#### Parameters
+
+-   `opts`: The options object for the chain info request.
+-   `opts.disableWarning`: If true, the SDK will disable the warning message when the chain ID does not match the expected chain ID. Default is false.
 
 #### Returns
 
@@ -324,6 +341,68 @@ The following signature types and corresponding identifiers can be used:
 #### Returns
 
 A new instance of the KwilSigner class.
+
+## Auth
+
+The `Auth` class is used to execute authentication-related operations on a Kwil Gateway.
+
+:::warning
+The `Auth` class will only work if you are connected to a Kwil Gateway. If you are connected directly to a Kwil Node, none of the methods in the `Auth` class will work.
+:::
+
+### constructor()
+
+The auth class is automatically initialized with the Kwil class. It can be accessed with `kwil.auth`.
+
+### authenticate()
+
+```typescript
+async authenticate(signer: KwilSigner): Promise<GenericResponse<AuthSuccess<T>>>
+
+// AuthSuccess interface browser (WebKwil)
+interface AuthSuccess<EnvironmentType.Browser> {
+    result: string;
+}
+
+// AuthSuccess interface node (NodeKwil)
+interface AuthSuccess<EnvironmentType.Node> {
+    result: string;
+    cookie: string;
+}
+```
+
+Authenticates a user with the Kwil Gateway.
+
+#### Parameters
+
+-   `signer`: The signer for the authentication request. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+#### Returns
+
+A promise that resolves to an `AuthSuccess` object. The object contains the result of the authentication request. If the environment is a browser, the object will contain the result. If the environment is NodeJS, the object will contain the result and a cookie.
+
+### logout()
+
+```typescript
+async logout(): Promise<GenericResponse<LogoutResponse<T>>> 
+
+// LogoutResponse interface browser (WebKwil)
+interface LogoutResponse<EnvironmentType.Browser> {
+    result: string;
+}
+
+// LogoutResponse interface node (NodeKwil)
+interface LogoutResponse<EnvironmentType.Node> {
+    result: string;
+    cookie: string;
+}
+```
+
+Logs out the current user from the Kwil Gateway by expiring the cookie.
+
+#### Returns
+
+A promise that resolves to a `LogoutResponse` object. The object contains the result of the logout request. If the environment is a browser, the object will contain the result. If the environment is NodeJS, the object will contain the result and an expired cookie.
 
 ## Funder
 
