@@ -54,14 +54,24 @@ import TabItem from "@theme/TabItem";
 <TabItem value='browser'>
 
 ```typescript
-import { WebKwil } from '@kwilteam/kwil-js';
+import { WebKwil, KwilSigner } from '@kwilteam/kwil-js';
+import { BrowserProvider } from 'ethers';
 
 const kwil = new WebKwil({
     kwilProvider: "https://longhorn.kwil.com",
     chainId: "longhorn",
 });
 
+async function getSigner() {
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    const ethAddress = await ethSigner.getAddress();
+    return new KwilSigner(ethSigner, ethAddress);
+}
+
 async function authenticatedAction() {
+    const kwilSigner = await getSigner();
+
     const payload = {
         action: "get_profile",
         dbid: 'x123abc...'
@@ -82,7 +92,16 @@ const kwil = new NodeKwil({
     chainId: "longhorn",
 });
 
+async function getSigner() {
+    const provider = new BrowserProvider(window.ethereum);
+    const ethSigner = await provider.getSigner();
+    const ethAddress = await ethSigner.getAddress();
+    return new KwilSigner(ethSigner, ethAddress);
+}
+
 async function authenticatedAction() {
+    const kwilSigner = await getSigner();
+
     const payload = {
         action: "get_profile",
         dbid: 'x123abc...'
@@ -125,7 +144,7 @@ To manually authenticate a user, call the `authenticate` method. Kwil-JS will au
 
 ```typescript
 async function manualAuthenticate() {
-    await kwil.auth.authenticate();
+    await kwil.auth.authenticate(kwilSigner);
 }
 ```
 
@@ -138,14 +157,8 @@ You should not pass the cookie if in browser (WebKwil). The SDK relies on the br
 :::
 
 ```typescript
-const kwil = new NodeKwil({
-    kwilProvider: "https://longhorn.kwil.com",
-    chainId: "longhorn",
-    autoAuthenticate: false,
-});
-
 async function authenticatedAction() {
-    const auth = await kwil.auth.authenticate();
+    const auth = await kwil.auth.authenticate(kwilSigner);
 
     const cookie = auth.data?.cookie;
 
