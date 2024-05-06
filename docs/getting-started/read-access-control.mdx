@@ -20,7 +20,8 @@ The Kwil Gateway requires a user to sign a message with their [account](/docs/co
 
 ## Require Authentication in Kuneiform
 
-To signal to the Kwil Gateway that an action requires authentication, and an annotation before the action. 
+To signal to the Kwil Gateway that an action requires authentication, add an annotation before the action. The `@kgw(authn='true')` annotation will require the user to authenticate via
+a signature before executing the action.
 
 ```sql title="social_media.kf"
 // authentication required view action to reveal a user profile
