@@ -114,7 +114,7 @@ procedure handle_array() public view returns (val text) {
 procedure age_conditional($age int) public {
     if $age < 0 {
         // do something
-    } elseif age < 18 {
+    } elseif $age < 18 {
         // do something
     } else {
         // something else
@@ -129,8 +129,8 @@ For loops can be declared over 4 different targets: arrays, ranges, procedure ca
 #### Array Loop
 
 ```ts
-procedure iterate_over_array(names text[]) public {
-    for $name in names {
+procedure iterate_over_array($names text[]) public {
+    for $name in $names {
         // $name is of type `text`
     }
 }
