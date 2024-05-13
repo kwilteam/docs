@@ -1,10 +1,10 @@
 ---
 sidebar_position: 3
-sidebar_label: "DML (SQL)"
-id: kuneiform-dml
-title: Kuneiform SQL
-description: An outline of Kuneiform's supported SQL DML syntax.
-slug: /kuneiform/dml
+sidebar_label: "Actions"
+id: kuneiform-actions
+title: Kuneiform Actions
+description: Using Actions in Kuneiform
+slug: /kuneiform/actions
 ---
 
 DML in Kuneiform is defined in `action` blocks.
