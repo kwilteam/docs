@@ -53,11 +53,11 @@ This section provides a detailed overview of the operational parameters availabl
 
       This section contains configurations for managing the snapshots of the kwild database.
 
-      - `enabled`: This variable toggles the snapshot feature on or off. By default, the snapshot feature is disabled.
+      - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network.
 
       - `snapshot_dir`: This variable specifies the path to the snapshots directory.
 
-      - `snapshot_heights`: This variable specifies the heights(multiples of heights) at which the database is snapshotted. The default is 10000, which is around 1 snapshot per day considering block rate of 1 block per 6-8 secs. 
+      - `recurring_height`: This variable specifies the heights (multiples of heights) at which the database is snapshotted. The default is 10000, which is around 1 snapshot per day considering block rate of 1 block per 6-8 secs. 
  
       - `max_snapshots`: This variable specifies the maximum number of snapshots to store on disk. The default is 3 snapshots.
 
@@ -162,6 +162,7 @@ Here is an example of a `config.toml` file with complete configuration:
 #   |- application/
 #   |- signing/
 #   |- snapshots/
+#   |- rcvd_snaps/
 
 # Required files: config.toml, private_key, and genesis files
 # The rest of the files & directories are created on the node startup
@@ -240,11 +241,23 @@ hostname = ""
 #######################################################################
 ###                     Extension Configuration                     ###
 #######################################################################
+
 [app.extensions]
+
+# Oracle extensions can be enabled by adding the following configuration
+# Each oracle extension configuration is defined under a subsection identified by the 
+# oracle extension name [app.extensions.<oracle_extension-name>]
+# The configuration options for each oracle extension are defined as key-value pairs under the subsection.
+# Only string values are supported for these configuration options.
+# For example, to enable the Ethereum listener extension, the configuration would look like:
+# [app.extensions.eth_listener]
+# rpc_provider = "https://mainnet.infura.io/v3/YOUR_INFURA_API_KEY"
+# contract_address = "0xYOUR_CONTRACT_ADDRESS"
 
 #######################################################################
 ###                     Snapshots Configuration                     ###
 #######################################################################
+
 [app.snapshots]
 
 # Enables snapshots
@@ -253,8 +266,8 @@ enabled = true
 # Path to the snapshots directory
 snapshot_dir = "snapshots"
 
-# Heights at which the database is snapshotted.
-snapshot_heights = 10000
+# Specifies the block heights(multiples of recurring_height) at which the snapshot should be taken
+recurring_height = {{.AppCfg.Snapshots.RecurringHeight}}
 
 # Maximum number of snapshots to store
 max_snapshots = 3
@@ -385,11 +398,15 @@ enable = true
 snapshot_dir = "rcvd_snaps"
 
 # Trusted snapshot providers (comma-separated chain RPC servers) are the source-of-truth for the snapshot integrity.
-# Snapshots are accepted for statesync only after verifying it with these trusted snapshot providers.
-# Atleast 2 trusted rpc servers are required for enabling state sync.
+# Snapshots are accepted for statesync only after verifying the snapshot metadata (snapshot hash, chunk count, height etc.)
+# with these trusted snapshot providers. At least 1 trusted snapshot provider is required for enabling state sync.
 rpc_servers = "http://rpc1:26657,http://rpc2:26657"
 
-# Time to spend discovering snapshots before initiating a restore.
+# Time spent discovering snapshots before offering the best(latest) snapshot to the application.
+# If no snapshots are discovered, the node will redo the discovery process until snapshots are found.
+# If network has no snapshots, restart the node with state sync disabled to sync with the network.
+# Current default is 15s, as only snapshot metadata is requested in the discovery process. 
+# Adjust this value according to the network latencies of your peers.
 discovery_time = "15s"
 
 # The timeout duration before re-requesting a chunk, possibly from a different
