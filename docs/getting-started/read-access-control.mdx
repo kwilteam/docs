@@ -18,7 +18,7 @@ Setting view action privacy is done using the Kwil Gateway.  The gateway is stil
 
 The Kwil Gateway requires a user to sign a message with their [account](/docs/concepts#accounts) keys. Once the signature is verified, the gateway will return the user a cookie to be passed with all subsequent requests.
 
-KGW cookies are partitioned by signer and origin. This means that multiple users can be authenticated at the same time, and users authenticated from one origin (e.g., `https://website1.com`) will not be authenticated on another origin (e.g., `https://website2.com`).
+KGW cookies are partitioned by origin. This means that multiple users can be authenticated at the same time, and users authenticated from one origin (e.g., `https://website1.com`) will not be authenticated on another origin (e.g., `https://website2.com`).
 
 ## Require Authentication in Kuneiform
 
