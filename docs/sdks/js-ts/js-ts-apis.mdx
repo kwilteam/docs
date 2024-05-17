@@ -384,7 +384,7 @@ A promise that resolves to an `AuthSuccess` object. The object contains the resu
 ### logout()
 
 ```typescript
-async logout(): Promise<GenericResponse<LogoutResponse<T>>> 
+logout(signer?: KwilSigner): Promise<GenericResponse<LogoutResponse<T>>>; 
 
 // LogoutResponse interface browser (WebKwil)
 interface LogoutResponse<EnvironmentType.Browser> {
@@ -398,7 +398,11 @@ interface LogoutResponse<EnvironmentType.Node> {
 }
 ```
 
-Logs out the current user from the Kwil Gateway by expiring the cookie.
+Logs out the current user(s) from the Kwil Gateway by expiring the cookie.
+
+#### Parameters
+
+-   `signer`: The signer to be logged out. This can be created with the [`KwilSigner`](#kwilsigner) class. If no signer is provided, all users will be logged out.
 
 #### Returns
 
