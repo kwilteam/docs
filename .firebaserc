@@ -1,8 +1,5 @@
 {
   "projects": {
-    "default": "kwil-docs",
-    "kwil-docs-prerelease": "prerelease-docs"
-  },
-  "targets": {},
-  "etags": {}
+    "default": "kwil-docs"
+  }
 }

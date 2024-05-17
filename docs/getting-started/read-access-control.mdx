@@ -18,6 +18,8 @@ Setting view action privacy is done using the Kwil Gateway.  The gateway is stil
 
 The Kwil Gateway requires a user to sign a message with their [account](/docs/concepts#accounts) keys. Once the signature is verified, the gateway will return the user a cookie to be passed with all subsequent requests.
 
+KGW cookies are partitioned by signer and origin. This means that multiple users can be authenticated at the same time, and users authenticated from one origin (e.g., `https://website1.com`) will not be authenticated on another origin (e.g., `https://website2.com`).
+
 ## Require Authentication in Kuneiform
 
 To signal to the Kwil Gateway that an action requires authentication, add an annotation before the action. The `@kgw(authn='true')` annotation will require the user to authenticate via a signature before executing the action.
@@ -38,7 +40,12 @@ The `@kgw(authn='true')` annotation will only require the user to authenticate I
 
 ## Authenticating a User
 
-Using the JavaScript SDK and the [KwilSigner](/docs/getting-started/read-write-data#signer), a user can authenticate with the Kwil Gateway. When calling the `call` method, the Kwil SDK will check if the gateway is enforcing authentication. If authentication is enforced, the gateway will prompt the user to sign a message with their account keys. Once the signature is verified, the SDK will include a cookie to be passed with all subsequent requests.
+Using the JavaScript SDK and the [KwilSigner](/docs/getting-started/read-write-data#signer), a user can authenticate with the Kwil Gateway (KGW). When calling the `call` method, the Kwil SDK will check if the gateway is enforcing authentication. If authentication is enforced, the gateway will prompt the user to sign a message with their account keys. Once the signature is verified, the SDK will include a cookie to be passed with all subsequent requests.
+
+:::tip
+When multiple users are authenticated, the current user is the signer passed to the `call` method.
+:::
+
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
@@ -116,11 +123,26 @@ async function authenticatedAction() {
 
 ## Logging Out a User
 
-Before using a new signer, it is important to log out the current user. This will clear the cookie and prompt the new user to sign a new message.
+Logging out a user invalidates the cookie from the requesting origin. This means that the user will need to re-authenticate to access any actions that require authentication.
+
+### Log out all users
+
+To logout all users, call the `logout` method with no arguments.
 
 ```typescript
 async function logout() {
     await kwil.auth.logout();
+}
+```
+
+### Log out a specific user
+
+To logout a specific user, pass the signer to the `logout` method.
+
+```typescript
+async function logoutUser() {
+    const kwilSigner = await getSigner();
+    await kwil.auth.logout(kwilSigner);
 }
 ```
 
