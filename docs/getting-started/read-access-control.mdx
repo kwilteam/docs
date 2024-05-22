@@ -125,9 +125,9 @@ async function authenticatedAction() {
 
 Logging out a user invalidates the cookie from the requesting origin. This means that the user will need to re-authenticate to access any actions that require authentication.
 
-### Log out all users
+### Log out all signers
 
-To logout all users, call the `logout` method with no arguments.
+To log out all signers that a user has authenticated with, call the `logout` method with no arguments.
 
 ```typescript
 async function logout() {
@@ -135,9 +135,9 @@ async function logout() {
 }
 ```
 
-### Log out a specific user
+### Log out a specific signer
 
-To logout a specific user, pass the signer to the `logout` method.
+To log out a specific signer, pass the signer to the `logout` method.
 
 ```typescript
 async function logoutUser() {
