@@ -1,0 +1,33 @@
+---
+sidebar_position: 1
+sidebar_label: "Background"
+id: fork-background
+title: "Background"
+description:  "Extension-based system for coordinating activation of consensus rule changes with new software."
+slug: /extensions/fork-background
+---
+
+In general, when a new version of some node software is released that contains
+changes affecting consensus rules or parameters, upgrading may involve
+transient network interruption as a super-majority of validators update, or even
+require full network migration if backward compatibility is lost. If the new
+software is unable to execute historical transactions in blocks produced by
+previous versions, the resolution is deploying a new chain with previous state
+at genesis (network migration). It is desirable to avoid these outcomes.
+
+Network interruption may be minimized with a network-wide *coordinated upgrade*.
+For instance, CometBFT (the consensus engine)[^1]<sup>,</sup>[^2] and Cosmos
+SDK[^3]<sup>,</sup>[^4] have required coordinated upgrades between major
+releases. In some cases, operators plan to upgrade their software around the
+same time to minimize interruption in block production while the required 2/3+
+of validators update. In other cases, it involves a network halt followed by
+exporting state for a new genesis.
+
+`kwild` provides mechanisms for performing coordinated upgrades with minimal
+network disruption and without resetting a chain from genesis. The next section
+describes how network operator and developers may specify these upgrades.
+
+[^1]: https://github.com/cometbft/cometbft/blob/main/UPGRADING.md
+[^2]: https://gist.github.com/alexanderbez/5e87886221eb304b9e85ad4b167c99c8
+[^3]: https://hub.cosmos.network/migration/latest#method-i-manual-upgrade
+[^4]: https://github.com/cometbft/cometbft/blob/v0.38.x/docs/rfc/rfc-100-abci-vote-extension-propag.md#upgrade-path)

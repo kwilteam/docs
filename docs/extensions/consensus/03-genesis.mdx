@@ -1,0 +1,36 @@
+---
+sidebar_position: 3
+sidebar_label: "Genesis Configuration"
+id: fork-genesis
+title: "Activation Height in Genesis Configuration"
+description:  "Extension-based system for coordinating activation of consensus rule changes with new software."
+slug: /extensions/fork-genesis
+---
+
+The genesis configuration file, `genesis.json`, contains a section where heights
+for these named "forks" should have their rule changes become active. This tells
+`kwild` when old or new rules should apply, permitting seamless changes to
+consensus-level logic.
+
+In the main `kwil-db` Go module, the `common/chain.GenesisConfig` structure
+models the `genesis.json` file. An `"activations"` field is used to associate
+named rule change sets with an activation height. For instance:
+
+```json
+{
+  "genesis_time": "2024-04-15T17:00:34.108598516Z",
+  "chain_id": "kwil-chain-g1KPHOsY",
+  "initial_height": 1,
+  "app_hash": null,
+  "activations": {
+    "kancun": 1234000
+  },
+  ...
+}
+```
+
+With the above in the genesis configuration, a backward incompatible rule change
+named `"kancun"` is scheduled to activate at height 1234000. If the height value
+is `null` or a fork name is omitted, those changes are disabled. If the height
+is `0`, they are in effect at genesis. Ethereum node operators are also likely
+to be familiar with this system.

@@ -1,0 +1,48 @@
+---
+sidebar_position: 2
+sidebar_label: "Kwil Overview"
+id: fork-kwild
+title: "Coordinated Upgrades in Kwild"
+description:  "Extension-based system for coordinating activation of consensus rule changes with new software."
+slug: /extensions/fork-kwild
+---
+
+:::caution
+The coordinated upgrade system and hardfork definitions defined here are
+**experimental**. The system is likely to change in the future as use cases are
+evaluated.
+:::
+
+`kwild` provides a mechanism for reducing network disruption by formally
+specifying:
+
+1. The consensus-level changes, and
+2. The height at which the changes should go into effect.
+
+This permits delaying the changes after a
+software update until a block height specified in the genesis configuration
+file. CometBFT uses a similar approach[^1] to enable certain features, including
+vote extensions and proposer-based time stamps (PBTS). The height-based activation
+system is exposed to developers to alter application logic that affects consensus.
+
+In brief, the process of defining a coordinated backward incompatible upgrade involves:
+
+- Specify the activation height in the `genesis.json` file, as described in
+  [next section](/docs/extensions/fork-genesis).
+- Define changes using the extension system, which requires no modification to
+  the `kwild` source code. See [Extension-based Changes](/docs/extensions/fork-ext)
+  for more.
+- If the changes cannot be specified by the functionality exposed by the
+  extension system, modify `kwild` source code to add ad-hoc conditional logic.
+  See [Canonical Changes](#ad-hoc-changes) for more. These become "canonical"
+  upgrades. This approach is primarily intended for the core Kwil development
+  team to coordinate updates applicable to all networks.
+
+In the event that software updates must introduce changes that cannot leverage
+these mechanisms to retain the ability to execute pre-upgrade blocks, and thus
+require a new chain (new genesis with exported state), `kwild` also has the
+ability to _halt_ at a specified block. At this point, a new version of the node
+software may start with exported state and an updated genesis configuration. See
+the [planned halt mechanism](#planned-halt-fork).
+
+[^1]: https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#application-configuration-required-to-switch-to-abci-20

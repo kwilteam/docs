@@ -1,0 +1,57 @@
+---
+sidebar_position: 4
+sidebar_label: "Extension-based Changes"
+id: fork-extensions
+title: "Extension-based Changes"
+description:  "Extension-based system for coordinating activation of consensus rule changes with new software."
+slug: /extensions/fork-ext
+---
+
+:::caution
+The coordinated upgrade system and hardfork definitions defined here are
+**experimental**. The system is likely to change in the future as use cases are
+evaluated.
+:::
+
+### Defining the Changes
+
+A set of well-defined changes may be specified using `kwild`'s extension system,
+which allows network operators to customize a network without forking or
+modifying the `kwild` source. The `extensions/consensus.Hardfork` Go structure
+is used to define several well-defined types of changes that are exposed by its
+fields. See the
+[godocs](https://pkg.go.dev/github.com/kwilteam/kwil-db/extensions/consensus)
+for reference.
+
+The set of functionality changes currently possible with the extension system are:
+
+- New _transaction payloads_ to recognize. Specifically, defining a new
+  `core/types/transactions.Payload` and `PayloadType` that should be recognized.
+- Updates to registered _authenticators_.  These are
+  `core/crypto/auth.Authenticator` types that perform signature verification and
+  identification with certain key types such as secp256k1.
+- Updates to the _resolutions_ that drive governance-based transactions.
+  These specify `extensions/resolutions.ResolutionConfig` instances to add or
+  update, and named resolution types to remove.
+- New _serialization schema_ (codecs) for transaction payloads. e.g. Borsch
+  instead of RLP. This is a list of new `core/types/serialize.Codec` instances
+  to enable.
+
+In addition to the above changes to pluggable functionality updates, which are
+persistent after activation, the following occur only at the activation height:
+
+- Parameter changes to return to the consensus engine (CometBFT) when finalizing
+  the block at the activation height. For example, block size or application
+  version. Changes to Kwil-specific parameters such as vote expiry may also be
+  specified. This is an instance of `extensions/consensus.ParamUpdates`.
+- One time arbitrary alterations to application state. This is exposed in case
+  there are state changes that must be done in concert with the other rules
+  changes. For example, corrective actions or preparation for new functionality.
+
+### Building `kwild` with Customizations
+
+Refer to the [extension documents](/docs/extensions/building-kwild-with-extensions)
+for creating a customized build of `kwild`. The process is the same, but with an
+`init()` function calling `consensus.RegisterHardfork` with the definition established
+as per the previous section. See [test node](https://github.com/jchappelow/kwil-db/blob/0affbcc0d9387f617515d69ce01ef4550e5d4777/test/nodes/fork/gremlin.go#L20)
+for an example.
