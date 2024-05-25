@@ -51,6 +51,9 @@ procedure declare_vars() public {
 
     // assign to $var2. type cast to match type text:
     $var2 := $var1::text;
+
+    // declare and assign a new variable. The type will be inferred as text:
+    $var3 := 'hello world';
 }
 ```
 
@@ -162,20 +165,6 @@ You can iterate over any SQL statement as well. The following examples reference
 procedure iterate_over_sql() public {
     for $row in SELECT id, name, age from users {
         // can access $row.id, $row.name, and $row.age
-    }
-}
-```
-
-You can also iterate of returning clauses:
-
-```ts
-procedure iterate_over_delete() public {
-    $age int := 100;
-    for $row in delete from users
-        where age = $age
-        returning * {
-        // can access $row.id, $row.name, and $row.age
-        // for all deleted users
     }
 }
 ```
