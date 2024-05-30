@@ -74,12 +74,6 @@ specifying the dimension to return the length of. Kwil only supports 1-dimension
 
 ## String Functions
 
-`btrim(TEXT, TEXT?) -> TEXT`
-
-Remove the longest string containing only characters in characters from the start and end of string.
-
----
-
 `bit_length(TEXT) -> INT`
 
 Returns the number of bits in the given string.
@@ -162,7 +156,8 @@ Returns a substring of the given string starting at the given position (second a
 
 This does not directly match Postgres's syntax, which uses `substring(string [from int] [for int])`, where either `from` or `for` is optional.
 Kwil requires `from` to be implicitly specified as the second parameter, and `for` to be the (optional) third parameter. To omit
-the `from` parameter in Kwil, use `substring(string, 1, for)`.
+the `from` parameter in Kwil, use `substring(string, 1, for)`. Kwil does not support the usage of regular expressions in `substring`,
+as Postgres does.
 
 ---
 
