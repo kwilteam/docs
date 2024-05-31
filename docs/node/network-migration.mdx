@@ -1,0 +1,113 @@
+---
+sidebar_position: 6
+sidebar_label: "Network Migrations"
+id: network-migrations
+title: Network Migrations
+description: Network Migrations
+slug: /node/network-migrations
+---
+This document provides a detailed guide on how to establish a new network that integrates existing data from a previous network, using nodes that run on the updated version of the `kwild` binaries. This approach is necessary when seamless upgrades to new versions are not feasible due to significant, breaking changes that affect consensus mechanisms and transaction replays.
+
+## Network Migrations
+
+Follow the steps below to upgrade the network to a new version of the `kwild` binaries:
+
+### Create Snapshot
+
+Stop the network by shutting down all the nodes in the network. Then, use the `kwil-admin snapshot` tool to take a snapshot of the final state of the Kwild database. For more details, refer to the [create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation. This tool connects directly to the database to capture its state and does not require the `kwild` process to be running.
+
+The `kwil-admin snapshot` tool generates a snapshot file and a genesis file required to start the new network. The genesis file includes the genesis app hash, derived from the hash of the uncompressed snapshot file, and the genesis validators set to the validators from the previous network. To start a new network with the snapshot data, the genesis file must have the `app_hash` field set; otherwise, the network will start with an empty state.
+
+```bash
+kwil-admin snapshot create --snapdir /path/to/snapdir
+
+# Running the above command will generate the snapshot file and the genesis.json file in the snapshot directory.
+ls /path/to/snapdir
+genesis.json            kwildb-snapshot.sql.gz
+```
+
+By default, the above command connects to the postgres instance runnning at `localhost:5432` with the default user `postgres` with `trust` authentication mode. To connect to a database running on a different host/port/user/password, use the following command:
+
+```bash
+kwil-admin snapshot create --snapdir /path/to/snapdir --dbname <dbname> --host <dbhost> --port <dbport> --user <dbuser> --password <dbpass>
+```
+
+#### Verify App Hash
+
+The app hash set in the genesis file is generated based on the hash of the uncompressed snapshot. You can verify the app hash in the generated genesis file as follows
+
+``` bash
+# Uncompress the snapshot file.
+gunzip /path/to/snapdir/kwildb-snapshot.sql.gz
+
+# Generate app hash using sha256sum.
+shasum -a 256 /path/to/snapdir/kwildb-snapshot.sql
+4c2ecfc145c37a45a1fd21cd38ee84db80d852996fc30438a007ba624387c683  /path/to/snapdir/kwildb-snapshot.sql
+
+# app_hash in genesis file is a hexadecimal representation of the sha256sum hash encoded in base64.
+# hex-> binary -> base64
+echo -n "4c2ecfc145c37a45a1fd21cd38ee84db80d852996fc30438a007ba624387c683" | xxd -r -p | base64
+
+TC7PwUXDekWh/SHNOO6E24DYUplvwwQ4oAe6YkOHxoM=
+
+# compare the app hash with the genesis file
+cat /path/to/snapdir/genesis.json | jq .app_hash
+
+"TC7PwUXDekWh/SHNOO6E24DYUplvwwQ4oAe6YkOHxoM="
+```
+
+### Distribute Genesis State
+
+Distribute the `snapshot` and the `genesis.json` files required to start the new network. 
+
+Ensure that the `genesis.json` file has the `app_hash` field set to the hash of the uncompressed snapshot file. Refer to the [Verify App Hash](#verify-app-hash) section to ensure the hash is correct. If any other changes are needed to the genesis configuration, update the genesis file manually before distributing it.
+
+### Run Genesis Nodes
+
+#### Install Kwild Binaries
+
+Firstly, install the new version of the `kwild` binaries. Refer to the [Installation](/docs/daemon/installation) documentation for more details on getting the required versions of the `kwild` binaries.
+
+####  Configure Node to Use Snapshot
+
+Refer to the [Node Configuration](/docs/daemon/kwild#configuration) documentation to setup `private_key` and `config.toml` files. Download the `snapshot` and the `genesis.json` files required for this new network and place them under the root_dir. 
+
+```
+root_dir
+├── config.toml
+├── private_key
+├── genesis.json
+├── abci/
+```
+
+To initialize the node with the snapshot data, the `snapshot_file` path in the `config.toml` file must be set to the location of the downloaded snapshot file. The node will fail to start if the `snapshot_file` path is not provided in the `config.toml`.
+
+```TOML
+#######################################################################
+###                      App Config Options                         ###
+#######################################################################
+
+[app]
+
+# Path to the snapshot file to restore the database from.
+# Used during the network migration process.
+snapshot_file = "/path/to/snapshot/file"
+```
+
+#### Start the Node
+
+Once the genesis and config files are configured to use snapshots, start the node using the following command:
+
+```bash
+# use -h for more options. 
+kwild -r /path/to/node/root/dir
+```
+
+### Nodes Catching Up
+
+Follow the same steps described in the [Run Genesis Nodes](#run-genesis-nodes) section to configure and join the network. Nodes can either sync with the network using `statesync` or `blocksync`.
+
+If the node uses `blocksync`, the `snapshot_file` path is mandatory to ensure that the node initializes with the same genesis initial state and replay all the historical blocks. If the node doesn't start from the same initial state, it will eventually fork itself off the chain during blocksync. 
+
+If the node uses `statesync` to catch up with the network, the `snapshot_file` path is not required in the `config.toml` file. The node will use the `statesync` protocol to catch up with the network as described in the [State Sync](/docs/node/statesync) documentation.
+

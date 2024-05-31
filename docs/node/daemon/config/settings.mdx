@@ -19,33 +19,47 @@ This section provides a detailed overview of the operational parameters availabl
 - `time_format`: This variable specifies the time format for logs. Options include `epochfloat` (default), `epochmilli`, and `rfc3339milli`.
 
 ## [app]   
-This section holds configurations specific to the Kwil application's operation.
+   This section holds configurations specific to the Kwil application's operation.
 
-- `grpc_listen_addr`: This variable specifies the address where the daemon's gRPC server listens for connections. The default is `localhost:50051`.
+   - `grpc_listen_addr`: This variable specifies the address where the daemon's gRPC server listens for connections. The default is `localhost:50051`.
 
-- `http_listen_addr`: This variable specifies the address where the daemon's HTTP server listens for connections. The default is `localhost:8080`.
+   - `http_listen_addr`: This variable specifies the address where the daemon's HTTP server listens for connections. The default is `localhost:8080`.
 
-- `admin_listen_addr`: This variable specifies the address where the daemon's admin gRPC server listens for connections. The default is `localhost:50151`.
+   - `admin_listen_addr`: This variable specifies the address where the daemon's admin gRPC server listens for connections. The default is `localhost:50151`.
 
-- `pg_db_host`: PostgreSQL database host (UNIX socket path or IP address with no port). The default is `/var/run/postgresql`.
+   - `pg_db_host`: PostgreSQL database host (UNIX socket path or IP address with no port). The default is `/var/run/postgresql`.
 
-- `pg_db_port`: PostgreSQL database port (may be omitted for UNIX socket hosts). The default is `5432`.
+   - `pg_db_port`: PostgreSQL database port (may be omitted for UNIX socket hosts). The default is `5432`.
 
-- `pg_db_user`: PostgreSQL database user (should be a "superuser"). The default is `kwild`.
+   - `pg_db_user`: PostgreSQL database user (should be a "superuser"). The default is `kwild`.
 
-- `pg_db_pass`: PostgreSQL database pass (may be omitted for some pg_hba.conf configurations).
+   - `pg_db_pass`: PostgreSQL database pass (may be omitted for some pg_hba.conf configurations).
 
-- `pg_db_name`: PostgreSQL database name (override database name). The default is `kwild`.
+   - `pg_db_name`: PostgreSQL database name (override database name). The default is `kwild`.
 
-- `private_key_path`: This variable specifies the path for node's private key. If left unspecified, it defaults to `./private_key` relative to the root directory.
+   - `private_key_path`: This variable specifies the path for node's private key. If left unspecified, it defaults to `./private_key` relative to the root directory.
 
-- `extension_endpoints`: This variable specifies the endpoints for extensions, separated by commas.
+   - `extension_endpoints`: This variable specifies the endpoints for extensions, separated by commas.
 
-- `tls_cert_file`: This variable specifies the file path containing a certificate to enable TLS on the gRPC server. This path can be either absolute or relative to the specified root directory. If unspecified, the gRPC server's communications remain unencrypted.
+   - `tls_cert_file`: This variable specifies the file path containing a certificate to enable TLS on the gRPC server. This path can be either absolute or relative to the specified root directory. If unspecified, the gRPC server's communications remain unencrypted.
 
-- `tls_key_file`: This variable specifies the file path containing the corresponding private key that enables TLS on the gRPC server. Like the `tls_cert_file`, this path can be either absolute or relative to the specified root directory. If unspecified, the gRPC server's communications remain unencrypted.
+   - `tls_key_file`: This variable specifies the file path containing the corresponding private key that enables TLS on the gRPC server. Like the `tls_cert_file`, this path can be either absolute or relative to the specified root directory. If unspecified, the gRPC server's communications remain unencrypted.
 
-- `hostname`: This variable sets the Kwil gRPC server's hostname.
+   - `hostname`: This variable sets the Kwil gRPC server's hostname.
+
+   - `snapshot_file`: This variable specifies the path to the snapshot file to be used for the initial state of the node. If the node is configured to start with initial state and this variable is not set, the node will fail to start.
+
+   ### [app.snapshots]
+
+      This section contains configurations for managing the snapshots of the kwild database.
+
+      - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network.
+
+      - `snapshot_dir`: This variable specifies the path to the snapshots directory.
+
+      - `recurring_height`: This variable specifies the heights (multiples of heights) at which the database is snapshotted. The default is 10000, which is around 1 snapshot per day considering block rate of 1 block per 6-8 secs. 
+ 
+      - `max_snapshots`: This variable specifies the maximum number of snapshots to store on disk. The default is 3 snapshots.
 
 ## [chain]
 This section contains configuration specific to the CometBFT-based blockchain.
@@ -57,6 +71,8 @@ This section contains configuration specific to the CometBFT-based blockchain.
       This section offers configurations for managing the blockchain's RPC service.
 
       - `listen_addr`: This variable specifies the listening address for the blockchain's RPC server. The default is `tcp://127.0.0.1:26657`.
+
+      - `broadcast-tx-timeout`: This variable specifies the time to wait for a transaction to be committed when authored with --sync flag in the CLI. The default is 10s.
 
    ### [chain.consensus]
 
@@ -106,6 +122,18 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `cache_size`: This variable specifies the cache size used to filter previously seen transactions.
 
+   ### [chain.statesync]
+
+      This section provides configuration to enable state sync instead of block sync to catchup with the network.
+
+      - `enable`: This variable toggles the state sync feature on or off. By default, the state sync feature is disabled and the node uses block sync to catch up with the network.
+
+      - `rpc_servers`: This variable specifies a list of trusted snapshot providers. It is a comma-seperated list of chain RPC servers and requires atleast 2 servers to enable statesync. These servers act as the source-of-truth for the snapshot integrity and also responsible for creating, distributing and validating snapshots. These servers should have [snapshot configuration](#appsnapshots) enabled.
+
+      - `discovery_time`: This variable specifies the time to spend discovering snapshots before offering the latest snapshot to the ABCI application. The default is 15s. The node will repeat this process until it finds a valid snapshot. If there are no snapshots available in the network, restart the node with block sync enabled to make progress with the node syncing.
+
+      - `chunk_request_timeout`: This variable specifies the timeout duration before re-requesting a chunk, possibly from a different peer.
+
 This is the structure in which these configs must appear in the `config.toml` file.
 
 ## Sample config.toml
@@ -133,6 +161,8 @@ Here is an example of a `config.toml` file with complete configuration:
 #   |   |- info/
 #   |- application/
 #   |- signing/
+#   |- snapshots/
+#   |- rcvd_snaps/
 
 # Required files: config.toml, private_key, and genesis files
 # The rest of the files & directories are created on the node startup
@@ -207,6 +237,41 @@ tls_key_file = ""
 
 # Kwild Server hostname
 hostname = ""
+
+#######################################################################
+###                     Extension Configuration                     ###
+#######################################################################
+
+[app.extensions]
+
+# Oracle extensions can be enabled by adding the following configuration
+# Each oracle extension configuration is defined under a subsection identified by the 
+# oracle extension name [app.extensions.<oracle_extension-name>]
+# The configuration options for each oracle extension are defined as key-value pairs under the subsection.
+# Only string values are supported for these configuration options.
+# For example, to enable the Ethereum listener extension, the configuration would look like:
+# [app.extensions.eth_listener]
+# rpc_provider = "https://mainnet.infura.io/v3/YOUR_INFURA_API_KEY"
+# contract_address = "0xYOUR_CONTRACT_ADDRESS"
+
+#######################################################################
+###                     Snapshots Configuration                     ###
+#######################################################################
+
+[app.snapshots]
+
+# Enables snapshots
+enabled = true
+
+# Path to the snapshots directory
+snapshot_dir = "snapshots"
+
+# Specifies the block heights(multiples of recurring_height) at which the snapshot should be taken
+recurring_height = {{.AppCfg.Snapshots.RecurringHeight}}
+
+# Maximum number of snapshots to store
+max_snapshots = 3
+
 
 #######################################################################
 ###                 Chain  Main Base Config Options                 ###
@@ -317,6 +382,39 @@ max_tx_bytes = 4194304
 
 # Size of the cache (used to filter transactions we saw earlier) in transactions
 cache_size = 10000
+
+#######################################################
+###         State Sync Configuration Options        ###
+#######################################################
+[chain.statesync]
+# State sync rapidly bootstraps a new node by discovering, fetching, and restoring the database
+# snapshot from peers instead of fetching and replaying historical blocks. Requires some peers in
+# the network to take and serve snapshots. State sync is not attempted if the node
+# has any local state (LastBlockHeight > 0). The node will have a truncated block history,
+# starting from the height of the snapshot.
+enable = true
+
+# Path to the directory where the received snapshot is stored
+snapshot_dir = "rcvd_snaps"
+
+# Trusted snapshot providers (comma-separated chain RPC servers) are the source-of-truth for the snapshot integrity.
+# Snapshots are accepted for statesync only after verifying the snapshot metadata (snapshot hash, chunk count, height etc.)
+# with these trusted snapshot providers. At least 1 trusted snapshot provider is required for enabling state sync.
+rpc_servers = "http://rpc1:26657,http://rpc2:26657"
+
+# Time spent discovering snapshots before offering the best(latest) snapshot to the application.
+# If no snapshots are discovered, the node will redo the discovery process until snapshots are found.
+# If network has no snapshots, restart the node with state sync disabled to sync with the network.
+# Current default is 15s, as only snapshot metadata is requested in the discovery process. 
+# Adjust this value according to the network latencies of your peers.
+discovery_time = "15s"
+
+# The timeout duration before re-requesting a chunk, possibly from a different
+# peer (default: 1 minute), if the current peer is unresponsive to the chunk request.
+chunk_request_timeout = "10s"
+
+# Note: If the requested chunk is not received within 2 minutes (hard-coded default), 
+# the state sync process is aborted and the node will fall back to the regular block sync process.
 ```
 </details>
 

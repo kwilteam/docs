@@ -28,6 +28,7 @@ The Kwil node admin tool.
 * [kwil-admin key](/docs/ref/kwil-admin/key)	 - The `key` command provides subcommands for private key generation and inspection.
 * [kwil-admin node](/docs/ref/kwil-admin/node)	 - The `node` command is used to get information about a running Kwil node.
 * [kwil-admin setup](/docs/ref/kwil-admin/setup)	 - The `setup` command provides functions for creating and managing node configuration and data.
+* [kwil-admin snapshot](/docs/ref/kwil-admin/snapshot)	 - The `snapshot` command is used to create and manage snapshots.
 * [kwil-admin utils](/docs/ref/kwil-admin/utils)	 - The `utils` command is used to get information about a running Kwil node.
 * [kwil-admin validators](/docs/ref/kwil-admin/validators)	 - The `validators` command provides functions for creating and broadcasting validator-related transactions.
 * [kwil-admin version](/docs/ref/kwil-admin/version)	 - Displays the cli version information.

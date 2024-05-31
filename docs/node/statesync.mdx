@@ -1,0 +1,87 @@
+---
+sidebar_position: 5
+sidebar_label: "Statesync"
+id: "Statesync"
+title: "Using State Sync"
+description: "Learn how to bootstrap a new node using statesync"
+slug: /node/statesync
+---
+
+Any new node joining a network needs to first catch up with the existing nodes. The default approach is to replay all the blocks from the genesis. Depending on the number of blocks in the chain, this process can take a long time.
+
+Statesync is a feature that allows a new node to bootstrap directly from a snapshot instead of replaying all the blocks from the genesis. Statesync greatly reduces the time needed to sync a new node to a network; however, the node will have a truncated history starting from the height of the snapshot.
+
+:::note
+Statesync should not be used on a partially synced node. If you have a partially synced node, it switches to blocksync to sync the remaining blocks.
+:::
+
+## Trusted Snapshot Providers
+
+To support statesync, each network should have at least one trusted snapshot provider responsible for creating, distributing, and validating snapshots. 
+
+### Setting up Trusted Snapshot Providers
+
+Trusted snapshot providers are regular full nodes with [snapshot creation](/docs/daemon/config/settings#appsnapshots) enabled. A trusted snapshot provider must have both P2P and RPC services accessible to other nodes. The P2P service allows the snapshots that the node creates to be distributed. The RPC service is used by joining nodes to validate snapshots received from either the trusted provider or other nodes.
+
+Along with the trusted snapshot providers, other nodes in the network can also enable snapshots and distribute them to the joining nodes during the statesync process. However, a joining node only accepts these snapshots after validating them with the trusted snapshot providers.
+
+### Enabling Snapshot Creation
+Snapshots can be enabled on the Kwil nodes by providing the following configuration in the `config.toml` file. Refer to the [snapshot](/docs/daemon/config/settings#appsnapshots) configuration for more details.
+
+```toml
+[app.snapshots]
+
+# Enables snapshots
+enabled = true
+
+# Path to the snapshots directory
+snapshot_dir = "snapshots"
+
+# (Multiples of) Heights at which the database is snapshotted.
+recurring_height = 10000
+
+# Maximum number of snapshots to store on disk
+max_snapshots = 3
+```
+
+If snapshots are enabled, node generates snapshots at every block height that is a multiple of `recurring_height`. The snapshots generated are stored on the disk at the location specified using the `snapshot_dir` configuration. These snapshots are the logical sql dumps of the underlying Postgres database, compressed and divided into chunks of 16MB each. The node stores a maximum of `max_snapshots` on the disk, and older snapshots are deleted when the limit is reached.
+
+For example, a node with the above configuration will generate snapshots at every 10,000 block height. If the node currently has snapshots at height 10000, 20000, and 30000, the node will generate the next snapshot at height 40000. As the max_snapshots is set to 3, the snapshot at height 10000 will be deleted when the snapshot at height 40000 is created.
+
+## Configuring Statesync
+
+Configure the new node to use statesync by providing the following configuration in the `config.toml` file.
+
+```yaml
+[chain.statesync]
+# State sync rapidly bootstraps a new node by discovering, fetching, and restoring the database
+# snapshot from peers instead of fetching and replaying historical blocks. Requires some peers in
+# the network to take and serve snapshots. State sync is not attempted if the node
+# has any local state (LastBlockHeight > 0). The node will have a truncated block history,
+# starting from the height of the snapshot.
+enable = true
+
+# Path to the directory where the received snapshot is stored
+snapshot_dir = "rcvd_snaps"
+
+# Trusted snapshot providers (comma-separated chain RPC servers) are the source-of-truth for the snapshot integrity.
+# Snapshots are accepted for statesync only after verifying it with these trusted snapshot providers.
+# Atleast 1 trusted rpc server is required for enabling state sync.
+rpc_servers = "http://rpc1:26657,http://rpc2:26657"
+
+# Time to spend discovering snapshots before initiating a restore. (default: 15 seconds)
+discovery_time = "15s"
+
+# The timeout duration before re-requesting a chunk, possibly from a different
+# peer (default: 1 minute), if the current peer is unresponsive to the chunk request.
+chunk_request_timeout = "10s"
+
+# Note: If the requested chunk is not received within 2 minutes (hard-coded default), 
+# the state sync process is aborted and the node will fall back to the regular block sync process.
+```
+
+When state sync is enabled, the node first discovers snapshots from all its connected peers. It then selects the latest snapshot from those discovered and validates the integrity of the snapshot with the trusted snapshot provider. Once a valid snapshot is identified, the node fetches the snapshot chunks from the peers and restores the database state using these chunks. The node then begins syncing blocks starting from the snapshot height.
+
+:::note
+The node will stay in the discovery phase until a snapshot is discovered and validated. If there are no snapshots in the network, the node will be stuck in the discovery phase. To make progess, disable statesync and restart the node. The node will then progress with blocksync.
+:::
