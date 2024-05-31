@@ -26,7 +26,7 @@ ls /path/to/snapdir
 genesis.json            kwildb-snapshot.sql.gz
 ```
 
-By default, the above command connects to the postgres instance runnning at `localhost:5432` with the default user `postgres` with `trust` authentication mode. To connect to a database running on a different host, port, use the following command:
+By default, the above command connects to the postgres instance runnning at `localhost:5432` with the default user `postgres` with `trust` authentication mode. To connect to a database running on a different host/port/user/password, use the following command:
 
 ```bash
 kwil-admin snapshot create --snapdir /path/to/snapdir --dbname <dbname> --host <dbhost> --port <dbport> --user <dbuser> --password <dbpass>
