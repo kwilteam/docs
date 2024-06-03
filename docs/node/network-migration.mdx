@@ -6,6 +6,7 @@ title: Network Migrations
 description: Network Migrations
 slug: /node/network-migrations
 ---
+
 This document provides a detailed guide on how to establish a new network that integrates existing data from a previous network, using nodes that run on the updated version of the `kwild` binaries. This approach is necessary when seamless upgrades to new versions are not feasible due to significant, breaking changes that affect consensus mechanisms and transaction replays.
 
 ## Network Migrations
@@ -66,21 +67,43 @@ Ensure that the `genesis.json` file has the `app_hash` field set to the hash of 
 
 #### Install Kwild Binaries
 
-Firstly, install the new version of the `kwild` binaries. Refer to the [Installation](/docs/daemon/installation) documentation for more details on getting the required versions of the `kwild` binaries.
+Install the new version of the `kwild` binaries. Refer to the [Installation](/docs/daemon/installation) documentation for more details on how to install the `kwild` binaries.
 
 ####  Configure Node to Use Snapshot
 
-Refer to the [Node Configuration](/docs/daemon/kwild#configuration) documentation to setup `private_key` and `config.toml` files. Download the `snapshot` and the `genesis.json` files required for this new network and place them under the root_dir. 
+Setup the files required to start a new node. Refer to the [Node Configuration](/docs/daemon/kwild#configuration) documentation or use the [`kwil-admin`](/docs/admin) tool:
+
+```bash
+kwil-admin setup init -o /path/to/node/root/dir
+```
+
+Next, copy the `snapshot`, `genesis.json`, and the original validator's `private_key` files into the new node's root directory.
+
+:::note
+The `private_key` needs to be copied because the new network will use the same validator set as the previous network.
+:::
+
+```
+# Copy the snapshot and genesis files to the node root directory.
+cp /path/to/snapdir/genesis.json /path/to/node/root/dir
+cp /path/to/snapdir/kwildb-snapshot.sql /path/to/node/root/dir
+
+# Copy the old validator's private key to the node root directory.
+cp /path/to/private_key /path/to/node/root/dir
+```
+
+The node root directory should have the following structure:
 
 ```
 root_dir
 ├── config.toml
 ├── private_key
 ├── genesis.json
+├── kwildb-snapshot.sql
 ├── abci/
 ```
 
-To initialize the node with the snapshot data, the `snapshot_file` path in the `config.toml` file must be set to the location of the downloaded snapshot file. The node will fail to start if the `snapshot_file` path is not provided in the `config.toml`.
+To initialize the node with the snapshot data, set the `snapshot_file` path in `config.toml` to the location of the downloaded snapshot file. The node will fail to start if the `snapshot_file` path is not provided in the `config.toml`.
 
 ```TOML
 #######################################################################
@@ -102,6 +125,10 @@ Once the genesis and config files are configured to use snapshots, start the nod
 # use -h for more options. 
 kwild -r /path/to/node/root/dir
 ```
+
+:::tip
+If your `genesis.json` file has multiple validators, you will need to start >2/3 of the validators before the network can start producing blocks.
+:::
 
 ### Nodes Catching Up
 
