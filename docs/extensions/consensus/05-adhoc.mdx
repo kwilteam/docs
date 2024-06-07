@@ -1,0 +1,56 @@
+---
+sidebar_position: 5
+sidebar_label: "Canonical Changes"
+id: fork-canonical
+title: "Ad-hoc Conditional Logic"
+description:  "Extension-based system for coordinating activation of consensus rule changes with new software."
+slug: /extensions/fork-canonical
+---
+
+Other changes that cannot be realized with those exposed by the extension system
+may still be coordinated, without a network migration, with changes to the
+`kwild` source to introduce ad-hoc conditional logic based on chain height. This
+approach is more typical for long lived public blockchains.
+
+:::caution
+
+Prefer implementing changes with extensions as described in [Extension-based Changes](#extension-based-changes).
+
+This section pertains to changes that are likely to affect all Kwil networks,
+and are intended to be canonical updates shipped with official releases from the
+Kwil team.
+
+:::
+
+The `Forks` method of the genesis configuration modeled by `common/chain.GenesisConfig`
+returns an instance of a `common/chain/forks.Forks` type that provides `kwild` with
+the ability to add conditional logic based on block height at arbitrary parts of the
+source code. Unlike [extension-based](/docs/extensions/fork-ext) changes, `kwild`
+source is modified to define canonical changes described in this section. The process
+of defining a canonical fork is:
+
+1. Add a new `*uint64` field to the `Forks struct`, such as `ChangesetX *uint64`.
+2. Define a corresponding "`Is`" method, such as `IsChangesetX(height uint64) bool`,
+   to indicate if the changes should be in effect _as of_ the given height.
+3. Define a corresponding "`Begins`" method, such as `BeginsChangesetX(height uint64) bool`,
+   to indicate if the changes should go into effect _at_ the given height.
+
+Anywhere in the source that has access to (1) this `Forks` struct and (2) the
+current block height may then define conditional logic to alter execution or
+other consensus-level behavior such as block proposal or approval. For instance:
+
+```go
+if f.IsChangesetX(height) {
+    // new rules (thresholds, formulae, conditions, etc.) in this code
+} else {
+    // legacy behavior
+}
+```
+
+This facilitates changes to functions that affect consensus such as transaction
+execution outcome, account state changes, "app hash" computation, etc. without
+consensus failure or validator disagreement that can affect network liveness.
+
+Again, [extension-based changes](/docs/extensions/fork-ext) are preferred as no
+modifications to `kwild` source are required. The canonical fork approach is
+intended for highly integrated changes implemented by the Kwil team.
