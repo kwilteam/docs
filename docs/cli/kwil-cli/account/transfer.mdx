@@ -30,12 +30,13 @@ kwil-cli account transfer <recipient> <amount> [flags]
 ### Options inherited from parent commands
 
 ```
-  -Y, --assume-yes             Assume yes for all prompts
-      --chain-id string        the expected/intended Kwil Chain ID
-      --kwil-provider string   the Kwil provider HTTP endpoint (default "http://localhost:8080")
-      --output string          the format for command output - either 'text' or 'json' (default "text")
-      --private-key string     the private key of the wallet that will be used for signing
-  -S, --silence                Silence logs
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
 ```
 
 ### SEE ALSO

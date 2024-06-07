@@ -3,17 +3,17 @@ sidebar_position: 2
 sidebar_label: "gen-auth-key"
 id: "kwil-admin-node-gen-auth-key"
 title: "kwil-admin node gen-auth-key"
-description: "Generate a new key pair for use in the node's validator set."
+description: "Generate a new key pair for use with an authenticated admin RPC service."
 slug: /ref/kwil-admin/node/gen-auth-key
 ---
 
 ## kwil-admin node gen-auth-key
 
-Generate a new key pair for use in the node's validator set.
+Generate a new key pair for use with an authenticated admin RPC service.
 
 ### Synopsis
 
-Generate a new key pair for use in the node's validator set.
+Generate a new key pair for use with an authenticated admin RPC service.
 	
 The key pair is generated and stored in the node's configuration directory, in the files auth.key and auth.cert. The key pair is used to authenticate the admin tool to the node.
 
@@ -25,15 +25,17 @@ kwil-admin node gen-auth-key [flags]
 
 ```
 # Generate a new TLS key pair to talk to the node
-kwil-admin node gen-auth-key --authrpc-cert "~/.kwild/rpc.cert"
+kwil-admin node gen-auth-key
+cat ~/.kwil-admin/auth.cert >> ~/.kwild/clients.pem # or copy to remote kwild machine
+# kwil-admin uses auth.{key,cert}, while kwild uses clients.pem
 ```
 
 ### Options
 
 ```
   -h, --help             help for gen-auth-key
-      --tlscert string   output path for the node's TLS certificate file (default "auth.cert")
-      --tlskey string    output path for the node's TLS key file (default "auth.key")
+      --tlscert string   output path for the new client certificate (default "auth.cert")
+      --tlskey string    output path for the new client key file (default "auth.key")
 ```
 
 ### Options inherited from parent commands

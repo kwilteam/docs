@@ -1,29 +1,31 @@
 ---
-sidebar_position: 1
-sidebar_label: "balance"
-id: "kwil-cli-account-balance"
-title: "kwil-cli account balance"
-description: "Gets an account's balance and nonce"
-slug: /ref/kwil-cli/account/balance
+sidebar_position: 4
+sidebar_label: "parse"
+id: "kwil-cli-utils-parse"
+title: "kwil-cli utils parse"
+description: "Parse a Kuneiform schema"
+slug: /ref/kwil-cli/utils/parse
 ---
 
-## kwil-cli account balance
+## kwil-cli utils parse
 
-Gets an account's balance and nonce
+Parse a Kuneiform schema
 
 ### Synopsis
 
-Gets an account's balance and nonce.
+Parse a Kuneiform schema and output the JSON schema.
 
 ```
-kwil-cli account balance [flags]
+kwil-cli utils parse <file_path> [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help      help for balance
-      --pending   reflect pending updates from mempool (default is confirmed only)
+  -d, --debug               Display debug information
+  -h, --help                help for parse
+  -p, --include-positions   Include positions in the debug output
+  -o, --out string          Output file. If debug is true, errors will also be written to this file
 ```
 
 ### Options inherited from parent commands
@@ -40,5 +42,5 @@ kwil-cli account balance [flags]
 
 ### SEE ALSO
 
-* [kwil-cli account](/docs/ref/kwil-cli/account)	 - Account related commands.
+* [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
 

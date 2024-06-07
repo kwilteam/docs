@@ -30,52 +30,68 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
 ### Options
 
 ```
-      --app.admin-listen-addr string                 kwild admin listen address (unix or tcp) (default "unix:///tmp/kwil_admin.sock")
-      --app.extension-endpoints strings              kwild extension endpoints
-      --app.grpc-listen-addr string                  kwild gRPC listen address (default "localhost:50051")
-      --app.hostname string                          kwild Server hostname
-      --app.http-listen-addr string                  kwild HTTP listen address (default "localhost:8080")
-      --app.pg-db-host string                        PostgreSQL host address (no port) (default "127.0.0.1")
-      --app.pg-db-name string                        PostgreSQL database name (default "kwild")
-      --app.pg-db-pass string                        PostgreSQL password name
-      --app.pg-db-port string                        PostgreSQL port (default "5432")
-      --app.pg-db-user string                        PostgreSQL user name (default "kwild")
-      --app.private-key-path string                  Path to the node private key file
-      --app.profile-file string                      kwild profile output file path (e.g. cpu.pprof)
-      --app.profile-mode string                      kwild profile mode (http, cpu, mem, mutex, or block)
-      --app.rpctls                                   Use TLS on the user gRPC server
-      --app.tls-cert-file string                     TLS certificate file path for RPC Server
-      --app.tls-key-file string                      TLS key file path for RPC Server
-      --chain.consensus.timeout-commit duration      Chain consensus timeout commit (default 6s)
-      --chain.consensus.timeout-precommit duration   Chain consensus timeout precommit (default 2s)
-      --chain.consensus.timeout-prevote duration     Chain consensus timeout prevote (default 2s)
-      --chain.consensus.timeout-propose duration     Chain consensus timeout propose (default 3s)
-      --chain.mempool.cache-size int                 Chain mempool cache size (default 10000)
-      --chain.mempool.max-tx-bytes int               chain mempool maximum single transaction size in bytes (default 4194304)
-      --chain.mempool.max-txs-bytes int              chain mempool maximum total transactions in bytes (default 536870912)
-      --chain.mempool.size int                       Chain mempool size (default 5000)
-      --chain.moniker string                         Node moniker
-      --chain.p2p.addr-book-strict                   Chain P2P address book strict
-      --chain.p2p.allow-duplicate-ip                 Chain P2P allow multiple peers with the same IP address (default true)
-      --chain.p2p.external-address string            Chain P2P external address to advertise
-      --chain.p2p.listen-addr string                 Chain P2P listen address (default "tcp://0.0.0.0:26656")
-      --chain.p2p.max-num-inbound-peers int          Chain P2P maximum number of inbound peers (default 40)
-      --chain.p2p.max-num-outbound-peers int         Chain P2P maximum number of outbound peers (default 10)
-      --chain.p2p.persistent-peers string            Chain P2P persistent peers
-      --chain.p2p.pex                                Enables peer information exchange (default true)
-      --chain.p2p.seed-mode                          Run kwild in a special "seed" mode where it crawls the network for peer addresses,
-                                                     sharing them with incoming peers before immediately disconnecting. It is recommended
-                                                     to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
-      --chain.p2p.seeds string                       Seed nodes for obtaining peer addresses, if address book is empty
-      --chain.p2p.unconditional-peer-ids string      Chain P2P unconditional peer IDs
-      --chain.rpc.listen-addr string                 Chain RPC listen address (default "tcp://127.0.0.1:26657")
-  -g, --genesis string                               path to genesis file
-  -h, --help                                         help for peer
-      --log.format string                            kwild log format (default "json")
-  -l, --log.level string                             kwild log level (default "info")
-      --log.output-paths strings                     kwild log output paths (default [stdout])
-      --log.time-format string                       kwild time log format (default "epochfloat")
-  -r, --root-dir string                              kwild root directory for config and data (default "~/.kwild")
+      --app.admin-listen-addr string                     kwild admin listen address (unix or tcp) (default "/tmp/kwild.socket")
+      --app.admin-notls                                  do not enable TLS on admin server (automatically disabled for unix socket or loopback listen addresses)
+      --app.admin-pass string                            password for the kwil admin service (may be empty)
+      --app.db-read-timeout duration                     timeout for database reads initiated by RPC requests (default 5s)
+      --app.extension-endpoints strings                  kwild extension endpoints
+      --app.hostname string                              kwild Server hostname
+      --app.http-listen-addr string                      kwild HTTP listen address (default "0.0.0.0:8080")
+      --app.jsonrpc-listen-addr string                   kwild JSON-RPC listen address (default "0.0.0.0:8484")
+      --app.pg-db-host string                            PostgreSQL host address (no port) (default "127.0.0.1")
+      --app.pg-db-name string                            PostgreSQL database name (default "kwild")
+      --app.pg-db-pass string                            PostgreSQL password name
+      --app.pg-db-port string                            PostgreSQL port (default "5432")
+      --app.pg-db-user string                            PostgreSQL user name (default "kwild")
+      --app.private-key-path string                      Path to the node private key file
+      --app.profile-file string                          kwild profile output file path (e.g. cpu.pprof)
+      --app.profile-mode string                          kwild profile mode (http, cpu, mem, mutex, or block)
+      --app.rpc-timeout duration                         timeout for RPC requests (through reading the request, handling the request, and sending the response) (default 45s)
+      --app.snapshots.enabled                            Enable snapshots
+      --app.snapshots.max-snapshots uint                 Maximum snapshots to store on disk. Default is 3. If max snapshots is reached, the oldest snapshot is deleted. (default 3)
+      --app.snapshots.recurring-height uint              Recurring heights to create snapshots (default 14400)
+      --app.snapshots.snapshot-dir string                Snapshot directory path (default "snapshots")
+      --app.tls-cert-file string                         TLS certificate file path for the admin and consensus RPC server (optional)
+      --app.tls-key-file string                          TLS key file path for the admin and consensus RPC servers (optional)
+      --chain.consensus.timeout-commit duration          Chain consensus timeout commit (default 6s)
+      --chain.consensus.timeout-precommit duration       Chain consensus timeout precommit (default 2s)
+      --chain.consensus.timeout-prevote duration         Chain consensus timeout prevote (default 2s)
+      --chain.consensus.timeout-propose duration         Chain consensus timeout propose (default 3s)
+      --chain.mempool.cache-size int                     Chain mempool cache size (default 10000)
+      --chain.mempool.max-tx-bytes int                   chain mempool maximum single transaction size in bytes (default 4194304)
+      --chain.mempool.max-txs-bytes int                  chain mempool maximum total transactions in bytes (default 536870912)
+      --chain.mempool.size int                           Chain mempool size (default 5000)
+      --chain.moniker string                             Node moniker
+      --chain.p2p.addr-book-strict                       Chain P2P address book strict
+      --chain.p2p.allow-duplicate-ip                     Chain P2P allow multiple peers with the same IP address (default true)
+      --chain.p2p.external-address string                Chain P2P external address to advertise
+      --chain.p2p.listen-addr string                     Chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.max-num-inbound-peers int              Chain P2P maximum number of inbound peers (default 40)
+      --chain.p2p.max-num-outbound-peers int             Chain P2P maximum number of outbound peers (default 10)
+      --chain.p2p.persistent-peers string                Chain P2P persistent peers
+      --chain.p2p.pex                                    Enables peer information exchange (default true)
+      --chain.p2p.seed-mode                              Run kwild in a special "seed" mode where it crawls the network for peer addresses,
+                                                         sharing them with incoming peers before immediately disconnecting. It is recommended
+                                                         to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
+      --chain.p2p.seeds string                           Seed nodes for obtaining peer addresses, if address book is empty
+      --chain.p2p.unconditional-peer-ids string          Chain P2P unconditional peer IDs
+      --chain.rpc.broadcast-tx-timeout duration          Chain RPC broadcast transaction timeout (default 15s)
+      --chain.rpc.listen-addr string                     Chain RPC listen address (default "tcp://127.0.0.1:26657")
+      --chain.statesync.chunk-request-timeout duration   Chain state sync chunk request timeout (default 10s)
+      --chain.statesync.discovery-time duration          Chain state sync discovery time (default 15s)
+      --chain.statesync.enable                           Chain state sync enable
+      --chain.statesync.rpc-servers string               Chain state sync rpc servers
+      --chain.statesync.snapshot-dir string              Chain state sync snapshot directory (default "rcvdSnaps")
+  -g, --genesis string                                   path to genesis file
+  -h, --help                                             help for peer
+      --log.consensus_level string                       consensus (cometbft) log level
+      --log.db_level string                              database backend (postgres) log level
+      --log.format string                                kwild log format (default "json")
+  -l, --log.level string                                 kwild log level (default "info")
+      --log.output-paths strings                         kwild log output paths (default [stdout,kwild.log])
+      --log.rpc_level string                             user rpc server log level
+      --log.time-format string                           kwild time log format (default "epochfloat")
+  -r, --root-dir string                                  kwild root directory for config and data (default "~/.kwild")
 ```
 
 ### Options inherited from parent commands

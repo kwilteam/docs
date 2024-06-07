@@ -1,29 +1,29 @@
 ---
-sidebar_position: 1
-sidebar_label: "balance"
-id: "kwil-cli-account-balance"
-title: "kwil-cli account balance"
-description: "Gets an account's balance and nonce"
-slug: /ref/kwil-cli/account/balance
+sidebar_position: 3
+sidebar_label: "decode-tx"
+id: "kwil-cli-utils-decode-tx"
+title: "kwil-cli utils decode-tx"
+description: "Decodes a raw transaction."
+slug: /ref/kwil-cli/utils/decode-tx
 ---
 
-## kwil-cli account balance
+## kwil-cli utils decode-tx
 
-Gets an account's balance and nonce
+Decodes a raw transaction.
 
 ### Synopsis
 
-Gets an account's balance and nonce.
+Decodes a raw transaction. Given the bytes of a transaction in base64, give a structured output.
 
 ```
-kwil-cli account balance [flags]
+kwil-cli utils decode-tx [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help      help for balance
-      --pending   reflect pending updates from mempool (default is confirmed only)
+  -h, --help      help for decode-tx
+      --payload   also show the payload, which may be large
 ```
 
 ### Options inherited from parent commands
@@ -40,5 +40,5 @@ kwil-cli account balance [flags]
 
 ### SEE ALSO
 
-* [kwil-cli account](/docs/ref/kwil-cli/account)	 - Account related commands.
+* [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
 

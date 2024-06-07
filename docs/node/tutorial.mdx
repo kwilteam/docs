@@ -105,7 +105,7 @@ new addresses for the different endpoints, so that the second node does not conf
 ```bash
 kwil-admin setup peer --root-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
   --chain.p2p.persistent-peers b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656 \
-  --app.grpc-listen-addr=localhost:50052 --app.http-listen-addr=localhost:8081 \
+  --app.jsonrpc-listen-addr=localhost:8485 --app.http-listen-addr=localhost:8081 \
   --app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
   --chain.p2p.listen-addr=tcp://127.0.0.1:26655
 ```

@@ -18,11 +18,11 @@ Batch executes an action on a database using inputs from a CSV file.
 To map a CSV column name to an action input, use the `--map-inputs` flag.
 The format is `--map-inputs "<csv_column_1>:<action_input_1>,<csv_column_2>:<action_input_2>"`.  If the `--map-inputs` flag is not passed,
 the CSV column name will be used as the action input name.
-	
+
 You can also specify the input values directly using the `--values` flag, delimited by a colon.
 These values will apply to all inserted rows, and will override the CSV column mappings.
 
-You can either specify the database to execute this against with the `--name` and `--owner` 
+You can either specify the database to execute this against with the `--name` and `--owner`
 flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
 flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
 
@@ -61,12 +61,13 @@ kwil-cli database batch --path ./users.csv --action create_user --name mydb --ow
 ### Options inherited from parent commands
 
 ```
-  -Y, --assume-yes             Assume yes for all prompts
-      --chain-id string        the expected/intended Kwil Chain ID
-      --kwil-provider string   the Kwil provider HTTP endpoint (default "http://localhost:8080")
-      --output string          the format for command output - either 'text' or 'json' (default "text")
-      --private-key string     the private key of the wallet that will be used for signing
-  -S, --silence                Silence logs
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
 ```
 
 ### SEE ALSO

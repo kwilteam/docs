@@ -32,3 +32,4 @@ The `snapshot` command is used to create and manage snapshots.
 
 * [kwil-admin](/docs/ref/kwil-admin)	 - The Kwil node admin tool.
 * [kwil-admin snapshot create](/docs/ref/kwil-admin/snapshot/create)	 - Creates a snapshot of the database.
+
