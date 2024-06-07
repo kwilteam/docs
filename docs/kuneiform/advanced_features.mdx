@@ -61,17 +61,28 @@ action select_data() public view {
 ## Calling Other Actions
 
 Actions can call other actions and procedures. They cannot handle return data from procedures, but they can call them.
-Below, we have an action that calls a procedure to get a user's name and age, and then updates the user's age.
+Below, we have an action that calls an action `do_something`.
 
 ```typescript
-procedure do_something() public {
+action do_something() private {
     // do something
 }
 
 action update_user_age($id uuid) public {
     do_something($id);
-    update_user($username, $age + 1);
+    // ...
 }
 ```
 
-Actions cannot directly call built-in functions, and can only call them in a SQL statement.
+Actions cannot directly call procedures or built-in functions, but can call them in SQL statements:
+
+```typescript
+procedure multiply($a int, $b int) public view returns (product int) {
+    return $a * $b;
+}
+
+action update_user_age($id uuid) public {
+    // call a procedure in a SQL statement
+    select abs(age), multiply(age, 3) from users;
+}
+```
