@@ -13,7 +13,7 @@ control logic, performing arithmetic, and managing control flow.
 ## Declaring Procedures
 
 Procedures are declared using the `procedure` keyword. They can be given a list of parameters and their corresponding types,
-return types, and access modifiers.
+return types, and access modifiers. Procedures are strongly typed, and all inputs and outputs must exactly match the declared types.
 
 The example below shows the signature for a `get_user` procedure. It takes one input (the id of the user, of type `uuid`),
 and returns the user's name and age. It will return exactly one record, containing a name and age:
@@ -140,7 +140,7 @@ about the supported functions, see [Functions](/docs/kuneiform/functions).
 
 ```ts
 procedure create_user($name text, $age int) public {
-    $id uuid := generate_uuid_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, @txid)
+    $id uuid := generate_uuid_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, @txid);
     // do something
     // ...
     INSERT INTO users (id, name, age)
@@ -229,7 +229,7 @@ procedure iterate_range_dynamic($start int, $end int) public {
 
 #### SQL Loops
 
-You can iterate over any SQL statement as well. The following examples reference an example table `users`, with columns `id`, `name`, and `age`.
+You can also iterate over each record returned from a SQL query. The following examples reference an example table `users`, with columns `id`, `name`, and `age`.
 
 ```ts
 procedure iterate_over_sql() public {
@@ -266,7 +266,7 @@ procedure get_users() public {
         // break if too many records have been read
         $count := $count + 1;
         if $count >= 50 {
-            break
+            break;
         }
     }
 }

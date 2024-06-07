@@ -105,7 +105,7 @@ Below are a list of operations that available for the foreign key declaration:
 
 The Kuneiform Language not only allows column declarations, but also the creation of indexes on one or more columns within your table. Kuneiform supports standard B-tree indexes.
 
-## Index Declaration
+### Index Declaration
 
 You can declare [three types](/docs/kuneiform/supported-features#indexes) of indexes:
 
@@ -137,13 +137,5 @@ table users {
     // ...other columns & indexes
 }
 ```
-
-Kwil supports the following index types defined at the `table` level:
-
-| Index Declaration | Description |
-| ----------------- | ----------- |
-| index(`<column-name-1>`, `<coloumn-name-2>`, ...) | Standard binary tree index |
-| unique(`<column-name-1>`, `<coloumn-name-2>`, ...) | Creates a binary tree index while enforcing the unique attribute on the specified columns |
-| primary(`<column-name-1>`, `<coloumn-name-2>`, ...) | Creates a binary tree index while enforcing the primary key values of the specified columns |
 
 This concludes the guide to table, column, and index declarations in the Kuneiform Language. With this knowledge, you're equipped to define and structure your data tables effectively.

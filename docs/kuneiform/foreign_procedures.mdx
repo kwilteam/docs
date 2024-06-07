@@ -25,7 +25,7 @@ foreign procedure get_users() returns table(username text, age int)
 
 ## Calling Foreign Procedures
 
-Foreign procedures can be called like any other function/procedure. The only difference is that the target
+Foreign procedures are called like any other function/procedure. The only difference is that the target
 database id (dbid) and procedure name must be passed using square brackets:
 
 ```typescript
@@ -38,7 +38,8 @@ procedure call_get_user($id uuid) public  {
 ```
 
 Since the target procedure name is passed as a string, it is only necessary that the arguments and returns
-match the expected types. For example, assume we have the following procedure in another database:
+match the expected types. The underlying procedure being called can have any name, as long as the types match.
+For example, assume we have the following procedure in another database:
 
 ```typescript
 // dbid: xc2bc33cd97f0a811ced54f9b74b6cc2d375640909ddc513d5adac036
