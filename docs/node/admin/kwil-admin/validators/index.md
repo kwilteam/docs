@@ -20,7 +20,7 @@ The `validators` command provides functions for creating and broadcasting valida
 ```
       --authrpc-cert string   kwild's TLS certificate
   -h, --help                  help for validators
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
       --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```

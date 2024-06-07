@@ -23,13 +23,14 @@ The Kwil CLI can be configured with a persistent configuration file.  This file 
 ### Options
 
 ```
-  -Y, --assume-yes             Assume yes for all prompts
-      --chain-id string        the expected/intended Kwil Chain ID
-  -h, --help                   help for kwil-cli
-      --kwil-provider string   the Kwil provider HTTP endpoint (default "http://localhost:8080")
-      --output string          the format for command output - either 'text' or 'json' (default "text")
-      --private-key string     the private key of the wallet that will be used for signing
-  -S, --silence                Silence logs
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -h, --help                 help for kwil-cli
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
 ```
 
 ### SEE ALSO
@@ -39,3 +40,4 @@ The Kwil CLI can be configured with a persistent configuration file.  This file 
 * [kwil-cli database](/docs/ref/kwil-cli/database)	 - The database command is a parent command containing subcommands for interacting with databases.
 * [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
 * [kwil-cli version](/docs/ref/kwil-cli/version)	 - Displays the cli version information.
+

@@ -32,7 +32,7 @@ The `node` command is used to get information about a running Kwil node.
 
 * [kwil-admin](/docs/ref/kwil-admin)	 - The Kwil node admin tool.
 * [kwil-admin node dump-config](/docs/ref/kwil-admin/node/dump-config)	 - Gets the current config from the node.
-* [kwil-admin node gen-auth-key](/docs/ref/kwil-admin/node/gen-auth-key)	 - Generate a new key pair for use in the node's validator set.
+* [kwil-admin node gen-auth-key](/docs/ref/kwil-admin/node/gen-auth-key)	 - Generate a new key pair for use with an authenticated admin RPC service.
 * [kwil-admin node peers](/docs/ref/kwil-admin/node/peers)	 - Print a list of the node's peers, with their public information.
 * [kwil-admin node status](/docs/ref/kwil-admin/node/status)	 - Print the node's status information.
 * [kwil-admin node version](/docs/ref/kwil-admin/node/version)	 - Print the node's version information.

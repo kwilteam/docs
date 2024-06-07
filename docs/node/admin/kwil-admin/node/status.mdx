@@ -22,8 +22,8 @@ kwil-admin node status [flags]
 ### Examples
 
 ```
-# Print the node's status information
-kwil-admin node status --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc.cert"
+# Print a remote node's status (TLS with self-signed certificate)
+kwil-admin node status --rpcserver /tmp/kwild.socket
 ```
 
 ### Options
@@ -31,7 +31,7 @@ kwil-admin node status --rpcserver localhost:50151 --authrpc-cert "~/.kwild/rpc.
 ```
       --authrpc-cert string   kwild's TLS certificate
   -h, --help                  help for status
-  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "unix:///tmp/kwil_admin.sock")
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
       --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```

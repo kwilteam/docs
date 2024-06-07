@@ -14,7 +14,7 @@ Call a 'view' action, returning the result.
 ### Synopsis
 
 Call a `view` action, returning the result.
-	
+
 `view` actions are read-only actions that do not require gas to execute.  They are
 the primary way to query the state of a database. The `call` command is used to call
 a `view` action on a database.  It takes the action name as a required flag, and the
@@ -25,7 +25,7 @@ For example, for action `get_user($username)`, you would specify the action as f
 
 `username:satoshi` --action=get_user
 
-You can either specify the database to execute this against with the `--name` and `--owner` 
+You can either specify the database to execute this against with the `--name` and `--owner`
 flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
 flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
 
@@ -59,12 +59,13 @@ kwil-cli database call --action get_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8B
 ### Options inherited from parent commands
 
 ```
-  -Y, --assume-yes             Assume yes for all prompts
-      --chain-id string        the expected/intended Kwil Chain ID
-      --kwil-provider string   the Kwil provider HTTP endpoint (default "http://localhost:8080")
-      --output string          the format for command output - either 'text' or 'json' (default "text")
-      --private-key string     the private key of the wallet that will be used for signing
-  -S, --silence                Silence logs
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
 ```
 
 ### SEE ALSO
