@@ -33,7 +33,7 @@ The configuration file will be stored at `~/.kwil-cli/config.json`.
 Global flags override the values in the configuration file at runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to the latest testnet, `https://longhorn.kwil.com`, using a config flag:
 
 ```bash
-kwil-cli database list --kwil-provider=https://longhorn.kwil.com
+kwil-cli database list --provider=https://longhorn.kwil.com
 ```
 
 ## Available Configs
@@ -42,7 +42,7 @@ Below is a table containing the available configs, their flags, an example value
 
 | Config | Flag | Example | Description |
 |-|-|-|-|
-| HTTP Endpoint | `--kwil-provider` | `https://longhorn.kwil.com`  | The endpoint of a Kwil node, which will be used for accessing data on the node's network. |
+| HTTP Endpoint | `--provider` | `https://longhorn.kwil.com`  | The endpoint of a Kwil node, which will be used for accessing data on the node's network. |
 | Kwil Chain ID | `--chain-id` | `kwil-test-chain` | The chain ID of the Kwil network to use. Can be left blank to trust a server-provided value. |
 |Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br/>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
 

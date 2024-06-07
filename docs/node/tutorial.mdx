@@ -45,7 +45,7 @@ docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=tr
   kwildb/postgres:latest
 
 # Run the node
-kwild --root-dir ./testnet/node0 --app.admin-listen-addr unix:///tmp/node0.sock --app.pg-db-port 5432
+kwild --root-dir ./testnet/node0 --app.admin-listen-addr /tmp/node0.sock --app.pg-db-port 5432
 ```
 
 The command then runs the local Kwil network, and begins producing blocks.
@@ -63,7 +63,7 @@ and request to join the network as a validator.
 To get our node's information, we can use the `kwil-admin` tool, specifying the UNIX socket that our admin RPC is listening on:
 
 ```bash
-$ kwil-admin node status --rpcserver unix:///tmp/node0.sock
+$ kwil-admin node status --rpcserver /tmp/node0.sock
 {
   "node": {
     "chain_id": "kwil-chain-WfnGxpWd",
@@ -106,7 +106,7 @@ new addresses for the different endpoints, so that the second node does not conf
 kwil-admin setup peer --root-dir ./testnet/node1 --genesis ./testnet/node0/genesis.json \
   --chain.p2p.persistent-peers b624b3395f22f8cb57cf86d58cbcd6b355d12e18@127.0.0.1:26656 \
   --app.jsonrpc-listen-addr=localhost:8485 --app.http-listen-addr=localhost:8081 \
-  --app.admin-listen-addr=unix:///tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
+  --app.admin-listen-addr=/tmp/node1.sock --chain.rpc.listen-addr=tcp://127.0.0.1:26658 \
   --chain.p2p.listen-addr=tcp://127.0.0.1:26655
 ```
 
@@ -137,13 +137,13 @@ We will use the configured UNIX socket to communicate with the nodes.
 To request to join from the second node:
 
 ```bash
-kwil-admin validators join --rpcserver unix:///tmp/node1.sock
+kwil-admin validators join --rpcserver /tmp/node1.sock
 ```
 
 To check that the request was successful, we can get a list of pending join requests:
 
 ```bash
-$ kwil-admin validators list-join-requests --rpcserver unix:///tmp/node0.sock
+$ kwil-admin validators list-join-requests --rpcserver /tmp/node0.sock
 Pending join requests (1 approval needed):
  Candidate                                                         | Power | Approvals | Expiration
 -------------------------------------------------------------------+-------+-----------+------------
@@ -157,7 +157,7 @@ vote to approve the second node by running the `kwil-admin validators approve` c
 
 ```bash
 kwil-admin validators approve a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794 \
-  --rpcserver unix:///tmp/node0.sock
+  --rpcserver /tmp/node0.sock
 ```
 
 :::tip
@@ -167,7 +167,7 @@ If the requesting node's public key is unknown, all pending requests and their p
 And that's it! The second node should now be a validator on the network.  To verify this, we can use the `kwil-admin` tool to get the list of validators:
 
 ```bash
-$ kwil-admin validators list --rpcserver unix:///tmp/node0.sock
+$ kwil-admin validators list --rpcserver /tmp/node0.sock
 Current validator set:
   0. {pubkey = 22cbbb666c26b2c1f42502df72c32de4d521138a1a2c96121d417a2f341a759c, power = 1}
   1. {pubkey = a2d8e307117695c8d0d3adbda136cb2ad630c43b8672a0eba46d79501831b794, power = 1}

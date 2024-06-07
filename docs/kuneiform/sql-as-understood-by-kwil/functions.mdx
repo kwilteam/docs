@@ -1,0 +1,201 @@
+---
+sidebar_position: 2
+sidebar_label: "Supported Functions"
+id: supported-functions
+title: Supported SQL Functions
+description: Supported SQL functions in Kuneiform.
+slug: /kuneiform/functions
+---
+
+:::info
+Most of these functions are direct copies of PostgreSQL functions, and further documentation can be found in the
+[PostgreSQL Documentation](https://www.postgresql.org/docs/16/functions.html). Functions that are not direct translations from Postgres
+will have a * next to them.
+
+All parameters with a `?` are optional.
+:::
+
+## Mathematical Functions
+
+`abs(INT|DECIMAL) -> INT|DECIMAL`
+
+Returns the absolute value of the given integer.
+
+## UUID Functions
+
+`uuid_generate_v5(UUID, TEXT) -> UUID`
+
+Generates a deterministic UUID from the given namespace and text value. Namespaces guarantee uniqueness of the generated
+UUID, even if the same input value is used elsewhere. Namespaces should be hardcoded as follows: `uuid_generate_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, 'hello')`
+
+## Encoding Functions
+
+`encode(BLOB, TEXT) -> TEXT`
+
+Encodes a binary string into a text string. Supported formats are `base64`, `hex`, and `escape`.
+
+---
+
+`decode(TEXT, TEXT) -> BLOB`
+
+Decodes a text string into a binary string. Supported formats are `base64`, `hex`, and `escape`.
+
+## Digest Functions
+
+`digest(TEXT|BLOB, TEXT) -> BLOB`
+
+Computes a hash of the given input string using the specified algorithm. Supported algorithms are
+`md5`, `sha1`, `sha224`, `sha256`, `sha384`, and `sha512`.
+
+## Array Functions
+
+`array_append(any[], any) -> any[]`
+
+Appends a value to the end of an array.
+
+---
+
+`array_prepend(any, any[]) -> any[]`
+
+Prepends a value to the beginning of an array.
+
+---
+
+`array_cat(any[], any[]) -> any[]`
+
+Concatenates two arrays together.
+
+---
+
+`array_length(any[]) -> INT`*
+
+Returns the length of the array. This does not directly match Postgres's `array_length` function, which takes a second argument
+specifying the dimension to return the length of. Kwil only supports 1-dimensional arrays.
+
+## String Functions
+
+`bit_length(TEXT) -> INT`
+
+Returns the number of bits in the given string.
+
+---
+
+`char_length(TEXT) -> INT`
+
+`character_length(TEXT) -> INT`
+
+`length(TEXT) -> INT`
+
+Returns the number of characters in the given string.
+
+---
+
+`lower(TEXT) -> TEXT`
+
+Lowercases the given string.
+
+---
+
+`lpad(TEXT, INT, TEXT?) -> TEXT`
+
+Expands the given string (first argument) to the given length (second argument) by adding the padding string (third argument) to the left.
+If the padding string is not provided, it defaults to a space.
+
+---
+
+`ltrim(TEXT, TEXT?) -> TEXT`
+
+Removes the longest string from the first argument that contains only characters in the second argument from the left.
+If the second argument is not provided, it defaults to a space.
+
+---
+
+`octet_length(TEXT) -> INT`
+
+Returns the number of bytes in the given string.
+
+---
+
+`overlay(TEXT, TEXT, INT, INT?) -> TEXT`*
+
+Overlays the second argument on top of the first argument, starting at the given position (third argument) and replacing the given number of characters (fourth argument).
+If the fourth argument is not provided, it defaults to the length of the second argument.
+
+This does not directly match Postgres's syntax, which uses `overlay(string placing string from int [for int])`, however it does
+directly match Postgres's `overlay` functionality.
+
+---
+
+`position(TEXT, TEXT) -> INT`*
+
+Returns the position of the second argument in the first argument.
+
+This does not directly match Postgres's syntax, which uses `position(substring in string)`, however it does
+directly match Postgres's `position` functionality.
+
+---
+
+`rpad(TEXT, INT, TEXT?) -> TEXT`
+
+Expands the given string (first argument) to the given length (second argument) by adding the padding string
+(third argument) to the right. If the padding string is not provided, it defaults to a space.
+
+---
+
+`rtrim(TEXT, TEXT?) -> TEXT`
+
+Removes the longest string from the first argument that contains only characters in the second argument from the right.
+If the second argument is not provided, it defaults to a space.
+
+---
+
+`substring(TEXT, INT, INT?) -> TEXT`*
+
+Returns a substring of the given string starting at the given position (second argument) and optionally ending at the given position
+(third argument). If the third argument is not provided, it defaults to the end of the string.
+
+This does not directly match Postgres's syntax, which uses `substring(string [from int] [for int])`, where either `from` or `for` is optional.
+Kwil requires `from` to be implicitly specified as the second parameter, and `for` to be the (optional) third parameter. To omit
+the `from` parameter in Kwil, use `substring(string, 1, for)`. Kwil does not support the usage of regular expressions in `substring`,
+as Postgres does.
+
+---
+
+`trim(TEXT, TEXT?) -> TEXT`*
+
+Removes the longest string from the first argument that contains only characters in the second argument from
+the start and end of the string. If the second argument is not provided, it defaults to a space.
+
+This does not directly match Postgres's syntax, which allows for the specification of the trim direction (leading, trailing, or both).
+To trim only the start or end, use `ltrim` or `rtrim` respectively.
+
+---
+
+`upper(TEXT) -> TEXT`
+
+Uppercases the given string.
+
+---
+
+`format(TEXT, ...any) -> TEXT`
+
+Formats the given string with the given arguments. It uses the same syntax as `sprintf` in C.
+
+## Aggregate Functions
+
+`count(*) -> INT`
+
+Returns the number of rows in the current group.
+
+---
+
+`sum(INT|DECIMAL|UINT256) -> INT|DECIMAL|UINT256`
+
+Returns the sum of all values in the current group.
+
+## Misc Functions
+
+`error(TEXT) -> none`*
+
+Error raises an exception with the given message. It halt execution when it is called,
+and rollback any changes made in the current transaction.

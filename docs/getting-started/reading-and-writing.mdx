@@ -27,7 +27,7 @@ Kwil has different initialization logic for Web and NodeJS.
 
 ### Kwil Class
 
-The Kwil class is the main class for interacting with Kwil. It is used to initialize the SDK, and to execute actions.
+The Kwil class is the main class for interacting with Kwil. It is used to initialize the SDK, and to execute procedures.
 
 ```typescript
 import { WebKwil } from '@kwilteam/kwil-js';
@@ -68,7 +68,7 @@ const dbid = Utils.generateDBID('your_wallet_here', 'social_media');
 
 ## Write Data
 
-To write data, we can use the `execute()` method to execute an action:
+To write data, we can use the `execute()` method to execute a procedure:
 
 ```typescript
 async function createUser(id, username, age) {
@@ -76,7 +76,7 @@ async function createUser(id, username, age) {
 
     const result = await kwil.execute({
         dbid,
-        action: "create_user",
+        name: "create_user",
         inputs: [
             {
                 $id: id,
@@ -92,13 +92,13 @@ async function createUser(id, username, age) {
 
 ## Read Data
 
-To read data, we will call a `view` action on the schema.  This will return the data that was written to the database.
+To read data, we will call a `view` procedure on the schema.  This will return the data that was written to the database.
 
 ```typescript
 async function getUser(username) {
     const result = await kwil.call({
         dbid,
-        action: "get_user",
+        name: "get_user",
         inputs: [
             {
                 $username: username

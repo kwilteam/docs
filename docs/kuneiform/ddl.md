@@ -11,7 +11,9 @@ DDL in Kuneiform is comprised of "tables" that contain the structure of data.
 
 ## Database Declaration in Kuneiform Language
 
-At the top of every Kuneiform file is the database declaration. Note that the database name **must** be followed by semi-colon, otherwise you will get an error when the the file is compiled.
+At the top of every Kuneiform file is the database declaration. Note that the database name **must** be followed by semi-colon, otherwise you will get an error when the the file is parsed. Database names must be unique for the wallet deploying them. A global
+unique identifier (DBID) is assigned to each database when it is deployed. The DBID is derived from the deployer's wallet address
+and the schema name.
 
 ```typescript
 database mydb;
@@ -41,22 +43,35 @@ table <your_desired_name> {}
 
 ## Adding Columns
 
-To append a column to your table, declare the column name along with a valid column variable type. The supported column types are int and text. Here's how you can declare columns:
+Columns can be declared with their column name, type, and several attributes:
 
 ```typescript
 table users {
-    id int,
-    name text,
+    id int primary key,
+    name text not null minlen(30),
     // ...other columns
 }
 ```
+
+Below is a table of all supported attributes:
+
+| Attribute Name | Kuneiform Symbol | Description |
+| --------- | --------- | ----------- |
+| Primary Key | `primary`, `primary key`, `pk`, `primary_key` | The column is the primary key of the table.  A table can only have one primary key. |
+| Unique | `unique` | The column must have a unique value for each row. |
+| Not Null | `notnull`, `not null` | The column cannot be null. |
+| Default Value | `default(value)` | The column will have a default value if no value is provided. |
+| Minimum Integer | `min(int_value)` | The column must be greater than or equal to the value provided. |
+| Maximum Integer | `max(int_value)` | The column must be less than or equal to the value provided. |
+| Minimum Text Length | `minlen(int_value)` | The column must have a text length greater than or equal to the value provided. |
+| Maximum Text Length | `maxlen(int_value)` | The column must have a text length less than or equal to the value provided. |
 
 ## Foreign Key
 
 Within your table declaration, you can add foreign key declaration to link a column in your declared table to a column in another table. You can also optionally set an operation to be executed when the linked column is updated or deleted. A reference column must be unique. The syntax for a foreign key declaration looks like:
 
 ```typescript
-foreign_key (<column-name>) references <table-name>(<reference-column-name>) on_update | on_delete <foreign-key-operation>
+foreign key (<column-name>) references <table-name>(<reference-column-name>) on update | delete <foreign-key-operation>
 ```
 
 In a table, a foreign key declaration would look like:
@@ -73,24 +88,24 @@ table posts {
     userid int notnull,
     username text notnull,
     content text notnull,
-    foreign_key (userid) references users(id) on_delete cascade
-    foreign_key (username) references users(name) on_update cascade
+    foreign key (userid) references users(id) on delete cascade
+    foreign key (username) references users(name) on update cascade
 }
 ```
 
 Below are a list of operations that available for the foreign key declaration:
 
-- ```no_action``` No operation is triggered.
+- ```no action``` No operation is triggered.
 - ```restrict``` Other calls to the other refrenced column will fail to update the column.
-- ```set_null``` The column is set to null.
-- ```set_default``` The column is set to the column's default value (if specified in the table declaration).
+- ```set null``` The column is set to null.
+- ```set default``` The column is set to the column's default value (if specified in the table declaration).
 - ```cascade``` The change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
 
 ## Indexing in Tables
 
-The Kuneiform Language not only allows column declarations, but also the creation of indexes on one or more columns within your table. Kuneiform supports standard SQLite B-tree indexes. For more details on SQLite indexes, please refer to [this tutorial](<https://www.sqlitetutorial.net/sqlite-index/>).
+The Kuneiform Language not only allows column declarations, but also the creation of indexes on one or more columns within your table. Kuneiform supports standard B-tree indexes.
 
-## Index Declaration
+### Index Declaration
 
 You can declare [three types](/docs/kuneiform/supported-features#indexes) of indexes:
 
@@ -106,7 +121,7 @@ index(column1, column2, ...)
 unique(column1, column2, ...)
 ```
 
-3. Primary index: Primary index creates a composite primary key on the specified columns. The syntax is:
+3. Primary index: Primary index creates a composite primary key on the specified columns. **If a primary index is present, the table cannot have another primary key or primary index.** The syntax is:
 
 ```typescript
 primary(column1, column2, ...)
