@@ -34,15 +34,15 @@ In brief, the process of defining a coordinated backward incompatible upgrade in
   for more.
 - If the changes cannot be specified by the functionality exposed by the
   extension system, modify `kwild` source code to add ad-hoc conditional logic.
-  See [Canonical Changes](#ad-hoc-changes) for more. These become "canonical"
-  upgrades. This approach is primarily intended for the core Kwil development
-  team to coordinate updates applicable to all networks.
+  See [Canonical Changes](/docs/extensions/fork-canonical) for more. These
+  become "canonical" upgrades. This approach is primarily intended for the core
+  Kwil development team to coordinate updates applicable to all networks.
 
 In the event that software updates must introduce changes that cannot leverage
 these mechanisms to retain the ability to execute pre-upgrade blocks, and thus
 require a new chain (new genesis with exported state), `kwild` also has the
 ability to _halt_ at a specified block. At this point, a new version of the node
 software may start with exported state and an updated genesis configuration. See
-the [planned halt mechanism](#planned-halt-fork).
+the [planned halt mechanism](https://github.com/kwilteam/kwil-db/blob/6014154ee740947f9e62c7b3e7b1031e835b05bf/common/chain/forks/forks.go#L12-L31).
 
 [^1]: https://docs.cometbft.com/v0.38/spec/abci/abci++_app_requirements#application-configuration-required-to-switch-to-abci-20

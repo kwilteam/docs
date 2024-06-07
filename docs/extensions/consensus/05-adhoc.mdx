@@ -25,7 +25,7 @@ Kwil team.
 The `Forks` method of the genesis configuration modeled by `common/chain.GenesisConfig`
 returns an instance of a `common/chain/forks.Forks` type that provides `kwild` with
 the ability to add conditional logic based on block height at arbitrary parts of the
-source code. Unlike [extension-based](#extension-based-changes) changes, `kwild`
+source code. Unlike [extension-based](/docs/extensions/fork-ext) changes, `kwild`
 source is modified to define canonical changes described in this section. The process
 of defining a canonical fork is:
 
@@ -51,6 +51,6 @@ This facilitates changes to functions that affect consensus such as transaction
 execution outcome, account state changes, "app hash" computation, etc. without
 consensus failure or validator disagreement that can affect network liveness.
 
-Again, [extension-based changes](#extension-based-changes) are preferred as no
+Again, [extension-based changes](/docs/extensions/fork-ext) are preferred as no
 modifications to `kwild` source are required. The canonical fork approach is
 intended for highly integrated changes implemented by the Kwil team.
