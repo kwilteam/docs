@@ -46,34 +46,34 @@ table posts {
 }
 ```
 
-## Using Actions
+## Using Procedures
 
-To define how users can interact with your database, you can define actions.  Actions contain SQL statements that are executed when an end user calls an action.
+To define how users can interact with your database, you can define procedures.  Procedures contain SQL statements and business logic that are executed when an end user calls the procedure.
 
-Inputs are defined using a `$` symbol, followed by the variable name.  Contextual values, such as the wallet address calling your action, are specified using the `@` symbol, followed by the contextual value name.
+Inputs are defined using a `$` symbol, followed by the variable name.  Contextual values, such as the wallet address calling your procedure, are specified using the `@` symbol, followed by the contextual value name.
 
 To learn more about the support SQL syntax, see [Kuneiform's supported DML](/docs/kuneiform/dml).
 
 ```sql title="social_media.kf"
-// a public action for creating a user
+// a public procedure for creating a user
 // it will automatically include the wallet address
 // of the caller in the "address" column
-action create_user ($id, $username, $age) public {
+procedure create_user ($id int, $username text, $age int) public {
     INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
-// a public action for updating mutable user data
-action update_user ($username, $age) public {
+// a public procedure for updating mutable user data
+procedure update_user ($username text, $age int) public {
     UPDATE users
     SET username=$username, age=$age
     WHERE address=@caller;
 }
 
-// a public action for creating a post
+// a public procedure for creating a post
 // it will automatically include the account id
 // of the caller in the "author_id" column
-action create_post ($id, $title, $content, $date_string) public {
+procedure create_post ($id int, $title text, $content text, $date_string text) public {
     INSERT INTO posts (id, title, content, author_id, post_date)
     VALUES ($id, $title, $content, (
         SELECT id
@@ -83,25 +83,32 @@ action create_post ($id, $title, $content, $date_string) public {
 }
 ```
 
-## Creating Read-Only Actions
+## Creating Read-Only Procedures
 
-Data is read back from actions using read-only actions.  To specify a read-only action, use the `view` access modifier.
-`view` actions are not processed in network consensus, and therefore are gasless and return results immediately.
+Data is read back from procedures using read-only procedures.  To specify a read-only procedure, use the `view` access modifier.
+`view` procedures are not processed in network consensus, and therefore are gasless and return results immediately.
 
 ```sql title="social_media.kf"
-// action get_user will get a user by their username
-action get_user ($username) public view {
-    SELECT *
-    FROM users
-    WHERE username=$username;
-}
-
-// get_posts will get the posts for a given user
-action get_posts ($user_id) public view {
-    SELECT *
+// get_posts will get the posts for a given user.
+// It will return many values in a table
+procedure get_posts($user_id int) public view returns table(title text, content text, post_date text) {
+    return SELECT title, content, post_date
     FROM posts
     WHERE author_id=$user_id;
 }
+
+// procedure get_user will get a user by their username.
+// It will return exactly one value, and error if no user is found.
+procedure get_user($username text) public view returns (username text, age int, address text) {
+    // we iterate over the sql results and return the first row
+    for $row in SELECT username, age, address
+    FROM users WHERE username=$username {
+        return $row.username, $row.age, $row.address;
+    }
+    // if no user is found, we raise an error
+    ERROR('user not found');
+}
+
 ```
 
 ## Full Example
@@ -130,25 +137,25 @@ table posts {
     post_date text notnull
 }
 
-// a public action for creating a user
+// a public procedure for creating a user
 // it will automatically include the wallet address
 // of the caller in the "address" column
-action create_user ($id, $username, $age) public {
+procedure create_user ($id int, $username text, $age int) public {
     INSERT INTO users (id, username, age, address)
     VALUES ($id, $username, $age, @caller);
 }
 
-// a public action for updating mutable user data
-action update_user ($username, $age) public {
+// a public procedure for updating mutable user data
+procedure update_user ($username text, $age int) public {
     UPDATE users
     SET username=$username, age=$age
     WHERE address=@caller;
 }
 
-// a public action for creating a post
+// a public procedure for creating a post
 // it will automatically include the account id
 // of the caller in the "author_id" column
-action create_post ($id, $title, $content, $date_string) public {
+procedure create_post ($id int, $title text, $content text, $date_string text) public {
     INSERT INTO posts (id, title, content, author_id, post_date)
     VALUES ($id, $title, $content, (
         SELECT id
@@ -157,17 +164,24 @@ action create_post ($id, $title, $content, $date_string) public {
     ), $date_string);
 }
 
-action get_user ($username) public view {
-    SELECT *
-    FROM users
-    WHERE username=$username;
-}
-
-// get_posts will get the posts for a given user
-action get_posts ($user_id) public view {
-    SELECT *
+// get_posts will get the posts for a given user.
+// It will return many values in a table
+procedure get_posts($user_id int) public view returns table(title text, content text, post_date text) {
+    return SELECT title, content, post_date
     FROM posts
     WHERE author_id=$user_id;
+}
+
+// procedure get_user will get a user by their username.
+// It will return exactly one value, and error if no user is found.
+procedure get_user($username text) public view returns (username text, age int, address text) {
+    // we iterate over the sql results and return the first row
+    for $row in SELECT username, age, address
+    FROM users WHERE username=$username {
+        return $row.username, $row.age, $row.address;
+    }
+    // if no user is found, we raise an error
+    ERROR('user not found');
 }
 ```
 </details>
@@ -178,7 +192,7 @@ To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To depl
 
 ```bash
 # highlight-next-line
-$ kwil-cli database deploy --path=./path/to/social_media.kf --kwil-provider='https://longhorn.kwil.com' --chain-id 'longhorn' --private-key 'your-private-key' --sync
+$ kwil-cli database deploy --path=./path/to/social_media.kf --provider='https://longhorn.kwil.com' --chain-id 'longhorn' --private-key 'your-private-key' --sync
 TxHash: 53018a450101d07f096e767fc6bc11374addf7f5a5a9788d8ad69ed6f1a24f49
 Status: success
 Height: 587740

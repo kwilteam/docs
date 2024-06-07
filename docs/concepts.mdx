@@ -31,9 +31,11 @@ In Kwil, databases refer to relational database schemas on a Kwil Network. The K
 
 In a Kuneiform file, you can define:
 
-- Relational Tables
-- Actions - CRUD Operations that can be executed on the database.
+- Tables - The structure of the database.
+- Procedures - SQL Queries and business logic that can be executed on the database.
+- Actions - CRUD Operations that can be executed on the database, and call extensions.
 - Extensions - Import additional logic that can be executed on the database.
+- Foreign Procedures: Define an interface for interacting with procedures in another database.
 
 ### Database Identifiers
 
@@ -41,11 +43,11 @@ Database identifiers (DBIDs) are unique identifiers for a database on a [Kwil Ne
 
 ### Transactions
 
-Transactions are database deployments, database drops, and state changing (create, update, delete) actions that are executed on a database. Transactions are signed by an account and are propagated to the Kwil Network. Transactions are executed deterministically on each node in the network and are validated by the nodes.
+Transactions are database deployments, database drops, and state changing (create, update, delete) procedures/actions that are executed on a database. Transactions are signed by an account and are propagated to the Kwil Network. Transactions are executed deterministically on each node in the network and are validated by the nodes.
 
-### View Actions
+### View Procedures/Actions
 
-View actions are the primary way of reading data from a database. View actions are called from a single node and may or may not require signature. The advantage of view actions is that they can be executed without the need to wait for consensus.
+View procedures/actions are the primary way of reading data from a database. View procedures/actions are called from a single node and may or may not require signature. The advantage of view procedures/actions is that they can be executed without the need to wait for consensus.
 
 ## Kwil Network
 

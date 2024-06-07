@@ -8,10 +8,10 @@ description: Enforce restrictions on reading data from a network.
 
 In this tutorial, we will cover how to authenticate a user to enforce read access control. This tutorial expands on the schema created in the [Write Access Control](/docs/getting-started/write-access-control) tutorial.
 
-In Kwil, data is primarily read with `view` actions. For executing `view` actions, the same general access control rules are available as for [write actions](/docs/getting-started/write-access-control). However, because data stored on nodes are default public, Kwil networks running in permissioned or federated environments can use the Kwil Gateway to enforce user authentication and stronger read access control.
+In Kwil, data is primarily read with `view` procedures. For executing `view` procedures, the same general access control rules are available as for [write procedures](/docs/getting-started/write-access-control). However, because data stored on nodes are default public, Kwil networks running in permissioned or federated environments can use the Kwil Gateway to enforce user authentication and stronger read access control.
 
 :::tip
-Setting view action privacy is done using the Kwil Gateway.  The gateway is still in private beta.  If you would like access, please contact our team.
+Setting view procedure privacy is done using the Kwil Gateway.  The gateway is still in private beta.  If you would like access, please contact our team.
 :::
 
 ## Overview
@@ -22,13 +22,13 @@ KGW cookies are partitioned by origin. This means that multiple users can be aut
 
 ## Require Authentication in Kuneiform
 
-To signal to the Kwil Gateway that an action requires authentication, add an annotation before the action. The `@kgw(authn='true')` annotation will require the user to authenticate via a signature before executing the action.
+To signal to the Kwil Gateway that a procedure requires authentication, add an annotation before the procedure. The `@kgw(authn='true')` annotation will require the user to authenticate via a signature before executing the procedure.
 
 ```sql title="social_media.kf"
-// authentication required view action to reveal a user profile
+// authentication required view procedure to reveal a user profile
 @kgw(authn='true')
-action get_profile () public view {
-    SELECT *
+procedure get_profile () public view returns table(id int, username text, age int) {
+    return SELECT id, username, age
     FROM users
     WHERE address = @caller;
 }
@@ -76,11 +76,11 @@ async function getSigner() {
     return new KwilSigner(ethSigner, ethAddress);
 }
 
-async function authenticatedAction() {
+async function authenticatedProcedure() {
     const kwilSigner = await getSigner();
 
     const payload = {
-        action: "get_profile",
+        name: "get_profile",
         dbid: 'x123abc...'
     }
 
@@ -106,11 +106,11 @@ async function getSigner() {
     return new KwilSigner(ethSigner, ethAddress);
 }
 
-async function authenticatedAction() {
+async function authenticatedProcedure() {
     const kwilSigner = await getSigner();
 
     const payload = {
-        action: "get_profile",
+        name: "get_profile",
         dbid: 'x123abc...'
     }
 
@@ -123,7 +123,7 @@ async function authenticatedAction() {
 
 ## Logging Out a User
 
-Logging out a user invalidates the cookie from the requesting origin. This means that the user will need to re-authenticate to access any actions that require authentication.
+Logging out a user invalidates the cookie from the requesting origin. This means that the user will need to re-authenticate to access any procedures that require authentication.
 
 ### Log out all signers
 
@@ -150,7 +150,7 @@ async function logoutUser() {
 
 ### Disable Auto Authentication
 
-By default, the Kwil SDK will automatically prompt the user to authenticate when calling an action that requires authentication. To disable this behavior, set the `autoAuthenticate` option to `false`.
+By default, the Kwil SDK will automatically prompt the user to authenticate when calling a procedure that requires authentication. To disable this behavior, set the `autoAuthenticate` option to `false`.
 
 ```typescript
 const kwil = new WebKwil({
@@ -179,13 +179,13 @@ You should not pass the cookie if in browser (WebKwil). The SDK relies on the br
 :::
 
 ```typescript
-async function authenticatedAction() {
+async function authenticatedProcedure() {
     const auth = await kwil.auth.authenticate(kwilSigner);
 
     const cookie = auth.data?.cookie;
 
     const payload = {
-        action: "get_profile",
+        name: "get_profile",
         dbid: 'x123abc...',
         cookie
     }

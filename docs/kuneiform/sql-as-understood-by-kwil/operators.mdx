@@ -1,0 +1,32 @@
+---
+sidebar_position: 3
+sidebar_label: "Operators"
+id: operators
+title: Operator Order of Precedence
+description: "Order of precedence for operators in Kuneiform."
+slug: /kuneiform/operators
+---
+
+The below table shows order of operations for all operators, from highest to lowest precedence. This generally matches
+[Postgres's operator precedence](<https://www.postgresql.org/docs/7.2/sql-precedence.html>), albeit with a restricted
+set of operators.
+
+| Operator | Associativity | Description |
+| -------- | ------------- | ----------- |
+| `()` | | Parentheses |
+| `::` | Left | Type Cast |
+| `[]` | Left | Array Index |
+| `.` | Left | Member Access |
+| `-` | Right | Negation |
+| `*`, `/`, `%` | Left | Multiplication, Division, Modulo |
+| `+`, `-` | Left | Addition, Subtraction |
+| `IS` |  | Type Comparison |
+| `IN` |  | Set Membership |
+| `BETWEEN` |  | Range Comparison |
+| `LIKE`, `ILIKE` |  | Pattern Matching |
+| `>`, `<`, `>=`, `<=` |  | Comparison |
+| `==`, `!=`, `=`, `:=` | Right | Equal, Not Equal, SQL Assignment, Procedure Assignment |
+| `NOT` | Right | Logical NOT |
+| `AND` | Left | Logical AND |
+| `OR` | Left | Logical OR |
+

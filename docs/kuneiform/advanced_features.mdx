@@ -1,0 +1,77 @@
+---
+sidebar_position: 5
+sidebar_label: "Advanced Features"
+id: advanced-features
+title: Advanced Kuneiform Features
+description: Using Actions and Extensions
+slug: /kuneiform/advanced-features
+---
+
+Kuneiform supports a number of advanced features that provide powerful and flexible functionality for your Kwil database.
+Developers should use these features with caution, as they can introduce complexity and potential security risks.
+
+## Actions
+
+Actions are similar to procedures, in that they are used to execute SQL statements. Unlike procedures, actions are not strongly typed,
+and cannot include business logic. Actions can only be used to call extensions, call other procedures/actions, or execute SQL.
+Actions are primarily used to call [precompiles](/docs/extensions/precompiles), which are built-in functions that are specific
+to each Kwil network. **Actions cannot be called by procedures.**
+
+:::tip
+Unless you are using precompiles, you should use procedures instead of actions, as procedures are
+safer and more efficient.
+:::
+
+```typescript
+action update_user ($username, $age) public {
+    // execute a SQL statement
+    UPDATE users
+    SET username=$username, age=$age
+    WHERE address=@caller;
+}
+```
+
+Actions can include the same [access modifiers](/docs/kuneiform/procedures#access-modifiers) and
+[contextual variables](/docs/kuneiform/introduction#contextual-variables) as procedures.
+
+## Extensions (Precompiles)
+
+Extensions are network-specific functions that network deployers can build into their Kwil binaries. They are capable
+of containing any arbitrary business logic. They can only be called by actions, and **cannot** be called by procedures.
+To learn how to create your own custom extension, see the [Extensions](/docs/extensions/precompiles) documentation.
+
+To initialize an extension, use the `use` block. Below, we initialize and call and extension called `hash`.
+The extension has the method `digest`, and can be initialized with the desired algorithm.
+This is a hypothetical extension, and is not a real precompile.
+
+```typescript
+database mydb;
+
+use hash {
+    algorithm: 'sha256'
+} as hash;
+
+action select_data() public view {
+    $hash_value = hash.digest('my_data');
+
+    select $hash_value::text;
+}
+```
+
+## Calling Other Actions
+
+Actions can call other actions and procedures. They cannot handle return data from procedures, but they can call them.
+Below, we have an action that calls a procedure to get a user's name and age, and then updates the user's age.
+
+```typescript
+procedure do_something() public {
+    // do something
+}
+
+action update_user_age($id uuid) public {
+    do_something($id);
+    update_user($username, $age + 1);
+}
+```
+
+Actions cannot directly call built-in functions, and can only call them in a SQL statement.

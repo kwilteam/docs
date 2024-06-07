@@ -7,16 +7,12 @@ description: An introduction to the Kuneiform schema language.
 slug: /kuneiform/introduction
 ---
 
-Kuneiform is a language for defining databases on Kwil.  Although we typically refer to an entire schema file as a "Kuneiform" file, schema files are technically made of two distinct languages:
-
-- **Kuneiform (DDL):** The Kuneiform language is specifically a Data Defintion Language (DDL) for Kwil databases.  DDL's typically manage structuring metadata; a common example is the `CREATE TABLE ...` statement in typical SQL databases.  Kuneiform is a more "modern" version of this, featuring a C-like syntax, as well as new features.
-
-- **SQL (DML):** In Kwil, regular SQL is used as the Data Manipulation Language (DML).  SQL is written within a Kuneiform file to store, update, or retrieve data.  While Kwil uses it's own SQL standard for security purposes, it is most similar to the SQL-92 standard.  For most users, it can be thought of as a slightly restrictive version of SQLite's syntax.
+Kuneiform is a language for defining databases on Kwil. It is capable of defining the structure of the database, queries
+for modifying and accessing data, and business logic for enforcing rules around data. Code in Kuneiform is written in blocks.
+All blocks have are given a name, which must be unique from all other blocks in the same file.
 
 :::tip
-
-You can write, compile, and deploy Kuneiform, as well as view sample Kuneiform files, online at https://ide.kwil.com.
-
+You can write, parse, and deploy Kuneiform, as well as view sample Kuneiform files, online at https://ide.kwil.com.
 :::
 
 ```typescript title="social_network.kf"
@@ -31,18 +27,61 @@ table users {
     address text notnull unique // wallet address
 }
 
-// a public action for creating a user
+// a public procedure for creating a user
 // it will store the user's wallet address
-action create_user ($id, $username, $age) public {
+procedure create_user ($id int, $username text, $age int) public {
     INSERT INTO users
-    VALUES ($id, $username, $age, @caller);
+    VALUES ($id, $username, $age, @caller); // @caller is the wallet address of the calling user
 }
 
-// a public action for updating a user's own mutable data
-action update_user ($username, $age) public {
-    UPDATE users
-    SET username=$username, age=$age
-    WHERE address=@caller;
+// a public, read-only procedure for getting all users
+procedure get_users() public view returns table(username text, age int) {
+    return SELECT username, age FROM users;
+}
+```
+
+## Data Types
+
+Below is a list of all supported data types in Kuneiform.
+
+| Data Type | Description |
+| --------- | ----------- |
+| `int` | A 64-bit integer. |
+| `text` | A string of text. |
+| `bool` | A boolean value. |
+| `blob` | A binary large object. |
+| `uuid` | A 128-bit universally unique identifier. |
+| `decimal(precision, scale)` | A fixed-point number, that can be defined with a precision and scale between 1 and 1000. |
+| `uint256` | A 256-bit unsigned integer. |
+
+ Kuneiform also supports 1-dimensional arrays for all data types. To declare an array, simple include square brackets:
+
+```typescript
+   table users {
+       id int primary,
+       names text[] notnull
+   }
+```
+
+## Contextual Variables
+
+Kuneiform supports "contextual variables", which allow you to access information about the current transaction.
+Contextual variables can be accessed anywhere regular variables can be accessed, and are prefixed with an `@` symbol.
+The following contextual variables are available:
+
+| Variable | Data Type | Description |
+| -------- | --------- | ----------- |
+| `@caller` | `text` | The wallet address of the user calling the procedure. |
+| `@signer` | `blob` | The signing address / public key of the user calling the procedure. |
+| `@txid` | `uuid` | The transaction ID of the current transaction. If called in a read-only connection, it is empty. |
+| `@height` | `int` | The height of the current block. If called in a read-only connection, it is -1. |
+
+To use a contextual variable, simply reference it in your SQL statement:
+
+```typescript
+procedure create_user($name text) public {
+    INSERT INTO users (name, address)
+    VALUES ($name, @caller);
 }
 ```
 
