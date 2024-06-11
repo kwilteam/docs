@@ -52,14 +52,14 @@ type Instance interface {
 ```go
 import (
     "context"
-    "github.com/kwilteam/kwil-db/common"
+    "github.com/kwilteam/kwil-db/core/types"
 )
 
 // DeploymentContext is the context for a dataset deployment
 // transaction.
 type DeploymentContext struct {
 	Ctx    context.Context
-	Schema *common.Schema
+	Schema *types.Schema
 }
 ```
 
@@ -82,11 +82,46 @@ type ProcedureContext struct {
 	// if calling a precompile instance instead of a procedure, it
 	// will be the last used DBID.
 	DBID string
+
+	// TxID is the hash of the transaction that the scope
+	// was called in.
+	TxID string
+
 	// Procedure is the Procedure identifier for the current scope.
 	// if calling a precompile instance instead of a Procedure, it
 	// will be the last used Procedure.
 	Procedure string
 	// Result is the result of the most recent SQL query.
 	Result *sql.ResultSet
+	// Height is the block height of the current execution.
+	Height int64
+
+	// StackDepth tracks the current depth of the procedure call stack. It is
+	// incremented each time a procedure calls another procedure.
+	StackDepth int
+	// UsedGas is the amount of gas used in the current execution.
+	UsedGas uint64
+}
+
+// SetValue sets a value in the scope.
+// Values are case-insensitive.
+// If a value for the key already exists, it will be overwritten.
+func (p *ProcedureContext) SetValue(key string, value any) {
+	// ...
+}
+
+// Values copies the values from the scope into a map. It will also
+// include contextual variables, such as the caller. If a context
+// variable has the same name as a scope variable, the scope variable
+// will be overwritten.
+func (p *ProcedureContext) Values() map[string]any {
+	// ...
+}
+
+// NewScope creates a new procedure context for a child procedure.
+// It will not inherit the values or last result from the parent.
+// It will inherit the dbid, procedure, and stack depth from the parent.
+func (p *ProcedureContext) NewScope() *ProcedureContext {
+	// ...
 }
 ```
