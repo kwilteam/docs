@@ -442,4 +442,11 @@ The corresponding command line flags and environment variables for `field` and
 |------------------------------------|----------------------------------------|
 | `--section.field`                  | `KWILD_SECTION_FIELD`                  |
 | `--section.subsection.other-field` | `KWILD_SECTION_SUBSECTION_OTHER_FIELD` |
+
+The one exception to the above is for configuring values in the `app.extensions` section of the `config.toml`.
+Extension configs must be specified after all others, and must be delimited from the rest of the command line arguments by a double dash `--`:
+
+```bash
+kwild --autogen --app.private_key_path ./private_key -- --app.extension.<extension-name>.<config-key> <config-value>
+```
 :::
