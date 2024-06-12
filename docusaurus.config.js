@@ -95,8 +95,8 @@ module.exports = {
                 href: 'https://www.kwil.com/',
               },
               {
-                label: 'Kwil IDE',
-                href: 'https://ide.kwil.com/',
+                label: 'Kwil Admin',
+                href: 'https://admin.kwil.com/',
               },
             ],
           },
