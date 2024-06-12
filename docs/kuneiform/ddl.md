@@ -21,7 +21,7 @@ database mydb;
 
 ## Table Declaration
 
-The Kuneiform Language allows you to establish your own tables, along with defining the corresponding [columns](#adding-columns), [foreign keys](#foreign-key), and [indexes](#indexing-in-tables). For every column, you must specify a [data type](/docs/kuneiform/supported-features#data-types) and have the option to set an [attribute type](/docs/kuneiform/supported-features#attributes). Here is an example:
+The Kuneiform Language allows you to establish your own tables, along with defining the corresponding [columns](#adding-columns), [foreign keys](#foreign-key), and [indexes](#indexing-in-tables). For every column, you must specify a [data type](/docs/kuneiform/introduction#data-types) and have the option to set an [attribute type](/docs/kuneiform/ddl#adding-columns). Here is an example:
 
 ```typescript
 table users {
@@ -107,7 +107,7 @@ The Kuneiform Language not only allows column declarations, but also the creatio
 
 ### Index Declaration
 
-You can declare [three types](/docs/kuneiform/supported-features#indexes) of indexes:
+You can declare three types of indexes:
 
 1. Standard binary tree index: This is a conventional B-tree index applied to the chosen column(s). Here's the syntax:
 

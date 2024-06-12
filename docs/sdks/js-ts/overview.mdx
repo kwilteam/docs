@@ -266,7 +266,7 @@ const res = await kwil.call(actionBody);
 </TabItem>
 </Tabs>
 
-If the view action uses a `@caller` [contextual variable](/docs/kuneiform/dml#using-contextual-variables-in-actions), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. The user does not need to sign for view actions.
+If the view action uses a `@caller` [contextual variable](/docs/kuneiform/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. The user does not need to sign for view actions.
 
 ```javascript
 await kwil.call(actionBody, kwilSigner)
