@@ -66,7 +66,7 @@ import { BrowserProvider } from 'ethers';
 
 const kwil = new WebKwil({
     kwilProvider: "https://longhorn.kwil.com",
-    chainId: "longhorn",
+    chainId: "longhorn-2",
 });
 
 async function getSigner() {
@@ -96,7 +96,7 @@ import { NodeKwil } from '@kwilteam/kwil-js';
 
 const kwil = new NodeKwil({
     kwilProvider: "https://longhorn.kwil.com",
-    chainId: "longhorn",
+    chainId: "longhorn-2",
 });
 
 async function getSigner() {
@@ -155,7 +155,7 @@ By default, the Kwil SDK will automatically prompt the user to authenticate when
 ```typescript
 const kwil = new WebKwil({
     kwilProvider: "https://longhorn.kwil.com",
-    chainId: "longhorn",
+    chainId: "longhorn-2",
     autoAuthenticate: false,
 });
 ```
