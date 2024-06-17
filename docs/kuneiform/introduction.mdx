@@ -75,6 +75,7 @@ The following contextual variables are available:
 | `@signer` | `blob` | The signing address / public key of the user calling the procedure. |
 | `@txid` | `uuid` | The transaction ID of the current transaction. If called in a read-only connection, it is empty. |
 | `@height` | `int` | The height of the current block. If called in a read-only connection, it is -1. |
+| `@foreign_caller` | `text` | The DBID of the calling database, if a procedure was called via a foreign procedure. It is an empty string if the procedure was called directly. |
 
 To use a contextual variable, simply reference it in your SQL statement:
 
