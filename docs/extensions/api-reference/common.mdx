@@ -73,9 +73,9 @@ type Engine interface {
 	Procedure(ctx context.Context, tx sql.DB, options *ExecutionData) (*sql.ResultSet, error)
 	// GetSchema returns the schema of a dataset.
 	// It will return an error if the dataset does not exist.
-	GetSchema(ctx context.Context, dbid string) (*Schema, error)
+	GetSchema(dbid string) (*Schema, error)
 	// ListDatasets returns a list of all datasets on the network.
-	ListDatasets(ctx context.Context, caller []byte) ([]*types.DatasetIdentifier, error)
+	ListDatasets(caller []byte) ([]*types.DatasetIdentifier, error)
 	// Execute executes a SQL statement on a dataset.
 	// It uses Kwil's SQL dialect.
 	Execute(ctx context.Context, tx sql.DB, dbid, query string, values map[string]any) (*sql.ResultSet, error)
