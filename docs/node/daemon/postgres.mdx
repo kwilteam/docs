@@ -97,11 +97,35 @@ This means that it will fail to start if there is a process on the host machine
 already listening on port 5432.
 :::
 
-A persistent Docker volume called `postgres_kwildb` will be created. If
-resetting `kwild`'s data folders, it is also necessary to delete this volume.
-Ensure that the Docker Engine is running and configured so that the `postgres`
-service has sufficient disk, CPU, and memory resources for demand of your
-application.
+If resetting `kwild`'s data folders, it is also necessary to delete the
+`kwil-pgdata` Docker volume, or whatever named volume was used in the `docker run`
+command. Ensure that the Docker Daemon is running and configured so that
+the `postgres` service has sufficient disk, CPU, and memory resources for demand
+of your application.
+
+:::tip
+If using Docker Daemon directly rather than Docker Desktop, such as would be the
+case on a headless server, it is recommended to modify the Docker configuration
+to disable the "userland proxy" for performance reasons.
+
+Also, if the system disk partition has limited free space or uses a slow block
+device, as is common on certain cloud providers, either change the `"data-root"`
+Docker setting or use a suitable host file system path rather than a named volume.
+
+Modify the docker configuration as follows, setting `"userland-proxy"` to
+`false`, and `"data-root"` to the location of a directory on a file system with
+sufficient free disk space and performance characteristics:
+
+```json title="/etc/docker/daemon.json"
+{
+  "userland-proxy": false,
+  "data-root": "/mnt/suitable_drive/docker"
+}
+```
+
+If changing `"data-root"`, be sure to copy the previous Docker folder, which is
+typically `/var/lib/docker`.
+:::
 
 ### PostgreSQL Configuration
 
@@ -175,4 +199,4 @@ the official [PostgreSQL documentation](https://www.postgresql.org/docs/16/auth-
 
 ## Running `kwild`
 
-Continue to the [Using Kwild](/docs/daemon/kwild) page for running Kwil node.
+Continue to the [Using `kwild`](/docs/daemon/kwild) page for running Kwil node.

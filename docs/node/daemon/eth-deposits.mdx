@@ -1,9 +1,9 @@
 ---
 sidebar_position: 5
-sidebar_label: "Eth Deposits"
+sidebar_label: "Ethereum Deposits"
 id: eth-deposits-oracle
-title: Eth Deposits Oracle
-description: Using the Eth Deposits Oracle
+title: Ethereum Deposits Oracle
+description: Using the Ethereum Deposits Oracle
 slug: /extensions/oracles/eth-deposits
 ---
 
@@ -20,7 +20,7 @@ Therefore this oracle can be used in a variety of use cases, such as:
 - Reward minters of NFTs with the Kwil gas as a part of the minting process.
 - Burn ERC20 tokens on Ethereum to acquire Kwil gas.
 
-Follow the steps below to use the Eth Deposits Oracle:
+Follow the steps below to use the Ethereum Deposits Oracle:
 1. [Implement the smart contract](#implement-smart-contract-with-credit-event) that emits the `Credit(address,uint256)` event.
 2. [Deploy the smart contract](#deploy-the-smart-contract) on an EVM chain.
 3. [Configure Kwil node](#configure-kwil-node) to start the `eth-deposits` oracle.
@@ -61,7 +61,7 @@ The next step is to configure the Kwil node to configure the `eth-deposits` orac
 1. `rpc_provider`: This variable specifies the WebSocket URL of the EVM node provider. This is a required field and would likely be an Infura or Alchemy URL.
 2. `contract_address`: This variable specifies the address of the deployed smart contract for the oracle to listen to the `Credit` events at. This is a required field.
 3. `starting_height`: This variable specifies the Ethereum block height at which the oracle starts to listen for the `Credit` events. Any events emitted before this block height are ignored. The default value is `0`.
-4. `required_confirmations`: This variable specifies the number of ethereum blocks that must be mined before the oracle creates a deposit event in Kwil. This is to protect against Ethereum network reorgs or soft forks. This is an optional field and defaults to `12` if not configured.
+4. `required_confirmations`: This variable specifies the number of Ethereum blocks that must be mined before the oracle creates a deposit event in Kwil. This is to protect against Ethereum network reorgs or soft forks. This is an optional field and defaults to `12` if not configured.
 5. `reconnection_interval`: This variable specifies the amount of time in seconds that the oracle will wait before reconnecting to the Ethereum RPC endpoint if it is disconnected. Long-running RPC subscriptions are prone to being reset by the Ethereum RPC endpoint, so this will allow the oracle to reconnect. This is an optional field and defaults to `60`s if not configured.
 6. `max_retries`: This variable specifies the number of times the oracle will attempt to reconnect to the Ethereum RPC endpoint before giving up. This is an optional field and defaults to `10` if not configured.
 7. `block_sync_chunk_size`: This variable specifies the number of Ethereum blocks requested by oracle from the Ethereum RPC endpoint at a time while catching up to the network. This is an optional field and defaults to `1000000` if not configured.
