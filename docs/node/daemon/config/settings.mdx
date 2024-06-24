@@ -12,32 +12,44 @@ This section provides a detailed overview of the operational parameters availabl
 
 - `level`: This variable specifies the logging level of the Kwil application. By default, the level is set to `info`.
 
-- `output_paths`: This variable specifies where logs are written to. You can designate multiple paths, separated by commas. By default, logs are directed to `stdout`.
+- `rpc_level`: This variable specifies the logging level for the RPC server, which must be higher than the general log level. No default.
 
-- `format`: This variable specifies the log format, which can be either `plain` or `json`.
+- `output_paths`: This variable specifies where logs are written to. You can designate multiple paths, separated by commas. By default, logs are directed to `stdout` and `kwild.log`.
 
-- `time_format`: This variable specifies the time format for logs. Options include `epochfloat` (default), `epochmilli`, and `rfc3339milli`.
+- `format`: This variable specifies the log format, which can be either `plain` or `json`. The default is `json`.
+
+- `time_format`: This variable specifies the time format for logs. Options include `epochfloat`, `epochmilli`, and `rfc3339milli`. The default is `epochfloat`.
 
 ## [app]   
    This section holds configurations specific to the Kwil application's operation.
 
-   - `jsonrpc_listen_addr`: This variable specifies the address where the daemon's JSON-RPC server listens for connections. The default is `localhost:8484`.
+   - `jsonrpc_listen_addr`: This variable specifies the address where the daemon's JSON-RPC server listens for connections. The default is `0.0.0.0:8484`.
 
-   - `http_listen_addr`: This variable specifies the address where the daemon's HTTP server listens for connections. The default is `localhost:8080`.
+   - `admin_listen_addr`: This variable specifies the address where the daemon's admin JSON-RPC server listens for connections. The default is `/tmp/kwild.socket`.
 
-   - `admin_listen_addr`: This variable specifies the address where the daemon's admin JSON-RPC server listens for connections. The default is `localhost:50151`.
+   - `admin_pass`: The password for the kwil admin service. May be empty. No default.
 
-   - `pg_db_host`: PostgreSQL database host (UNIX socket path or IP address with no port). The default is `localhost`.
+   - `admin_notls`: Toggle TLS on the admin server. Automatically disabled for unix socket or loopback listen addresses.
+   
+   - `pg_db_host`: PostgreSQL database host (UNIX socket path or IP address with no port). The default is `127.0.0.1` (localhost).
 
    - `pg_db_port`: PostgreSQL database port (may be omitted for UNIX socket hosts). The default is `5432`.
 
    - `pg_db_user`: PostgreSQL database user (should be a "superuser"). The default is `kwild`.
 
-   - `pg_db_pass`: PostgreSQL database pass (may be omitted for some pg_hba.conf configurations).
+   - `pg_db_pass`: PostgreSQL database pass (may be omitted for some pg_hba.conf configurations). No default.
 
    - `pg_db_name`: PostgreSQL database name (override database name). The default is `kwild`.
 
    - `private_key_path`: This variable specifies the path for node's private key. If left unspecified, it defaults to `./private_key` relative to the root directory.
+
+   - `profile_mode`: This variable sets the kwild profiling module. Options are `http`, `cpu`, `mem`, `mutex`, and `block`. No default.
+
+   - `profile_file`: The kwild profile output file path. Not enabled by default.
+
+   - `rpc_timeout`: The timeout for the JSON-RPC server. Default is 45s. 
+
+   - `db_read_timeout`: The timeout for database reads initiated by RPC requests. Default is 5s. 
 
    - `extension_endpoints`: This variable specifies the endpoints for extensions, separated by commas.
 
@@ -45,13 +57,13 @@ This section provides a detailed overview of the operational parameters availabl
 
    - `tls_key_file`: This variable specifies the file path containing the corresponding private key that enables TLS on the JSON-RPC server. Like the `tls_cert_file`, this path can be either absolute or relative to the specified root directory. If unspecified, the JSON-RPC server's communications remain unencrypted.
 
-   - `hostname`: This variable sets the Kwil JSON-RPC server's hostname.
+   - `hostname`: This variable sets the Kwil JSON-RPC server's hostname. No default.
 
-   - `genesis_state`: This variable specifies the path to the snapshot file to be used for the initial state of the node. If the node is configured to start with initial state and this variable is not set, the node will fail to start.
+   - `genesis_state`: This variable specifies the path to the snapshot file to be used for the initial state of the node. If the node is configured to start with initial state and this variable is not set, the node will fail to start. No default.
 
    ### [app.snapshots]
 
-      This section contains configurations for managing the snapshots of the kwild database.
+      This section contains configurations for managing the snapshots of the kwild database. Snapshot variables do not have a default value.
 
       - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network.
 
@@ -70,9 +82,9 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       This section offers configurations for managing the blockchain's RPC service.
 
-      - `listen_addr`: This variable specifies the listening address for the blockchain's RPC server. The default is `tcp://127.0.0.1:26657`.
+      - `listen_addr`: This variable specifies the listening address for the blockchain's RPC server. Default is `tcp://127.0.0.1:26657`.
 
-      - `broadcast-tx-timeout`: This variable specifies the time to wait for a transaction to be committed when authored with --sync flag in the CLI. The default is 10s.
+      - `broadcast_tx_timeout`: This variable specifies the time to wait for a transaction to be committed when authored with --sync flag in the CLI. Default is 15s.
 
    ### [chain.consensus]
 
@@ -90,37 +102,39 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       This section outlines configurations for the P2P service, which manages peer-to-peer connectivity within the blockchain network.
 
-      - `listen_addr`: This variable specifies the address for listening to the incoming peer connections. The default is `tcp://0.0.0.0:26656`.
+      - `listen_addr`: This variable specifies the address for listening to the incoming peer connections. Default is `tcp://0.0.0.0:26656`.
 
       - `external_address`: This variable specifies the address for peers to connect to. If left empty, it defaults to the same port as the `listen_addr` and will introspect based on the listener.
 
-      - `persistent_peers`: This variable specifies a comma-separated list of nodes to consistently connect to.
+      - `persistent_peers`: This variable specifies a comma-separated list of nodes to consistently connect to. No default.
 
-      - `pex`: A toggle to enable peer exchange, an ongoing function of the node used to share known peers with other nodes.
+      - `pex`: A toggle to enable peer exchange, an ongoing function of the node used to share known peers with other nodes. Default is `true`.
 
-      - `seeds`: This variable specifies a comma-separated list of seed nodes or dedicated seeders services used to provide peer addresses when bootstrapping. This is unused if there are entries in the address book.
+      - `seeds`: This variable specifies a comma-separated list of seed nodes or dedicated seeders services used to provide peer addresses when bootstrapping. This is unused if there are entries in the address book. No default.
 
-      - `seed_mode`: A toggle to run in a special "seed mode" where kwild constantly crawls the network to obtain a large address book, which it shares with incoming nodes before disconnecting them. A node running with this setting would be used only to bootstrap other nodes via their `seeds` setting. This is not appropriate for a validator or an RPC service provider.
+      - `seed_mode`: A toggle to run in a special "seed mode" where kwild constantly crawls the network to obtain a large address book, which it shares with incoming nodes before disconnecting them. A node running with this setting would be used only to bootstrap other nodes via their `seeds` setting. This is not appropriate for a validator or an RPC service provider. Default is `false`.
 
       - `addr_book_strict`: A toggle for enforcing strict address routability rules. By default, nodes with routable addresses are considered for connection. However, if this setting is disabled, non-routable IP addresses, like addresses in a private network can be added to the address book.
 
-      - `max_num_inbound_peers`: This variable specifies the maximum number of inbound peers.
+      - `max_num_inbound_peers`: This variable specifies the maximum number of inbound peers. Default is 40.
 
-      - `max_num_outbound_peers`: This variable specifies the maximum number of outbound peers to connect to, excluding persistent peers.
+      - `max_num_outbound_peers`: This variable specifies the maximum number of outbound peers to connect to, excluding persistent peers. Default is 10.
 
-      - `unconditional_peer_ids`: This variable specifies a comma separated list of node ID's that will always have connections (re)established, regardless of the connection limits.
+      - `unconditional_peer_ids`: This variable specifies a comma separated list of node ID's that will always have connections (re)established, regardless of the connection limits. No default.
 
-      - `allow_duplicate_ip`: A toggle to prevent multiple peers from using the same IP address.
+      - `allow_duplicate_ip`: A toggle to prevent multiple peers from using the same IP address. Default is `true`.
 
    ### [chain.mempool]
    
       This section discusses the configurations for the blockchain's transaction mempool.
 
-      - `size`: This variable specifies the mempool's maximum transaction count.
+      - `size`: This variable specifies the mempool's maximum transaction count. Default is 5000.
 
-      - `max_txs_bytes`: This variable specifies the limit on the total size of all transactions in the mempool.
+      - `max_tx_byte`: This variable specifies the maximum size of any one transaction in the mempool. Default is 4MB.
 
-      - `cache_size`: This variable specifies the cache size used to filter previously seen transactions.
+      - `max_txs_bytes`: This variable specifies the limit on the total size of all transactions in the mempool. Default is 512 MB.
+
+      - `cache_size`: This variable specifies the cache size used to filter previously seen transactions. Default is 10000 bytes. 
 
    ### [chain.statesync]
 
@@ -128,11 +142,13 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `enable`: This variable toggles the state sync feature on or off. By default, the state sync feature is disabled and the node uses block sync to catch up with the network.
 
+      - `snapshot_dir`: This variable specifies the path to the directory where the received snapshot is stored. Default is `rcvdSnaps`.
+
       - `rpc_servers`: This variable specifies a list of trusted snapshot providers. It is a comma-seperated list of chain RPC servers and requires atleast 2 servers to enable statesync. These servers act as the source-of-truth for the snapshot integrity and also responsible for creating, distributing and validating snapshots. These servers should have [snapshot configuration](#appsnapshots) enabled.
 
-      - `discovery_time`: This variable specifies the time to spend discovering snapshots before offering the latest snapshot to the ABCI application. The default is 15s. The node will repeat this process until it finds a valid snapshot. If there are no snapshots available in the network, restart the node with block sync enabled to make progress with the node syncing.
+      - `discovery_time`: This variable specifies the time to spend discovering snapshots before offering the latest snapshot to the ABCI application. The default is 15s. The node will repeat this process until it finds a valid snapshot. If there are no snapshots available in the network, restart the node with block sync enabled to make progress with the node syncing. Default is 15s.
 
-      - `chunk_request_timeout`: This variable specifies the timeout duration before re-requesting a chunk, possibly from a different peer.
+      - `chunk_request_timeout`: This variable specifies the timeout duration before re-requesting a chunk, possibly from a different peer. Default is 10s.
 
 This is the structure in which these configs must appear in the `config.toml` file.
 
@@ -144,39 +160,48 @@ Here is an example of a `config.toml` file with complete configuration:
   <summary>sample config.toml file </summary>
 
 ```yaml
-# This is a TOML config file.
-# For more information, see https://github.com/toml-lang/toml
 
-# NOTE: Any path below can be absolute (e.g. "/var/myapp/data") or
+# NOTE: Any path below can be absolute (e.g. "/var/myawesomeapp/data") or
 # relative to the home directory (e.g. "data")
 
 # Root Directory Structure:
 # RootDir/
 #   |- config.toml   (app and chain configuration for running the kwild node)
-#   |- genesis.json  (genesis file for the network)
 #   |- private_key   (node's private key)
 #   |- abci/
-#   |   |- addrbook.json  (peer routable addresses for the kwild node)
-#   |   |- data/          (blockchain files: blockstore.db, state.db, etc)
+#   |   |- config/
+#   |   |   |- genesis.json   (genesis file for the network)
+#   |   |   |- addrbook.json  (peer routable addresses for the kwild node)
+#   |   |- data/
+#   |   |   |- blockchain db files/dir (blockstore.db, state.db, etc)
 #   |   |- info/
-#   |- application/
 #   |- signing/
 #   |- snapshots/
-#   |- rcvd_snaps/
+#   |- rcvdSnaps/
 
-# Required files: config.toml, private_key, and genesis files
-# The rest of the files & directories are created on the node startup
+# Only the config.toml and genesis file are required to run the kwild node
+# The rest of the files & directories are created by the kwild node on startup
 
 #######################################################################
 ###                    Logging Config Options                       ###
 #######################################################################
+
 [log]
 
 # Output level for logging, default is "info". Other options are "debug", "error", "warn", "trace"
 level = "info"
 
+# RPC systems' logging level. Must be higher than log.level.
+rpc_level = ""
+
+# Consensus engine's logging level. Must be higher than log.level.
+consensus_level = ""
+
+# DB driver's logging level. Must be higher than log.level.
+db_level = ""
+
 # Output paths for the logger, can be stdout or a file path
-output_paths = ["stdout"]
+output_paths = ["stdout", "kwild.log"]
 
 # Output format: 'plain' or 'json'
 format = "json"
@@ -196,11 +221,14 @@ private_key_path = "private_key"
 # TCP or UNIX socket address for the KWILD App's JSON-RPC server to listen on
 jsonrpc_listen_addr = "localhost:8484"
 
-# TCP or UNIX socket address for the KWILD App's HTTP server to listen on
-http_listen_addr = "localhost:8080"
+# Unix socket or TCP address for the KWILD App's Admin server to listen on
+admin_listen_addr = "/tmp/kwild.socket"
 
-# TCP or UNIX socket address for the KWILD App's Admin JSON-RPC server to listen on
-admin_listen_addr = "localhost:50151"
+# Timeout on requests on the user RPC servers
+rpc_timeout = "45s"
+
+# Timeout on database reads initiated by the user RPC service
+db_read_timeout = "5s"
 
 # List of Extension endpoints to be enabled ex: ["localhost:50052", "169.198.102.34:50053"]
 extension_endpoints = []
@@ -220,23 +248,37 @@ pg_db_pass = ""
 # PostgreSQL database name (override database name, default is "kwild")
 pg_db_name = "kwild"
 
-# The path to a file containing certificate that is used to enable TLS on the JSON-RPC server.
+# The admin RPC server can require a password, if set. Ensure the connection is
+# encrypted since the password is sent unencrypted in the HTTP Authorization
+# header. Not needed if client authentication is done with mutual TLS (clients.pem).
+# admin_pass = ""
+
+# Disable TLS on the admin service server. It is automatically disabled for a
+# UNIX socket or loopback TCP listen address. This setting can disable it for
+# any TCP listen address.
+admin_notls = false
+
+# The path to a file containing certificate that is used to create the HTTPS server.
 # Might be either absolute path or path related to the kwild root directory.
 # If the certificate is signed by a certificate authority,
 # the certFile should be the concatenation of the server's certificate, any intermediates,
 # and the CA's certificate.
-# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to enable TLS.
+# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to create HTTPS server.
 # Otherwise, HTTP server is run.
 tls_cert_file = ""
 
-# The path to a file containing matching private key that is used to enable TLS on the JSON-RPC server.
+# The path to a file containing matching private key that is used to create the HTTPS server.
 # Might be either absolute path or path related to the kwild root directory.
-# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to enable TLS.
+# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to create HTTPS server.
 # Otherwise, HTTP server is run.
 tls_key_file = ""
 
 # Kwild Server hostname
 hostname = ""
+
+# Path to the snapshot file to restore the database from.
+# Used during the network migration process.
+genesis_state = ""
 
 #######################################################################
 ###                     Extension Configuration                     ###
@@ -272,10 +314,10 @@ recurring_height = {{.AppCfg.Snapshots.RecurringHeight}}
 # Maximum number of snapshots to store
 max_snapshots = 3
 
-
 #######################################################################
 ###                 Chain  Main Base Config Options                 ###
 #######################################################################
+
 [chain]
 
 # A custom human readable name for this node
@@ -288,14 +330,19 @@ moniker = ""
 #######################################################
 ###       RPC Server Configuration Options          ###
 #######################################################
+
 [chain.rpc]
 
 # TCP or UNIX socket address for the RPC server to listen on
 listen_addr = "tcp://127.0.0.1:26657"
 
+# Timeout for each broadcast tx commit
+broadcast_tx_timeout = "15s"
+
 #######################################################
 ###         Consensus Configuration Options         ###
 #######################################################
+
 [chain.consensus]
 
 # How long we wait for a proposal block before prevoting nil
@@ -315,19 +362,21 @@ timeout_commit = "6s"
 #######################################################
 ###           P2P Configuration Options             ###
 #######################################################
+
 [chain.p2p]
 
 # Address to listen for incoming connections
 listen_addr = "tcp://0.0.0.0:26656"
 
 # Address to advertise to peers for them to dial
-# If empty, will use the same port as the laddr,
+# If empty, will use the same port as the listening address,
 # and will introspect on the listener or use UPnP
 # to figure out the address. ip and port are required
 # example: 159.89.10.97:26656
 external_address = ""
 
-# Comma separated list of nodes to keep persistent connections to
+# Comma separated list of nodes to keep persistent connections to (used for bootstrapping)
+# Nodes should be identified as id@host:port, where id is the hex encoded CometBFT address.
 # Example: "d128266b8b9f64c313de466cf29e0a6182dba54d@172.10.100.2:26656,9440f4a8059cf7ff31454973c4f9c68de65fe526@172.10.100.3:26656"
 persistent_peers = ""
 
@@ -354,10 +403,8 @@ pex = true
 # address book are unreachable.
 seeds = ""
 
-# Seed mode, in which the node constantly crawls the network and looks for
+# Seed mode, in which node constantly crawls the network and looks for
 # peers. If another node asks it for addresses, it responds and disconnects.
-# This function is not for validator or sentry nodes. A seed node is to be
-# operated to support other nodes via their `seeds` config.
 #
 # It is recommended to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
 #
@@ -367,8 +414,8 @@ seed_mode = false
 #######################################################
 ###          Mempool Configuration Options          ###
 #######################################################
-[chain.mempool]
 
+[chain.mempool]
 # Maximum number of transactions in the mempool
 size = 5000
 
@@ -386,19 +433,20 @@ cache_size = 10000
 #######################################################
 ###         State Sync Configuration Options        ###
 #######################################################
+
 [chain.statesync]
-# State sync rapidly bootstraps a new node by discovering, fetching, and restoring the database
+# State sync rapidly bootstraps a new node by discovering, fetching, and restoring a state machine
 # snapshot from peers instead of fetching and replaying historical blocks. Requires some peers in
-# the network to take and serve snapshots. State sync is not attempted if the node
+# the network to take and serve state machine snapshots. State sync is not attempted if the node
 # has any local state (LastBlockHeight > 0). The node will have a truncated block history,
 # starting from the height of the snapshot.
 enable = true
 
-# Path to the directory where the received snapshot is stored
-snapshot_dir = "rcvd_snaps"
+# SnapshotDir is the directory to store the received snapshot chunks.
+snapshot_dir = "rcvdSnaps"
 
 # Trusted snapshot providers (comma-separated chain RPC servers) are the source-of-truth for the snapshot integrity.
-# Snapshots are accepted for statesync only after verifying the snapshot metadata (snapshot hash, chunk count, height etc.)
+# Snapshots are accepted for statesync only after verifying the snapshot metadata (snapshot hash, chunk count, height etc.) 
 # with these trusted snapshot providers. At least 1 trusted snapshot provider is required for enabling state sync.
 rpc_servers = "http://rpc1:26657,http://rpc2:26657"
 
@@ -413,8 +461,9 @@ discovery_time = "15s"
 # peer (default: 1 minute), if the current peer is unresponsive to the chunk request.
 chunk_request_timeout = "10s"
 
-# Note: If the requested chunk is not received within 2 minutes (hard-coded default), 
+# Note: If the requested chunk is not received for a duration of 2 minutes (hard-coded default), 
 # the state sync process is aborted and the node will fall back to the regular block sync process.
+
 ```
 </details>
 
