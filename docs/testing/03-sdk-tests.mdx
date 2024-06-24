@@ -1,0 +1,213 @@
+---
+sidebar_position: 3
+sidebar_label: "SDK Tests"
+id: kuneiform-sdk-tests
+title: SDK tests
+description: Testing Kuneiform with the testing SDK
+slug: /testing/go-sdk
+---
+
+To use the testing SDK, you will need to have Go installed and have a project set up.
+This document assumes that you are generally familiar with Go and standard library testing.
+TODO: link to a tutorial on this.
+
+## Installation
+
+To install the testing SDK, run:
+
+```shell
+$ go get github.com/kwilteam/kwil-db/testing
+```
+
+## Making The Test
+
+To make a test, create a new test file and import the testing package:
+
+```go title="main_test.go"
+package main_test
+
+import (
+	"testing"
+
+	kwilTesting "github.com/kwilteam/kwil-db/testing"
+)
+
+func Test_Kuneiform(t *testing.T) {
+	kwilTesting.RunSchemaTest(t, kwilTesting.SchemaTest{})
+}
+```
+
+Below is a full reference for the `kwilTesting.SchemaTest` struct:
+
+<details>
+  <summary> Kwil Go Testing Reference </summary>
+
+```go
+// SchemaTest allows for testing schemas against a live database.
+// It allows for several ways of specifying schemas to deploy, as well
+// as functions that can be run against the schemas, and expected results.
+type SchemaTest struct {
+	// Name is the name of the test case.
+	Name string `json:"name"`
+	// Schemas are plain text schemas to deploy as
+	// part of the text.
+	Schemas []string `json:"-"`
+	// SchemaFiles are paths to the schema files to deploy.
+	SchemaFiles []string `json:"schema_files"`
+	// SeedStatements are SQL statements run before each test that are
+	// meant to seed the database with data. It maps the database name
+	// to the SQL statements to run. The name is the database name,
+	// defined using "database <name>;". The test case will derive the
+	// DBID from the name.
+	SeedStatements map[string][]string `json:"seed_statements"`
+	// TestCases execute actions or procedures against the database
+	// engine, taking certain inputs and expecting certain outputs or
+	// errors. These run separately from the functions, and separately
+	// from each other. They are the easiest way to test the database
+	// engine, but if more nuanced tests are needed (e.g. to simulate
+	// several different wallets), the FunctionTests field should be used
+	// instead. All schemas will be redeployed and all seed data re-applied
+	// between executing each TestCase.
+	TestCases []TestCase `json:"test_cases"`
+	// FunctionTests are arbitrary functions that can be used to
+	// execute any logic against the schemas.
+	// All schemas will be reset before each function is run.
+	// FunctionTests are more cumbersome to use than TestCases, but
+	// they allow for more nuanced testing and flexibility.
+	// All functions and testcases are run against fresh schemas.
+	FunctionTests []TestFunc `json:"-"`
+}
+
+// TestCase executes an action or procedure against the database engine.
+// It can be given inputs, expected outputs, expected error types,
+// and expected error messages.
+type TestCase struct {
+	// Name is a name that the test will be identified by if it fails.
+	Name string `json:"name"`
+	// Database is the name of the database schema to execute the
+	// action/procedure against. This is the database NAME,
+	// defined using "database <name>;". The test case will
+	// derive the DBID from the name.
+	Database string `json:"database"`
+	// Name is the name of the action/procedure.
+	Target string `json:"target"`
+	// Args are the inputs to the action/procedure.
+	// If the action/procedure takes no parameters, this should be nil.
+	Args []any `json:"args"`
+	// Returns are the expected outputs of the action/procedure.
+	// It takes a two-dimensional array to model the output of a table.
+	// If the action/procedure has no outputs, this should be nil.
+	Returns [][]any `json:"returns"`
+	// Err is the expected error type. If no error is expected, this
+	// should be nil.
+	Err error `json:"-"`
+	// ErrMsg will search the error returned by the action/procedure for
+	// the given substring. If no error is expected, this should be an
+	// empty string.
+	ErrMsg string `json:"error"`
+	// Signer sets the @caller, and the bytes will be used as the @signer.
+	// If empty, the test case schema deployer will be used.
+	Caller string `json:"caller"`
+	// BlockHeight sets the blockheight for the test, accessible by
+	// the @height variable. If not set, it will default to 0.
+	Height int64 `json:"height"`
+}
+
+// TestFunc is a function that can be run against the database engine.
+// A returned error signals a failed test.
+type TestFunc func(ctx context.Context, platform *Platform) error
+```
+
+</details>
+
+## Example
+
+The following example uses a test schema. The schema implements a basic database
+for storing a querying users. The full test schema can be found below:
+
+<details>
+  <summary> users.kf </summary>
+
+```sql showLineNumbers
+database users_db;
+
+table users {
+  id uuid primary key,
+  name text not null unique,
+  address text not null unique
+}
+
+procedure create_user ($name text) public  {
+  // derive a deterministic uuid from the blockchain transaction ID
+  // https://www.postgresql.org/docs/16.1/uuid-ossp.html#UUID-OSSP-FUNCTIONS-SECT
+  $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+
+  insert into users (id, name, address)
+  values ($uuid, $name, @caller);
+}
+
+procedure get_users() public view returns table (name text, address text) {
+  return select name, address from users;
+}
+```
+</details>
+
+### Implementing The Test
+
+We will test the `create_user` and `get_users` procedures. Our test will have a top-level
+name `users_test`, and will have three cases named `create user - success`,
+"`conflicting username - failure`,", and `get users - success`. Each test case runs against
+a fresh database; data is wiped after every test case, and the seed data is re-applied.
+The tests can be run using the standard Go test tooling.
+
+```go title="main_test.go"
+package main_test
+
+import (
+	"testing"
+
+	kwilTesting "github.com/kwilteam/kwil-db/testing"
+)
+
+func Test_Kuneiform(t *testing.T) {
+	kwilTesting.RunSchemaTest(t, kwilTesting.SchemaTest{
+        Name:        "users_test",
+		SchemaFiles: []string{"./users_db.kf"},
+		SeedStatements: map[string][]string{
+			"users_db": {
+				`INSERT INTO users (id, name, address)
+				 VALUES ('42f856df-b212-4bdc-a396-f8fb6eae6901'::uuid, 'satoshi', '0xAddress')`,
+			},
+		},
+		TestCases: []kwilTesting.TestCase{
+			{
+				// should create a user - happy case
+				Name:     "create user - success",
+				Database: "users_db",
+				Target:   "create_user",
+				Args:     []any{"alice"},
+			},
+			{
+				// conflicting with the name "satoshi" in the "name" column,
+				// which is unique.
+				Name:     "conflicting username - failure",
+				Database: "users_db",
+				Target:   "create_user",
+				Args:     []any{"satoshi"},
+				ErrMsg:   "duplicate key value",
+			},
+            {
+                Name: "get users - success"
+                Database: "users_db",
+                Target: "users_db",
+                Returns: [["satoshi", "0xAddress"]]
+            },
+		},
+    })
+}
+```
+
+## Next Steps
+
+For a more complex example displaying tests spanning 3 interconnected schemas,
+see the example in the [main `kwil-db` repo](<https://github.com/kwilteam/kwil-db/testing/proxy>)
