@@ -45,7 +45,7 @@ This section provides a detailed overview of the operational parameters availabl
 
    - `profile_mode`: This variable sets the kwild profiling module. Options are `http`, `cpu`, `mem`, `mutex`, and `block`. No default.
 
-   - `profile_file`: The kwild profile output file path. Not enabled by default.
+   - `profile_file`: The kwild profile output file path. Not enabled by default. This setting does not apply for `http` profiling.
 
    - `rpc_timeout`: The timeout for the JSON-RPC server. Default is 45s. 
 
@@ -63,13 +63,13 @@ This section provides a detailed overview of the operational parameters availabl
 
    ### [app.snapshots]
 
-      This section contains configurations for managing the snapshots of the kwild database. Snapshot variables do not have a default value.
+      This section contains configurations for managing the snapshots of the kwild database.
 
-      - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network.
+      - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network. Default is false.
 
-      - `snapshot_dir`: This variable specifies the path to the snapshots directory.
+      - `snapshot_dir`: This variable specifies the path to the snapshots directory. Default is `snapshots`.
 
-      - `recurring_height`: This variable specifies the heights (multiples of heights) at which the database is snapshotted. The default is 10000, which is around 1 snapshot per day considering block rate of 1 block per 6-8 secs. 
+      - `recurring_height`: This variable specifies the heights (multiples of heights) at which the database is snapshotted. The default is 14400, which is around 1 snapshot per day considering block rate of 1 block per 6 seconds
  
       - `max_snapshots`: This variable specifies the maximum number of snapshots to store on disk. The default is 3 snapshots.
 
@@ -132,7 +132,7 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `max_tx_byte`: This variable specifies the maximum size of any one transaction in the mempool. Default is 4MB.
 
-      - `max_txs_bytes`: This variable specifies the limit on the total size of all transactions in the mempool. Default is 512 MB.
+      - `max_txs_bytes`: This variable specifies the limit on the total size of all transactions in the mempool. Default is 2^29 bytes.
 
       - `cache_size`: This variable specifies the cache size used to filter previously seen transactions. Default is 10000 bytes. 
 
@@ -166,12 +166,11 @@ Here is an example of a `config.toml` file with complete configuration:
 
 # Root Directory Structure:
 # RootDir/
+#   |- genesis.json   (genesis file for the network)
 #   |- config.toml   (app and chain configuration for running the kwild node)
 #   |- private_key   (node's private key)
 #   |- abci/
-#   |   |- config/
-#   |   |   |- genesis.json   (genesis file for the network)
-#   |   |   |- addrbook.json  (peer routable addresses for the kwild node)
+#   |   |- addrbook.json  (peer routable addresses for the kwild node)
 #   |   |- data/
 #   |   |   |- blockchain db files/dir (blockstore.db, state.db, etc)
 #   |   |- info/
