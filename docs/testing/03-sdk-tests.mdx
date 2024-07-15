@@ -160,18 +160,23 @@ name `users_test`, and will have three cases named `create user - success`,
 a fresh database; data is wiped after every test case, and the seed data is re-applied.
 The tests can be run using the standard Go test tooling.
 
+We also implement a function test that shows how to run a custom function against the schema.
+The function test simply runs the `get_users` procedure and checks the output.
 ```go title="main_test.go"
 package main_test
 
 import (
+	"context"
+	"errors"
 	"testing"
 
+	"github.com/kwilteam/kwil-db/common"
 	kwilTesting "github.com/kwilteam/kwil-db/testing"
 )
 
 func Test_Kuneiform(t *testing.T) {
 	kwilTesting.RunSchemaTest(t, kwilTesting.SchemaTest{
-        Name:        "users_test",
+		Name:        "users_test",
 		SchemaFiles: []string{"./users_db.kf"},
 		SeedStatements: map[string][]string{
 			"users_db": {
@@ -196,18 +201,70 @@ func Test_Kuneiform(t *testing.T) {
 				Args:     []any{"satoshi"},
 				ErrMsg:   "duplicate key value",
 			},
-            {
-                Name: "get users - success"
-                Database: "users_db",
-                Target: "users_db",
-                Returns: [["satoshi", "0xAddress"]]
-            },
+			{
+				Name:     "get users - success",
+				Database: "users_db",
+				Target:   "users_db",
+				Returns:  [][]any{{"satoshi", "0xAddress"}},
+			},
 		},
-    })
+		FunctionTests: []kwilTesting.TestFunc{
+			func(ctx context.Context, platform *kwilTesting.Platform) error {
+				// first, we need to get the dbid of the users_db
+				datasets, err := platform.Engine.ListDatasets(platform.Deployer)
+				if err != nil {
+					return err
+				}
+
+				// find the dbid of the users_db
+				var dbID string
+				for _, dataset := range datasets {
+					if dataset.Name == "users_db" {
+						dbID = dataset.DBID
+						break
+					}
+				}
+				if dbID == "" {
+					return errors.New("could not find dbID for users_db")
+				}
+
+				// execute the procedure
+				result, err := platform.Engine.Procedure(ctx, platform.DB, &common.ExecutionData{
+					TransactionData: common.TransactionData{
+						Signer: platform.Deployer,
+						Caller: string(platform.Deployer),
+						TxID:   "test-tx",
+						Height: 1,
+					},
+					Dataset:   dbID,
+					Procedure: "get_users",
+				})
+				if err != nil {
+					return err
+				}
+
+				// check the result
+				if len(result.Rows) != 1 {
+					return errors.New("expected 1 row")
+				}
+
+				if result.Rows[0][0] != "satoshi" {
+					return errors.New("expected satoshi")
+				}
+
+				if result.Rows[0][1] != "0xAddress" {
+					return errors.New("expected 0xAddress")
+				}
+
+				return nil
+			},
+		},
+	})
 }
 ```
 
 ## Next Steps
 
 For a more complex example displaying tests spanning 3 interconnected schemas,
-see the example in the [main `kwil-db` repo](<https://github.com/kwilteam/kwil-db/testing/proxy>)
+see the example in the [main `kwil-db` repo](<https://github.com/kwilteam/kwil-db/tree/main/testing/proxy>).
+For an example on how to write custom test functions in Go, see the [example here](<https://github.com/kwilteam/kwil-db/blob/90f8b0534d313d70bb72d3b33ef50f3de02611e7/testing/proxy/proxy_test.go#L94>).

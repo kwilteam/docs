@@ -8,7 +8,7 @@ slug: /testing/kwil-cli
 ---
 
 To run CLI tests, you will need the `kwil-cli` binary installed. To download the binary,
-see the [downloads page of Github](<https://github.com/kwilteam/kwil-db/releases>).
+see the [downloads page of GitHub](<https://github.com/kwilteam/kwil-db/releases>).
 
 This documentation explains how to define JSON tests using an example Kuneiform
 schema. The schema is a basic application that stores and retrieves users:
@@ -51,9 +51,10 @@ working-dir/
     |- users.kf
 ```
 
-The below file gives our tests a top-level name of "my users.kf tests". It will read in
-the schema in the file `users.kf`. It defines an insert statement to seed data into the
-schema named `users_db`, which is the name we defined for our schema in `users.kf`:
+The below file gives our tests a top-level name of `"my users.kf tests"`. It will read in
+the schema in the file `users.kf`. It defines an insert statement to seed data (defined in
+the `"seed_statements"` field) into the database. All data is wiped and the seed statements are
+re-applied before each test case is run.
 
 ```json title="tests.json"
 {
@@ -69,16 +70,16 @@ schema named `users_db`, which is the name we defined for our schema in `users.k
 ### Defining Individual Test Cases
 
 Within the `test_cases` array, you can define individual test cases. Each test case can
-define the following fields:
+define the following fields. Optional fields are marked with an asterisk:
 
 - `name`: The name of the test case, which will be used to identify the test case if it fails.
 - `database`: The name of the database schema that you are targeting, as defined at the top of the schema.
 - `target`: The name of the action/procedure in the schema that you were testing.
-- `args`: An array of arguments that will be passed to the procedure. It must match the expected parameters of the procedure. It can be empty if the procedure does not take any arguments.
-- `returns`: A 2-dimensional array of expected return values. This matches the expected return table of the action/procedure. This can be empty if the procedure does not return anything, or if an error is expected.
-- `error`: If the test case is expected to return an error, you can define the expected error message here. The tool will check that the returned error contains this string as a substring. If empty, the test case is expected to succeed.
-- `caller`: The wallet address (or any other string) that will be assigned to `@caller`. If empty, the caller will be set to the same wallet address as the database deployer.
-- `height`: The height of the block that the test case will be run at. If empty, the height will be set to 0.
+- `args`*: An array of arguments that will be passed to the procedure. It must match the expected parameters of the procedure. It can be empty if the procedure does not take any arguments.
+- `returns`*: A 2-dimensional array of expected return values. This matches the expected return table of the action/procedure. This can be empty if the procedure does not return anything, or if an error is expected.
+- `error`*: If the test case is expected to return an error, you can define the expected error message here. The tool will check that the returned error contains this string as a substring. If empty, the test case is expected to succeed.
+- `caller`*: The wallet address (or any other string) that will be assigned to `@caller`. If empty, the caller will be set to the same wallet address as the database deployer.
+- `height`*: The height of the block that the test case will be run at. If empty, the height will be set to 0.
 
 Below, we add two test cases to our schema. The first test case tests the `create_user` procedure, and the second tests the `get_users` procedure.
 **All data will be wiped after each test case is run,** except for the data that was seeded in the `seed_statements` field.
@@ -103,7 +104,7 @@ Below, we add two test cases to our schema. The first test case tests the `creat
             "database": "users_db",
             "target": "get_users",
             "args": [],
-            "returns": [["satoshi", "0xAddress"]]`
+            "returns": [["satoshi", "0xAddress"]]
         }
     ]
 }
@@ -112,7 +113,7 @@ Below, we add two test cases to our schema. The first test case tests the `creat
 ## Running Tests
 
 To run the test, use the `kwil-cli utils test` command. The test file path can be passed using
-the `--file` flag. Multiple test files can be spcified by simply adding more `--file` flags.
+the `--file` flag. Multiple test files can be specified by simply adding more `--file` flags.
 The test also needs a Postgres instance to run against. You can use the `--test-container` flag
 to have the test automatically start a Postgres instance in a Docker container. Alternatively, you
 can connect to your own Postgres image using the `--host`, `--port`, `--user`, `--password`, and `--database` flags.
