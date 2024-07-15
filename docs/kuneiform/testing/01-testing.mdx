@@ -1,0 +1,32 @@
+---
+sidebar_position: 1
+sidebar_label: "Overview"
+id: testing-kuneiform
+title: Testing Kuneiform
+description: Test Kuneiform schemas, procedure logic, and precompiles.
+slug: /kuneiform/testing/intro
+---
+
+Kwil provides a testing framework for users to test their applications. This can be used
+to test SQL queries, procedure logic, and precompiles. There are two ways to run the tests:
+using `kwil-cli`, or using the Kwil testing SDK.
+
+**CLI Tests**
+
+`kwil-cli` tests are generally easier to write. Users can specify test cases in
+JSON, and run the tests using the `kwil-cli utils test` command. `kwil-cli` tests are useful
+for users who want to test certain procedure logic / SQL queries, or test foreign procedures
+calling several schemas. They are _not_ capable of testing precompiles.
+
+**Go SDK Tests**
+
+SDK tests can be more cumbersome to write, but allow for more flexibility and can test more
+features. They use the Go testing SDK, and therefore the tests themselves must be written in Go.
+While SDK tests can do everything a `kwil-cli` test can do, they can also be used to:
+
+- simulate multiple users using an application
+- make multiple consecutive procedure/action calls across one or more schemas
+- test extensions such as precompiles and resolutions
+
+To get started, see the guides for either the [`kwil-cli` tests](/docs/kuneiform/testing/kwil-cli) or the
+[Go SDK tests](/docs/kuneiform/testing/go-sdk).

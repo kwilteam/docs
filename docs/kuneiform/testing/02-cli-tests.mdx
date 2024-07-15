@@ -1,0 +1,124 @@
+---
+sidebar_position: 2
+sidebar_label: "CLI Tests"
+id: kuneiform-cli-tests
+title: CLI tests
+description: Testing Kuneiform with `kwil-cli`
+slug: /kuneiform/testing/kwil-cli
+---
+
+To run CLI tests, you will need the `kwil-cli` binary installed. To download the binary,
+see the [downloads page of GitHub](<https://github.com/kwilteam/kwil-db/releases>).
+
+This documentation explains how to define JSON tests using an example Kuneiform
+schema. The schema is a basic application that stores and retrieves users:
+
+<details>
+  <summary> users.kf </summary>
+
+```sql showLineNumbers
+database users_db;
+
+table users {
+  id uuid primary key,
+  name text not null unique,
+  address text not null unique
+}
+
+procedure create_user ($name text) public  {
+  // derive a deterministic uuid from the blockchain transaction ID
+  // https://www.postgresql.org/docs/16.1/uuid-ossp.html#UUID-OSSP-FUNCTIONS-SECT
+  $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+
+  insert into users (id, name, address)
+  values ($uuid, $name, @caller);
+}
+
+procedure get_users() public view returns table (name text, address text) {
+  return select name, address from users;
+}
+```
+</details>
+
+## Defining A Test
+
+To define a test, create a new JSON file called `tests.json`. This test assumes we have the current directory
+setup:
+
+```shell
+working-dir/
+    |- tests.json
+    |- users.kf
+```
+
+The below file gives our tests a top-level name of `"my users.kf tests"`. It will read in
+the schema in the file `users.kf`. It defines an insert statement to seed data (defined in
+the `"seed_statements"` field) into the database. All data is wiped and the seed statements are
+re-applied before each test case is run.
+
+```json title="tests.json"
+{
+    "name": "my users.kf tests",
+    "schema_files": ["users.kf"],
+    "seed_statements": {
+        "users_db": ["INSERT INTO users (id, name, address) VALUES ('42f856df-b212-4bdc-a396-f8fb6eae6901'::uuid, 'satoshi', '0xAddress')"]
+    },
+    "test_cases": []
+}
+```
+
+### Defining Individual Test Cases
+
+Within the `test_cases` array, you can define individual test cases. Each test case can
+define the following fields. Optional fields are marked with an asterisk:
+
+- `name`: The name of the test case, which will be used to identify the test case if it fails.
+- `database`: The name of the database schema that you are targeting, as defined at the top of the schema.
+- `target`: The name of the action/procedure in the schema that you were testing.
+- `args`*: An array of arguments that will be passed to the procedure. It must match the expected parameters of the procedure. It can be empty if the procedure does not take any arguments.
+- `returns`*: A 2-dimensional array of expected return values. This matches the expected return table of the action/procedure. This can be empty if the procedure does not return anything, or if an error is expected.
+- `error`*: If the test case is expected to return an error, you can define the expected error message here. The tool will check that the returned error contains this string as a substring. If empty, the test case is expected to succeed.
+- `caller`*: The wallet address (or any other string) that will be assigned to `@caller`. If empty, the caller will be set to the same wallet address as the database deployer.
+- `height`*: The height of the block that the test case will be run at. If empty, the height will be set to 0.
+
+Below, we add two test cases to our schema. The first test case tests the `create_user` procedure, and the second tests the `get_users` procedure.
+**All data will be wiped after each test case is run,** except for the data that was seeded in the `seed_statements` field.
+
+```json title="tests.json"
+{
+    "name": "my users.kf tests",
+    "schema_files": ["users.kf"],
+    "seed_statements": {
+        "users_db": ["INSERT INTO users (id, name, address) VALUES ('42f856df-b212-4bdc-a396-f8fb6eae6901'::uuid, 'satoshi', '0xAddress')"]
+    },
+    "test_cases": [
+        {
+            "name": "create_user test",
+            "database": "users_db",
+            "target": "create_user",
+            "args": ["alice"],
+            "caller": "0xOtherAddress"
+        },
+        {
+            "name": "get_users test",
+            "database": "users_db",
+            "target": "get_users",
+            "args": [],
+            "returns": [["satoshi", "0xAddress"]]
+        }
+    ]
+}
+```
+
+## Running Tests
+
+To run the test, use the `kwil-cli utils test` command. The test file path can be passed using
+the `--file` flag. Multiple test files can be specified by simply adding more `--file` flags.
+The test also needs a Postgres instance to run against. You can use the `--test-container` flag
+to have the test automatically start a Postgres instance in a Docker container. Alternatively, you
+can connect to your own Postgres image using the `--host`, `--port`, `--user`, `--password`, and `--database` flags.
+
+
+```shell
+kwil-cli utils test --file tests.json --test-container
+```

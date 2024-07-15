@@ -1,0 +1,270 @@
+---
+sidebar_position: 3
+sidebar_label: "SDK Tests"
+id: kuneiform-sdk-tests
+title: SDK tests
+description: Testing Kuneiform with the testing SDK
+slug: /kuneiform/testing/go-sdk
+---
+
+To use the testing SDK, you will need to have Go installed and have a project set up.
+This document assumes that you are generally familiar with Go and the standard library testing.
+For more information on how to set this up, please refer to the [Go Documentation](<https://go.dev/doc/tutorial/add-a-test>).
+
+## Installation
+
+To install the testing SDK, run:
+
+```shell
+$ go get github.com/kwilteam/kwil-db/testing
+```
+
+## Making The Test
+
+To make a test, create a new test file and import the testing package:
+
+```go title="main_test.go"
+package main_test
+
+import (
+	"testing"
+
+	kwilTesting "github.com/kwilteam/kwil-db/testing"
+)
+
+func Test_Kuneiform(t *testing.T) {
+	kwilTesting.RunSchemaTest(t, kwilTesting.SchemaTest{})
+}
+```
+
+Below is a full reference for the `kwilTesting.SchemaTest` struct:
+
+<details>
+  <summary> Kwil Go Testing Reference </summary>
+
+```go
+// SchemaTest allows for testing schemas against a live database.
+// It allows for several ways of specifying schemas to deploy, as well
+// as functions that can be run against the schemas, and expected results.
+type SchemaTest struct {
+	// Name is the name of the test case.
+	Name string `json:"name"`
+	// Schemas are plain text schemas to deploy as
+	// part of the text.
+	Schemas []string `json:"-"`
+	// SchemaFiles are paths to the schema files to deploy.
+	SchemaFiles []string `json:"schema_files"`
+	// SeedStatements are SQL statements run before each test that are
+	// meant to seed the database with data. It maps the database name
+	// to the SQL statements to run. The name is the database name,
+	// defined using "database <name>;". The test case will derive the
+	// DBID from the name.
+	SeedStatements map[string][]string `json:"seed_statements"`
+	// TestCases execute actions or procedures against the database
+	// engine, taking certain inputs and expecting certain outputs or
+	// errors. These run separately from the functions, and separately
+	// from each other. They are the easiest way to test the database
+	// engine, but if more nuanced tests are needed (e.g. to simulate
+	// several different wallets), the FunctionTests field should be used
+	// instead. All schemas will be redeployed and all seed data re-applied
+	// between executing each TestCase.
+	TestCases []TestCase `json:"test_cases"`
+	// FunctionTests are arbitrary functions that can be used to
+	// execute any logic against the schemas.
+	// All schemas will be reset before each function is run.
+	// FunctionTests are more cumbersome to use than TestCases, but
+	// they allow for more nuanced testing and flexibility.
+	// All functions and testcases are run against fresh schemas.
+	FunctionTests []TestFunc `json:"-"`
+}
+
+// TestCase executes an action or procedure against the database engine.
+// It can be given inputs, expected outputs, expected error types,
+// and expected error messages.
+type TestCase struct {
+	// Name is a name that the test will be identified by if it fails.
+	Name string `json:"name"`
+	// Database is the name of the database schema to execute the
+	// action/procedure against. This is the database NAME,
+	// defined using "database <name>;". The test case will
+	// derive the DBID from the name.
+	Database string `json:"database"`
+	// Name is the name of the action/procedure.
+	Target string `json:"target"`
+	// Args are the inputs to the action/procedure.
+	// If the action/procedure takes no parameters, this should be nil.
+	Args []any `json:"args"`
+	// Returns are the expected outputs of the action/procedure.
+	// It takes a two-dimensional array to model the output of a table.
+	// If the action/procedure has no outputs, this should be nil.
+	Returns [][]any `json:"returns"`
+	// Err is the expected error type. If no error is expected, this
+	// should be nil.
+	Err error `json:"-"`
+	// ErrMsg will search the error returned by the action/procedure for
+	// the given substring. If no error is expected, this should be an
+	// empty string.
+	ErrMsg string `json:"error"`
+	// Signer sets the @caller, and the bytes will be used as the @signer.
+	// If empty, the test case schema deployer will be used.
+	Caller string `json:"caller"`
+	// BlockHeight sets the blockheight for the test, accessible by
+	// the @height variable. If not set, it will default to 0.
+	Height int64 `json:"height"`
+}
+
+// TestFunc is a function that can be run against the database engine.
+// A returned error signals a failed test.
+type TestFunc func(ctx context.Context, platform *Platform) error
+```
+
+</details>
+
+## Example
+
+The following example uses a test schema. The schema implements a basic database
+for storing a querying users. The full test schema can be found below:
+
+<details>
+  <summary> users.kf </summary>
+
+```sql showLineNumbers
+database users_db;
+
+table users {
+  id uuid primary key,
+  name text not null unique,
+  address text not null unique
+}
+
+procedure create_user ($name text) public  {
+  // derive a deterministic uuid from the blockchain transaction ID
+  // https://www.postgresql.org/docs/16.1/uuid-ossp.html#UUID-OSSP-FUNCTIONS-SECT
+  $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+
+  insert into users (id, name, address)
+  values ($uuid, $name, @caller);
+}
+
+procedure get_users() public view returns table (name text, address text) {
+  return select name, address from users;
+}
+```
+</details>
+
+### Implementing The Test
+
+We will test the `create_user` and `get_users` procedures. Our test will have a top-level
+name `users_test`, and will have three cases named `create user - success`,
+"`conflicting username - failure`,", and `get users - success`. Each test case runs against
+a fresh database; data is wiped after every test case, and the seed data is re-applied.
+The tests can be run using the standard Go test tooling.
+
+We also implement a function test that shows how to run a custom function against the schema.
+The function test simply runs the `get_users` procedure and checks the output.
+```go title="main_test.go"
+package main_test
+
+import (
+	"context"
+	"errors"
+	"testing"
+
+	"github.com/kwilteam/kwil-db/common"
+	kwilTesting "github.com/kwilteam/kwil-db/testing"
+)
+
+func Test_Kuneiform(t *testing.T) {
+	kwilTesting.RunSchemaTest(t, kwilTesting.SchemaTest{
+		Name:        "users_test",
+		SchemaFiles: []string{"./users_db.kf"},
+		SeedStatements: map[string][]string{
+			"users_db": {
+				`INSERT INTO users (id, name, address)
+				 VALUES ('42f856df-b212-4bdc-a396-f8fb6eae6901'::uuid, 'satoshi', '0xAddress')`,
+			},
+		},
+		TestCases: []kwilTesting.TestCase{
+			{
+				// should create a user - happy case
+				Name:     "create user - success",
+				Database: "users_db",
+				Target:   "create_user",
+				Args:     []any{"alice"},
+			},
+			{
+				// conflicting with the name "satoshi" in the "name" column,
+				// which is unique.
+				Name:     "conflicting username - failure",
+				Database: "users_db",
+				Target:   "create_user",
+				Args:     []any{"satoshi"},
+				ErrMsg:   "duplicate key value",
+			},
+			{
+				Name:     "get users - success",
+				Database: "users_db",
+				Target:   "users_db",
+				Returns:  [][]any{{"satoshi", "0xAddress"}},
+			},
+		},
+		FunctionTests: []kwilTesting.TestFunc{
+			func(ctx context.Context, platform *kwilTesting.Platform) error {
+				// first, we need to get the dbid of the users_db
+				datasets, err := platform.Engine.ListDatasets(platform.Deployer)
+				if err != nil {
+					return err
+				}
+
+				// find the dbid of the users_db
+				var dbID string
+				for _, dataset := range datasets {
+					if dataset.Name == "users_db" {
+						dbID = dataset.DBID
+						break
+					}
+				}
+				if dbID == "" {
+					return errors.New("could not find dbID for users_db")
+				}
+
+				// execute the procedure
+				result, err := platform.Engine.Procedure(ctx, platform.DB, &common.ExecutionData{
+					TransactionData: common.TransactionData{
+						Signer: platform.Deployer,
+						Caller: string(platform.Deployer),
+						TxID:   "test-tx",
+						Height: 1,
+					},
+					Dataset:   dbID,
+					Procedure: "get_users",
+				})
+				if err != nil {
+					return err
+				}
+
+				// check the result
+				if len(result.Rows) != 1 {
+					return errors.New("expected 1 row")
+				}
+
+				if result.Rows[0][0] != "satoshi" {
+					return errors.New("expected satoshi")
+				}
+
+				if result.Rows[0][1] != "0xAddress" {
+					return errors.New("expected 0xAddress")
+				}
+
+				return nil
+			},
+		},
+	})
+}
+```
+
+## Next Steps
+
+For a more complex example displaying tests spanning 3 interconnected schemas,
+see the example in the [main `kwil-db` repo](<https://github.com/kwilteam/kwil-db/tree/main/testing/proxy>).
+For an example on how to write custom test functions in Go, see the [example here](<https://github.com/kwilteam/kwil-db/blob/90f8b0534d313d70bb72d3b33ef50f3de02611e7/testing/proxy/proxy_test.go#L94>).
