@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "kwil-docs"
-  }
+    "default": "kwil-docs",
+    "prerelease": "prerelease-docs"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
