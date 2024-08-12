@@ -1,0 +1,65 @@
+---
+sidebar_position: 3
+sidebar_label: "State Replication"
+id: state-replication
+title: State Replication
+description: Replicate the state changes from the existing network to the new network
+slug: /node/migrations/zero-downtime-migrations/state-replication
+---
+
+Zero-Downtime Migrations require the new network to start with the state of the existing network at the start of the migration and then replicate the state changes of the existing network to the new network during the migration period to stay in sync with the existing network.
+
+The sections below describes how the state replication is handled during the migration period and the things that nodes on the new and the existing network does to facilitate the state replication.
+
+## State Replication Process On New Network
+
+State replication is handled by a built-in `migrations` listener extension in the Kwil node. The `migrations` listener extension polls for the state changes on the existing network and records these changes onto the new network using governance transactions. Once these transactions are approved by the new network, the changes are applied to the KwilDB. 
+
+The `migrations` listener extension can be enabled by setting the below configuration in the `config.toml` and `genesis.json` files.
+
+`migrate_from` config in the `config.toml` file specifies the JSON-RPC address of the node from the existing network that the new network should replicate the state changes from. 
+```toml
+[app]
+migrate_from = "http://kwild-jsonrpc-server-address:8484"
+```
+:::note
+The connection should be secure to ensure that the received data is not tampered with.
+:::
+
+The `migration` consensus parameter in the `genesis.json` file specify the start and end block heights from which the state changes are to be replicated from the existing network to the new network.
+```json
+{
+    "consensus_params": {
+        "migration": {
+            "start_height": <start_height>,
+            "end_height": <end_height>,
+        },
+    }
+}
+```
+:::warning
+`start_height` and `end_height` in the genesis file and `migrate_from` in the config file are mandatory to ensure that the new network stays in sync with the existing network during the migration period. If neither are set, the new network will start with the state from the snapshot state, but doesn't include any state changes from the existing network. If one of them is set but not other, the node will fail to start.
+:::
+
+## Handling State Divergence
+
+During migration period, as both old and new networks are running concurrently handing user transactions and replicating state changes from the existing network, there is a possibility for the occurance of state divergences between the two networks. 
+The migration process does its best to resolve the conflicts between the two networks using a set of conflict resolution principles. However, there might be some schemas where the conflicts cannot be resolved without any loss of data.
+
+:::note
+** Do's and Dont's: ** Operators should migrate to new network as soon as possible and redirect all the user transactions to the new network. Any single user transactions should not be scattered across both new and old chains to avoid any state divergence and should be redirected to a single network as much as possible.
+:::
+
+### Conflict Resolution For User Datasets
+
+User Dataset changeset conflicts are handled as follows:
+
+- **Inserts**: Inserts from the old network will attempt to be applied to the new network, and any conflicts will be ignored, in favor of whatever already exists on the new network.
+- **Updates**: The new network will check the pre-change value of the proposed update from the old network's changeset. If the new network's record for that primary key matches the pre-change value in the changeset, it will apply the change. If the values are not equal, it will discard the change, in favor of what data exists on the new network
+- **Deletes**: Similar to update, if the record matches the pre-change value in the changeset, it will be deleted. Otherwise, no change will be applied.
+
+### Conflict Resolution For Account Spends
+
+All spends from the old network should be replicated to the new network and the conflicts are handled as follows:
+- If a spend from the old network would cause a user's balance to drop below zero, the entire balance will be spent, setting it to zero.
+- Otherwise, the specified amount from the old network’s spend will be deducted from the user’s balance on the new network.

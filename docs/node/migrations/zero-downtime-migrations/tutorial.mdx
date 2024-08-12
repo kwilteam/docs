@@ -1,0 +1,150 @@
+---
+sidebar_position: 3
+sidebar_label: "Tutorial"
+id: zero-downtime-migrations-tutorial
+title: Zero Downtime Migrations Tutorial
+description: "Tutorial on how to upgrade a network using zero-downtime migrations"
+slug: /node/migrations/zero-downtime-migrations/tutorial
+---
+
+This tutorial demonstrates how to ugrade a network using zero-downtime migrations. 
+
+## Migration Proposal Consensus
+
+Let's assume that the validators decided off-chain to migrate the network to a new chain `kwil-chain-2` and agreed upon the below migration proposal:
+```
+ActivationPeriod: 100
+Duration: 2000
+ChainID: "kwil-chain-2"
+```
+
+### Submit Migration Proposal
+A validator operator can submit a migration proposal to the network by running the below command. 
+
+```bash
+kwil-admin migrate propose --activation-period 100 --duration 2000 --chain-id kwil-chain-2
+```
+
+To check if the proposal is submitted successfully, we can get the list of pending migration proposals as shown below:
+
+```bash
+kwil-admin migrate list
+```
+```bash
+Migrations:
+4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e:
+        activationPeriod: 100
+        migrationDuration: 2000
+        chainID: kwil-chain-2
+```
+This shows that there is a pending migration proposal with the proposal ID `4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e` with the specified activation period, duration, and chain ID. 
+
+### Approve Migration Proposal
+All other validators can now approve the migration proposal using the proposal ID using the below command.
+
+```bash
+kwil-admin migrate approve 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+```
+
+### Migration Proposal Status
+Operators can check the status of the proposal and the votes information as shown below:
+
+```bash
+kwil-admin migrate status 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+```
+```bash
+Migration Status:
+        Proposal ID: 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+        ExpiresAt: 100810
+        Approvals Received: 2 (needed 3)
+                Validator 8b90c1a6c017eb42f3c8496524bb186a1900b8b832309713e797d7f5defdccec: (approved)
+                Validator 594e07489b13bfcae681482423dc4327a2f99601f74b7be785501f1dd3c022be: (approved)
+                Validator 6d28361677bfe61fe86f3dd4457e069dfba57f912a5c01d554de528766f8a1c3: (not approved)
+                Validator b7404d70ae6f21b9f43d26fde6acc378be51c170a9744cb08634b6bdae22e1d2: (not approved)
+```
+
+If the proposal is approved by at least a supermajority of the validators, the network proposal is considered approved and the migration process is set to start after the activation period. 
+
+As the migration proposal is approved, the proposal is moved from pending to approved state, therefore the `kwil-admin migrate list/status` commands will not list the proposal anymore. However, `kwil-admin node status` will show the migration status of the node
+
+```bash
+kwil-admin node status
+```
+```bash
+"migration": {
+    "status": "MigrationNotStarted",
+    "start_height": 143,
+    "end_height": 2143
+}
+```
+
+## Genesis State
+
+Once the proposal is approved, the network is set to start the migration process after the specified activation period. The snapshots and genesis files generated at the start of the migration can be downloaded using the `kwil-admin migrate genesis-state` command as shown below.
+
+```bash
+kwil-admin migrate genesis-state --out-dir /tmp/chain2
+```
+
+Note that the command will not download any files if there is no approved migration or the migration has not yet started. Please retry the command after the migration is activated.
+
+```text
+No genesis state to download yet. Migration is set to start at block height: 143
+```
+
+:::warning
+The `genesis.json` and `snapshot.sql.gz` files are generated in the directory specified using the `--out-dir` flag. Ensure that you don't run the command with `--root-dir` flag set to the current node's root directory as it can overwrite the existing genesis file in the node's root directory.
+
+If the admin service is directly accessible from the new node (e.g. it is listening on a TCP socket securely accessible from the new node) it can be run on the new node directly.
+:::
+
+```bash
+kwil-admin migrate genesis-state --root-dir /tmp/chain2
+Migration State:
+        Start Height: 143
+        End Height: 2143
+        Downloaded Genesis File: .testnet2/genesis.json
+        Downloaded Snapshot File: .testnet2/snapshot.sql.gz
+```
+
+:::info
+If the node is still catching up, the genesis file won't be generated until it has fully synced with the network.
+:::
+
+
+## Start New Network
+The new network should be configured to bootstrap from the snapshot file provided by the old network and replicate the state changes from the old network during the migration period. 
+
+1.  Install the new versions of the `kwild` binaries. Please refer to the [installation guide](/docs/daemon/installation) for more details.
+2. [Download the snapshot and genesis files](#genesis-state) generated at the start of the migration as shown above.
+    The genesis file downloaded will have the following information set:
+    - `chain_id`: This is set based on the chainID in the migration proposal.
+    - `app_hash`: This field is set based on the hash of the downloaded snapshot file at the migration start height.This should not be changed as it must match the genesis state snapshot.
+    - `validators`: This field is set to the validators from the existing network.
+    - `consensus_params.migration.start_height`: The start height of the migration on the old network. Specifies the height from which the state changes are to be replicated onto the new network.  This should not be changed as it must match the migration proposal on the old network.
+    - `consensus_params.migration.end_height`: The end height of the migration on the old network. Specifies the height until which the state changes are to be replicated onto the new network.  This should not be changed as it must match the migration proposal on the old network.
+
+    :::warning
+    `allocs` and `activations` fields are set to `null` in the genesis file. All other fields have same configurations as that on the old network. If any other changes are needed to the genesis configuration, update the genesis file manually and redistribute it to the node operators.
+    :::
+
+3. Configure the new nodes to bootstrap using the downloaded snapshot file by setting the `genesis_state` field in the `config.toml` file as shown below:
+    ```TOML
+    [app]
+    genesis_state = "/path/to/snapshot/file" 
+    ```
+4. Configure the new nodes to replicate the state changes from the existing network during the migration period by setting the `migrate_from` field in the `config.toml` file as shown below:
+    ```TOML
+    [app]
+    migrate_from = "http://kwild-jsonrpc-server-address:8484"
+    ```
+    This field specifies the JSON-RPC address of the node from the existing network that the new network should pull the state changes from. The connection should be secure to ensure that the received data is not tampered with.
+5. Start the nodes on new network using the `kwild start` command.
+    ```bash
+    kwild -r /path/to/root/dir
+    ```
+6. The migration process is deemed complete when the following message appears in the Kwild logs:
+    :::info
+    Migration completed. The `migration` section in `genesis.json` and the `migrate_from` configuration in `config.toml` are no longer relevant and should be removed.
+    :::
+    At this point, the old network can be fully decommissioned, and the new network can be used for all transactions.
