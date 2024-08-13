@@ -1,0 +1,188 @@
+---
+sidebar_position: 6
+sidebar_label: "Proxy Pattern"
+id: proxy-pattern
+title: Proxy Pattern
+description: Proxy Pattern for Database Upgradeability
+slug: /kuneiform/proxy-pattern
+---
+
+Kuneiform is meant to run as a smart contract, so schemas are immutable. However, a proxy pattern similar to Solidity can be implemented to allow for schema upgradeability. 
+
+## Proxy Pattern Overview
+
+This proxy pattern example for database upgradability contains three files: 
+
+**`proxy.kf`**: The schema that will be deployed that has a stable API. This is what an end user would interact with. It points to an implementation that should actually be run.
+
+**`impl_1.kf`**: An initial implementation that will be treated as the "original application". It is a simple app that allows users to create user profiles.
+
+**`impl_2.kf`**: A second schema that changes and adds a few columns from the first. It migrates the data from the old contract, and is compatible to be used from **`proxy.kf`**.
+
+## Example
+
+#### **`proxy.kf`**
+``` typescript 
+database proxy;
+
+// admin simply tracks the schema admins
+table admin {
+  address text primary key
+}
+
+// metadata tracks info set by admins
+table metadata {
+  config text primary key,
+  value text
+}
+
+// add_admin adds a new admin to the schema.
+// only current admins can add new admins
+procedure add_admin ($address text) public  {
+  if !is_admin(@caller) {
+    error('caller is not an admin');
+  }
+
+  insert into admin (address)
+  values ($address);
+}
+
+// register_owner allows the owner to register themselves
+// as a user if there are no admins
+procedure register_owner() public owner {
+  $count int;
+  for $row in SELECT COUNT(*) as count FROM admin {
+    $count := $row.count;
+  }
+
+  if $count != 0 {
+    error('register_owner can only be called if there are no admins');
+  }
+
+  insert into admin (address)
+  values (@caller);
+}
+
+
+procedure is_admin ($address text) public view returns (bool) {
+  $found := false;
+  for $row in select address from admin where address = $address {
+    $found := true;
+  }
+
+  return $found;
+}
+
+// set_target allows an admin to configure the target contract
+// that the proxy refers to
+procedure set_target($value text) public {
+  if !is_admin(@caller) {
+    error('caller is not an admin');
+  }
+
+  insert into metadata (config, value)
+  values ('target', $value)
+    on conflict (config) do update
+      set value = $value;
+}
+
+// get_target gets the target set by the admin
+procedure get_target() public view returns (text) {
+  for $row in SELECT value from metadata where config = 'target' {
+    return $row.value; // return on the first row
+  }
+
+  // if no row is hit, it is not configured
+  error('admin has not yet configured a target');
+}
+
+// the foreign procedures specify the procedures that exist in any valid
+// implementation contract
+foreign procedure proxy_create_user($name text)
+foreign procedure proxy_get_users() returns table(name text, address text)
+
+procedure create_user($name text) public {
+  // this will call the procedure named 'create_user'
+  // that exists on the dbid returned from get_target().
+  // It is also possible to allow the procedure name to be
+  // configurable, but for now we just hard core 'create_user'
+  proxy_create_user[get_target(), 'create_user']($name);
+}
+
+procedure get_users () public view returns table(name text, address text) {
+  return select * from proxy_get_users[get_target(), 'get_users']();
+}
+```
+
+#### **`impl_1.kf`**
+``` typescript 
+database impl_1;
+
+table users {
+  id uuid primary key,
+  name text not null unique,
+  address text not null unique
+}
+
+procedure create_user ($name text) public  {
+  // derive a deterministic uuid from the blockchain transaction ID
+  // https://www.postgresql.org/docs/16.1/uuid-ossp.html#UUID-OSSP-FUNCTIONS-SECT
+  $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+
+  insert into users (id, name, address)
+  values ($uuid, $name, @caller);
+}
+
+procedure get_users() public view returns table (name text, address text) {
+  return select name, address from users;
+}
+```
+
+In impl_2, the impl_1 schema is updated by renaming one of the columns, and adding a new column "created_at", which is the height an account was created at.
+#### **`impl_2.kf`**
+``` typescript 
+database impl_2;
+
+table users {
+  id uuid primary key,
+  name text not null unique,
+  wallet_address text not null unique, // wallet_address is renamed from address
+  created_at int not null
+}
+
+procedure create_user ($name text) public  {
+  // derive a deterministic uuid from the blockchain transaction ID
+  // https://www.postgresql.org/docs/16.1/uuid-ossp.html#UUID-OSSP-FUNCTIONS-SECT
+  $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+
+  insert into users (id, name, wallet_address, created_at)
+  values ($uuid, $name, @caller, @height);
+}
+
+procedure get_users() public view returns table (name text, address text) {
+  // we alias "wallet_address as address" to match the interface defined
+  // in the proxy
+  return SELECT name, wallet_address AS address FROM users;
+}
+
+// migrate migrates the data from schema 1.
+procedure migrate($old_dbid text, $old_procedure_name text) public owner returns (count int) {
+  $migrate_count := 0;
+  for $user in SELECT * FROM get_old_users[$old_dbid, $old_procedure_name]() {
+    // generate a uuid for each user based on its username.
+    // we cannot use the txid as above, because it would give all
+    // migrated users the same uuid, since this whole migration runs
+    // as one tx
+    $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, $user.name);
+
+    insert into users (id, name, wallet_address, created_at)
+    values ($uuid, $user.name, $user.address, @height);
+
+    $migrate_count := $migrate_count + 1;
+  }
+
+  return $migrate_count;
+}
+
+foreign procedure get_old_users() returns table(name text, address text)
+```
