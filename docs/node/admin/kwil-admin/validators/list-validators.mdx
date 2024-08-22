@@ -35,8 +35,9 @@ kwil-admin validators list
 ### Options inherited from parent commands
 
 ```
-      --authrpc-cert string   kwild's TLS certificate
+      --authrpc-cert string   kwild's TLS certificate, required for HTTPS server
       --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert). May be set in ~/.kwil-admin/rpc-admin-pass instead.
   -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
   -S, --silence               Silence logs
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")

@@ -1,0 +1,91 @@
+---
+sidebar_position: 7
+sidebar_label: "Private Networks"
+id: private-networks
+title: Private Networks
+description: Private Networks
+slug: /node/private-networks
+---
+
+This document describes how to set up a private network to have a granular control over who can access your network.
+
+## Private Mode
+
+Kwild nodes can be run in a private mode, where the node will only accept connections from a list of known peers. This is useful when you want to restrict access to your network to a specific set of nodes.
+
+Private mode can be enabled by setting the `private_mode` field in the `chain.p2p` section of the `config.toml` as shown below:
+
+```toml
+[chain.p2p]
+private_mode = true
+```
+
+Private mode can also be enabled by setting the `--chain.p2p.private-mode` flag or `KWILD_CHAIN_P2P_PRIVATE_MODE` env variable when starting the node as shown below:
+
+```bash
+kwild -r /path/to/root/dir --chain.p2p.private-mode
+```
+
+
+## Whitelist Peers
+
+When running a Kwild node in private mode, it can be configured to only accept connections from a list of known peers. `whitelist_peers` field should be a comma-separated list of node IDs (ed25519 address).
+
+Peers can be added to the whitelist by setting the `whitelist_peers` field in the `chain.p2p` section of the `config.toml` as shown below:
+
+```toml
+[chain.p2p]
+whitelist_peers = "b624b3395f22f8cb57cf86d58cbcd6b355d12e18,7b4b3b3b5f22f8cb57cf86d58cbcd6b355d12e18"
+```
+or
+
+```bash
+kwild -r /path/to/root/dir --chain.p2p.private-mode --chain.p2p.whitelist-peers="b624b3395f22f8cb57cf86d58cbcd6b355d12e18,7b4b3b3b5f22f8cb57cf86d58cbcd6b355d12e18"
+```
+
+The current set of validators, persistent peers and seed nodes are automatically added to the whitelist. Therefore, the `whitelist_peers` field is used to add additional peers to the list that you want to provide access to your network.
+
+The whitelist can also be updated dynamically using the `kwil-admin peers` commands. Refer to the [Kwil Admin Peers Subcommand](/docs/ref/kwil-admin/peers) documentation for more information.
+
+:::note
+In Private mode, to establish a connection with the other node, both the nodes should add each other's node ID to the whitelist. If one of the nodes doesn't add the other node to it's whitelist, the connection will not be established between the nodes.
+:::
+
+## Onboarding a Read Node
+
+When onboarding a new read node to the network, the node should be added to the whitelist of at least one of the existing nodes the node wants to connect to. The existing nodes Node ID can be used as a seed node or persistent peer for the new node.
+
+For example, to onboard a new node with the Node ID `new-node-id` to an existing node with the Node ID `existing-node-id`, follow the steps below:
+
+1. Add the new node to the whitelist of an existing node as shown below:
+    ```bash
+    kwil-admin peers add <new-node-id>
+    ```
+2. Verify that the new node is added to the whitelist of the existing node:
+    ```bash
+    kwil-admin peers list
+    ```
+3. The new node can join the network by connecting to the existing node as a seed node or persistent peer. As seeds nodes and persistent peers are automatically whitelisted, the new node should be able to connect to the existing node without explicitly adding the existing node ID to the whitelist.
+
+    ```toml
+    [chain.p2p]
+    seeds = "existing-node-id@localhost:26656"
+    ```
+    ```toml
+    [chain.p2p]
+    persistent_peers = "existing-node-id@localhost:26656"
+    ```
+## Onboarding a Validator Node
+
+When onboarding a new validator node to the network, the node should first be [added as a read node](#onboarding-a-read-node) to the network. Once the node is part of the network, the node can then request the network to become a validator.
+
+The entire process is as follows:
+- Joiner node is first onboarded as a read node to the network. Refer to the [Onboarding a Read Node](#onboarding-a-read-node) section for more information.
+- Joiner node then requests the network to become a validator by sending a join request to the existing validators. Refer to the [Validator Guide](/docs/node/tutorial#upgrading-the-second-node-to-a-validator) for more information on issuing and approving validator join requests.
+- Existing validators will then approve the join request and adds the joiner node to their whitelisted peers.
+- Once the validator join request is approved, all the nodes would have the joiner node in their whitelist 
+- If the validator join request is rejected, the joiner node will be removed from the whitelist of all the validators that approved the join request.
+
+:::note
+Whenever a validator is demoted, it is automatically removed from the whitelist of all the nodes in the network. The validator will need to be added back to the whitelist if they want to connect to the network as a read node.
+:::

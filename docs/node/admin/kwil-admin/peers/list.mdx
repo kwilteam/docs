@@ -1,36 +1,31 @@
 ---
-sidebar_position: 1
-sidebar_label: "ping"
-id: "kwil-admin-utils-ping"
-title: "kwil-admin utils ping"
-description: "Check connectivity with the node's admin RPC interface."
-slug: /ref/kwil-admin/utils/ping
+sidebar_position: 2
+sidebar_label: "list"
+id: "kwil-admin-peers-list"
+title: "kwil-admin peers list"
+description: "List all peers in the node's whitelist."
+slug: /ref/kwil-admin/peers/list
 ---
 
-## kwil-admin utils ping
+## kwil-admin peers list
 
-Check connectivity with the node's admin RPC interface.
-
-### Synopsis
-
-Check connectivity with the node's admin RPC interface. If successful, returns 'pong'.
+List all peers in the node's whitelist.
 
 ```
-kwil-admin utils ping [flags]
+kwil-admin peers list [flags]
 ```
 
 ### Examples
 
 ```
-# Ping the node's admin RPC interface
-kwil-admin node ping --rpcserver /tmp/kwild.socket
+kwil-admin peers list --rpcserver /tmp/kwild.socket
 ```
 
 ### Options
 
 ```
       --authrpc-cert string   kwild's TLS certificate, required for HTTPS server
-  -h, --help                  help for ping
+  -h, --help                  help for list
       --pass string           admin server password (alternative to mTLS with tlskey/tlscert). May be set in ~/.kwil-admin/rpc-admin-pass instead.
   -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
@@ -46,5 +41,5 @@ kwil-admin node ping --rpcserver /tmp/kwild.socket
 
 ### SEE ALSO
 
-* [kwil-admin utils](/docs/ref/kwil-admin/utils)	 - The `utils` command is used to get information about a running Kwil node.
+* [kwil-admin peers](/docs/ref/kwil-admin/peers)	 - manages the node's peers
 
