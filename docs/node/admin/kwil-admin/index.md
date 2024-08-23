@@ -1,6 +1,6 @@
 ---
-sidebar_position: 0
-sidebar_label: "kwil-admin"
+sidebar_position: 10
+sidebar_label: "Reference"
 id: "kwil-admin"
 title: "kwil-admin"
 description: "The Kwil node admin tool."
