@@ -24,7 +24,7 @@ kwil-admin setup peer [flags]
 
 ```
 # Initialize a node as a peer to an existing network
-kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --peers
+kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --chain.p2p.persistent-peers peer1@ip:26656,peer2@ip:26656
 ```
 
 ### Options
@@ -35,15 +35,15 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
       --app.admin-pass string                            password for the kwil admin service (may be empty)
       --app.db-read-timeout duration                     timeout for database reads initiated by RPC requests (default 5s)
       --app.extension-endpoints strings                  kwild extension endpoints
+      --app.genesis-state string                         Path to the genesis state file
       --app.hostname string                              kwild Server hostname
-      --app.http-listen-addr string                      kwild HTTP listen address (default "0.0.0.0:8080")
       --app.jsonrpc-listen-addr string                   kwild JSON-RPC listen address (default "0.0.0.0:8484")
       --app.pg-db-host string                            PostgreSQL host address (no port) (default "127.0.0.1")
       --app.pg-db-name string                            PostgreSQL database name (default "kwild")
       --app.pg-db-pass string                            PostgreSQL password name
       --app.pg-db-port string                            PostgreSQL port (default "5432")
       --app.pg-db-user string                            PostgreSQL user name (default "kwild")
-      --app.private-key-path string                      Path to the node private key file
+      --app.private-key-path string                      Path to the node private key file (default "private_key")
       --app.profile-file string                          kwild profile output file path (e.g. cpu.pprof)
       --app.profile-mode string                          kwild profile mode (http, cpu, mem, mutex, or block)
       --app.rpc-timeout duration                         timeout for RPC requests (through reading the request, handling the request, and sending the response) (default 45s)
@@ -57,10 +57,10 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
       --chain.consensus.timeout-precommit duration       Chain consensus timeout precommit (default 2s)
       --chain.consensus.timeout-prevote duration         Chain consensus timeout prevote (default 2s)
       --chain.consensus.timeout-propose duration         Chain consensus timeout propose (default 3s)
-      --chain.mempool.cache-size int                     Chain mempool cache size (default 10000)
+      --chain.mempool.cache-size int                     Chain mempool cache size (default 60000)
       --chain.mempool.max-tx-bytes int                   chain mempool maximum single transaction size in bytes (default 4194304)
       --chain.mempool.max-txs-bytes int                  chain mempool maximum total transactions in bytes (default 536870912)
-      --chain.mempool.size int                           Chain mempool size (default 5000)
+      --chain.mempool.size int                           Chain mempool size (default 50000)
       --chain.moniker string                             Node moniker
       --chain.p2p.addr-book-strict                       Chain P2P address book strict
       --chain.p2p.allow-duplicate-ip                     Chain P2P allow multiple peers with the same IP address (default true)
@@ -70,11 +70,13 @@ kwil-admin setup peer --root-dir ./kwil-node --genesis /path/to/genesis.json --p
       --chain.p2p.max-num-outbound-peers int             Chain P2P maximum number of outbound peers (default 10)
       --chain.p2p.persistent-peers string                Chain P2P persistent peers
       --chain.p2p.pex                                    Enables peer information exchange (default true)
+  -p, --chain.p2p.private-mode                           Run the node in private mode. In private mode, the connectivity to the node is restricted to the current validators and whitelist peers.
       --chain.p2p.seed-mode                              Run kwild in a special "seed" mode where it crawls the network for peer addresses,
                                                          sharing them with incoming peers before immediately disconnecting. It is recommended
                                                          to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
       --chain.p2p.seeds string                           Seed nodes for obtaining peer addresses, if address book is empty
       --chain.p2p.unconditional-peer-ids string          Chain P2P unconditional peer IDs
+      --chain.p2p.whitelist-peers string                 List of allowed sentry nodes that can connect to the node. Whitelist peers can be updated dynamically using kwil-admin peer commands.
       --chain.rpc.broadcast-tx-timeout duration          Chain RPC broadcast transaction timeout (default 15s)
       --chain.rpc.listen-addr string                     Chain RPC listen address (default "tcp://127.0.0.1:26657")
       --chain.statesync.chunk-request-timeout duration   Chain state sync chunk request timeout (default 10s)

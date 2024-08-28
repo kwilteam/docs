@@ -108,6 +108,10 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `persistent_peers`: This variable specifies a comma-separated list of nodes to consistently connect to. No default.
 
+      - `private_mode`: This variable enables private mode on the Kwil node. Default is `false`. In private mode, only connections from whitelisted peers are accepted.
+
+      - `whitelist_peers`: This variable specifies a comma-separated list of node IDs to accept the connections from in private mode. No default.
+
       - `pex`: A toggle to enable peer exchange, an ongoing function of the node used to share known peers with other nodes. Default is `true`.
 
       - `seeds`: This variable specifies a comma-separated list of seed nodes or dedicated seeders services used to provide peer addresses when bootstrapping. This is unused if there are entries in the address book. No default.
