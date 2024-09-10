@@ -75,9 +75,11 @@ The following contextual variables are available:
 | -------- | --------- | ----------- |
 | `@caller` | `text` | The wallet address of the user calling the procedure. |
 | `@signer` | `blob` | The signing address / public key of the user calling the procedure. |
-| `@txid` | `uuid` | The transaction ID of the current transaction. If called in a read-only connection, it is empty. |
+| `@txid` | `text` | The transaction ID of the current transaction. If called in a read-only connection, it is empty. |
 | `@height` | `int` | The height of the current block. If called in a read-only connection, it is -1. |
 | `@foreign_caller` | `text` | The DBID of the calling database, if a procedure was called via a foreign procedure. It is an empty string if the procedure was called directly. |
+| `@block_timestamp` | `int` | The Unix timestamp (in seconds) of the current block. This is set by the block proposer, and therefore can be manipulated. |
+| `@authenticator` | `text` | The registered [authenticator name](/docs/extensions/authenticators) that was used to verify the incoming user. |
 
 To use a contextual variable, simply reference it in your SQL statement:
 
