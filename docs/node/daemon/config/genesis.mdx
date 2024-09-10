@@ -115,13 +115,9 @@ Below is an example of a genesis file with complete configuration:
 
 ```json title="sample genesis.json file"
 {
-  "genesis_time": "2024-09-10T22:00:55.651468Z",
-  "chain_id": "kwil-chain-p2rrR6RH",
+  "genesis_time": "2024-09-10T22:37:12.960766Z",
+  "chain_id": "kwil-chain-wcHt2Qul",
   "initial_height": 1,
-  "alloc": {
-    "247620d8b3e92ac21b74bbda3e51d59de5b9a210b740bba0d3683579ddf6d8dd": 10000000000000000000000,
-    "0xc89d42189f0450c2b2c3c61f58ec5d628176a1e7": 10000000000000000000000
-  },
   "app_hash": null,
   "activations": null,
   "consensus_params": {
@@ -145,21 +141,21 @@ Below is an example of a genesis file with complete configuration:
       "join_expiry": 14400
     },
     "votes": {
-      "vote_expiry": 0,
+      "vote_expiry": 14400,
       "max_votes_per_tx": 100
     },
     "abci": {
       "vote_extensions_enable_height": 0
     },
     "migration": {
-      "start_height": -1,
-      "end_height": -1
+      "start_height": 0,
+      "end_height": 0
     },
     "without_gas_costs": true
   },
   "validators": [
     {
-      "pub_key": "dab2391b7e97d41e80d09635557bb0b5cdf44a398ba1d3eedba85203b1b4281c",
+      "pub_key": "6ec435ec737629ffade7d0f4679f4e89f285529487a72beb1945326c3b59be4a",
       "power": 1,
       "name": "validator-0"
     }
