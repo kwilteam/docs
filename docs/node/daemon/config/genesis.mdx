@@ -15,17 +15,38 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 
 ```json title="sample genesis.json file"
 {
-  "genesis_time": "2023-08-28T22:24:04.513472Z",
-  "chain_id": "kwil-chain-RQMl2F",
-  "initial_height": "0",
+  "genesis_time": "2024-09-10T22:20:11.75149Z",
+  "chain_id": "kwil-chain-YLyVNOKZ",
+  "initial_height": 1,
+  "consensus_params": {
+    "block": {
+      "max_bytes": 6291456,
+      "max_gas": -1,
+      "abci_max_bytes": false
+    },
+    "evidence": {
+      "max_age_num_blocks": 100000,
+      "max_age_duration": 172800000000000,
+      "max_bytes": 1048576
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ],
+      "join_expiry": 14400
+    },
+    "votes": {
+      "vote_expiry": 14400,
+      "max_votes_per_tx": 100
+    }
+  },
   "validators": [
     {
-      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "pub_key": "45a41991ce11839115e5a47d70c6589de28eea8780295a251ea16b62ec1accdd",
       "power": 1,
       "name": "validator-0"
     }
-  ],
-  "app_hash": "4F8735846B8CFB01A277430A392DD3DB7B66510C358C5F4A2AF88A348CB20A62"
+  ]
 }
 ```
 
@@ -41,7 +62,7 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 
 ### Initial Height
 
- `initial_height`: This field sets the initial height the blockchain should begin at. Although the default height is 0, during a network upgrade or restart, commencing from the last known height ensures distinctness from prior heights.
+ `initial_height`: This field sets the initial height the blockchain should begin at. By default, it should be set to 1.
 
 ### Genesis Validators
 
@@ -94,37 +115,50 @@ Below is an example of a genesis file with complete configuration:
 
 ```json title="sample genesis.json file"
 {
-  "genesis_time": "2023-08-28T22:24:04.513472Z",
-  "chain_id": "kwil-chain-RQMl2F",
-  "initial_height": "0",
-  "alloc": {
-    "247620d8b3e92ac21b74bbda3e51d59de5b9a210b740bba0d3683579ddf6d8dd": 10000000000000000000000, // validator ed25519 public key
-    "0xc89d42189f0450c2b2c3c61f58ec5d628176a1e7": 10000000000000000000000, // user ethereum address
-  }
+  "genesis_time": "2024-09-10T22:37:12.960766Z",
+  "chain_id": "kwil-chain-wcHt2Qul",
+  "initial_height": 1,
+  "app_hash": null,
+  "activations": null,
   "consensus_params": {
     "block": {
-      "max_bytes": "22020096",
-      "max_gas": "-1"
+      "max_bytes": 6291456,
+      "max_gas": -1,
+      "abci_max_bytes": false
+    },
+    "evidence": {
+      "max_age_num_blocks": 100000,
+      "max_age_duration": 172800000000000,
+      "max_bytes": 1048576
+    },
+    "version": {
+      "app": 0
     },
     "validator": {
       "pub_key_types": [
         "ed25519"
       ],
-      "join_expiry": "86400"
+      "join_expiry": 14400
     },
-    "version": {
-      "app": "0"
+    "votes": {
+      "vote_expiry": 14400,
+      "max_votes_per_tx": 100
     },
-    "without_gas_costs": true,
-    "without_nonces": false
+    "abci": {
+      "vote_extensions_enable_height": 0
+    },
+    "migration": {
+      "start_height": 0,
+      "end_height": 0
+    },
+    "without_gas_costs": true
   },
   "validators": [
     {
-      "pub_key": "71d79c64ffb46e8f6c36f1429066a9d92f6adf5bbe546204e40ec5559478b6aa",
+      "pub_key": "6ec435ec737629ffade7d0f4679f4e89f285529487a72beb1945326c3b59be4a",
       "power": 1,
       "name": "validator-0"
     }
-  ],
-  "app_hash": "4F8735846B8CFB01A277430A392DD3DB7B66510C358C5F4A2AF88A348CB20A62"
+  ]
 }
 ```
