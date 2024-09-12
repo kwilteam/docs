@@ -183,6 +183,8 @@ procedure handle_array() public view returns (val text) {
 
 ### If/Then
 
+If/else/elseif statements can be used to conditionally execute code:
+
 ```ts
 procedure age_conditional($age int) public {
     if $age < 0 {
@@ -191,6 +193,16 @@ procedure age_conditional($age int) public {
         // do something
     } else {
         // something else
+    }
+}
+```
+
+They can be logically combined with `and` and `or`:
+
+```ts
+procedure age_conditional($age int) public {
+    if $age < 0 or $age > 100 {
+        // do something
     }
 }
 ```
