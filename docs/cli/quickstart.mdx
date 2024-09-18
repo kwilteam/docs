@@ -30,7 +30,7 @@ Your configuration file will be stored at `~/.kwil-cli/config.json`.
 For temporary use, you can override persistent configurations by using global flags like so:
 
 ```bash
-kwil-cli --provider=your.kwil.provider:port --private-key=your_private_key --chain-id=your_chain_id
+kwil-cli --provider=http://your.kwil.provider:port --private-key=your_private_key --chain-id=your_chain_id
 ```
 
 Global flags take precedence over persistent configs.
@@ -40,27 +40,27 @@ Global flags take precedence over persistent configs.
 To deploy a database, you need to have a file containing the database schema in Kuneiform or JSON format:
 
 ```bash
-kwil-cli database deploy --path ./path_to_schema_file
+kwil-cli database deploy ./path_to_schema_file.kf
 ```
 
-## Executing an Action
+## Executing a Procedure/Action
 
-Execute an action against a database by providing the action name and parameters:
+Execute an action or procedure against a database by providing the action/procedure name and parameters.
 
 ```bash
-kwil-cli database execute parameter_1:value_1 parameter_2:value_2 --action action_name --dbid target_dbid
+kwil-cli database execute procedure_name parameter_1:value_1 parameter_2:value_2 --dbid target_dbid
 ```
 
-## Calling a View Action
+## Calling a View Procedure/Action
 
-Call a view (read-only) action on a database using the following command:
+Call a view (read-only) procedure on a database using the following command:
 
 ```bash
-kwil-cli database call parameter_1:value_1 --action view_action_name --dbid target_dbid
+kwil-cli database call view_procedure_name parameter_1:value_1 --dbid target_dbid
 ```
 
 ## Note
 
-Remember to replace placeholders such as `your.kwil.provider:port`, `your_private_key`, `your_chain_id`,  `path_to_schema_file`, `target_dbid`, `action_name`, `parameter:value`, and `view_action_name` with actual values based on your database and setup.
+Remember to replace placeholders such as `your.kwil.provider:port`, `your_private_key`, `your_chain_id`,  `path_to_schema_file`, `target_dbid`, `procedure_name`, `parameter:value`, and `view_procedure_name` with actual values based on your database and setup.
 
 For a more detailed usage of each command, refer to the appropriate section of the Kwil CLI reference guide.

@@ -12,7 +12,8 @@ Out of the box, Kwil supports a variety of access control capabilities. If you w
 
 ## Raising Errors
 
-In a procedure, you can use SQL `CASE` statements to raise errors if certain conditions are not met. If an error is raised, the transaction will fail entirely, and data will not be written to the network.
+In a procedure, you can raise errors that will cancel execution. Below, we query our [users table](http://localhost:3000/docs/getting-started/create-a-database#defining-tables) to ensure
+that a user exists. If the user does not exist, we raise an error.
 
 ```sql title="social_media.kf"
 // private procedure to check if user exists
@@ -29,10 +30,9 @@ procedure check_user() private view {
 }
 ```
 
-
 ## Procedure Privacy
 
-Procedure privacy enforces whether a procedure can be called by a user or not. Public procedures can be called by users. Private procedures can only be called by other procedures.
+Procedure privacy enforces whether a procedure can be called by a user or not. Public procedures can be called by users. Private procedures can only be called by other procedures in the schema.
 
 The distinction between public and private procedures are similar to the distinction between public and private methods in object-oriented programming, where public methods are accessible from outside the class, and private methods are only accessible from within the class.
 
@@ -66,7 +66,7 @@ procedure create_post ($id int, $title text, $content text, $date_string text) p
 
 ## Owner-only Procedures
 
-Procedures can be given an `owner` privacy level, which means that only the owner of the database can call the procedure. This is useful for procedures that should only be called by the database owner, such as admin operations.
+Procedures can be given an `owner` privacy level, which means that only the owner of the database (the wallet address that deployed the schema) can call the procedure. This is useful for procedures that should only be called by the database owner, such as admin operations.
 
 ```sql title="social_media.kf"
 // owner only procedure to delete a user

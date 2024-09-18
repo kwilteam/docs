@@ -38,28 +38,12 @@ kwil-admin snapshot create --snapdir /path/to/snapdir --dbname <dbname> --host <
 The app hash set in the genesis file is generated based on the hash of the uncompressed snapshot. You can verify the app hash in the generated genesis file as follows
 
 ``` bash
-# Uncompress the snapshot file.
-gunzip /path/to/snapdir/kwildb-snapshot.sql.gz
-
-# Generate app hash using sha256sum.
-shasum -a 256 /path/to/snapdir/kwildb-snapshot.sql
-4c2ecfc145c37a45a1fd21cd38ee84db80d852996fc30438a007ba624387c683  /path/to/snapdir/kwildb-snapshot.sql
-
-# app_hash in genesis file is a hexadecimal representation of the sha256sum hash encoded in base64.
-# hex-> binary -> base64
-echo -n "4c2ecfc145c37a45a1fd21cd38ee84db80d852996fc30438a007ba624387c683" | xxd -r -p | base64
-
-TC7PwUXDekWh/SHNOO6E24DYUplvwwQ4oAe6YkOHxoM=
-
-# compare the app hash with the genesis file
-cat /path/to/snapdir/genesis.json | jq .app_hash
-
-"TC7PwUXDekWh/SHNOO6E24DYUplvwwQ4oAe6YkOHxoM="
+kwil-admin setup genesis-hash --snapshot /path/to/snapdir/kwildb-snapshot.sql.gz
 ```
 
 ### Distribute Genesis State
 
-Distribute the `snapshot` and the `genesis.json` files required to start the new network. 
+Distribute the `kwildb-snapshot.sql.gz` and the `genesis.json` files required to start the new network. 
 
 Ensure that the `genesis.json` file has the `app_hash` field set to the hash of the uncompressed snapshot file. Refer to the [Verify App Hash](#verify-app-hash) section to ensure the hash is correct. If any other changes are needed to the genesis configuration, update the genesis file manually before distributing it.
 
@@ -74,10 +58,10 @@ Install the new version of the `kwild` binaries. Refer to the [Installation](/do
 Setup the files required to start a new node. Refer to the [Node Configuration](/docs/daemon/kwild#configuration) documentation or use the [`kwil-admin`](/docs/admin) tool:
 
 ```bash
-kwil-admin setup init -o /path/to/node/root/dir
+kwil-admin setup init --root-dir /path/to/node/root/dir
 ```
 
-Next, copy the `snapshot`, `genesis.json`, and the original validator's `private_key` files into the new node's root directory.
+Next, copy the `kwildb-snapshot.sql.gz`, `genesis.json`, and the original validator's `private_key` files into the new node's root directory.
 
 :::note
 The `private_key` needs to be copied because the new network will use the same validator set as the previous network.
@@ -85,11 +69,11 @@ The `private_key` needs to be copied because the new network will use the same v
 
 ```
 # Copy the snapshot and genesis files to the node root directory.
-cp /path/to/snapdir/genesis.json /path/to/node/root/dir
-cp /path/to/snapdir/kwildb-snapshot.sql /path/to/node/root/dir
+cp /path/to/snapdir/genesis.json /path/to/node/root/dir/genesis.json
+cp /path/to/snapdir/kwildb-snapshot.sql.gz /path/to/node/root/dir/kwildb-snapshot.sql.gz
 
 # Copy the old validator's private key to the node root directory.
-cp /path/to/private_key /path/to/node/root/dir
+cp /path/to/private_key /path/to/node/root/dir/private_key
 ```
 
 The node root directory should have the following structure:
@@ -99,7 +83,7 @@ root_dir
 ├── config.toml
 ├── private_key
 ├── genesis.json
-├── kwildb-snapshot.sql
+├── kwildb-snapshot.sql.gz
 ├── abci/
 ```
 
@@ -114,7 +98,7 @@ To initialize the node with the snapshot data, set the `genesis_state` path in `
 
 # Path to the snapshot file to restore the database from.
 # Used during the network migration process.
-genesis_state = "/path/to/snapshot/file"
+genesis_state = "/path/to/snapshot/file/kwildb-snapshot.sql.gz"
 ```
 
 #### Start the Node

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "utils"
 id: "kwil-cli-utils"
 title: "kwil-cli utils"
@@ -35,12 +35,15 @@ Various CLI utility commands.
 
 ### SEE ALSO
 
-* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
 * [kwil-cli utils authenticate](/docs/ref/kwil-cli/utils/authenticate)	 - Authenticate with a Kwil Gateway using a private key.
 * [kwil-cli utils chain-info](/docs/ref/kwil-cli/utils/chain-info)	 - Display information about the connected Kwil network.
 * [kwil-cli utils decode-tx](/docs/ref/kwil-cli/utils/decode-tx)	 - Decodes a raw transaction.
+* [kwil-cli utils generate-dbid](/docs/ref/kwil-cli/utils/generate-dbid)	 - `dbid` generates a dbid for a given schema name and deployer.
+* [kwil-cli utils generate-key](/docs/ref/kwil-cli/utils/generate-key)	 - Generates a new key pair.
 * [kwil-cli utils parse](/docs/ref/kwil-cli/utils/parse)	 - Parse a Kuneiform schema
 * [kwil-cli utils ping](/docs/ref/kwil-cli/utils/ping)	 - Ping the kwil provider endpoint.  If successful, returns 'pong'.
 * [kwil-cli utils print-config](/docs/ref/kwil-cli/utils/print-config)	 - Print the current CLI configuration.
 * [kwil-cli utils query-tx](/docs/ref/kwil-cli/utils/query-tx)	 - Queries a transaction from the blockchain. Requires 1 argument: the hex encoded transaction id.
+* [kwil-cli utils test](/docs/ref/kwil-cli/utils/test)	 - Runs Kuneiform JSON tests.
 

@@ -47,7 +47,8 @@ Running a Kwil node requires `genesis.json`, `config.toml` and `private_key` fil
 
 ### Private Keys
 
-Kwil nodes use ed25519 keys for validator related operations. Refer to the [key management guide](/docs/admin/keys#generation) for generating these node keys. The default location of private_key is `root_dir/private_key`. You can override this configuration by setting the `KWILD_APP_PRIVATE_KEY_PATH` environment variable or using the `app.private-key-path` command line flag.
+Kwil nodes use ed25519 keys for validator related operations. Refer to the [key management guide](/docs/admin/keys#generation) for generating these node keys. The default location of private_key is `root_dir/private_key`. You can override this configuration by setting the `KWILD_APP_PRIVATE_KEY_PATH` environment variable using the `app.private-key-path` command line flag, or
+setting the `app.private_key_path` in the `config.toml`.
 
 ### Genesis File (genesis.json)
 
@@ -73,11 +74,11 @@ To connect a node to an existing network, obtain the genesis file from the desir
 
 Copy the sample [config.toml](/docs/daemon/config/settings#sample-configtoml) into `root_dir/config.toml` and update the configuration as required.
 
-Notable options include the RPC and HTTP server settings such as `app.jsonrpc-listen-addr`, `chain.rpc.listen-addr` and `chain.p2p.listen-addr`.
+Notable options include the RPC and HTTP server settings such as `app.jsonrpc_listen_addr`, `chain.rpc.listen_addr` and `chain.p2p.listen_addr`.
 
 There are two settings related to establishing connections to other network nodes:
 
-- `chain.p2p.persistent-peers` is used to maintain persistent connections with certain nodes.
+- `chain.p2p.persistent_peers` is used to maintain persistent connections with certain nodes.
 - `chain.p2p.seeds` specifies special seed nodes or services from which additional peer addresses are obtained.
 
 The above fields can be empty if the network is made up of a standalone node.

@@ -7,7 +7,7 @@ description: An outline of Kuneiform's supported data definition language.
 slug: /kuneiform/ddl
 ---
 
-DDL in Kuneiform is comprised of "tables" that contain the structure of data.
+DDL (data definition language) in Kuneiform is comprised of "tables" that contain the structure of data.
 
 ## Database Declaration in Kuneiform Language
 
@@ -21,15 +21,15 @@ database mydb;
 
 ## Table Declaration
 
-The Kuneiform Language allows you to establish your own tables, along with defining the corresponding [columns](#adding-columns), [foreign keys](#foreign-key), and [indexes](#indexing-in-tables). For every column, you must specify a [data type](/docs/kuneiform/introduction#data-types) and have the option to set an [attribute type](/docs/kuneiform/ddl#adding-columns). Here is an example:
+The Kuneiform Language allows you to establish your own tables, along with defining the corresponding [columns](#adding-columns), [foreign keys](#foreign-key), and [indexes](#indexing-in-tables). For every column, you must specify a [data type](/docs/kuneiform/introduction#data-types) and have the option to set one or more [attribute types](/docs/kuneiform/ddl#adding-columns). Here is an example:
 
 ```typescript
 table users {
-    id int primary,     // The id column
-    name text notnull,  // The name column
-    username text notnull,  // The username column
-    wallet text notnull,    // The wallet column
-    #wallet_index index(wallet) // B-tree index on the wallet column
+    id int primary,                     // The id column
+    name text notnull,                  // The name column
+    username text notnull, minlen(5),   // The username column
+    wallet text notnull,                // The wallet column
+    #wallet_index index(wallet)         // B-tree index on the wallet column
 }
 ```
 
@@ -103,13 +103,13 @@ Below are a list of operations that available for the foreign key declaration:
 
 ## Indexing in Tables
 
-The Kuneiform Language not only allows column declarations, but also the creation of indexes on one or more columns within your table. Kuneiform supports standard B-tree indexes.
+The Kuneiform Language not only allows column declarations, but also the creation of indexes on one or more columns within your table. Kuneiform only supports standard B-tree indexes.
 
 ### Index Declaration
 
 You can declare three types of indexes:
 
-1. Standard binary tree index: This is a conventional B-tree index applied to the chosen column(s). Here's the syntax:
+1. Standard B-tree index: This is a conventional B-tree index applied to the chosen column(s). Here's the syntax:
 
 ```typescript
 index(column1, column2, ...)

@@ -1,0 +1,32 @@
+---
+sidebar_position: 6
+sidebar_label: "Hooks"
+id: api-reference-hooks
+title: "Hook Extension APIs"
+description: "Hook Extension APIs"
+slug: /extensions/api-reference/hooks
+---
+
+## GenesisHook
+
+```go
+// GenesisHook is a function that is run exactly once, at network genesis.
+// It can be used to create initial state or perform other setup tasks.
+// If it returns an error, the network will immediately halt. Any state
+// changed or error returned should be deterministic, as all nodes will
+// run the same GenesisHooks in the same order.
+type GenesisHook func(ctx context.Context, app *common.App, chain *common.ChainContext) error
+```
+
+## EndBlockHook
+
+```go
+// EndBlockHook is a function that is run at the end of each block, after
+// all of the transactions in the block have been processed, but before the
+// any state has been committed. It is meant to be used to alter state, send
+// data to external services, or perform cleanup tasks for other extensions.
+// An error returned will halt the local node. All state changes and errors
+// should be deterministic, as all nodes will run the same EndBlockHooks in
+// the same order.
+type EndBlockHook func(ctx context.Context, app *common.App, block *common.BlockContext) error
+```

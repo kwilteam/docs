@@ -16,7 +16,7 @@ when implementing an extension. These are outlined in each extension types page.
 
 ## Types of Extensions
 
-There are four types of extensions. Each extension has its own set of interfaces that must be implemented, as well as their
+There are six types of extensions. Each extension has its own set of interfaces that must be implemented, as well as their
 own set of rules and restrictions that must be followed.
 
 ### [Authenticators](/docs/extensions/authenticators)
@@ -42,3 +42,16 @@ threshold, the maximum duration of the proposal, and the subsequent state change
 Event Listeners allow nodes to listen to external systems and automatically create and vote on resolutions. This is primarily used for syncing data from
 external event-driven systems, such as Ethereum. It can also be used to poll external APIs for data, as long as the exact data can eventually be agreed upon
 by the requisite threshold for the resolution to pass.
+
+### [Hooks](/docs/extensions/hooks)
+
+Hooks are functions that are called at specific points in the Kwil node's lifecycle. By implementing hooks, developers can add custom functionality to their
+Kwil node. Hooks can be used to add network-level schemas, periodic tasks, custom logging, or other functionality that is not provided by the default Kwil
+implementation.
+
+### [Coordinated Upgrades](/docs/extensions/consensus)
+
+Coordinates Upgrades allow users to make breaking changes to their network functionality without starting a new network. Typically, if a user modifies
+an extension, they are unable to run it on an existing network because their new node will fail to reach consensus with the existing nodes. Coordinated
+upgrades allow users to specify a block height at which the new extension will be activated, and the network will automatically upgrade to the new
+functionality at that block height.

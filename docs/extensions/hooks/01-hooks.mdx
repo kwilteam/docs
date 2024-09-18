@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+sidebar_label: "Hooks"
+id: hooks
+title: "Hooks"
+description: Hook extensions for Kwil
+slug: /extensions/hooks/overview
+---
+
+Hooks allow developers to extend Kwil with custom logic that is executed at specific points in the network's lifecycle. Hooks can be used to create
+new network rules, add periodic tasks, or perform any other custom logic that is not provided by the default Kwil implementation. **All hooks must be
+deterministic**.
+
+## Types of Hooks
+
+There are currently two types of hooks that can be implemented in Kwil:
+
+### Genesis Hooks
+
+Genesis Hooks are functions that are called exactly once, at the end of a network's genesis block (the first block). Genesis hooks are primarily used to
+create initial network state, such as deploying a network-level Kuneiform schema that can be accessed by all other users.
+
+```go
+// GenesisHook is a function that is run exactly once, at network genesis.
+// It can be used to create initial state or perform other setup tasks.
+// If it returns an error, the network will immediately halt. Any state
+// changed or error returned should be deterministic, as all nodes will
+// run the same GenesisHooks in the same order.
+type GenesisHook func(ctx context.Context, app *common.App, chain *common.ChainContext) error
+```
+
+### End Block Hooks
+
+End Block Hooks are functions that are called at the end of every block. End block hooks are primarily used to perform periodic tasks, such as updating
+network state, sending notifications, caching, or other tasks that need to be performed at regular intervals.
+
+```go
+// EndBlockHook is a function that is run at the end of each block, after
+// all of the transactions in the block have been processed, but before the
+// any state has been committed. It is meant to be used to alter state, send
+// data to external services, or perform cleanup tasks for other extensions.
+// An error returned will halt the local node. All state changes and errors
+// should be deterministic, as all nodes will run the same EndBlockHooks in
+// the same order.
+type EndBlockHook func(ctx context.Context, app *common.App, block *common.BlockContext) error
+```

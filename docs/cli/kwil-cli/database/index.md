@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "database"
 id: "kwil-cli-database"
 title: "kwil-cli database"
@@ -35,7 +35,7 @@ The database command is a parent command containing subcommands for interacting 
 
 ### SEE ALSO
 
-* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
 * [kwil-cli database batch](/docs/ref/kwil-cli/database/batch)	 - Batch execute an action using inputs from a CSV file.
 * [kwil-cli database call](/docs/ref/kwil-cli/database/call)	 - Call a 'view' action, returning the result.
 * [kwil-cli database deploy](/docs/ref/kwil-cli/database/deploy)	 - Deploy a database schema to the target Kwil node.

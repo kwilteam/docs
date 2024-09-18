@@ -7,14 +7,11 @@ description: Install kwil-cli
 slug: /kwil-cli/installation
 ---
 
-Until the main Kwil DB repository is open source, the `kwil-cli` command line
-application may be downloaded from the kwil-db repository.
+`kwil-cli` is a command line tool for interacting with a Kwil network. It allows users to author transactions, deploy database, write and read data, and manage tokens.
 
 ## Download the `kwil-cli` Executable
 
-The Kwil Cli (`kwil-cli`) will be packaged together with Kwil Daemon (`kwild`) and Kwil Admin Tool (`kwil-admin`).
-Download the [latest release](https://github.com/kwilteam/kwil-db/releases)
-for your platform.  Extract the `kwil-cli` file from the archive and put it
+The Kwil CLI (`kwil-cli`) is packaged together with Kwil Daemon (`kwild`) and Kwil Admin Tool (`kwil-admin`), which can be [downloaded from the main Kwil repo](https://github.com/kwilteam/kwil-db/releases). One downloaded, extract the `kwil-cli` file from the archive and put it
 into a folder that is in your `PATH` environment.
 
 ## Verify Installation
@@ -27,4 +24,4 @@ kwil-cli version
 
 If installed correctly, it should display the version info match your downloaded version.
 
-Continue to the [Configuration](/docs/cli/configuration.md)page to setup.
+Continue to the [Configuration](/docs/cli/configuration.md) page to setup a default CLI configuration.

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "account"
 id: "kwil-cli-account"
 title: "kwil-cli account"
@@ -35,7 +35,7 @@ Commands related to Kwil account, such as balance checks and transfers.
 
 ### SEE ALSO
 
-* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface for using Kwil databases.
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
 * [kwil-cli account balance](/docs/ref/kwil-cli/account/balance)	 - Gets an account's balance and nonce
 * [kwil-cli account id](/docs/ref/kwil-cli/account/id)	 - Show the account ID.
 * [kwil-cli account transfer](/docs/ref/kwil-cli/account/transfer)	 - Transfer value to an account

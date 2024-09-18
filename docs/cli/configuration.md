@@ -10,7 +10,7 @@ slug: /kwil-cli/configuration
 `kwil-cli` supports two ways to provide configuration:
 
 - persistent configuration, via a local configuration file
-- global flags, which last only for the specified command's lifetime.
+- global flags, which last only for the specified command's lifetime
 
 Global flag configs are given precedence over persistent configs.
 
@@ -42,8 +42,8 @@ Below is a table containing the available configs, their flags, an example value
 
 | Config | Flag | Example | Description |
 |-|-|-|-|
-| HTTP Endpoint | `--provider` | `https://longhorn.kwil.com`  | The endpoint of a Kwil node, which will be used for accessing data on the node's network. |
+| Kwil RPC Provider URL | `--provider` | `https://longhorn.kwil.com`  | The endpoint of a Kwil node, which will be used for accessing data on the node's network. |
 | Kwil Chain ID | `--chain-id` | `kwil-test-chain` | The chain ID of the Kwil network to use. Can be left blank to trust a server-provided value. |
-|Private Key| `--private-key` | `0371808159548bae6fe902a88cb432ca`<br/>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
+| Private Key | `--private-key` | `0371808159548bae6fe902a88cb432ca`<br/>`d31044324fc8df9c2a0ee72643cf3dda` | The secp256k1 private key to use for signing messages and transactions. |
 
 > NOTE: There is another specical flag `--output`, which is used to specify the output format. By default it's `text`, but you can also set it to `json`.  When set to `json`, command output will be formatted as JSON instead of text.
