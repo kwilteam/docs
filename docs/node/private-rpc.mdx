@@ -1,0 +1,77 @@
+---
+sidebar_position: 8
+sidebar_label: "Private RPCs"
+id: private-rpc
+title: Private RPC Server Mode
+description: Enable private RPC server mode for restricted data access
+slug: /node/private-rpc
+---
+
+This page describes the "private" RPC server mode that restricts access to
+network data, facilitating data privacy.
+
+## Overview 
+
+This RPC service mode requires authenticated call requests, disables ad-hoc SQL
+queries, and omits raw transaction data from transaction status queries.
+
+:::warning
+
+Private RPC mode should be used with peer filtering as described on the
+[Private Networks page](/docs/node/private-networks), or with coordinated access control
+all nodes' P2P services (e.g. linked via VPN). Open access to a node's P2P service
+makes all data available to any other Kwil node that can reach it.
+
+:::
+
+## Configuration
+
+The `app.private_rpc` setting is used to enable the private RPC mode.  Enable it
+in the `config.toml` file:
+
+```toml
+[app]
+
+# Enforce data privacy: authenticate JSON-RPC call requests using challenge-based
+# authentication. the node will only accept JSON-RPC requests that has a valid signed
+# challenge response. This also disables ad hoc queries, and no raw transaction retrieval.
+private_rpc = true
+```
+
+When enabled, `kwild` does the following:
+
+1. "Call" requests must be signed, and contain a challenge provided by the RPC
+   service for replay protection.
+2. Ad-hoc SQL queries are disabled.
+3. Transaction status responses omit verbose transaction details that would
+   contain the transaction body where any user data may be present.
+
+## Client Requirements
+
+For RPC clients to make call requests with servers running in private mode, the
+call request must include a valid signature and a server-provided "challenge".
+The client requests a "challenge", which it includes in the call request that is
+signed with the user's private key for authentication. **The Kwil official
+clients handle this automatically.**
+
+With `kwil-cli`, provide the `--callauth` flag when calling an action or procedure:
+
+```sh
+kwil-cli database call --callauth <param:val> ...
+```
+
+If the client has been configured with a private key, this will automatically
+handle the challenge request authentication described above.
+
+The Go and JavaScript SDKs have similar behaviors.
+
+## Advanced Server Configuration
+
+```toml
+# Time after which a "call" challenge expires.
+challenge_expiry = "10s"
+
+# Call challenge request rate limit per second per client IP.
+challenge_rate_limit = 10.0
+```
+
