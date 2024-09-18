@@ -24,7 +24,7 @@ makes all data available to any other Kwil node that can reach it.
 
 :::
 
-## Configuration
+## Node Configuration
 
 The `app.private_rpc` setting is used to enable the private RPC mode.  Enable it
 in the `config.toml` file:
@@ -46,30 +46,37 @@ When enabled, `kwild` does the following:
 3. Transaction status responses omit verbose transaction details that would
    contain the transaction body where any user data may be present.
 
-## Client Requirements
+## Client
 
 For RPC clients to make call requests with servers running in private mode, the
 call request must include a valid signature and a server-provided "challenge".
 The client requests a "challenge", which it includes in the call request that is
-signed with the user's private key for authentication. **The Kwil official
-clients handle this automatically.**
+signed with the user's private key for authentication.
 
-With `kwil-cli`, provide the `--callauth` flag when calling an action or procedure:
-
-```sh
-kwil-cli database call --callauth <param:val> ...
-```
-
-If the client has been configured with a private key, this will automatically
+If the client has been configured with a private key, it will automatically
 handle the challenge request authentication described above.
-
-The Go and JavaScript SDKs have similar behaviors.
 
 ## Advanced Server Configuration
 
+The RPC server may be configured to control call challenge handling.
+
+Challenges issued to clients expire after the duration specified by the
+`app.challenge_expiry` setting. The challenge expiry may be shortened if client
+provide signed call requests quickly, or lengthened if interactive signing
+requires additional time.
+
 ```toml
+[app]
+
 # Time after which a "call" challenge expires.
 challenge_expiry = "10s"
+```
+
+The `app.challenge_rate_limit` setting controls the maximum frequency at which a
+client (by IP address) is permitted to request call challenges.
+
+```toml
+[app]
 
 # Call challenge request rate limit per second per client IP.
 challenge_rate_limit = 10.0
