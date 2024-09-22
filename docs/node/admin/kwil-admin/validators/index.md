@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "validators"
 id: "kwil-admin-validators"
 title: "kwil-admin validators"

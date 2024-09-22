@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "node"
 id: "kwil-admin-node"
 title: "kwil-admin node"

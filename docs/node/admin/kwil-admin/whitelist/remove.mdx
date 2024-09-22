@@ -1,31 +1,31 @@
 ---
-sidebar_position: 1
-sidebar_label: "add"
-id: "kwil-admin-peers-add"
-title: "kwil-admin peers add"
-description: "Add a peer to the node's whitelist peers to accept connections from"
-slug: /ref/kwil-admin/peers/add
+sidebar_position: 3
+sidebar_label: "remove"
+id: "kwil-admin-whitelist-remove"
+title: "kwil-admin whitelist remove"
+description: "Remove a peer from the node's whitelist and disconnect it."
+slug: /ref/kwil-admin/whitelist/remove
 ---
 
-## kwil-admin peers add
+## kwil-admin whitelist remove
 
-Add a peer to the node's whitelist peers to accept connections from
+Remove a peer from the node's whitelist and disconnect it.
 
 ```
-kwil-admin peers add <peerID> [flags]
+kwil-admin whitelist remove <peerID> [flags]
 ```
 
 ### Examples
 
 ```
-kwil-admin peers add <peerID>
+kwil-admin whitelist remove <peerID>
 ```
 
 ### Options
 
 ```
       --authrpc-cert string   kwild's TLS certificate, required for HTTPS server
-  -h, --help                  help for add
+  -h, --help                  help for remove
       --pass string           admin server password (alternative to mTLS with tlskey/tlscert). May be set in ~/.kwil-admin/rpc-admin-pass instead.
   -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
       --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
@@ -41,5 +41,5 @@ kwil-admin peers add <peerID>
 
 ### SEE ALSO
 
-* [kwil-admin peers](/docs/ref/kwil-admin/peers)	 - manages the node's peers
+* [kwil-admin whitelist](/docs/ref/kwil-admin/whitelist)	 - The whitelist command is used to manage a node's peer whitelist.
 
