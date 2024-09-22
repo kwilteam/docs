@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "utils"
 id: "kwil-admin-utils"
 title: "kwil-admin utils"

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 0
+sidebar_position: 99
 sidebar_label: "setup"
 id: "kwil-admin-setup"
 title: "kwil-admin setup"
@@ -33,9 +33,9 @@ The `setup` command provides functions for creating and managing node configurat
 ### SEE ALSO
 
 * [kwil-admin](/docs/ref/kwil-admin)	 - The Kwil node admin tool.
+* [kwil-admin setup genesis-hash](/docs/ref/kwil-admin/setup/genesis-hash)	 - Compute genesis hash from existing PostgreSQL datasets, and optionally update `genesis.json`.
 * [kwil-admin setup init](/docs/ref/kwil-admin/setup/init)	 - The `init` command facilitates quick setup of an isolated Kwil node.
-* [kwil-admin setup peer](/docs/ref/kwil-admin/setup/peer)	 - The `peer` command facilitates quick setup of a Kwil node as a peer to an existing node.
 * [kwil-admin setup reset](/docs/ref/kwil-admin/setup/reset)	 - To delete all of a Kwil node's data files, use the `reset` command.
-* [kwil-admin setup reset-state](/docs/ref/kwil-admin/setup/reset-state)	 - Delete blockchain state files.
+* [kwil-admin setup reset-state](/docs/ref/kwil-admin/setup/reset-state)	 - `reset-state` deletes the data in Postgres.
 * [kwil-admin setup testnet](/docs/ref/kwil-admin/setup/testnet)	 - The `testnet` command is used to create multiple node configurations, all with the same genesis config, and pre-configured to connect to each other.
 

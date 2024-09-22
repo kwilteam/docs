@@ -1,0 +1,55 @@
+---
+sidebar_position: 4
+sidebar_label: "propose"
+id: "kwil-admin-migrate-propose"
+title: "kwil-admin migrate propose"
+description: "Submit a migration proposal."
+slug: /ref/kwil-admin/migrate/propose
+---
+
+## kwil-admin migrate propose
+
+Submit a migration proposal.
+
+### Synopsis
+
+A Validator operator can submit a migration proposal using the `propose` subcommand. The migration proposal includes the new `chain-id`, `activation-period` and `duration`. This action will generate a migration resolution for the other validators to vote on. If a super-majority of validators approve the migration proposal, the migration will commence after the specified activation-period blocks from approval and will continue for the duration defined by duration blocks.
+
+```
+kwil-admin migrate propose [flags]
+```
+
+### Examples
+
+```
+# Submit a migration proposal to migrate to a new chain "kwil-chain-new" with activation period 1000 and migration duration of 14400 blocks.
+kwil-admin migrate propose --activation-period 1000 --duration 14400 --chain-id kwil-chain-new
+(or)
+kwil-admin migrate propose -a 1000 -d 14400 -c kwil-chain-new
+```
+
+### Options
+
+```
+  -a, --activation-period uint   The number of blocks before the migration is activated since the approval of the proposal.
+  -c, --chain-id string          The chain ID of the migration.
+  -d, --duration uint            The duration of the migration.
+  -h, --help                     help for propose
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert). May be set in ~/.kwil-admin/rpc-admin-pass instead.
+  -s, --rpcserver string      admin RPC server address (either unix or tcp) (default "/tmp/kwild.socket")
+  -S, --silence               Silence logs
+      --tlscert string        kwil-admin's TLS certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwil-admin's TLS key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwil-admin migrate](/docs/ref/kwil-admin/migrate)	 - The `migrate` command provides functions for managing migration proposals.
+

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 4
 sidebar_label: "reset"
 id: "kwil-admin-setup-reset"
 title: "kwil-admin setup reset"
@@ -13,7 +13,7 @@ To delete all of a Kwil node's data files, use the `reset` command.
 
 ### Synopsis
 
-To delete all of a Kwil node's data files, use the `reset` command. If directories are not specified, the node's default directories will be used.
+To delete all of a Kwil node's data files, use the `reset` command. If the root directory is not specified, the node's default root directory will be used.
 
 WARNING: This command should not be used on production systems. This should only be used to reset disposable test nodes.
 
@@ -25,16 +25,20 @@ kwil-admin setup reset [flags]
 
 ```
 # Delete all of a Kwil node's data files
-kwil-admin setup reset --root-dir "~/.kwild" --sqlpath "~/.kwild/data/kwil.db"
+kwil-admin setup reset --root-dir "~/.kwild"
 ```
 
 ### Options
 
 ```
+      --dbname string     Name of the database in the PostgreSQL server (default "kwild")
   -f, --force             force removal of default home directory
   -h, --help              help for reset
+      --host string       Host of the database (default "localhost")
+      --password string   Password for the database user
+      --port string       Port of the database (default "5432")
   -r, --root-dir string   root directory of the kwild node
-  -p, --snappath string   path to the snapshot directory
+      --user string       User with administrative privileges on the database (default "postgres")
 ```
 
 ### Options inherited from parent commands

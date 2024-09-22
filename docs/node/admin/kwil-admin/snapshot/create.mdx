@@ -37,14 +37,13 @@ genesis.json    kwildb-snapshot.sql.gz
 ### Options
 
 ```
-      --dbname string      Name of the database to snapshot (default "kwild")
-  -h, --help               help for create
-      --host string        Host of the database (default "localhost")
-      --max-row-size int   Maximum row size to read from pg_dump (default: 4MB). Adjust this accordingly if you encounter 'bufio.Scanner: token too long' error. (default 4194304)
-      --password string    Password for the database user
-      --port string        Port of the database (default "5432")
-      --snapdir string     Directory to store the snapshot and hash files (default "kwild-snaps")
-      --user string        User with administrative privileges on the database (default "postgres")
+      --dbname string     Name of the database in the PostgreSQL server (default "kwild")
+  -h, --help              help for create
+      --host string       Host of the database (default "localhost")
+      --password string   Password for the database user
+      --port string       Port of the database (default "5432")
+      --snapdir string    Directory to store the snapshot and hash files (default "kwild-snaps")
+      --user string       User with administrative privileges on the database (default "postgres")
 ```
 
 ### Options inherited from parent commands

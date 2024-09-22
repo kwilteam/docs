@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 2
 sidebar_label: "init"
 id: "kwil-admin-setup-init"
 title: "kwil-admin setup init"
@@ -31,13 +31,82 @@ kwil-admin setup init -o ~/.kwild-new
 ### Options
 
 ```
-      --alloc allocFlag           account=amount pairs of genesis account allocations (default map[])
-  -i, --block-interval duration   shortest block interval in seconds (default 6s)
-      --chain-id string           chain ID to use for the genesis file
-      --gas                       enable gas
-  -h, --help                      help for init
-      --join-expiry int           number of blocks before a join request expires (default 14400)
-  -o, --output-dir string         generated node parent directory (default "./.testnet")
+      --alloc allocFlag                                  account=amount pairs of genesis account allocations (default map[])
+      --app.admin-listen-addr string                     kwild admin listen address (unix or tcp) (default "/tmp/kwild.socket")
+      --app.admin-notls                                  do not enable TLS on admin server (automatically disabled for unix socket or loopback listen addresses)
+      --app.admin-pass string                            password for the node's admin service (may be empty)
+      --app.challenge-expiry duration                    Time after which a challenge expires (default 10s)
+      --app.challenge-rate-limit float                   challenge request rate limit per second per client IP (default 10)
+      --app.db-read-timeout duration                     timeout for database reads initiated by RPC requests (default 5s)
+      --app.extension-endpoints strings                  kwild extension endpoints
+      --app.genesis-state string                         Path to the genesis state file
+      --app.hostname string                              kwild Server hostname
+      --app.jsonrpc-listen-addr string                   kwild JSON-RPC listen address (default "0.0.0.0:8484")
+      --app.migrate-from string                          kwild JSON-RPC listening address of the node to replicate the state from.
+      --app.pg-db-host string                            PostgreSQL host address (no port) (default "127.0.0.1")
+      --app.pg-db-name string                            PostgreSQL database name (default "kwild")
+      --app.pg-db-pass string                            PostgreSQL password name
+      --app.pg-db-port string                            PostgreSQL port (default "5432")
+      --app.pg-db-user string                            PostgreSQL user name (default "kwild")
+      --app.private-key-path string                      Path to the node private key file (default "private_key")
+      --app.private-rpc                                  Enforce data privacy with authenticated call request, disabled ad hoc queries, and no raw transaction retrieval
+      --app.profile-file string                          kwild profile output file path (e.g. cpu.pprof)
+      --app.profile-mode string                          kwild profile mode (http, cpu, mem, mutex, or block)
+      --app.rpc-max-req-size int                         RPC request size limit (default 4200000)
+      --app.rpc-timeout duration                         timeout for RPC requests (through reading the request, handling the request, and sending the response) (default 45s)
+      --app.snapshots.enabled                            Enable snapshots
+      --app.snapshots.max-snapshots uint                 Maximum snapshots to store on disk. Default is 3. If max snapshots is reached, the oldest snapshot is deleted. (default 3)
+      --app.snapshots.recurring-height uint              Recurring heights to create snapshots (default 14400)
+      --app.tls-cert-file string                         TLS certificate file path for the admin and consensus RPC server (optional)
+      --app.tls-key-file string                          TLS key file path for the admin and consensus RPC servers (optional)
+      --chain-id string                                  chain ID to use for the genesis file
+      --chain.consensus.timeout-commit duration          Chain consensus timeout commit (default 6s)
+      --chain.consensus.timeout-precommit duration       Chain consensus timeout precommit (default 2s)
+      --chain.consensus.timeout-prevote duration         Chain consensus timeout prevote (default 2s)
+      --chain.consensus.timeout-propose duration         Chain consensus timeout propose (default 3s)
+      --chain.mempool.cache-size int                     Chain mempool cache size (default 60000)
+      --chain.mempool.max-tx-bytes int                   chain mempool maximum single transaction size in bytes (default 4194304)
+      --chain.mempool.max-txs-bytes int                  chain mempool maximum total transactions in bytes (default 536870912)
+      --chain.mempool.size int                           Chain mempool size (default 50000)
+      --chain.moniker string                             Node moniker
+      --chain.p2p.addr-book-strict                       Chain P2P address book strict
+      --chain.p2p.allow-duplicate-ip                     Chain P2P allow multiple peers with the same IP address (default true)
+      --chain.p2p.dial-timeout duration                  Chain P2P dial timeout (default 3s)
+      --chain.p2p.external-address string                Chain P2P external address to advertise
+      --chain.p2p.handshake-timeout duration             Chain P2P handshake timeout (default 20s)
+      --chain.p2p.listen-addr string                     Chain P2P listen address (default "tcp://0.0.0.0:26656")
+      --chain.p2p.max-num-inbound-peers int              Chain P2P maximum number of inbound peers (default 40)
+      --chain.p2p.max-num-outbound-peers int             Chain P2P maximum number of outbound peers (default 10)
+      --chain.p2p.persistent-peers string                Chain P2P persistent peers
+      --chain.p2p.pex                                    Enables peer information exchange (default true)
+  -p, --chain.p2p.private-mode                           Run the node in private mode. In private mode, the connectivity to the node is restricted to the current validators and whitelist peers.
+      --chain.p2p.seed-mode                              Run kwild in a special "seed" mode where it crawls the network for peer addresses,
+                                                         sharing them with incoming peers before immediately disconnecting. It is recommended
+                                                         to instead run a dedicated seeder like https://github.com/kwilteam/cometseed.
+      --chain.p2p.seeds string                           Seed nodes for obtaining peer addresses, if address book is empty
+      --chain.p2p.unconditional-peer-ids string          Chain P2P unconditional peer IDs
+      --chain.p2p.whitelist-peers kwil-admin             List of allowed sentry nodes that can connect to the node. Whitelist peers can be updated dynamically using kwil-admin commands.
+      --chain.rpc.broadcast-tx-timeout duration          Chain RPC broadcast transaction timeout (default 15s)
+      --chain.rpc.listen-addr string                     Chain RPC listen address (default "tcp://127.0.0.1:26657")
+      --chain.statesync.chunk-request-timeout duration   Chain state sync chunk request timeout (default 10s)
+      --chain.statesync.discovery-time duration          Chain state sync discovery time (default 15s)
+      --chain.statesync.enable                           Chain state sync enable
+      --chain.statesync.rpc-servers string               Chain state sync rpc servers
+      --gas                                              enable gas
+  -g, --genesis string                                   path to genesis file
+  -s, --genesis-state string                             path to genesis state snapshot file
+  -h, --help                                             help for init
+      --join-expiry int                                  number of blocks before a join request expires (default 14400)
+      --log.consensus-level string                       consensus (cometbft) log level
+      --log.db-level string                              database backend (postgres) log level
+      --log.file-roll-size int                           threshold in KB at which the log file rolls over and archives the current one (default 100000)
+      --log.format string                                kwild log format (default "json")
+  -l, --log.level string                                 kwild log level (default "info")
+      --log.output-paths strings                         kwild log output paths (default [stdout,kwild.log])
+      --log.retain-max-rolls int                         retention limit on the number of archived log files to keep (default is 0, meaning retain all)
+      --log.rpc-level string                             user rpc server log level
+      --log.time-format string                           kwild time log format (default "epochfloat")
+  -r, --root-dir string                                  kwild root directory for config and data (default "~/.kwild")
 ```
 
 ### Options inherited from parent commands

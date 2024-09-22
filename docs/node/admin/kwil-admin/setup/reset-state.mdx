@@ -1,19 +1,23 @@
 ---
-sidebar_position: 4
+sidebar_position: 5
 sidebar_label: "reset-state"
 id: "kwil-admin-setup-reset-state"
 title: "kwil-admin setup reset-state"
-description: "Delete blockchain state files."
+description: "`reset-state` deletes the data in Postgres."
 slug: /ref/kwil-admin/setup/reset-state
 ---
 
 ## kwil-admin setup reset-state
 
-Delete blockchain state files.
+`reset-state` deletes the data in Postgres.
 
 ### Synopsis
 
-Delete blockchain state files.
+`reset-state` deletes the data in Postgres.
+
+Unlike the `reset` command, which deletes all of the application data in Postgres and all of the block data
+in the root directory, `reset-state` only deletes the application data in Postgres. This command is useful if
+you want to replay all of the blocks without having to re-download them.
 
 ```
 kwil-admin setup reset-state [flags]
@@ -22,16 +26,18 @@ kwil-admin setup reset-state [flags]
 ### Examples
 
 ```
-# Delete blockchain state files
-kwil-admin setup reset-state --root-dir "~/.kwild"
+kwil-admin setup reset-state --host localhost --port 5432 --user kwild --password kwild --dbname kwild
 ```
 
 ### Options
 
 ```
-  -f, --force             force removal of default home directory
+      --dbname string     Name of the database in the PostgreSQL server (default "kwild")
   -h, --help              help for reset-state
-  -r, --root-dir string   root directory of the kwild node
+      --host string       Host of the database (default "localhost")
+      --password string   Password for the database user
+      --port string       Port of the database (default "5432")
+      --user string       User with administrative privileges on the database (default "postgres")
 ```
 
 ### Options inherited from parent commands
