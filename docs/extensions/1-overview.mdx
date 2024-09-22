@@ -43,13 +43,13 @@ Event Listeners allow nodes to listen to external systems and automatically crea
 external event-driven systems, such as Ethereum. It can also be used to poll external APIs for data, as long as the exact data can eventually be agreed upon
 by the requisite threshold for the resolution to pass.
 
-### [Hooks](/docs/extensions/hooks)
+### [Hooks](/docs/extensions/hooks/overview)
 
 Hooks are functions that are called at specific points in the Kwil node's lifecycle. By implementing hooks, developers can add custom functionality to their
 Kwil node. Hooks can be used to add network-level schemas, periodic tasks, custom logging, or other functionality that is not provided by the default Kwil
 implementation.
 
-### [Coordinated Upgrades](/docs/extensions/consensus)
+### [Coordinated Upgrades](/docs/extensions/fork-background)
 
 Coordinates Upgrades allow users to make breaking changes to their network functionality without starting a new network. Typically, if a user modifies
 an extension, they are unable to run it on an existing network because their new node will fail to reach consensus with the existing nodes. Coordinated
