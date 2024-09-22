@@ -68,8 +68,8 @@ Below is a sample `genesis.json` file featuring a basic configuration:
 
  `validators`: This field sets the list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
   - `pub_key`: This field specifies the validator's public key bytes (hex).
-  - `power`: The validator’s voting power. Power 0 indicates that the node is a non-validator.
-  - `name`: The validator’s name. 
+  - `power`: The validator's voting power. Power 0 indicates that the node is a non-validator.
+  - `name`: The validator's name. 
 
 ### Genesis App Hash
 
@@ -104,8 +104,6 @@ The genesis file can also be used to establish a predefined set of consensus rul
     - `app_version`: This field sets the ABCI application version. 
 
 #### General
-
-  - `without_nonces`: This field sets whether nonces should be enabled for the transactions. By default, nonces are enabled for the transactions.
 
   - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
 

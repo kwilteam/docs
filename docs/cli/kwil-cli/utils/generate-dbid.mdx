@@ -1,0 +1,56 @@
+---
+sidebar_position: 4
+sidebar_label: "generate-dbid"
+id: "kwil-cli-utils-generate-dbid"
+title: "kwil-cli utils generate-dbid"
+description: "`dbid` generates a dbid for a given schema name and deployer."
+slug: /ref/kwil-cli/utils/generate-dbid
+---
+
+## kwil-cli utils generate-dbid
+
+`dbid` generates a dbid for a given schema name and deployer.
+
+### Synopsis
+
+`dbid` generates a dbid for a given schema name and deployer.
+
+```
+kwil-cli utils generate-dbid [flags]
+```
+
+### Examples
+
+```
+# Generate a dbid for a schema and deployer
+kwil-cli utils dbid --schema=myschema --deployer=0x1234567890abcdef
+
+# Maintain the exact deployer address, and do not trim off the 0x prefix
+kwil-cli utils dbid --schema=myschema --deployer=0xnot_an_eth_address --no-trim
+```
+
+### Options
+
+```
+      --deployer string   Deployer address
+  -h, --help              help for generate-dbid
+      --no-trim           Do not trim off the 0x prefix of the deployer address
+      --schema string     Schema name
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
+

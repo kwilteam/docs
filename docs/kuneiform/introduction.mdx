@@ -9,7 +9,7 @@ slug: /kuneiform/introduction
 
 Kuneiform is a language for defining databases on Kwil. It is capable of defining the structure of the database, queries
 for modifying and accessing data, and business logic for enforcing rules around data. Code in Kuneiform is written in blocks.
-All blocks have are given a name, which must be unique from all other blocks in the same file.
+All blocks are given a name, which must be unique from all other blocks in the same schema.
 
 :::tip
 You can write, parse, and deploy Kuneiform, as well as view sample Kuneiform files, online at https://admin.kwil.com/ide.
@@ -89,12 +89,6 @@ procedure create_user($name text) public {
     VALUES ($name, @caller);
 }
 ```
-
-## Kuneiform Video
-
-Check out the Kuneiform Tutorial below for a helpful overview of the language and how to deploy your database through the IDE.
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/iEy2iVV4A5Q" title="Kuneiform IDE Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
 ## Read More
 

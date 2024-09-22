@@ -1,0 +1,104 @@
+---
+sidebar_position: 2
+sidebar_label: "Example: Network-Level Schema"
+id: hooks-example
+title: "Example: Network-Level Schema"
+description: An example of using Kwil hooks.
+slug: /extensions/hooks/example
+---
+
+This example demonstrates how to use hooks to implement a network-level schema. Unlike user-defined schemas, which are not deployed when the
+network starts and can be dropped, network-level schemas are not owned by a user, and exist for the lifetime of the network. This is particularly
+useful in cases where you need to guarantee a schema always exists.
+
+This example shows a basic schema that is written to once per block. It contains a single table, `blocks`, where each height is registered. This example
+is likely not useful in any real world scenarios.
+
+## Step 1: Implement the Schema
+
+Below is the basic schema we will be deploying. It contains a single table, `blocks`, with a single column, `height`.
+
+```typescript title="blocks.kf"
+database blocks;
+
+table blocks {
+    height int primary key
+}
+
+// we use owner to guarantee that only the deployer (network consensus in this case)
+// can call this procedure
+procedure insert_block() public owner {
+    insert into blocks values (@height);
+}
+```
+
+## Step 2: Genesis and End Block Hooks
+
+Below, we have a file that implements two hooks: a genesis hook and an end block hook. The genesis hook deploys the schema, and the end block hook
+inserts a new row into the `blocks`.
+
+```go title="extension.go"
+package main
+
+import (
+	"context"
+	_ "embed"
+
+	"github.com/kwilteam/kwil-db/common"
+	"github.com/kwilteam/kwil-db/extensions/hooks"
+	"github.com/kwilteam/kwil-db/parse"
+)
+
+var (
+	//go:embed blocks.kf
+	genesisSchema []byte
+	// networkIdent is used to identify that the schema belongs to the network,
+	// instead of a user.
+	networkIdent = "network"
+)
+
+func init() {
+    // parse the schema so we can deploy it
+	schema, err := parse.Parse(genesisSchema)
+	if err != nil {
+		panic(err)
+	}
+
+	schema.Owner = []byte(networkIdent)
+
+	// Use a genesis hook to deploy the schema when the network is started.
+	err = hooks.RegisterGenesisHook("blocks_deploy", func(ctx context.Context, app *common.App, chain *common.ChainContext) error {
+		// deploy the schema
+		return app.Engine.CreateDataset(&common.TxContext{
+			Ctx: ctx,
+			BlockContext: &common.BlockContext{
+				ChainContext: chain,
+				Height:       0,
+			},
+			Signer: []byte(networkIdent),
+			Caller: networkIdent,
+		}, app.DB, schema)
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	// Use an end block hook to insert the block number into the schema.
+	err = hooks.RegisterEndBlockHook("custom_end_block", func(ctx context.Context, app *common.App, block *common.BlockContext) error {
+		// execute the procedure
+		_, err := app.Engine.Procedure(&common.TxContext{
+			Ctx:          ctx,
+			Signer:       []byte(networkIdent),
+			Caller:       networkIdent,
+			BlockContext: block,
+		}, app.DB, &common.ExecutionData{
+			Dataset:   schema.DBID(),
+			Procedure: "insert_block",
+		})
+		return err
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+```

@@ -31,7 +31,7 @@ Procedures can also return tables, which are a collection of many records. The b
 of a certain age:
 
 ```ts
-// get_users takes one integerm and will return a table with two columns:
+// get_users takes one integer and will return a table with two columns:
 // "name" of type text, and "age" of type int
 // It has a view tag, which means it does not mutate state, and can
 // be called without submitting a blockchain transaction
@@ -55,7 +55,7 @@ procedure create_user($name text, $age int) public {
 
 Procedures can be given access modifiers to specify how/when they can be called. All procedures must be specified
 as `public` or `private`: `public` procedures can be called externally, while `private` procedures can only be called
-by other procedues within the same schema:
+by other procedues within the same schema. This works exactly like `public` and `private` in JavaScript:
 
 ```typescript
 database social_network;
@@ -165,9 +165,7 @@ procedure join_procedure() public {
 
 ### Handling Arrays
 
-Procedures support basic array operations. See [Functions](/docs/kuneiform/functions#array-functions) for more information on array functions.
-
-**Arrays use 1-based indexing.**
+Procedures support basic array operations. **Arrays use 1-based indexing.**
 
 ```ts
 procedure handle_array() public view returns (val text) {
@@ -181,7 +179,7 @@ procedure handle_array() public view returns (val text) {
 }
 ```
 
-### If/Then
+### If/Else
 
 If/else/elseif statements can be used to conditionally execute code:
 

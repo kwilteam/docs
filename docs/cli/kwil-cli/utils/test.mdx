@@ -1,0 +1,80 @@
+---
+sidebar_position: 10
+sidebar_label: "test"
+id: "kwil-cli-utils-test"
+title: "kwil-cli utils test"
+description: "Runs Kuneiform JSON tests."
+slug: /ref/kwil-cli/utils/test
+---
+
+## kwil-cli utils test
+
+Runs Kuneiform JSON tests.
+
+### Synopsis
+
+Runs Kuneiform JSON tests.
+	
+The `test` command executes runs tests for Kuneiform.
+Custom tests for user-defined schemas can be defined using JSON.
+For information on how to create JSON tests for Kuneiform schemas,
+reference the Kwil docs (https://docs.kwil.com).
+
+Paths to JSON files for tests are relative to the working directory, but
+schema filepaths specified in the JSON will be accessed relative to the
+respective JSON file.
+
+Test cases can be run by specyfing the path to the JSON using the
+`file` flag. Multiple test files can be specified by simply
+using the flag many times.
+
+The tests need an active PostgreSQL instance to run against. Users can
+use the `--test-container` flag to have `kwil-cli` setup
+and teardown a Docker test container, if they have Docker installed locally.
+Alternatively, users can specify a PostgreSQL connection using the
+ `--host`, `--port`, `--user`, `--password`, and `--database` flags.
+
+```
+kwil-cli utils test [flags]
+```
+
+### Examples
+
+```
+# Run tests with a test container
+kwil-cli utils test --file ./test1.json --file ./test2.json --test-container
+
+# Run tests against a manually set up local Postgres instance
+kwil-cli utils test --file ./test1.json --host localhost --port 5432 \
+--user postgres --password password --database postgres
+```
+
+### Options
+
+```
+  -Y, --assume-yes        Assume yes for all prompts
+      --database string   name of the Postgres database to manually connect to (default "kwild")
+  -f, --file strings      filepaths of tests to run
+  -h, --help              help for test
+      --host string       host of the database (default "localhost")
+      --password string   password for the database user
+      --port string       port of the database (default "5432")
+      --test-container    runs the tests with a Docker testcontainer
+      --user string       user with administrative privileges on the database (default "postgres")
+```
+
+### Options inherited from parent commands
+
+```
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
+

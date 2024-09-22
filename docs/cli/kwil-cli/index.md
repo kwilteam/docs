@@ -1,24 +1,24 @@
 ---
-sidebar_position: 10
+sidebar_position: 99
 sidebar_label: "Reference"
 id: "kwil-cli"
 title: "kwil-cli"
-description: "Command line interface for using Kwil databases."
+description: "Command line interface client for using Kwil."
 slug: /ref/kwil-cli
 ---
 
 ## kwil-cli
 
-Command line interface for using Kwil databases.
+Command line interface client for using Kwil.
 
 ### Synopsis
 
-Command line interface for using Kwil databases.
-
-The Kwil CLI is a command line interface for interacting with Kwil databases.  It can be used to deploy, update, and query databases.  It can also be used to generate documentation for Kwil databases.
-
-The Kwil CLI can be configured with a persistent configuration file.  This file can be configured with the 'kwil-cli configure' command.  The Kwil CLI will look for a configuration file at `$HOME/.kwil-cli/config.json`.
+Command line interface client for using Kwil.
 	
+`kwil-cli` is a command line interface for interacting with Kwil. It can be used to deploy, update, and query databases.
+	
+`kwil-cli` can be configured with a persistent configuration file. This file can be configured with the 'kwil-cli configure' command.
+`kwil-cli` will look for a configuration file at `$HOME/.kwil-cli/config.json`.
 
 ### Options
 

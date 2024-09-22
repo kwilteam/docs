@@ -11,7 +11,7 @@ The `setup` command provides functions for creating and managing node
 configuration and data, including:
 
 * performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
-* updating genesis config with initial SQLite files (`genesis-hash`)
+* updating genesis config a hash of the initial database state (`genesis-hash`)
 * resetting node state and all data files (`reset`)
 
 ## Quick Setup of a Single Kwil Node
@@ -24,9 +24,8 @@ For example, to create a node configuration for a new network in a node root
 folder at `~/.kwild-new`:
 
 ```
-$ kwil-admin setup init -o ~/.kwild-new
-Generated genesis file /home/user/.kwild-new/abci/config/genesis.json
-Successfully initialized node directory:  /home/user/.kwild-new
+$ kwil-admin setup init --root-dir ~/.kwild-new
+Initialized node in /home/user/.kwild-new
 ```
 
 The above command also generated a new `config.toml` and `private_key` file in
@@ -77,33 +76,28 @@ The config files for each of the nodes will specify all of the other nodes as
 persistent peers so that they will connect to each other on startup. This is
 generally only practical for small test networks with fewer than 12 nodes.
 
-The following options may be used to control what is generated:
-
-- `--validators` or `-v` is the number of validators [default: 4]
-- `--non-validators` or `-n` is the number of non-validators [default: 4]
-- `--config` is a template config file to use, default is none
-- `--output-dir` or `-o` is the parent directory for all of generated node folders [default: ".testnet"]
-- `--node-dir-prefix` is the prefix for the node directories (node results in node0, node1, ...) [default: "node"]
-- `--hostname-prefix` is the prefix for node host names e.g. node results in node0, node1, etc.
-- `--hostname-suffix` is the suffix for node host names e.g. .example.com results in node0.example.com, node1.example.com, etc.
-- `--starting-ip` is the starting IP address of the first network node, with subsequent nodes on the next address in the subnet
-- `--hostnames` overrides all hostnames of the nodes
-- `--p2p-port` or `-p` is the TCP port on which each node listens for P2P connections
-
-## Updating Genesis Config with Initial SQLite Data
-
-If preparing a network with initial databases, it is required to update the "app
-hash" in `kwild`'s genesis configuration to reflect the initial state that
-includes one or more SQLite files. The syntax is:
+For more information on usage, configurations, and more, use the `--help` flag:
 
 ```
-kwil-admin setup genesis-hash [--genesis GENESIS] [DBDIR]
+kwil-admin setup testnet --help
+```
+
+## Updating Genesis Config with Initial Postgres Data
+
+If preparing a network with initial databases, it is required to update the "app
+hash" in `kwild`'s genesis configuration to reflect the initial state of a Postgres database. The syntax is:
+
+```
+kwil-admin setup genesis-hash [--genesis GENESIS] [--root-dir ROOTDIR] [--snapshot SNAPSHOT] \
+  [--dbname DBNAME] [--host HOST] [--port PORT] [--user USER] [--password PASSWORD]
 ```
 
 Both inputs are optional, using default paths. `GENESIS` is the path to the
 genesis file to patch, which is `~/.kwild/abci/config/genesis.json` by default.
-The `DBDIR` argument is the directory containing all of `kwild`'s SQLite files
-to be hashed, which is `~/.kwild/data/kwil.db/` by default.
+The `ROOTDIR` argument is the root directory of a node, which is `~/.kwild` by
+default. Alternatively, configurations for a Postgres connection can be provided,
+or a path to a snapshot file can be specified.
+Use the `--help` flag for more information.
 
 ## Resetting All Application Data
 
@@ -113,12 +107,13 @@ To delete all of a Kwil node's data files, use the `reset` command.
 only be used to reset disposable test nodes.**
 
 ```
-kwil-admin setup reset [--root_dir DIR] [--force] [--sqlpath DIR] [--snappath DIR]
+kwil-admin setup reset [--root-dir DIR] [--force] [--dbname DBNAME] [--host HOST] \
+  [--port PORT] [--user USER] [--password PASSWORD]
 ```
 
-This command only requires one: (a) `--root_dir` to specify a node root
+This command only requires one: (a) `--root-dir` to specify a node root
 directory containing the files to reset, or (b) `--force` to automatically reset
 the files in the default node root directory at `~/.kwild`.
 
-The paths to the SQLite files (`--sqlpath`) and snapshots (`--snappath`) are
-optional, but provided here since they are configurable on the node.
+Extra Postgres configurations can be provided if needed, but the command will attempt
+to connect using the configurations in the `config.toml` file in the node root.

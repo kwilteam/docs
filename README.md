@@ -71,7 +71,7 @@ When ready, use your favourite Node.js IDE tooling, e.g., VS Code, to add new pa
 
 ## Committing changes and pushing to a new branch
 
-After you’ve tested your changes:
+After you've tested your changes:
 
 - Stage any newly added and updated pages
 

@@ -50,8 +50,10 @@ kwil-cli database call --action get_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8B
 ```
   -a, --action string   the target action name (required)
       --authenticate    authenticate signals that the call is being made to a gateway and should be authenticated with the private key
+      --callauth        authenticate call RPCs by signing a challenge response with the call data
   -i, --dbid string     the target database id
   -h, --help            help for call
+      --logs            result will include logs from notices raised during the call
   -n, --name string     the target database schema name
   -o, --owner string    the target database schema owner
 ```

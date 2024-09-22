@@ -12,7 +12,7 @@ however you can also deploy your database using the [Kuneiform IDE](<https://adm
 ## Prerequisites
 
 - [Kwil CLI](https://github.com/kwilteam/kwil-db/releases) - Download from the Kwil Binary Releases.
-- [Ethereum Wallet](https://privatekeys.pw/keys/ethereum/random) - You will need an Ethereum private key to sign the transaction.
+- [Ethereum Private Key](/docs/ref/kwil-cli/utils/generate-key#examples) - You will need an Ethereum private key to sign the transaction.
 - [Testnet Tokens](https://faucet.kwil.com) - Get testnet tokens from the Kwil Faucet for your associated Ethereum address.
 - (Optional) [Kuneiform VSCode Extension](https://marketplace.visualstudio.com/items?itemName=kwil-tools.kuneiform) - For syntax highlighting and intellisense.
 
@@ -193,7 +193,7 @@ To deploy the database, we will use the [Kwil CLI](/docs/category/cli).  To depl
 
 ```bash
 # highlight-next-line
-$ kwil-cli database deploy --path=./path/to/social_media.kf --provider='https://longhorn.kwil.com' --chain-id 'longhorn-2' --private-key 'your-private-key' --sync
+$ kwil-cli database deploy ./path/to/social_media.kf --provider='https://longhorn.kwil.com' --chain-id 'longhorn-2' --private-key 'your-private-key' --sync
 TxHash: 53018a450101d07f096e767fc6bc11374addf7f5a5a9788d8ad69ed6f1a24f49
 Status: success
 Height: 587740

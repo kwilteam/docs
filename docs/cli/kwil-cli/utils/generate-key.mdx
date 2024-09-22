@@ -1,0 +1,54 @@
+---
+sidebar_position: 5
+sidebar_label: "generate-key"
+id: "kwil-cli-utils-generate-key"
+title: "kwil-cli utils generate-key"
+description: "Generates a new key pair."
+slug: /ref/kwil-cli/utils/generate-key
+---
+
+## kwil-cli utils generate-key
+
+Generates a new key pair.
+
+### Synopsis
+
+Generates a new key ECDSA pair using the secp256k1 curve.
+
+```
+kwil-cli utils generate-key [flags]
+```
+
+### Examples
+
+```
+# Generate a new key pair
+$ kwil-cli utils generate-key
+Private key: 5ecb2ce01dee61729f70e75830d2f0cd151514193f2e05816aad5c453a85edbd
+Public key: 0489590f68d80907d74df59b8d9392b78e060a015f4bc58f346820e0d3266d805766bc14fad70b1b8e8a76bab87c4239345790560b00bca7bf5bc7c6bc3c34a4d5
+Address: 0x7C4239345790560b00bcA7bF5bC7c6BC3C34a4D5
+```
+
+### Options
+
+```
+  -h, --help         help for generate-key
+  -o, --out string   Output file for the generated key pair.
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
+

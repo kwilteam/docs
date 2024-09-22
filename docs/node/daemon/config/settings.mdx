@@ -6,13 +6,19 @@ title: Settings
 description: Operational parameters
 slug: /daemon/config/settings
 ---
-This section provides a detailed overview of the operational parameters available in the `config.toml` file for configuring a Kwil node. These settings are grouped into three categories: chain-specific configurations related to the underlying blockchain operations, app-specific configurations that dictate the Kwil application's behavior, and logging configurations. Below are the explanations for each parameter:
+This section provides a detailed overview of the operational parameters available in the `config.toml` file for configuring a Kwil node.
+These settings are grouped into three categories: logging configurations, app-specific configurations that dictate the Kwil application's
+behavior, and chain-specific configurations related to the underlying blockchain operations. Below are the explanations for each parameter:
 
 ## [log]
 
 - `level`: This variable specifies the logging level of the Kwil application. By default, the level is set to `info`.
 
 - `rpc_level`: This variable specifies the logging level for the RPC server, which must be higher than the general log level. No default.
+
+- `consensus_level`: The level of logging for the consensus engine (CometBFT). This level must be higher than the general log level. No default.
+
+- `db_level`: The level of logging for the database driver. This level must be higher than the general log level. No default.
 
 - `output_paths`: This variable specifies where logs are written to. You can designate multiple paths, separated by commas. By default, logs are directed to `stdout` and `kwild.log`.
 
@@ -49,7 +55,9 @@ This section provides a detailed overview of the operational parameters availabl
 
    - `rpc_timeout`: The timeout for the JSON-RPC server. Default is 45s. 
 
-   - `db_read_timeout`: The timeout for database reads initiated by RPC requests. Default is 5s. 
+   - `db_read_timeout`: The timeout for database reads initiated by RPC requests. Default is 5s.
+
+   - `max_req_size`: The maximum size of a request body in bytes. Default is 4.2MB.
 
    - `extension_endpoints`: This variable specifies the endpoints for extensions, separated by commas.
 
@@ -60,6 +68,14 @@ This section provides a detailed overview of the operational parameters availabl
    - `hostname`: This variable sets the Kwil JSON-RPC server's hostname. No default.
 
    - `genesis_state`: This variable specifies the path to the snapshot file to be used for the initial state of the node. If the node is configured to start with initial state and this variable is not set, the node will fail to start. No default.
+
+   - `migrate_from`: A trusted RPC server address where this node can request the latest data from during a zero downtime network migration.
+
+   - `private_rpc`: Runs the RPC in private mode, which authenticates clients requesting to read data. Default is `false`.
+
+   - `challenge_expiry`: The time (in seconds) after which a challenge will expire. Default is 10s. Only applicable when `private_rpc` is enabled.
+
+   - `challenge_rate_limit`: The challenge request rate limit per second per client IP. Only applicable when `private_rpc` is enabled. Default is 10.
 
    ### [app.snapshots]
 
@@ -84,7 +100,7 @@ This section contains configuration specific to the CometBFT-based blockchain.
 
       - `listen_addr`: This variable specifies the listening address for the blockchain's RPC server. Default is `tcp://127.0.0.1:26657`.
 
-      - `broadcast_tx_timeout`: This variable specifies the time to wait for a transaction to be committed when authored with --sync flag in the CLI. Default is 15s.
+      - `broadcast_tx_timeout`: This variable specifies the time to wait for a transaction to be committed when authored with `--sync` flag in the CLI. Default is 15s.
 
    ### [chain.consensus]
 
@@ -127,6 +143,10 @@ This section contains configuration specific to the CometBFT-based blockchain.
       - `unconditional_peer_ids`: This variable specifies a comma separated list of node ID's that will always have connections (re)established, regardless of the connection limits. No default.
 
       - `allow_duplicate_ip`: A toggle to prevent multiple peers from using the same IP address. Default is `true`.
+
+      - `handshake_timeout`: This variable specifies the time to wait for a handshake to complete. Default is 20s.
+
+      - `dial_timeout`: This variable specifies the time to wait for a dial to complete. Default is 3s.
 
    ### [chain.mempool]
    

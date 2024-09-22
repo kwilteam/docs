@@ -1,42 +1,42 @@
 ---
 sidebar_position: 2
-sidebar_label: "Building kwild With Extensions"
-id: building-kwild-with-extensions
-title: Building kwild With Extensions
-description: Build a custom kwild binary with your own extensions
-slug: /extensions/building-kwild-with-extensions
+sidebar_label: "Building Custom Binaries"
+id: building-custom-binaries
+title: Building Custom Kwil Binaries
+description: Build a custom kwil binary with your own extensions
+slug: /extensions/building-kwil-with-extensions
 ---
 
-In order to use extensions in Kwil, users need to build custom `kwild` binaries that include the extensions they want to use.
-This guide will walk you through the process of building a custom `kwild` binary with extensions.
+In order to use extensions with Kwil, users need to build custom binaries that include the extensions they want to use.
+This guide will walk you through the process of building a custom Kwil binary with extensions.
 
 ## Prerequisites
 
-Before building a custom `kwild` binary, ensure you have the following installed:
+Before building a custom binary, ensure you have the following installed:
 - [Go 1.21+](https://golang.org/doc/install)
 - [Docker](https://docs.docker.com/get-docker/)
 
-## Step 1: Setting up the environment
+# Step 1: Setting up the environment
 
-Start by setting up the repo for building the custom `kwild` binary. This will be a standard Go repo setup.
+Start by setting up the repo for building the custom binary. This will be a standard Go repo setup.
 
-Create a new directory for the custom `kwild` binary and navigate to it:
+Create a new directory for the binary and navigate to it:
 
 ```shell
-mkdir custom-kwild
-cd custom-kwild
+mkdir custom-kwil
+cd custom-kwil
 ```
 
 Initialize a new Go module:
 
 ```shell
-go mod init custom-kwild
+go mod init custom-kwil
 ```
 
 Install the Kwil SDK:
     
 ```shell
-go get github.com/kwilteam/kwil-db@v0.8.1
+go get github.com/kwilteam/kwil-db
 ```
 
 Run `go mod tidy` to ensure all dependencies are installed.
@@ -62,11 +62,15 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kwilteam/kwil-db/cmd/kwild/root"
+	"github.com/kwilteam/kwil-db/cmd/custom"
 )
 
 func main() {
-	if err := root.RootCmd().Execute(); err != nil {
+	err := custom.NewCustomCmd(custom.CommonCmdConfig{
+		RootCmd:     "my-custom-cmd",
+		ProjectName: "My Project Name",
+	}).Execute()
+	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -130,17 +134,23 @@ func (Ed25519Authenticator) Identifier(sender []byte) (string, error) {
 }
 ```
 
-## Step 4: Build the custom `kwild` binary
+## Step 4: Build the custom binary
 
-Build the custom `kwild` binary. This will compile all the files in the project directory, as well as any that are imported:
+Build the custom binary. This will compile all the files in the project directory, as well as any that are imported:
 
 ```shell
-go build -o kwild
+go build . -o my-custom-cmd
 ```
+
+This will create a binary called `my-custom-cmd` in the root of the project directory. The binary has 3 subcommands:
+- `node`: Start a Kwil node, equivalent to a standalone [`kwild`](/docs/node/quickstart) binary.
+- `client`: A client to interact with the Kwil node, equivalent to a standalone [`kwil-cli`](/docs/kwil-cli/installation) binary.
+- `admin`: A client for node operators to interact with the Kwil node's admin RPC, equivalent to a standalone [`kwil-admin`](/docs/admin) binary.
+
 
 ## Step 5: Run Postgres
 
-Before running the custom `kwild` binary, you will have to start Postgres. The Kwil team has provided a default image
+Before running the custom node, you will have to start Postgres. The Kwil team has provided a default image
 with the necessary configurations. For more information on how to configure your own Postgres database, please
 refer to the [Postgres setup guide](/docs/daemon/installation#postgresql).
 
@@ -149,20 +159,20 @@ docker run -d -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=tr
     kwildb/postgres:latest
 ```
 
-## Step 6: Run the custom `kwild` binary
+## Step 6: Run the custom `my-custom-cmd node` binary
 
-After running Postgres, you can run the custom `kwild` binary. The `--autogen` flag will automatically generate a new node key, a network genesis file, and a default
-node configuration:
+After running Postgres, you can run the custom `my-custom-cmd node` command. The `--autogen` flag will automatically generate a new node key,
+a network genesis file, and a default node configuration:
 
 ```shell
-./kwild --autogen
+./my-custom-cmd node --autogen
 ```
 
 ## Conclusion
 
-In this guide, you built a custom `kwild` binary with extensions.
-You can now use the custom `kwild` binary to run a Kwil node with the custom extension.
-For more information on how to use the custom extension, please refer to the respective extension documentation.
+In this guide, you built a custom Kwil binary with extensions.
+You can now use the custom binary to run a Kwil node with your custom extension(s).
+For more information on how to implement custom extensions, please refer to the respective extension documentation.
 
 ## Next Steps
 
@@ -171,3 +181,4 @@ Additional extension types and tutorials found below:
 - **Kuneiform Precompiles**: [Build a SHA Kuneiform precompile](/docs/extensions/precompiles/sha)
 - **Resolutions**: [Build account credit resolution](/docs/extensions/oracle-example-part-1)
 - **Event Listeners**: [Build Ethereum event listener](/docs/extensions/oracle-example-part-2)
+- **Hooks**: [Build a custom hook](/docs/extensions/hooks/overview)
