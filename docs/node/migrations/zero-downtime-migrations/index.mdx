@@ -7,10 +7,129 @@ description: Zero Downtime Migrations
 slug: /node/migrations/zero-downtime-migrations
 ---
 
-In the scenarios where the network cannot afford any downtime, Zero Downtime Migrations are the best solution. This method involves launching a new network and running it in parallel with the existing network during the migration period and streaming changes from the existing network to the new network to keep the new network in sync with the existing network. At the end of the migration period, the old network can be decommissioned without any disruption to the network's users or services.
+This page describes in detail the different phases of zero downtime migration process, from the approval of a migration proposal to the final decommissioning of the old network. 
 
-```mdx-code-block
-import DocCardList from '@theme/DocCardList';
+![Migration Process](../../../../static/img/migration.jpg)
 
-<DocCardList />
+## Migration Proposal
+A network migration is proposed by a validator using a special network governance resolution. The migration proposal includes the activation period, duration, and the chain ID of the new network as shown below.
+
+- `ActivationPeriod`: The amount of blocks before the migration is activated. It starts after the migration is approved via the voting system. The intention is to allow validators to prepare for the migration.
+- `Duration`: The amount of blocks the migration will take to complete.
+- `ChainID`: The new chain ID that the network will migrate to. A new chain ID should always be used for a new network to avoid cross-network replay attacks.
+- `Timestamp`: The time at which the migration was proposed.
+
+The Migration proposal needs to be approved by at least 2/3rd of the validators to start the migration process. The migration proposal will expire if the supermajority of the validators do not approve the proposal within `100800` blocks (roughly 7 days with a 6 second block interval). Once the migration proposal is approved, the network moves into migration mode after the specified activation period.
+
+### Submit Migration Proposal
+
+A validator operator can submit a migration proposal using the `kwil-admin migrate propose` command as shown below. Refer to the [Submit Migration Proposal](/docs/ref/kwil-admin/migrate/propose) documentation for more details.
+
+```bash
+kwil-admin migrate propose --activation-period <activationPeriod> --duration <migrationDuration> --chain-id <newChainID> --rpcserver /tmp/kwil.sock
 ```
+
+:::note
+An off-chain communication is required among the validator operators to decide on the details of the migration proposal. One of the validators should submit the proposal to the network for approval. Only one proposal can be applied to the network during the lifetime of the network (per chain-id). Once the proposal is approved, all the other migration proposals will be rejected from the network and no new proposals can be submitted or approved.
+:::
+
+To check if the proposal is submitted successfully, we can get the list of pending migration proposals as shown below:
+
+```bash
+kwil-admin migration list --rpcserver /tmp/kwild.socket
+```
+This list will contain the proposal ID which is used by the validators to vote on the proposal.
+
+
+### Approve Migration Proposal
+
+To start the migration, the migration proposal needs the approval from at least a supermajority of the validators. The validators can submit their vote approval on the migration proposal using the below command.
+
+```bash
+kwil-admin migration approve <proposal-id>
+```
+
+Operators can check the status of the proposal and the votes information as shown below:
+
+```bash
+kwil-admin migration status <proposal-id>
+```
+
+:::note
+The migration proposal will get expired if the supermajority of the validators do not approve the proposal within `100800` blocks (roughly 7 days with a 6sec block interval). The proposal can be resubmitted after the expiration.
+:::
+
+## Activation Period
+
+Once the migration proposal is approved, the migration is set to start after the activation period. During this activation period, no new migration proposals can be submitted or approved. The activation period allows all network participants to prepare for the upcoming migration.
+
+## Migration Starts
+
+The network migration begins once the specified activation period (measured in blocks) has passed since the approval of migration proposal. The following sections provide a detailed breakdown of the events that take place on both the existing and the new network throughout the migration period.
+
+### Existing Network During Migration
+
+At the start of the migration, all the existing nodes will take a network snapshot and generate the genesis configuration files that will be used to initialize the new network. From this height onwards, all the nodes on the existing network records state changes such as account spends or changes to user data on a per-block basis and replicate these changes onto the new network.
+
+Starting from this height, the existing network will continue to operate but with limited capabilities. It will continues to support "inserts/updates/deletes" on user datasets as usual but the below functionalities will be disabled during the migration period:
+- Schema Deploy and Drop
+- Account Credits and Transfers
+- Resolution Creation
+- Resolution Approvals
+
+### New Network During Migration
+
+New network can be started in parallel to the existing network with the genesis-state as the state of the existing network at the start of the migration and then replicate the state changes of the existing network to the new network during the migration period to stay in sync with the existing network.
+
+#### Replicate State Changes From Existing Network
+
+State replication from the existing network onto the new network is handled by a built-in `migrations` listener extension in the Kwil node. The `migrations` listener extension polls for the state changes on the existing network and records these changes on the new network using governance transactions. Once these transactions are approved by the new network, the changes are applied to the database. 
+
+The `migrations` listener extension can be enabled by setting the below configuration in the `config.toml` and `genesis.json` files.
+
+`migrate_from` config in the `config.toml` file specifies the JSON-RPC address of the node from the existing network that the new network should replicate the state changes from. 
+```toml
+[app]
+migrate_from = "http://kwild-jsonrpc-server-address:8484"
+```
+:::note
+The connection should be secure to ensure that the received data is not tampered with.
+:::
+
+The `migration` consensus parameter in the `genesis.json` file specify the start and end block heights from which the state changes are to be replicated from the existing network to the new network.
+```json
+{
+    "consensus_params": {
+        "migration": {
+            "start_height": <start_height>,
+            "end_height": <end_height>,
+        },
+    }
+}
+```
+:::warning
+`start_height` and `end_height` in the genesis file and `migrate_from` in the config file are mandatory to ensure that the new network stays in sync with the existing network during the migration period. If neither are set, the new network will start with the state from the snapshot state, but doesn't include any state changes from the existing network. If one of them is set but not other, the node will fail to start.
+:::
+
+#### Handling State Divergence
+
+During migration period, as both old and new networks are running concurrently handing user transactions and replicating state changes from the existing network, there is a possibility for the occurance of state divergences between the two networks. 
+The migration process does its best to resolve the conflicts between the two networks using a set of conflict resolution principles. However, there might be some schemas where the conflicts cannot be resolved without any loss of data.
+
+:::note
+** Do's and Dont's: ** Operators should migrate to new network as soon as possible and redirect all the user transactions to the new network. Any single user transactions should not be scattered across both new and old chains to avoid any state divergence and should be redirected to a single network as much as possible.
+:::
+
+User Dataset changeset conflicts are handled as follows:
+
+- **Inserts**: Inserts from the old network will attempt to be applied to the new network, and any conflicts will be ignored, in favor of whatever already exists on the new network.
+- **Updates**: The new network will check the pre-change value of the proposed update from the old network's changeset. If the new network's record for that primary key matches the pre-change value in the changeset, it will apply the change. If the values are not equal, it will discard the change, in favor of what data exists on the new network
+- **Deletes**: Similar to update, if the record matches the pre-change value in the changeset, it will be deleted. Otherwise, no change will be applied.
+
+All spends from the old network should be replicated to the new network and the conflicts are handled as follows:
+- If a spend from the old network would cause a user's balance to drop below zero, the entire balance will be spent, setting it to zero.
+- Otherwise, the specified amount from the old network’s spend will be deducted from the user’s balance on the new network.
+
+## Migration Ends
+
+The existing network halts after the `Duration` blocks since the start of the migration. The existing network will no longer accept new transactions or produce new blocks with transactions. The RPC services remain available for querying the state of the network. Once the new network is fully synced with the existing network, the existing network can be safely decommissioned. Whereas, the new network continues to produce blocks and process transactions as usual.

@@ -1,0 +1,142 @@
+---
+sidebar_position: 2
+sidebar_label: "Offline Migrations"
+id: offline-migrations
+title: Offline Migrations
+description: Offline Migrations
+slug: /node/migrations/offline-migrations
+---
+
+This document provides a detailed guide on how to use offline migrations to establish a new network that integrates existing data from a previous network, using nodes that run on the updated version of the `kwild` binaries. The migration process involves the following steps:
+
+1. [Halt the existing network](#halt-the-existing-network)
+2. [Create network snapshot](#create-network-snapshot)
+3. [Distribute the genesis state](#distribute-genesis-state)
+4. [Start new network](#start-new-network)
+
+Follow the steps below to upgrade the network to a new version of the `kwild` binaries:
+
+## Halt the existing network
+Offline migrations requires coordinated halting of the existing network to ensure that the network state is consistent across all nodes before proceeding to take a network snapshot. 
+
+:::note
+Offline coordination is required among the operators to decide on the block height at which the network should halt. 
+:::
+
+To halt the network, stop the your node and set the `halt` hardfork config in the `genesis.json` file to the agreed block height. Restart the node for `halt` to take effect and ensure that the network halts after the configured activation block height is reached.
+
+```json
+{
+  "genesis_time": "2024-04-15T17:00:34.108598516Z",
+  "chain_id": "kwil-chain-g1KPHOsY",
+  "activations": {
+    "halt": 1234000 // `halt` set to agreed upon block height
+  },
+  ...
+}
+```
+Stop the node once the `halt` activation height is reached.
+
+## Create Network Snapshot
+
+Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the Kwild database. For more details, refer to the [create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation. This tool connects directly to the database to capture its state and does not require the `kwild` process to be running.
+
+```sh
+kwil-admin snapshot create --snapdir /path/to/snapdir
+```
+
+:::tip
+By default, the `snapshot create` command connects to the `postgres` instance running at `localhost:5432` with the default user `postgres` (without a password?). To modify the database connection settings, see the `kwil-admin` reference page.
+:::
+
+This generates a compressed snapshot file and a template genesis file required to start the new network as shown below.
+
+```sh
+$ ls /path/to/snapdir
+genesis.json            kwildb-snapshot.sql.gz
+```
+
+### Verify App Hash
+
+The app hash set in the genesis file is generated based on the hash of the uncompressed snapshot. You can verify the app hash in the generated genesis file as follows
+
+``` bash
+kwil-admin setup genesis-hash --snapshot /path/to/snapdir/kwildb-snapshot.sql.gz
+```
+
+## Distribute Genesis State
+
+The generated genesis file includes the genesis app hash, derived from the hash of the uncompressed snapshot file, and the genesis validators set to the validators from the previous network. If there are any changes to the validator set in the new network, modify the validator set manually to remove or add new validators. The rest of the configuration in the genesis file is set to defaults, so you should update it based on your requirements before distributing the genesis file.
+
+:::warning
+It is recommended that only one validator operator is responsible for generating, updating, and distributing the genesis state file to all other validators. This ensures that all validators are working from the same, consistent configuration.
+:::
+
+Distribute the `kwildb-snapshot.sql.gz` and the `genesis.json` files required to start the new network. 
+
+## Start New Network
+
+### Install Kwild Binaries
+
+Install the new version of the `kwild` binaries. Refer to the [Installation](/docs/daemon/installation) documentation for more details on how to install the `kwild` binaries.
+
+### Setup Root directory
+
+Copy the `kwildb-snapshot.sql.gz`, `genesis.json` files downloaded [above](/docs/node/migrations/offline-migrations#create-network-snapshot) to the new node's root directory. 
+
+:::note
+Ensure that the `private_key` corresponding to the validator node are securely copied to the new node's root directory.
+:::
+
+```
+root_dir
+├── config.toml
+├── private_key
+├── genesis.json
+├── snapshot.sql.gz
+├── abci/
+```
+
+### Configure Nodes To Use Snapshots
+
+Configure `config.toml` with required settings, refer to the [Node Configuration](/docs/daemon/config/settings) documentation for more details.
+
+To initialize the node with the snapshot data, set the `genesis_state` path in `config.toml` to the location of the downloaded snapshot file. 
+
+```TOML
+#######################################################################
+###                      App Config Options                         ###
+#######################################################################
+
+[app]
+
+# Path to the snapshot file to restore the database from.
+# Used during the network migration process.
+genesis_state = "/path/to/snapshot/file"
+```
+
+:::info
+To start a new network with the snapshot data, the genesis file must have the `app_hash` field set; otherwise, the network will start with an empty state.
+The node will fail to start if the `app_hash` field is set in the `genesis.json` file but the `genesis_state` path is not provided in the `config.toml` file. 
+:::
+
+### Start Kwild Nodes
+
+Once the genesis and config files are configured to use snapshots, start the node using the following command:
+
+```bash
+# use -h for more options. 
+kwild -r /path/to/node/root/dir
+```
+
+:::tip
+If your `genesis.json` file has multiple validators, you will need to start >2/3 of the validators before the network can start producing blocks.
+:::
+
+## Nodes Catching Up
+
+Follow the same steps described in the [Start New Network](#start-new-network) section to configure and join the network. Nodes can either sync with the network using `statesync` or `blocksync`.
+
+If the node uses `blocksync`, the `genesis_state` path is mandatory to ensure that the node initializes with the same genesis initial state and replay all the historical blocks. If the node doesn't start from the same initial state, it will eventually fork itself off the chain during blocksync. 
+
+If the node uses `statesync` to catch up with the network, the `genesis_state` path is not required in the `config.toml` file. The node will use the `statesync` protocol to catch up with the network as described in the [State Sync](/docs/node/statesync) documentation.

@@ -19,13 +19,13 @@ When a software version includes breaking changes to the consensus rules, it may
 
 ### [Offline Migrations](/docs/node/migrations/offline-migrations)
 
-Offline Migrations are quite simple and only requires coordination among the validators to take the network offline for a short period of time to upgrade the network. It uses network snapshots to bootstrap the new network with the same state as the existing network at the time of the snapshot.
+Offline migrations are quite simple, requiring validators to briefly take the network offline for an upgrade. Using snapshots, the validators bootstrap the new network with the same state as the original at the time of the snapshot.
 
 ### [Zero Downtime Migrations](/docs/node/migrations/zero-downtime-migrations)
 
-In a zero-downtime migration, a new network is launched and run in parallel with the existing network during a migration period. This allows the data to be accessible through one network or the other throughout the process.
+In a zero-downtime migration, a new network is launched and run in parallel with the existing network during a migration period. Data is accessible through either networks during the migration process.
 
-In this kind of migration, the new network is continually synchronizing with the original network, replicating any state changes that occur on the existing network. During the migration period, users and applications should be updated to access data via the new network. This ensures that the new network stays up to date with the latest changes while the migration is in progress.
+In a zero-downtime migration, the new network is continually synchronizing with the original network, replicating any state changes that occur on the existing network. This ensures that the new network stays up to date with the latest changes while the migration is in progress. During the migration period, users and applications should update their clients to use the new network's endpoints.
 
 Once the ecosystem migration is complete and the migration period ends, the old network can be decommissioned without any disruption to the network's users or services.
 

@@ -2,7 +2,7 @@
 sidebar_position: 3
 sidebar_label: "Tutorial"
 id: zero-downtime-migrations-tutorial
-title: Zero Downtime Migrations Tutorial
+title: Tutorial
 description: "Tutorial on how to upgrade a network using zero-downtime migrations"
 slug: /node/migrations/zero-downtime-migrations/tutorial
 ---
@@ -93,7 +93,7 @@ No genesis state to download yet. Migration is set to start at block height: 143
 ```
 
 :::warning
-The `genesis.json` and `snapshot.sql.gz` files are generated in the directory specified using the `--out-dir` flag. Ensure that you don't run the command with `--root-dir` flag set to the current node's root directory as it can overwrite the existing genesis file in the node's root directory.
+The `genesis.json` and `snapshot.sql.gz` files are generated in the directory specified using the `--out-dir` flag. Ensure that you don't run the command with `--out-dir` flag set to the current node's root directory as it can overwrite the existing genesis file in the node's root directory.
 
 If the admin service is directly accessible from the new node (e.g. it is listening on a TCP socket securely accessible from the new node) it can be run on the new node directly.
 :::
@@ -118,14 +118,15 @@ The new network should be configured to bootstrap from the snapshot file provide
 1.  Install the new versions of the `kwild` binaries. Please refer to the [installation guide](/docs/daemon/installation) for more details.
 2. [Download the snapshot and genesis files](#genesis-state) generated at the start of the migration as shown above.
     The genesis file downloaded will have the following information set:
-    - `chain_id`: This is set based on the chainID in the migration proposal.
-    - `app_hash`: This field is set based on the hash of the downloaded snapshot file at the migration start height.This should not be changed as it must match the genesis state snapshot.
-    - `validators`: This field is set to the validators from the existing network.
+    - `app_hash`: This field is set based on the hash of the downloaded snapshot file at the migration start height. This should not be changed as it must match the genesis state snapshot.
+    - `chain_id` and `validators`: This may be modified as long as the modifications are used for all nodes on the new network.
     - `consensus_params.migration.start_height`: The start height of the migration on the old network. Specifies the height from which the state changes are to be replicated onto the new network.  This should not be changed as it must match the migration proposal on the old network.
     - `consensus_params.migration.end_height`: The end height of the migration on the old network. Specifies the height until which the state changes are to be replicated onto the new network.  This should not be changed as it must match the migration proposal on the old network.
 
-    :::warning
-    `allocs` and `activations` fields are set to `null` in the genesis file. All other fields have same configurations as that on the old network. If any other changes are needed to the genesis configuration, update the genesis file manually and redistribute it to the node operators.
+    All other fields have same configurations as that on the old network. If any other changes are needed to the genesis configuration, update the genesis file manually and redistribute it to the node operators.
+
+    :::note
+    As with offline migrations, it is necessary to make the genesis.json and genesis_state files available for all nodes. One or more trusted sources should be made available to distribute these.
     :::
 
 3. Configure the new nodes to bootstrap using the downloaded snapshot file by setting the `genesis_state` field in the `config.toml` file as shown below:
@@ -144,7 +145,7 @@ The new network should be configured to bootstrap from the snapshot file provide
     kwild -r /path/to/root/dir
     ```
 6. The migration process is deemed complete when the following message appears in the Kwild logs:
-    :::info
+    ```text
     Migration completed. The `migration` section in `genesis.json` and the `migrate_from` configuration in `config.toml` are no longer relevant and should be removed.
-    :::
+    ```
     At this point, the old network can be fully decommissioned, and the new network can be used for all transactions.
