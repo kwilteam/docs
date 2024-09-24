@@ -61,9 +61,13 @@ behavior, and chain-specific configurations related to the underlying blockchain
 
    - `extension_endpoints`: This variable specifies the endpoints for extensions, separated by commas.
 
-   - `tls_cert_file`: This variable specifies the file path containing a certificate to enable TLS on the JSON-RPC server. This path can be either absolute or relative to the specified root directory. If unspecified, the JSON-RPC server's communications remain unencrypted.
+   - `admin_pass`: This is the optional password the admin RPC server. If used, ensure the connection is encrypted or otherwise secure since this uses Basic HTTP Authentication. Setting this disables mTLS client authentication.
 
-   - `tls_key_file`: This variable specifies the file path containing the corresponding private key that enables TLS on the JSON-RPC server. Like the `tls_cert_file`, this path can be either absolute or relative to the specified root directory. If unspecified, the JSON-RPC server's communications remain unencrypted.
+   - `admin_notls`: This disables TLS on the admin service server. It is automatically disabled for a UNIX socket or loopback TCP listen address; this setting can disable it for any TCP listen address.
+
+   - `admin_tls_cert_file`: This variable specifies the file path containing a certificate to enable TLS on the admin JSON-RPC server. This path can be either absolute or relative to the specified root directory. If unspecified, the server's communications remain unencrypted.
+
+   - `admin_tls_key_file`: This variable specifies the file path containing the corresponding private key that enables TLS on the admin JSON-RPC server. Like the `tls_cert_file`, this path can be either absolute or relative to the specified root directory. If unspecified, the server's communications remain unencrypted.
 
    - `hostname`: This variable sets the Kwil JSON-RPC server's hostname. No default.
 
@@ -281,20 +285,17 @@ pg_db_name = "kwild"
 # any TCP listen address.
 admin_notls = false
 
-# The path to a file containing certificate that is used to create the HTTPS server.
-# Might be either absolute path or path related to the kwild root directory.
-# If the certificate is signed by a certificate authority,
-# the certFile should be the concatenation of the server's certificate, any intermediates,
-# and the CA's certificate.
-# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to create HTTPS server.
-# Otherwise, HTTP server is run.
-tls_cert_file = ""
+# The path to a file containing certificate that is used to create the admin HTTPS server.
+# It may be either an absolute path or a path related to the kwild root directory.
+# If set, admin_tls_cert_file must also be set.
+# If unset, an HTTP server is run.
+admin_tls_cert_file = ""
 
-# The path to a file containing matching private key that is used to create the HTTPS server.
-# Might be either absolute path or path related to the kwild root directory.
-# NOTE: both tls_cert_file and tls_key_file must be present for CometBFT to create HTTPS server.
-# Otherwise, HTTP server is run.
-tls_key_file = ""
+# The path to a file containing matching private key that is used to create the admin HTTPS server.
+# It may be either an absolute path or a path related to the kwild root directory.
+# If set, admin_tls_cert_file must also be set.
+# If unset, an HTTP server is run.
+admin_tls_key_file = ""
 
 # Kwild Server hostname
 hostname = ""
