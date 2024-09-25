@@ -79,6 +79,13 @@ kwil-admin node status
 ```
 
 ## Genesis State
+Once the proposal is approved, the network starts the migration process after the specified activation period. You can download the snapshots and genesis files generated at the start of the migration using the kwil-admin migrate genesis-state command as shown below.
+
+
+
+
+
+
 
 Once the proposal is approved, the network is set to start the migration process after the specified activation period. The snapshots and genesis files generated at the start of the migration can be downloaded using the `kwil-admin migrate genesis-state` command as shown below.
 
@@ -95,7 +102,7 @@ No genesis state to download yet. Migration is set to start at block height: 143
 :::warning
 The `genesis.json` and `snapshot.sql.gz` files are generated in the directory specified using the `--out-dir` flag. Ensure that you don't run the command with `--out-dir` flag set to the current node's root directory as it can overwrite the existing genesis file in the node's root directory.
 
-If the admin service is directly accessible from the new node (e.g. it is listening on a TCP socket securely accessible from the new node) it can be run on the new node directly.
+If the admin service is directly accessible from the new node (e.g. it is listening on a TCP socket securely accessible from the new node) the `migrate genesis-state` command can be run on the new node directly.
 :::
 
 ```bash
