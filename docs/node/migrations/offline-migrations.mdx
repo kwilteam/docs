@@ -35,19 +35,15 @@ To halt the network, stop the your node and set the `halt` hardfork config in th
   ...
 }
 ```
-Stop the node once the `halt` activation height is reached.
+Proceed to the next step to generate snapshots once the `halt` activation height has been reached.
 
 ## Create Network Snapshot
 
-Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the Kwild database. For more details, refer to the [create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation. This tool connects directly to the database to capture its state and does not require the `kwild` process to be running.
+Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the PostgresDB instance. For more details, refer to the [create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation. This tool connects directly to the database to capture its state and does not require the `kwild` process to be running.
 
 ```sh
-kwil-admin snapshot create --snapdir /path/to/snapdir
+kwil-admin snapshot create --snapdir ./network_snapshot --dbname postgres --host localhost --port 5432 --user kwild
 ```
-
-:::tip
-By default, the `snapshot create` command connects to the `postgres` instance running at `localhost:5432` with the default user `postgres` (without a password?). To modify the database connection settings, see the `kwil-admin` reference page.
-:::
 
 This generates a compressed snapshot file and a template genesis file required to start the new network as shown below.
 
@@ -82,26 +78,21 @@ Install the new version of the `kwild` binaries. Refer to the [Installation](/do
 
 ### Setup Root directory
 
-Copy the `kwildb-snapshot.sql.gz`, `genesis.json` files downloaded [above](/docs/node/migrations/offline-migrations#create-network-snapshot) to the new node's root directory. 
+Setup the new node's root directory with the genesis file and the snapshot data using the `kwil-admin setup init` command.
+
+```
+kwil-admin setup init --root-dir /new/node/dir --genesis ./path/to/genesis.json --genesis-state ./path/to/snapshot.sql.gz
+```
 
 :::note
 Ensure that the `private_key` corresponding to the validator node are securely copied to the new node's root directory.
 :::
 
-```
-root_dir
-├── config.toml
-├── private_key
-├── genesis.json
-├── snapshot.sql.gz
-├── abci/
-```
-
 ### Configure Nodes To Use Snapshots
 
 Configure `config.toml` with required settings, refer to the [Node Configuration](/docs/daemon/config/settings) documentation for more details.
 
-To initialize the node with the snapshot data, set the `genesis_state` path in `config.toml` to the location of the downloaded snapshot file. 
+Ensure that the `genesis_state` path in `config.toml` is set to the location of the snapshot file.
 
 ```TOML
 #######################################################################
@@ -135,8 +126,4 @@ If your `genesis.json` file has multiple validators, you will need to start >2/3
 
 ## Nodes Catching Up
 
-Follow the same steps described in the [Start New Network](#start-new-network) section to configure and join the network. Nodes can either sync with the network using `statesync` or `blocksync`.
-
-If the node uses `blocksync`, the `genesis_state` path is mandatory to ensure that the node initializes with the same genesis initial state and replay all the historical blocks. If the node doesn't start from the same initial state, it will eventually fork itself off the chain during blocksync. 
-
-If the node uses `statesync` to catch up with the network, the `genesis_state` path is not required in the `config.toml` file. The node will use the `statesync` protocol to catch up with the network as described in the [State Sync](/docs/node/statesync) documentation.
+Follow the same steps described in the [Start New Network](#start-new-network) section to configure and join the network. Nodes can either sync with the network using [statesync](../statesync) or blocksync. All nodes using blocksync need to have the genesis state locally to sync with the chain. Nodes using statesync do not need to download the genesis state locally.

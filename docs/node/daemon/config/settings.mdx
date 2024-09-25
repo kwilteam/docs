@@ -26,6 +26,13 @@ behavior, and chain-specific configurations related to the underlying blockchain
 
 - `time_format`: This variable specifies the time format for logs. Options include `epochfloat`, `epochmilli`, and `rfc3339milli`. The default is `epochfloat`.
 
+## [migration]
+   This section holds configurations specific to the zero downtime migration process.
+
+   - enable: This variable enables the migration process. Default is false.
+
+   - migrate_from: A trusted RPC server address where this node can request the genesis state and state changes during a zero downtime network migration.
+
 ## [app]   
    This section holds configurations specific to the Kwil application's operation.
 
@@ -69,8 +76,6 @@ behavior, and chain-specific configurations related to the underlying blockchain
 
    - `genesis_state`: This variable specifies the path to the snapshot file to be used for the initial state of the node. If the node is configured to start with initial state and this variable is not set, the node will fail to start. No default.
 
-   - `migrate_from`: A trusted RPC server address where this node can request the latest data from during a zero downtime network migration.
-
    - `private_rpc`: Runs the RPC in private mode, which authenticates clients requesting to read data. Default is `false`.
 
    - `challenge_expiry`: The time (in seconds) after which a challenge will expire. Default is 10s. Only applicable when `private_rpc` is enabled.
@@ -81,7 +86,7 @@ behavior, and chain-specific configurations related to the underlying blockchain
 
       This section contains configurations for managing the snapshots of the kwild database.
 
-      - `enabled`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network. Default is false.
+      - `enable`: This variable enables creation and serving of snapshots to support state sync on nodes joining the network. Default is false.
 
       - `snapshot_dir`: This variable specifies the path to the snapshots directory. Default is `snapshots`.
 
@@ -326,7 +331,7 @@ genesis_state = ""
 [app.snapshots]
 
 # Enables snapshots
-enabled = true
+enable = true
 
 # Path to the snapshots directory
 snapshot_dir = "snapshots"

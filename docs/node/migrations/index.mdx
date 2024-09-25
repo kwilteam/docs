@@ -11,7 +11,7 @@ This section provides an overview of the migration system in Kwil. When a major 
 
 ## Rolling upgrades
 
-If a new a version of kwild has no breaking changes to the consensus rules, a network upgrade can be done in a rolling fashion. In a rolling upgrade, the validators can upgrade their nodes one by one without stopping the network and still ensure that the nodes agree on the application state at each block. This avoids creating a new network, which would have a new genesis block and chain ID. When possible, Kwil will supports rolling upgrades. However, between major releases, it may not be practical to support rolling upgrades, thus necessitating a migration process as described in the next section.
+If a new a version of `kwild` has no breaking changes to the consensus rules, a network upgrade can be done in a rolling fashion. In a rolling upgrade, the validators can upgrade their nodes one by one without stopping the network and still ensure that the nodes agree on the application state at each block. This avoids creating a new network, which would have a new genesis block and chain ID. When possible, Kwil will supports rolling upgrades. However, between major releases, it may not be practical to support rolling upgrades, thus necessitating a migration process as described in the next section.
 
 ## Network Migrations
 
@@ -27,7 +27,7 @@ In a zero-downtime migration, a new network is launched and run in parallel with
 
 In a zero-downtime migration, the new network is continually synchronizing with the original network, replicating any state changes that occur on the existing network. This ensures that the new network stays up to date with the latest changes while the migration is in progress. During the migration period, users and applications should update their clients to use the new network's endpoints.
 
-Once the ecosystem migration is complete and the migration period ends, the old network can be decommissioned without any disruption to the network's users or services.
+Once the migration is complete and the migration period ends, the old network can be decommissioned without any disruption to the network's users or services.
 
 ```mdx-code-block
 import DocCardList from '@theme/DocCardList';
