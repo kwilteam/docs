@@ -46,6 +46,14 @@ When enabled, `kwild` does the following:
 3. Transaction status responses omit verbose transaction details that would
    contain the transaction body where any user data may be present.
 
+The RPC server may also be configured to control call challenge handling.
+Challenges issued to clients expire after the duration specified by the
+`app.challenge_expiry` setting. This may be shortened if clients provide signed
+call requests quickly, or lengthened if interactive signing requires additional
+time. The `app.challenge_rate_limit` setting controls the maximum frequency at
+which a client (by IP address) is permitted to request call challenges. See the
+node [config reference](/docs/daemon/config/settings) for details.
+
 ## Client
 
 For RPC clients to make call requests with servers running in private mode, the
@@ -53,32 +61,10 @@ call request must include a valid signature and a server-provided "challenge".
 The client requests a "challenge", which it includes in the call request that is
 signed with the user's private key for authentication.
 
-If the client has been configured with a private key, it will automatically
-handle the challenge request authentication described above.
+:::note
 
-## Advanced Server Configuration
+The clients maintained by the Kwil team (Kwil CLI, kwil-js, and Kwil Go) will
+automatically handle the challenge request authentication if the client is 
+configured with a private key.
 
-The RPC server may be configured to control call challenge handling.
-
-Challenges issued to clients expire after the duration specified by the
-`app.challenge_expiry` setting. The challenge expiry may be shortened if clients
-provide signed call requests quickly, or lengthened if interactive signing
-requires additional time.
-
-```toml
-[app]
-
-# Time after which a "call" challenge expires.
-challenge_expiry = "10s"
-```
-
-The `app.challenge_rate_limit` setting controls the maximum frequency at which a
-client (by IP address) is permitted to request call challenges.
-
-```toml
-[app]
-
-# Call challenge request rate limit per second per client IP.
-challenge_rate_limit = 10.0
-```
-
+:::
