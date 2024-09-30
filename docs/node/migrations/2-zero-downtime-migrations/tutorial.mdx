@@ -113,8 +113,9 @@ To verify that a node is running in migration mode, search for a log resembling 
 
 ### Verify The New Network Is Syncing
 
-To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate network-status` command. When used on youe old node,
-this command will tell you whether the new network is syncing or has finished. If the new network is syncing, you will see a message like the following:
+To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate network-status` command. When used on the old node,
+this command will tell you whether the network is still replicating changes to the new network, or if it has reached the end height and stopped accepting transactions.
+If the new network is syncing, you will see a message like the following:
 
 ```shell
 $ kwil-admin migrate network-status
