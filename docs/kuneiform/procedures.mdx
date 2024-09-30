@@ -140,7 +140,7 @@ about the supported functions, see [Functions](/docs/kuneiform/functions).
 
 ```ts
 procedure create_user($name text, $age int) public {
-    $id uuid := generate_uuid_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, @txid);
+    $id uuid := uuid_generate_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, @txid);
     // do something
     // ...
     INSERT INTO users (id, name, age)
