@@ -17,33 +17,28 @@ This tutorial demonstrates how to ugrade a network using zero-downtime migration
 # 1. Creating The Migration Proposal
 
 To migrate the network, more than 2/3 of the validators need to agree to the migration. Therefore, the first step is to use the `kwil-admin migrate propose`
-command to create a migration proposal. Other nodes will be able to see this proposal and vote on it. A proposal has 3 key parameters:
+command to create a migration proposal. Other nodes will be able to see this proposal and vote on it. A proposal has 2 parameters:
 
 - `ActivationPeriod`: The number of blocks in between when enough nodes have voted to proceed with the migration, and when the migration actually begins. This
 gives node operators time to set up their new nodes. We will use 100 blocks in this example.
 - `Duration`: The number of blocks that the migration will take. This is the time that the both the new and old network will run in parallel. We will use
 2000 blocks in this example.
-- `ChainID`: The name of the new chain that the network will migrate to. It is important that this is different from the current chain ID, otherwise malicious
-attackers can replay transactions from the old chain on the new chain (and vice versa). We will use `kwil-chain-2` in this example.
 
 ```shell
-kwil-admin migrate propose --activation-period 100 --duration 2000 --chain-id kwil-chain-2
+kwil-admin migrate propose --activation-period 100 --duration 2000
 ```
 
 To ensure that the proposal was submitted successfully, you can check the list of pending migration proposals:
 
 ```shell
+# NOTE: If you are running a single node network, you won't see any migrations in this list.
+# Proposed migrationa are automatically approved by the authoring validator. Therefore if
+# you are the only validator, the migration is automatically approved.
 $ kwil-admin migrate list
 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e:
         activationPeriod: 100
         migrationDuration: 2000
-        chainID: kwil-chain-2
 ```
-
-:::tip
-If you are running a single node network, you won't see any migrations in your list. Since you are the single node, it has
-already been approved by >2/3 of the validators, and has been automatically approved.
-:::
 
 # 2. Approving The Migration Proposal
 
@@ -54,11 +49,11 @@ the migration proposal. The command requires the proposal ID as an argument. In 
 kwil-admin migrate approve 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
 ```
 
-To see which validators have already approved a proposal, and which have not, you can use the `kwil-admin migrate status` command. This command also requires
+To see which validators have already approved a proposal, and which have not, you can use the `kwil-admin migrate proposal-status` command. This command also requires
 the proposal ID as an argument.
 
 ```shell
-$ kwil-admin migrate status 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+$ kwil-admin migrate proposal-status 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
 Migration Status:
         Proposal ID: 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
         ExpiresAt: 100810
@@ -69,13 +64,23 @@ Migration Status:
                 Validator b7404d70ae6f21b9f43d26fde6acc378be51c170a9744cb08634b6bdae22e1d2: (not approved)
 ```
 
-Once >2/3 of the validators have approved the proposal, the activation period will begin.
+Once the migration has been approved by >2/3 of the validators, the activation period will begin. You can check its status using the
+`kwil-admin migrate network-status` command:
+
+```shell
+$ kwil-admin migrate network-status
+Migration Status: ActivationPeriod
+        Start Height: 80000
+        End Height: 82000
+        Current Block: 79950
+```
 
 # 3. Setting Up The New Nodes
 
-Once the activation period has begun, node operators can start setting up their new nodes. We will create a new genesis file for the new chain; this genesis file
-is not complete. Each node will complete it with the genesis state, validator set, and other information once the activation period has ended. We will use the
-`kwil-admin setup genesis` command to create the genesis file. This will be generated at `./genesis.json`.
+Once the activation period has begun, node operators can start setting up their new nodes. This will require you to create and distributes a new genesis file
+for the new network. Genesis files used in network migrations must originate in a incomplete state. Each node will complete the genesis file with the genesis state,
+validator set, initial height, and other information once the activation period has ended. Use the `kwil-admin setup genesis --migration` command to create a genesis file that can
+be used with migrations. This will be generated at `./genesis.json`.
 
 ```shell
 kwil-admin setup genesis --chain-id kwil-chain-2 --migration
@@ -88,15 +93,38 @@ To set up our new node, use the `kwil-admin setup init` command with the new gen
 kwil-admin setup init --genesis /path/to/genesis.json
 ```
 
-Run the migration node, and point it at the RPC endpoint of the current node:
+Run the migration node, and point it at the RPC endpoint of the old node. The new node will use this RPC endpoint to sync data from the old network.
 
 ```shell
 kwild --migration.enable --migration.from http://old-node-rpc:8484
 ```
 
-# 4. Running Both Networks In Parallel
+# 4. Verify Both Networks Are Running In Parallel
 
-Once the old network has reached the end of the activation period, the migration will begin. The new node will download the genesis state, validator set,
-and other information from the old node. If >2/3 of the new nodes are running, the new network will start producing blocks. The old network will continue
-to produce blocks, and changes on the old network will be reflected on the new network. Once the duration has ended, the old network will stop producing
-blocks, and the new network will continue to run.
+While new nodes are running during the activation period, they will enter a "migration mode", where they do not produce blocks. In this mode, they will poll
+the old node for the genesis state of the new network. Once the activation period has ended, if >2/3 of the new nodes are running, the new network will start
+producing blocks. The old network will continue to produce blocks, and changes on the old network will be reflected on the new network. Once the migration
+duration has ended, the new network will stop syncing blocks from the old network, and the old network can be safely decommissioned.
+
+To verify that a node is running in migration mode, search for a log resembling the following in the node's logs:
+
+```shell
+{"level":"info","ts":1727721906.8221178,"logger":"kwild","msg":"Entering migration mode","migrate_from":"http://old-rpc:8484"}
+```
+
+### Verify The New Network Is Syncing
+
+To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate network-status` command. When used on youe old node,
+this command will tell you whether the new network is syncing or has finished. If the new network is syncing, you will see a message like the following:
+
+```shell
+$ kwil-admin migrate network-status
+Genesis migration in progress.
+```
+
+Once the new network has finished syncing, you will see a message like the following:
+
+```shell
+$ kwil-admin migrate network-status
+Genesis migration complete.
+```
