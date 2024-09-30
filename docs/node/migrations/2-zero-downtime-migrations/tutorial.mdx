@@ -78,12 +78,11 @@ Migration Status: ActivationPeriod
 # 3. Setting Up The New Nodes
 
 Once the activation period has begun, node operators can start setting up their new nodes. This will require you to create and distributes a new genesis file
-for the new network. Genesis files used in network migrations must originate in a incomplete state. Each node will complete the genesis file with the genesis state,
-validator set, initial height, and other information once the activation period has ended. Use the `kwil-admin setup genesis --migration` command to create a genesis file that can
-be used with migrations. This will be generated at `./genesis.json`.
+for the new network. Each node will complete the genesis file with the genesis state, validator set, initial height, and other information once the activation
+period has ended. Use the `kwil-admin setup genesis` command to create a genesis file that can be used with migrations. This will be generated at `./genesis.json`.
 
 ```shell
-kwil-admin setup genesis --chain-id kwil-chain-2 --migration
+kwil-admin setup genesis --chain-id kwil-chain-2
 ```
 
 To set up our new node, use the `kwil-admin setup init` command with the new genesis file. Each node operator will need to run this command on their new node.
