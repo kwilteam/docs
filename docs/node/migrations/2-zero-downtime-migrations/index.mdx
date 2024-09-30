@@ -95,7 +95,7 @@ reject any new migration proposals. The activation period allows all network par
 Validators should start setting up their nodes for the new network as soon as possible. All validator should agree on the genesis configuration for the new network except
 the `app_hash`, `validators` and `migration` configurations. These configurations should be left empty as they will be filled in during the migration phase automatically
 by the new nodes when run in `migration` mode. For information on how to automatically generate a genesis file that can be used for a network migration, see the
-[tutorial](/docs/node/migrations/zero-downtime-migrations/tutorial#3.-setting-up-the-new-nodes).
+[tutorial](/docs/node/migrations/zero-downtime-migrations/tutorial#3-setting-up-the-new-nodes).
 
 To enable validators in the new network to replicate changes from the old network, the new validators need to set the following configurations in the `config.toml`.
 `migrate_from` config in the `config.toml` file specifies the JSON-RPC address of the node from the old network that the new network should replicate the state changes from.
