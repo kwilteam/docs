@@ -23,7 +23,7 @@ Offline migrations are quite simple, requiring validators to briefly take the ne
 
 ### [Zero Downtime Migrations](/docs/node/migrations/zero-downtime-migrations)
 
-In a zero-downtime migration, a new network is launched and run in parallel with the existing network during a migration period. Data is accessible through either networks during the migration process.
+In a zero-downtime migration, a new network is launched and run in parallel with the existing network during a migration period. Data is accessible through either network during the migration process.
 
 In a zero-downtime migration, the new network is continually synchronizing with the original network, replicating any state changes that occur on the existing network. This ensures that the new network stays up to date with the latest changes while the migration is in progress. During the migration period, users and applications should update their clients to use the new network's endpoints.
 

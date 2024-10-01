@@ -1,0 +1,97 @@
+---
+sidebar_position: 4
+sidebar_label: "Halting a Network"
+id: halting-a-network
+title: Gracefully Halting a Network
+description: Learn how to gracefully halt a Kwil network at a height agreed upon by the validators.
+slug: /node/migrations/halting-a-network
+---
+
+Networks may find it desirable to halt a network at a specific block height to perform maintenance or upgrades. This page provides a guide on how to gracefully
+halt a Kwil network at a height agreed upon by the validators.
+
+## Halt an Existing Network
+
+In order to halt a running network, >=1/3 of the validators must agree to do so. The validators must agree on the block to halt at by modifying their local
+`genesis.json` file to include the `halt` activation at the desired block height. The `halt` activation is a hard fork that will halt the network at the
+specified block height.
+
+For example, take the following `genesis.json`:
+
+```json title="genesis.json"
+{
+  "genesis_time": "2024-09-30T19:14:28.153768Z",
+  "chain_id": "my-kwil-chain",
+  "initial_height": 1,
+  "app_hash": null,
+  "activations": null,
+  "consensus_params": {
+    "block": {
+      "max_bytes": 6291456,
+      "max_gas": -1,
+      "abci_max_bytes": false
+    },
+    "evidence": {
+      "max_age_num_blocks": 100000,
+      "max_age_duration": 172800000000000,
+      "max_bytes": 1048576
+    },
+    "version": {
+      "app": 0
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ],
+      "join_expiry": 100800
+    },
+    "votes": {
+      "vote_expiry": 14400,
+      "max_votes_per_tx": 100
+    },
+  }
+}
+```
+
+If we want to halt the network at height 1000, at least 1>3 of the validators must modify their `genesis.json` file to include the `halt` activation at
+height 1000:
+
+```json title="genesis.json"
+{
+  "genesis_time": "2024-09-30T19:14:28.153768Z",
+  "chain_id": "my-kwil-chain",
+  "initial_height": 1,
+  "app_hash": null,
+// highlight-next-line
+  "activations": {
+// highlight-next-line
+    "halt": 1000
+// highlight-next-line
+  },
+  "consensus_params": {
+    "block": {
+      "max_bytes": 6291456,
+      "max_gas": -1,
+      "abci_max_bytes": false
+    },
+    "evidence": {
+      "max_age_num_blocks": 100000,
+      "max_age_duration": 172800000000000,
+      "max_bytes": 1048576
+    },
+    "version": {
+      "app": 0
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ],
+      "join_expiry": 100800
+    },
+    "votes": {
+      "vote_expiry": 14400,
+      "max_votes_per_tx": 100
+    },
+  }
+}
+```

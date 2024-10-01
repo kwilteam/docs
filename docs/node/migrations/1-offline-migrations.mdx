@@ -1,0 +1,86 @@
+---
+sidebar_position: 2
+sidebar_label: "Offline Migrations"
+id: offline-migrations
+title: Offline Migrations
+description: Offline Migrations
+slug: /node/migrations/offline-migrations
+---
+
+This document provides a detailed guide on how to use offline migrations to establish a new network that integrates existing data from a previous network, using nodes that run on the updated version of the `kwild` binaries. The migration process involves the following steps:
+
+1. [Create network snapshot](#create-network-snapshot)
+2. [Distribute the genesis state](#distribute-genesis-state)
+3. [Start the new network](#start-new-network)
+
+Follow the steps below to upgrade the network to a new version of the `kwild` binaries:
+
+## 1. Create Network Snapshot
+
+:::warning
+Any data written to the network after the snapshot is taken will be lost. To ensure that no data is lost, it is recommended to halt the network before taking the snapshot,
+so that users are aware that the network is being upgraded. For single node deployments, you should simply stop the node before taking the snapshot.
+For multi-node deployments, see the guide on [how to gracefully halt a network](/docs/node/migrations/halting-a-network).
+:::
+
+Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the PostgresDB instance. **Only state that exists in Postgres when this
+snapshot is taken will be included in the new network.** This tool connects directly to the database to capture its state
+and does not require the `kwild` process to be running. For more details on how snapshots can be taken, refer to the
+[create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation.
+
+```sh
+kwil-admin snapshot create --snapdir ./network_snapshot --dbname postgres --host localhost --port 5432 --user kwild
+```
+
+This generates a compressed snapshot file and a template genesis file required to start the new network as shown below.
+
+```sh
+$ ls /path/to/snapdir
+genesis.json            kwildb-snapshot.sql.gz
+```
+
+## 2. Distribute Genesis State
+
+:::tip
+It is recommended that only one validator operator is responsible for generating, updating, and distributing the genesis state file to all other validators.
+This ensures that all validators are working from the same, consistent configuration.
+:::
+
+The generated genesis file is a valid genesis configuration, and can be used to start the new network without any modifications necessary. However, if you wish to change
+your network's configuration, such as the initial height, chain ID, gas costs, validator set, or other parameters, you can modify the genesis file accordingly.
+
+
+
+Distribute the `kwildb-snapshot.sql.gz` and the `genesis.json` files somewhere where all node operators can download them. Validators will need these to start the new network. 
+
+## 3. Start New Network
+
+### Install `kwild` Binaries
+
+Install the new version of the `kwild` binaries. Refer to the [Installation](/docs/daemon/installation) documentation for more details on how to install the `kwild` binaries.
+
+### Setup Root directory
+
+Setup the new node's root directory with the genesis file and the snapshot data using the `kwil-admin setup init` command.
+
+```
+kwil-admin setup init --root-dir /new/node/dir --genesis ./path/to/genesis.json --genesis-state ./path/to/snapshot.sql.gz
+```
+
+:::note
+Ensure that the `private_key` corresponding to the validator node are securely copied to the new node's root directory.
+Alternatively, new private keys can be generated using the `kwil-admin key gen` command. If new keys are generated,
+ensure that the genesis file is updated with their corresponding public keys.
+:::
+
+### Start `kwild`
+
+Start `kwild` by pointing it to the root directory configured above.
+
+```bash
+kwild --root-dir /new/node/dir
+```
+
+:::tip
+If your `genesis.json` file has multiple validators, you will need to start >2/3 of the validators before the network can start producing blocks.
+:::
