@@ -34,7 +34,7 @@ To ensure that the proposal was submitted successfully, you can check the list o
 # NOTE: If you are running a single node network, you won't see any migrations in this list.
 # Proposed migrationa are automatically approved by the authoring validator. Therefore if
 # you are the only validator, the migration is automatically approved.
-$ kwil-admin migrate list
+$ kwil-admin migrate proposals
 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e:
         activationPeriod: 100
         migrationDuration: 2000
@@ -65,10 +65,10 @@ Migration Status:
 ```
 
 Once the migration has been approved by >2/3 of the validators, the activation period will begin. You can check its status using the
-`kwil-admin migrate network-status` command:
+`kwil-admin migrate status` command:
 
 ```shell
-$ kwil-admin migrate network-status
+$ kwil-admin migrate status
 Migration Status: ActivationPeriod
         Start Height: 80000
         End Height: 82000
@@ -113,18 +113,18 @@ To verify that a node is running in migration mode, search for a log resembling 
 
 ### Verify The New Network Is Syncing
 
-To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate network-status` command. When used on the old node,
+To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate status` command. When used on the old node,
 this command will tell you whether the network is still replicating changes to the new network, or if it has reached the end height and stopped accepting transactions.
 If the new network is syncing, you will see a message like the following:
 
 ```shell
-$ kwil-admin migrate network-status
+$ kwil-admin migrate status
 Genesis migration in progress.
 ```
 
 Once the new network has finished syncing, you will see a message like the following:
 
 ```shell
-$ kwil-admin migrate network-status
-Genesis migration complete.
+$ kwil-admin migrate status
+Genesis migration complete. No active migration on the network.
 ```

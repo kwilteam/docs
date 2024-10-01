@@ -59,7 +59,7 @@ all other migration proposals will be rejected from the network and no new propo
 To check if the proposal is submitted successfully, we can get the list of pending migration proposals as shown below:
 
 ```bash
-kwil-admin migration list
+kwil-admin migrate proposals
 ```
 This list will contain the proposal ID which is used by the validators to vote on the proposal. If it's a single validator network, the proposal will be automatically
 approved and immediately removed from this pending list.
@@ -70,19 +70,19 @@ approved and immediately removed from this pending list.
 To start the migration, the migration proposal needs the approval from at least a supermajority of the validators. The validators can submit their vote approval on the migration proposal using the below command.
 
 ```bash
-kwil-admin migration approve <proposal_id>
+kwil-admin migrate approve <proposal_id>
 ```
 
 Operators can check the status of the proposal and the votes information as shown below:
 
 ```bash
-kwil-admin migration proposal-status <proposal_id>
+kwil-admin migrate proposal-status <proposal_id>
 ```
 
-Once a migration proposal has been approved, operators can confirm that it is running using the `network-status` command:
+Once a migration proposal has been approved, operators can confirm that it is running using the `status` command:
 
 ```bash
-kwil-admin migration network-status
+kwil-admin migrate status
 ```
 
 ## Activation Period
