@@ -103,6 +103,12 @@ The genesis file can also be used to establish a predefined set of consensus rul
   - `version`:
     - `app_version`: This field sets the ABCI application version. 
 
+#### Migrations:
+  
+  - `migration`:
+    - `start_height`: The start height of the migration on the old network. Specifies the height from which the state changes are to be replicated onto the new network.
+    - `end_height`: The end height of the migration on the old network. Specifies the height until which the state changes are to be replicated onto the new network.
+
 #### General
 
   - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.

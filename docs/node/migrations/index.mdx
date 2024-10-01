@@ -1,0 +1,36 @@
+---
+sidebar_position: 6
+sidebar_label: "Migrations"
+id: migrations
+title: Migrations
+description: Migrations
+slug: /node/migrations
+---
+
+This section provides an overview of the migration system in Kwil. When a major software upgrade on an existing network cannot be accomplished due to consensus changes and lack of an suitable coordination mechanism, a network migration is used to move to a new network deployed with the new software version. Kwil supports two types of migrations to perform this with minimal downtime.
+
+## Rolling upgrades
+
+If a new a version of `kwild` has no breaking changes to the consensus rules, a network upgrade can be done in a rolling fashion. In a rolling upgrade, the validators can upgrade their nodes one by one without stopping the network and still ensure that the nodes agree on the application state at each block. This avoids creating a new network, which would have a new genesis block and chain ID. When possible, Kwil will supports rolling upgrades. However, between major releases, it may not be practical to support rolling upgrades, thus necessitating a migration process as described in the next section.
+
+## Network Migrations
+
+When a software version includes breaking changes to the consensus rules, it may be necessary to migrate to a new network. Kwil currently supports two types of migrations differing in the degree of coordination required and disruption that is tolerable.
+
+### [Offline Migrations](/docs/node/migrations/offline-migrations)
+
+Offline migrations are quite simple, requiring validators to briefly take the network offline for an upgrade. Using snapshots, the validators bootstrap the new network with the same state as the original at the time of the snapshot.
+
+### [Zero Downtime Migrations](/docs/node/migrations/zero-downtime-migrations)
+
+In a zero-downtime migration, a new network is launched and run in parallel with the existing network during a migration period. Data is accessible through either network during the migration process.
+
+In a zero-downtime migration, the new network is continually synchronizing with the original network, replicating any state changes that occur on the existing network. This ensures that the new network stays up to date with the latest changes while the migration is in progress. During the migration period, users and applications should update their clients to use the new network's endpoints.
+
+Once the migration is complete and the migration period ends, the old network can be decommissioned without any disruption to the network's users or services.
+
+```mdx-code-block
+import DocCardList from '@theme/DocCardList';
+
+<DocCardList />
+```
