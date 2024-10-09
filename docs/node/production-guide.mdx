@@ -42,14 +42,14 @@ For a node to be reachable, incoming TCP traffic on the P2P port must be allowed
 The node's P2P server must also be listening on a routable network interface that may be reached from remote peers. The default `chain.p2p.listen_address` setting of `0.0.0.0:26656` permits this. If changing this value, be sure it uses a non-loopback interface that is reachable by other peers.
 
 :::note
-If a node is **not** configured to permit incoming P2P connections, it may still operate by connecting to the network with outgoing connections, but it will not be available to support the bootstrapping of other nodes.
+If a node is **not** configured to permit incoming P2P connections, it may still operate by connecting to the network with outgoing connections, but other peers will not be able to bootstrap from the node.
 :::
 
-Finally, depending on the host machine's IP address assignment, it is often necessary to specify the actual external IP address that routes to the host machine's network interface using the `chain.p2p.external_address` setting. For instances, if the host machine is assigned a public IP address of `53.35.53.35` that transparently routes traffic to a VPC address of `10.1.2.3` on the host OS, it is helpful to set `chain.p2p.external_address = 53.35.53.35:26656` so that the Kwil node advertises itself on a reachable network address that is otherwise undiscoverable to `kwild` itself.
+Finally, depending on the host machine's IP address assignment, it is often necessary to specify the actual external IP address that routes to the host machine's network interface using the `chain.p2p.external_address` setting. For instance, if the host machine is assigned a public IP address of `53.35.53.35` that transparently routes traffic to a VPC address of `10.1.2.3` on the host OS, it is helpful to set `chain.p2p.external_address = 53.35.53.35:26656` so that the Kwil node advertises itself on a reachable network address that is otherwise undiscoverable to `kwild` itself.
 
 ### Peer Exchange
 
-In a healthy network, nodes have many peers to prevent single points of failure or unintended network partitions, and to support efficient network gossip. The feature that facilitates this is called peer exchanges (PEX). This is also enabled by default with the `chain.p2p.pex = true` setting. Only if it is required that a node not share its peers should this be turned off.
+In a healthy network, nodes have many peers to prevent single points of failure or unintended network partitions, and to support efficient network gossip. The feature that facilitates this is called peer exchanges (PEX). This is also enabled by default with the `chain.p2p.pex = true` setting. Disable this setting only if a node must not share its peers with other nodes.
 
 ### Network Bootstrapping
 
@@ -68,7 +68,7 @@ persistent_peers = "f664bfc6060231b12421aafbad971a58a27611f8@10.1.2.3:26656,5585
 
 #### Seeder and Seed nodes
 
-For larger networks, and in particular organically growing networks, special "seed" nodes may be created and specified with the `chain.p2p.seeds` setting.
+For larger networks, and in particular organically growing networks, special "seed" nodes may be set up to facilitate node onboarding. To connect to a seed node, configure the `chain.p2p.seeds` setting.
 
 Like the persistent peers setting, this is a comma-separated list of nodes. Unlike persistent peers, the connections to these nodes are transient, disconnecting after obtaining a list of their peers.
 
@@ -76,7 +76,7 @@ Like the persistent peers setting, this is a comma-separated list of nodes. Unli
 The `chain.p2p.seeds` setting should be used with `chain.p2p.pex = true`.
 :::
 
-A seed may be thought of as a network crawler, which performs no functions other than to continually connect to other peers, discovering new peer addresses, and sharing discovered addresses with peers making incoming connections. The recommended way to create a seed is with the [cometseed](https://github.com/kwilteam/cometseed) tool. A mature network would have one or more seeds that all nodes may use for bootstrapping.
+A seed may be thought of as a network crawler, which performs no functions other than to continually connect to other peers, discovering new peer addresses, and sharing discovered addresses with peers making incoming connections. The recommended way to create a seed is with the [cometseed](https://github.com/kwilteam/cometseed) tool. A mature network should have one or more seeds that all nodes may use for bootstrapping.
 
 ### Validators
 
@@ -193,7 +193,7 @@ The resulting genesis file has the chain ID and validators customized, with defa
 }
 ```
 
-Provide this **same** `genesis.json` file to all node operators.
+Provide this **same** `genesis.json` file to all node operators. The genesis file with the initial validators will remain the same for the entire lifetime of the network, even as the network adds new validators.
 
 #### Node Configuration
 
@@ -261,7 +261,7 @@ Recall that *both* of the validators need to be started and able to communicate 
 
 ### Adding a New Node
 
-Now that our network of two validators is running and producing blocks, we will created and synchronize a new node to the network, and once it is synchronized, promote the node to a validator.
+Now that our network of two validators is running and producing blocks, we will create and synchronize a new node to the network, and once it is synchronized, promote the node to a validator.
 
 #### Starting as a Sentry Node
 
@@ -272,7 +272,7 @@ When adding a node to the network, start it as a non-validator / sentry node.
 Always completely synchronize the node to the network before attempting to promote it to a validator.
 :::
 
-Like before we will specify the location of the network's `genesis.json` file, the host's external IP address, and one or more persistent peers. However, we will *not* specify a private key path so that a new key is generated:
+Like before, we will specify the location of the network's `genesis.json` file, the host's external IP address, and one or more persistent peers. However, we will *not* specify a private key path so that a new key is generated:
 
 ```sh title="node2"
 [node2]:~$ kwil-admin setup init --genesis prod-chain/genesis.json \
