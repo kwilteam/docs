@@ -32,14 +32,14 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 
 #### Parameters
 
--   `config`: The configuration object for the Kwil class.
--   `config.kwilProvider`: The URL of the Kwil provider.
--   `config.chainId`: The chain ID of the Kwil network.
--   `config.unconfirmedNonce`: (optional) If true, the SDK will use the unconfirmed nonce for the account. If false, the SDK will use the confirmed nonce for the account. Default is false. This is useful when sending multiple transactions in parallel.
--   `config.timeout`: (optional) The timeout for the Kwil provider. Default is 10000ms.
--   `config.logging`: (optional) If true, the SDK will log debug messages to the console. Default is false.
--   `config.logger`: (optional) A custom logger function. If provided, the SDK will use this function to log debug messages.
--   `config.cache`: (optional) The TTL cache for the SDK. Default is 600 seconds (10 minutes). See the [TTL Cache](/docs/sdks/js-ts/overview#optional-configuration) section for more information.
+- `config`: The configuration object for the Kwil class.
+- `config.kwilProvider`: The URL of the Kwil provider.
+- `config.chainId`: The chain ID of the Kwil network.
+- `config.unconfirmedNonce`: (optional) If true, the SDK will use the unconfirmed nonce for the account. If false, the SDK will use the confirmed nonce for the account. Default is false. This is useful when sending multiple transactions in parallel.
+- `config.timeout`: (optional) The timeout for the Kwil provider. Default is 10000ms.
+- `config.logging`: (optional) If true, the SDK will log debug messages to the console. Default is false.
+- `config.logger`: (optional) A custom logger function. If provided, the SDK will use this function to log debug messages.
+- `config.cache`: (optional) The TTL cache for the SDK. Default is 600 seconds (10 minutes). See the [TTL Cache](/docs/sdks/js-ts/overview#optional-configuration) section for more information.
 
 #### Returns
 
@@ -68,16 +68,17 @@ interface ActionBody {
 type Entries = { [key: string]: string | number | null };
 ```
 
-Calls a `view` action on the network. If authentication for the view action is enforced by a Kwil Gateway, a `kwilSigner` must be provided. The call method will prompt the user to authenticate if they have not already done so, and will retain a cookie to authenticate with the Kwil Gateway for all subsequent calls.
+Calls a `view` procedure on the network. If authentication for the view procedure is enforced by a Kwil Gateway, or if the Kwil network is running in Private mode, a `kwilSigner` must be provided. If authentication is enforced by the Kwil Gateway, the call method will prompt the user to authenticate if they have not already done so, and will retain a cookie to authenticate with the Kwil Gateway for all subsequent calls.
+
 
 #### Parameters
 
--   `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the action name and database ID. The `inputs` array must only have one entry.
--   `kwilSigner` (optional): The kwilSigner for the call request. This is only required if the action uses a `@caller` contextual variable. The SDK will use the `identifier` in the `kwilSigner` to fill in the `@caller` contextual variable.
+- `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the procedure name and database ID. The `inputs` array must only have one entry.
+- `kwilSigner` (optional): The kwilSigner for the call request. This is required if the procedure uses a `@caller` contextual variable, the Kwil network is running in Private mode, or you are using KGW and the action/procedure has the @kgw(authn='true') annotation. The SDK will use the `identifier` in the `kwilSigner` to fill in the `@caller` contextual variable.
 
 #### Returns
 
-A promise that resolves to the result of the action / query.
+A promise that resolves to the result of the procedure / query.
 
 ### chainInfo()
 
@@ -93,8 +94,8 @@ Retrieves the chain id, latest block height, and latest block hash on the specif
 
 #### Parameters
 
--   `opts`: The options object for the chain info request.
--   `opts.disableWarning`: If true, the SDK will disable the warning message when the chain ID does not match the expected chain ID. Default is false.
+- `opts`: The options object for the chain info request.
+- `opts.disableWarning`: If true, the SDK will disable the warning message when the chain ID does not match the expected chain ID. Default is false.
 
 #### Returns
 
@@ -115,11 +116,11 @@ Deploys a new database to the Kwil network.
 
 #### Parameters
 
--   `deployBody`: The deploy body to execute. This object should match the `DeployBody` interface and contain the compiled Kuneiform schema. It can also contain a custom signature message. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
+- `deployBody`: The deploy body to execute. This object should match the `DeployBody` interface and contain the compiled Kuneiform schema. It can also contain a custom signature message. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
 
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
--   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+- `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
@@ -140,11 +141,11 @@ Drops a database from the Kwil network.
 
 #### Parameters
 
--   `dropBody`: The drop body to execute. This object should match the `DropBody` interface and contain the database ID. It can also contain a custom signature message.
+- `dropBody`: The drop body to execute. This object should match the `DropBody` interface and contain the database ID. It can also contain a custom signature message.
 
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
--   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+- `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
@@ -165,15 +166,15 @@ interface ActionBody {
 type Entries = { [key: string]: string | number | null };
 ```
 
-Executes a state-changing (Create, Update, Delete) action on the Kwil network.
+Executes a state-changing (Create, Update, Delete) procedure on the Kwil network.
 
 #### Parameters
 
--   `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
+- `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the procedure name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
 
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
--   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+- `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
@@ -197,7 +198,7 @@ Retrieves an account using the owner's account identifier.
 
 #### Parameters
 
--   `owner`: The owner's account identifier
+- `owner`: The owner's account identifier
 
 #### Returns
 
@@ -213,8 +214,8 @@ Generates a unique database identifier (DBID) from the provided owner's identifi
 
 #### Parameters
 
--   `owner`: The owner's identifier (e.g. wallet address, public key, etc.)
--   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
+- `owner`: The owner's identifier (e.g. wallet address, public key, etc.)
+- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 
@@ -230,7 +231,7 @@ Retrieves the schema of a database given its unique identifier (DBID).
 
 #### Parameters
 
--   `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
+- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
 
 #### Returns
 
@@ -258,7 +259,7 @@ Lists all databases owned by a particular owner. If no owner is provided, it wil
 
 #### Parameters
 
--   `owner`(optional): The owner's identifier (e.g. wallet address, public key, etc.).
+- `owner`(optional): The owner's identifier (e.g. wallet address, public key, etc.).
 
 #### Returns
 
@@ -284,10 +285,12 @@ async selectQuery(dbid: string, query: string): Promise<GenericResponse<Object[]
 
 Performs a SELECT query on a database. The query must be a read-only query.
 
+Note: `selectQuery()` will error if the Kwil network is running in Private mode.
+
 #### Parameters
 
--   `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
--   `query`: The SELECT query to execute.
+- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
+- `query`: The SELECT query to execute.
 
 #### Returns
 
@@ -303,7 +306,7 @@ Retrieves information about a transaction given its hash.
 
 #### Parameters
 
--   `hash`: The hash of the transaction.
+- `hash`: The hash of the transaction.
 
 #### Returns
 
@@ -325,18 +328,18 @@ Creates a new instance of the KwilSigner class.
 
 #### Parameters
 
--   `signer`: The signer for the action transaction. It can receive an EtherJS (v5 or v6) signer or a custom signer function.
+- `signer`: The signer for the procedure transaction. It can receive an EtherJS (v5 or v6) signer or a custom signer function.
 
--   `identifier`: The identifier of the user that is executing the action transaction. This can be a hex string or a Uint8Array.
+- `identifier`: The identifier of the user that is executing the procedure transaction. This can be a hex string or a Uint8Array.
 
--   `signatureType`: The signature type enumerator. This is only required if a custom signer function is provided.
+- `signatureType`: The signature type enumerator. This is only required if a custom signer function is provided.
 
 The following signature types and corresponding identifiers can be used:
 
-| Type      |   Identifier   |   Enumerator   | Description |
-| :-------- | :------------: | ----------- | ----------- |
+| Type      |       Identifier        | Enumerator     | Description                                                                                                                                                            |
+| :-------- | :---------------------: | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
 | Secp256k1 | Ethereum Wallet Address | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
-| ED25519   | ED25519 Public Key |   'ed25519'    | The Kwil Signer will use an ED25519 signature. |signature.                                                                                                                         |
+| ED25519   |   ED25519 Public Key    | 'ed25519'      | The Kwil Signer will use an ED25519 signature.                                                                                                                         | signature. |
 
 #### Returns
 
@@ -344,20 +347,20 @@ A new instance of the KwilSigner class.
 
 ## Auth
 
-The `Auth` class is used to execute authentication-related operations on a Kwil Gateway.
+The `Auth` class is used to execute authentication-related operations on a Kwil Gateway or if the Kwil network is running in Private mode.
 
 :::warning
-The `Auth` class will only work if you are connected to a Kwil Gateway. If you are connected directly to a Kwil Node, none of the methods in the `Auth` class will work.
+The `Auth` class will only work if you are connected to a Kwil Gateway or running the Kwil network in Private mode. If you are connected directly to a Kwil Node, none of the methods in the `Auth` class will work.
 :::
 
 ### constructor()
 
 The auth class is automatically initialized with the Kwil class. It can be accessed with `kwil.auth`.
 
-### authenticate()
+### authenticateKGW()
 
 ```typescript
-async authenticate(signer: KwilSigner): Promise<GenericResponse<AuthSuccess<T>>>
+async authenticateKGW(signer: KwilSigner): Promise<GenericResponse<AuthSuccess<T>>>
 
 // AuthSuccess interface browser (WebKwil)
 interface AuthSuccess<EnvironmentType.Browser> {
@@ -375,16 +378,38 @@ Authenticates a user with the Kwil Gateway.
 
 #### Parameters
 
--   `signer`: The signer for the authentication request. This can be created with the [`KwilSigner`](#kwilsigner) class.
+- `signer`: The signer for the authentication request. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
 #### Returns
 
 A promise that resolves to an `AuthSuccess` object. The object contains the result of the authentication request. If the environment is a browser, the object will contain the result. If the environment is NodeJS, the object will contain the result and a cookie.
 
+### authenticatePrivateMode()
+
+```typescript
+authenticatePrivateMode(actionBody: ActionBody, signer: KwilSigner): Promise<AuthBody>;
+
+interface AuthBody {
+    signature: Base64String;
+    challenge: HexString;
+}
+```
+
+Authenticates a user in Private mode.
+
+#### Parameters
+
+- `actionBody`: The body of the read / view procedure to send.
+- `signer`: The signer for the authentication request. This can be created with the [`KwilSigner`](#kwilsigner) class.
+
+#### Returns
+
+A promise that resolves an `AuthBody` object, consisting of a signature and a challenge. Both a signature and a challenge is needed to authenticate a user in Private mode.
+
 ### logout()
 
 ```typescript
-logout(signer?: KwilSigner): Promise<GenericResponse<LogoutResponse<T>>>; 
+logout(signer?: KwilSigner): Promise<GenericResponse<LogoutResponse<T>>>;
 
 // LogoutResponse interface browser (WebKwil)
 interface LogoutResponse<EnvironmentType.Browser> {
@@ -402,7 +427,7 @@ Logs out the current user(s) from the Kwil Gateway by expiring the cookie.
 
 #### Parameters
 
--   `signer`: The signer to be logged out. This can be created with the [`KwilSigner`](#kwilsigner) class. If no signer is provided, all users will be logged out.
+- `signer`: The signer to be logged out. This can be created with the [`KwilSigner`](#kwilsigner) class. If no signer is provided, all users will be logged out.
 
 #### Returns
 
@@ -430,11 +455,11 @@ interface TransferBody {
 
 #### Parameters
 
--   `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message.
+- `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message.
 
--   `kwilSigner`: The signer for the action transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
+- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
--   `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
+- `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
 
 #### Returns
 
@@ -442,7 +467,7 @@ A promise that resolves to the `hash` of the transaction. The status of the tran
 
 ## Action Inputs
 
-The `ActionInput` class is a utility class to build action inputs to be executed in an action transaction. It is found in the `Utils` namespace, which can be imported from the `kwil` package.
+The `ActionInput` class is a utility class to build inputs to be passed and executed in an procedure transaction. It is found in the `Utils` namespace, which can be imported from the `kwil` package.
 
 ### constructor()
 
@@ -462,12 +487,12 @@ A new instance of the `ActionInput` class.
 put(key: string, value: any): ActionInput
 ```
 
-Adds or replaces a value for a single action input.
+Adds or replaces a value for a single input.
 
 #### Parameters
 
--   `key`: The action input name.
--   `value`: he value to put for the action input.
+- `key`: The input name .
+- `value`: he value to put for the input.
 
 #### Returns
 
@@ -479,12 +504,12 @@ The `ActionInput` instance for chaining.
 putIfAbsent(key: string, value: any): ActionInput
 ```
 
-Adds a value for a single action input if the key is not already present.
+Adds a value for a single input if the key is not already present.
 
 #### Parameters
 
--   `key`: The action input name.
--   `value`: The value to put for the action input.
+- `key`: The input name.
+- `value`: The value to put for the input.
 
 #### Returns
 
@@ -496,12 +521,12 @@ The current `ActionInput` class for chaining.
 replace(key: string, value: any): ActionInput
 ```
 
-Replaces a value for a single action input if the key is already present.
+Replaces a value for a single input if the key is already present.
 
 #### Parameters
 
--   `key`: The action input name.
--   `value`: The value to replace for the action input.
+- `key`: The input name.
+- `value`: The value to replace for the input.
 
 #### Returns
 
@@ -513,15 +538,15 @@ The current `ActionInput` class for chaining.
 get(key: string): any
 ```
 
-Retrieves an action input value given its key.
+Retrieves an input value given its key.
 
 #### Parameters
 
--   `key`: The action input name.
+- `key`: The input name.
 
 #### Returns
 
-The value associated with the action input name.
+The value associated with the input name.
 
 ### getOrDefault()
 
@@ -529,12 +554,12 @@ The value associated with the action input name.
 getOrDefault(key: string, defaultValue: any): any
 ```
 
-Retrieves a value by its action input name, or a default value if the action input name is not present.
+Retrieves a value by its input name, or a default value if the input name is not present.
 
 #### Parameters
 
--   `key`: The action input name.
--   `defaultValue`: The default value to return if the key is not present.
+- `key`: The input name.
+- `defaultValue`: The default value to return if the key is not present.
 
 #### Returns
 
@@ -546,15 +571,15 @@ The value associated with the key, or the default value.
 containsKey(key: string): boolean
 ```
 
-Checks if the map contains a specific action input name.
+Checks if the map contains a specific input name.
 
 #### Parameters
 
--   `key`: The action input name.
+- `key`: The input name.
 
 #### Returns
 
-True if the action input name is present, false otherwise.
+True if the input name is present, false otherwise.
 
 ### remove()
 
@@ -562,11 +587,11 @@ True if the action input name is present, false otherwise.
 remove(key: string): boolean
 ```
 
-Removes a action input name and its associated value from the map.
+Removes an input name and its associated value from the map.
 
 #### Parameters
 
--   `key`: The action input name to remove.
+- `key`: The input name to remove.
 
 #### Returns
 
@@ -578,11 +603,11 @@ True if the key was present and is now removed, false otherwise.
 toArray(filter?: Predicate): ReadonlyArray<EntryType>
 ```
 
-Converts the map of action inputs to an array of entries.
+Converts the map of inputs to an array of entries.
 
 #### Parameters
 
--   `filter`: An optional filter function.
+- `filter`: An optional filter function.
 
 #### Returns
 
@@ -594,11 +619,11 @@ A read-only array of entries.
 putFromObject(obj: object): ActionInput
 ```
 
-Adds or replaces values from and object of action name/key-value pairs.
+Adds or replaces values from and object of procedure name/key-value pairs.
 
 #### Parameters
 
--   `obj`: The object from which to extract action name/key-value pairs.
+- `obj`: The object from which to extract procedure name/key-value pairs.
 
 #### Returns
 
@@ -610,11 +635,11 @@ The current `ActionInput` instance for chaining.
 putIfAbsentFromObject(obj: object): ActionInput
 ```
 
-Adds values from and object of action name/key-value pairs if the key is not already present.
+Adds values from and object of procedure name/key-value pairs if the key is not already present.
 
 #### Parameters
 
--   `obj`: The object from which to extract action name/key-value pairs.
+- `obj`: The object from which to extract procedure name/key-value pairs.
 
 #### Returns
 
@@ -626,11 +651,11 @@ The current `ActionInput` instance for chaining.
 replaceFromObject(obj: object): ActionInput
 ```
 
-Replaces values from and object of action name/key-value pairs if the key is already present.
+Replaces values from and object of procedure name/key-value pairs if the key is already present.
 
 #### Parameters
 
--   `obj`: The object from which to extract action name/key-value pairs.
+- `obj`: The object from which to extract procedure name/key-value pairs.
 
 #### Returns
 
@@ -646,7 +671,7 @@ Creates multiple `ActionInput` instances from an array of objects.
 
 #### Parameters
 
--   `objs`: An array of objects from which to create `ActionInput` instances.
+- `objs`: An array of objects from which to create `ActionInput` instances.
 
 #### Returns
 
@@ -674,7 +699,7 @@ Creates a new `ActionInput` instance from an iterable array of entries.
 
 #### Parameters
 
--   `entries`: The iterable of set of entries. Entries should be formatted as an array of `[inputName, value]`.
+- `entries`: The iterable of set of entries. Entries should be formatted as an array of `[inputName, value]`.
 
 #### Returns
 
@@ -690,7 +715,7 @@ Creates a new `ActionInput` instance from an object.
 
 #### Parameters
 
--   `obj`: The object from which to create the `ActionInput`.
+- `obj`: The object from which to create the `ActionInput`.
 
 #### Returns
 
@@ -706,7 +731,7 @@ Creates multiple `ActionInput` instances from an array of objects.
 
 #### Parameters
 
--   `objs`: An array of objects from which to create `ActionInput` instances.
+- `objs`: An array of objects from which to create `ActionInput` instances.
 
 #### Returns
 
@@ -730,8 +755,8 @@ An alternative to the kwil.getDBID() method, allowing developers to retrieve a d
 
 #### Parameters
 
--   `owner`: The owner's account identifier.
--   `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
+- `owner`: The owner's account identifier.
+- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
 
 #### Returns
 
