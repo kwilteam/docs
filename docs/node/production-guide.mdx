@@ -85,6 +85,12 @@ Thus, if the network is not well connected and validators are unable to communic
 
 Not all nodes in a network must be validators. Non-validator nodes called "sentry" nodes are typically created to function as RPC service providers or just to support network health by relaying transactions, blocks, and misbehavior evidence.
 
+### Compatible Versions
+
+A final important concept is version compatibility. On a production network, it is important to only run nodes built from the same release branch, such as the `release-v0.8` branch, or a release tag with the same `MAJOR.MINOR` version.
+Different patch versions are compatible, but large releases that change the application's state machine logic cannot be run on the same network.
+For example, it is not possible to run `v0.8.4` and `v0.9.1` on the same network. To update a network between such major releases, it is necessary to perform a [migration](/docs/node/migrations).
+
 ## Walkthrough
 
 This section illustrates the process for launching a small network of independent remote nodes. It will begin with two validators at genesis, followed by the addition of a sentry node using block sync, and finally the new node will become a validator.
@@ -294,7 +300,7 @@ Node ID: bd56ce5a93c47b532be71531ff6ed469b341e61f
 
 Before adding the node as a validator, ensure that `node2` has completely synchronized with the network. You can do this with either the `kwil-admin` tool, or with the public user service using `kwil-cli`.
 
-Using `kwil-admin node status`, insect the `.sync.best_block_height` and `.sync.syncing` values:
+Using `kwil-admin node status`, inspect the `.sync.best_block_height` and `.sync.syncing` values:
 
 ```sh title="node2"
 [node2]:~$ kwil-admin node status
@@ -334,7 +340,7 @@ Height: 109
 Hash: 1d5a4ef85927dce3c90168e89fdfb32219c5c95bb5ed3332eb69e20bbe7346da
 ```
 
-Compare the output of that command with the result from `node2` to ensure the new node is keeping up.
+Compare the output of that command with the result from `node2` to ensure the new node stays in sync with the network as new blocks are produced.
 
 Alternatively, check the new node's health check REST endpoint, which will return an HTTP status code of 200 and a JSON body with `"healthy":true` if the node is ready:
 
@@ -389,4 +395,4 @@ On the block where the final approval transaction was mined, the `kwild` logs fo
 {"level":"info","ts":1727997606.6865957,"logger":"kwild.listener-manager","msg":"Node is a validator and caught up with the network, starting listeners"}
 ```
 
-The node is now a validator.  Keep it running and monitor it's health.
+The node is now a validator.  Keep it running and [monitor its health](#verifying-successful-node-synchronization).
