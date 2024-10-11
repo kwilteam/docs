@@ -70,7 +70,7 @@ persistent_peers = "f664bfc6060231b12421aafbad971a58a27611f8@10.1.2.3:26656,5585
 
 For larger networks, and in particular organically growing networks, special "seed" nodes may be set up to facilitate node onboarding. To connect to a seed node, configure the `chain.p2p.seeds` setting.
 
-Like the persistent peers setting, this is a comma-separated list of nodes using the same notation. Unlike persistent peers, the connections to these nodes are transient, disconnecting after obtaining a list of their peers.
+Like the persistent peers setting, this is a comma-separated list of nodes using the same `<nodeID>@<IP address>:<port>` notation. Unlike persistent peers, the connections to these nodes are transient, disconnecting after obtaining a list of their peers.
 
 :::info
 The `chain.p2p.seeds` setting should be used with `chain.p2p.pex = true`.
