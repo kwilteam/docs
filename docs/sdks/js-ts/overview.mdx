@@ -370,7 +370,7 @@ const res = await kwil.call(body, kwilSigner);
 Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures. Learn more about the Kwil Gateway [here](/docs/getting-started/read-access-control#kwil-gateway).
 
 :::tip
-The Kwil Gateway is still in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
+The Kwil Gateway is in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
 :::
 
 ```javascript
@@ -386,10 +386,10 @@ const res = await kwil.call(body, kwilSigner);
 
 ### Gateway logout
 
-To log out of the Kwil Gateway, you can call the `kwil.auth.logout()` method. This is useful if you want to switch accounts or remove the authentication cookie.
+To log out of the Kwil Gateway, you can call the `kwil.auth.logoutKGW()` method. This is useful if you want to switch accounts or remove the authentication cookie.
 
 ```javascript
-await kwil.auth.logout();
+await kwil.auth.logoutKGW();
 ```
 
 For advanced authentication usage, see [read access control advanced usage](/docs/getting-started/read-access-control#advanced-usage).
