@@ -54,6 +54,16 @@ time. The `app.challenge_rate_limit` setting controls the maximum frequency at
 which a client (by IP address) is permitted to request call challenges. See the
 node [config reference](/docs/daemon/config/settings) for details.
 
+### Quickstart
+
+To quickly enable private RPC mode, use the `--app.private-rpc` flag when starting `kwild`:
+
+```shell
+kwild --app.private-rpc
+```
+
+See the [Node Quickstart](/docs/node/quickstart) guide for more information.
+
 ## Client
 
 For RPC clients to make call requests with servers running in private mode, the

@@ -68,8 +68,12 @@ interface ActionBody {
 type Entries = { [key: string]: string | number | null };
 ```
 
-Calls a `view` procedure on the network. If authentication for the view procedure is enforced by a Kwil Gateway, or if the Kwil network is running in Private mode, a `kwilSigner` must be provided. If authentication is enforced by the Kwil Gateway, the call method will prompt the user to authenticate if they have not already done so, and will retain a cookie to authenticate with the Kwil Gateway for all subsequent calls.
+Calls a `view` procedure on the network. The `kwilSigner` is required if any of the following conditions are met:
+- The procedure uses a `@caller` contextual variable.
+- The Kwil network is running in Private mode.
+- The Kwil network is connected to a Kwil Gateway and the procedure has the `@kgw(authn='true')` annotation.
 
+For the last two condition, the SDK will automatically prompt the user to authenticate. 
 
 #### Parameters
 
@@ -404,7 +408,7 @@ Authenticates a user in Private mode.
 
 #### Returns
 
-A promise that resolves an `AuthBody` object, consisting of a signature and a challenge. Both a signature and a challenge is needed to authenticate a user in Private mode.
+A promise that resolves an `AuthBody` object, consisting of a signature and a challenge. Both a signature and a challenge are needed to authenticate a user in Private mode.
 
 ### logout()
 

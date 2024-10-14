@@ -147,7 +147,7 @@ Any procedure that executes a CUD operation must be signed and broadcasted to th
 
 ```javascript
 // construct action body
-const actionBody = {
+const body = {
     dbid,
     name: "your_action_name",
     inputs: [{
@@ -158,7 +158,7 @@ const actionBody = {
 };
 
 // pass action body and signer to execute method
-const res = await kwil.execute(actionBody, kwilSigner);
+const res = await kwil.execute(body, kwilSigner);
 
 /*
     res.data = {
@@ -174,7 +174,7 @@ const res = await kwil.execute(actionBody, kwilSigner);
 import { Types } from "@kwilteam/kwil-js";
 
 // construct action body
-const actionBody: Types.ActionBody = {
+const body: Types.ActionBody = {
   dbid: dbid,
   name: "your_action_name",
   inputs:[{
@@ -185,7 +185,7 @@ const actionBody: Types.ActionBody = {
 };
 
 // pass action body and signer to execute method
-await kwil.execute(actionBody, kwilSigner);
+await kwil.execute(body, kwilSigner);
 
 /*
     res.data = {
@@ -217,9 +217,9 @@ Only one `input` object is allowed in the `inputs` array for `view` procedures.
 <TabItem value="js">
 
 ```javascript
-const actionBody = {
+const body = {
     dbid,
-    name: "your_action_name",
+    name: "your_procedure_name",
     inputs: [{ // only one input object is allowed
         $input_name_1: "input_value_1",
         $input_name_2: ...
@@ -227,7 +227,7 @@ const actionBody = {
 };
 
 // pass action body to execute method
-const res = await kwil.call(actionBody);
+const res = await kwil.call(body);
 
 /*
     res.data = {
@@ -242,9 +242,9 @@ const res = await kwil.call(actionBody);
 ```typescript
 import { Types } from "@kwilteam/kwil-js";
 
-const actionBody: Types.ActionBody = {
+const body: Types.ActionBody = {
     dbid,
-    name: "your_action_name",
+    name: "your_procedure_name",
     inputs: [{
         $input_name_1: "input_value_1",
         $input_name_2: ...
@@ -252,7 +252,7 @@ const actionBody: Types.ActionBody = {
 };
 
 // pass action body to execute method
-const res = await kwil.call(actionBody);
+const res = await kwil.call(body);
 
 /*
     res.data = {
@@ -267,7 +267,7 @@ const res = await kwil.call(actionBody);
 If the view procedure uses a `@caller` [contextual variable](/docs/kuneiform/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view procedure to access the caller's account identifier. The user does not need to sign for view procedures.
 
 ```javascript
-await kwil.call(actionBody, kwilSigner)
+await kwil.call(body, kwilSigner)
 ```
 
 #### Select Query
@@ -349,10 +349,10 @@ const res = await kwil.getAccount("account_identifier")
 
 ### Private Mode
 
-Refer to the Private Mode documentation [here.](/docs/node/private-networks)
+Private RPC is a server-side configuration in kwild that enforces user authentication for each call request. Learn more about private mode [here](/docs/node/private-rpc).
 
 ```typescript
-const actionBody: ActionBody = {
+const body: ActionBody = {
         dbid,
         name: 'your_action_name',
         inputs: [{
@@ -361,13 +361,13 @@ const actionBody: ActionBody = {
           }],
 };
 
-// pass actionBody AND kwilSigner if in Private Mode
-const res = await kwil.call(actionBody, kwilSigner);
+// pass body AND kwilSigner if in Private Mode
+const res = await kwil.call(body, kwilSigner);
 ```
 
 ### Kwil Gateway Authentication
 
-Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures. If your Kwil network used a Kwil Gateway, you should pass a `KwilSigner` to the `kwil.call()` method. If the user is not authenticated, the user will be prompted to sign a message to authenticate, and the SDK will automatically include the authentication cookie in each subsequent request.
+Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures. Learn more about the Kwil Gateway [here](/docs/getting-started/read-access-control#kwil-gateway).
 
 :::tip
 The Kwil Gateway is still in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
@@ -375,7 +375,7 @@ The Kwil Gateway is still in private beta.  If you would like access, please [co
 
 ```javascript
 // pass KwilSigner to the call method
-const res = await kwil.call(actionBody, kwilSigner);
+const res = await kwil.call(body, kwilSigner);
 
 /*
     res.data = {

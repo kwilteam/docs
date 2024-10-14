@@ -109,27 +109,3 @@ async function getUser(username) {
     return result.data;
 }
 ```
-
-## Private Mode
-
-Authenticated RPC is a server-side configuration in kwild that enforces users to authenticate for each call request. Learn more about private mode here: [private mode docs](/docs/node/private-networks).
-
-You can configure your Kwil network to run in private mode.
-
-If your Kwil network is running in private mode, a signer is required for `view` procedures on schemas.
-
-```typescript
-async function getUser(username) {
-    const result = await kwil.call({
-        dbid,
-        name: "get_user",
-        inputs: [
-            {
-                $username: username
-            }
-        ]
-    } kwilSigner);
-
-    return result.data;
-}
-```
