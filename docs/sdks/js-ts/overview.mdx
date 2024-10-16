@@ -83,7 +83,7 @@ const dbid = Utils.generateDBID('account_identifier', 'database_name')
 
 ## Signers
 
-Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CRUD actions, etc).
+Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CUD procedures, read procedures in private mode, etc).
 
 To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a signing callback function (see [below](#custom-signers)).
 
@@ -126,13 +126,15 @@ const customSigner = (msg) => nacl.sign.detached(msg, keys.secretKey);
 const kwilSigner = new KwilSigner(customSigner, keys.publicKey, "ed25519");
 ```
 
+
+
 ## Database Queries
 
-### Create, Update, Delete (CUD) Actions
+### Create, Update, Delete (CUD) Procedures
 
-Any action that executes a CUD operation must be signed and broadcasted to the network through the `kwil.execute()` method.
+Any procedure that executes a CUD operation must be signed and broadcasted to the network through the `kwil.execute()` method.
 
-`.execute()` takes an object that matches the `ActionBody` interface. Action body has two required fields: `dbid` and `action`. You can also optionally add an `inputs` field if the action requires inputs, and a `description` field to customize the signature message that the user will sign.
+`.execute()` takes an object that matches the `ActionBody` interface. Action body has two required fields: `dbid` and `name`. You can also optionally add an `inputs` field if the procedure requires inputs, and a `description` field to customize the signature message that the user will sign.
 
 <Tabs
     defaultValue="js"
@@ -145,18 +147,18 @@ Any action that executes a CUD operation must be signed and broadcasted to the n
 
 ```javascript
 // construct action body
-const actionBody = {
+const body = {
     dbid,
-    action: "your_action_name",
+    name: "your_action_name",
     inputs: [{
         $input_name_1: "input_value_1",
         $input_name_2: ...
     }],
-    description: "Click sign to execute the action!",
+    description: "Click sign to execute the procedure!",
 };
 
 // pass action body and signer to execute method
-const res = await kwil.execute(actionBody, kwilSigner);
+const res = await kwil.execute(body, kwilSigner);
 
 /*
     res.data = {
@@ -172,18 +174,18 @@ const res = await kwil.execute(actionBody, kwilSigner);
 import { Types } from "@kwilteam/kwil-js";
 
 // construct action body
-const actionBody: Types.ActionBody = {
+const body: Types.ActionBody = {
   dbid: dbid,
-  action: "your_action_name",
+  name: "your_action_name",
   inputs:[{
      $input_name_1: "input_value_1",
      $input_name_2: ...
   }],
-  description: "Click sign to execute the action!",
+  description: "Click sign to execute the procedure!",
 };
 
 // pass action body and signer to execute method
-await kwil.execute(actionBody, kwilSigner);
+await kwil.execute(body, kwilSigner);
 
 /*
     res.data = {
@@ -197,13 +199,13 @@ await kwil.execute(actionBody, kwilSigner);
 
 ### Reading Data
 
-To read data on Kwil, you can (1) execute a `view` action message or (2) query with the `.selectQuery()` method.
+To read data on Kwil, you can (1) execute a `view` procedure message or (2) query with the `.selectQuery()` method.
 
-#### `View` Action Message
+#### `View` Procedure Message
 
-`View` actions are read-only actions that can be used to query data without having to wait for a transaction to be mined on Kwil.
+`View` procedures are read-only procedures that can be used to query data without having to wait for a transaction to be mined on Kwil.
 
-Only one `input` object is allowed in the `inputs` array for `view` actions.
+Only one `input` object is allowed in the `inputs` array for `view` procedures.
 
 <Tabs
     defaultValue="js"
@@ -215,9 +217,9 @@ Only one `input` object is allowed in the `inputs` array for `view` actions.
 <TabItem value="js">
 
 ```javascript
-const actionBody = {
+const body = {
     dbid,
-    action: "your_action_name",
+    name: "your_procedure_name",
     inputs: [{ // only one input object is allowed
         $input_name_1: "input_value_1",
         $input_name_2: ...
@@ -225,7 +227,7 @@ const actionBody = {
 };
 
 // pass action body to execute method
-const res = await kwil.call(actionBody);
+const res = await kwil.call(body);
 
 /*
     res.data = {
@@ -240,9 +242,9 @@ const res = await kwil.call(actionBody);
 ```typescript
 import { Types } from "@kwilteam/kwil-js";
 
-const actionBody: Types.ActionBody = {
+const body: Types.ActionBody = {
     dbid,
-    action: "your_action_name",
+    name: "your_procedure_name",
     inputs: [{
         $input_name_1: "input_value_1",
         $input_name_2: ...
@@ -250,7 +252,7 @@ const actionBody: Types.ActionBody = {
 };
 
 // pass action body to execute method
-const res = await kwil.call(actionBody);
+const res = await kwil.call(body);
 
 /*
     res.data = {
@@ -262,10 +264,10 @@ const res = await kwil.call(actionBody);
 </TabItem>
 </Tabs>
 
-If the view action uses a `@caller` [contextual variable](/docs/kuneiform/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view action to access the caller's account identifier. The user does not need to sign for view actions.
+If the view procedure uses a `@caller` [contextual variable](/docs/kuneiform/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view procedure to access the caller's account identifier. The user does not need to sign for view procedures.
 
 ```javascript
-await kwil.call(actionBody, kwilSigner)
+await kwil.call(body, kwilSigner)
 ```
 
 #### Select Query
@@ -343,17 +345,37 @@ const res = await kwil.getAccount("account_identifier")
 */
 ```
 
-## Kwil Gateway Authentication
+## Read Access Control
 
-Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view actions. If your Kwil network used a Kwil Gateway, you should pass a `KwilSigner` to the `kwil.call()` method. If the user is not authenticated, the user will be prompted to sign a message to authenticate, and the SDK will automatically include the authentication cookie in each subsequent request.
+### Private Mode
+
+Private RPC is a server-side configuration in kwild that enforces user authentication for each call request. Learn more about private mode [here](/docs/node/private-rpc).
+
+```typescript
+const body: ActionBody = {
+        dbid,
+        name: 'your_action_name',
+        inputs: [{
+            $input_name_1: 'input_value_1',
+            $input_name_2: ...
+          }],
+};
+
+// pass body AND kwilSigner if in Private Mode
+const res = await kwil.call(body, kwilSigner);
+```
+
+### Kwil Gateway Authentication
+
+Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures. Learn more about the Kwil Gateway [here](/docs/getting-started/read-access-control#kwil-gateway).
 
 :::tip
-The Kwil Gateway is still in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
+The Kwil Gateway is in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
 :::
 
 ```javascript
 // pass KwilSigner to the call method
-const res = await kwil.call(actionBody, kwilSigner);
+const res = await kwil.call(body, kwilSigner);
 
 /*
     res.data = {
@@ -364,10 +386,10 @@ const res = await kwil.call(actionBody, kwilSigner);
 
 ### Gateway logout
 
-To log out of the Kwil Gateway, you can call the `kwil.auth.logout()` method. This is useful if you want to switch accounts or remove the authentication cookie.
+To log out of the Kwil Gateway, you can call the `kwil.auth.logoutKGW()` method. This is useful if you want to switch accounts or remove the authentication cookie.
 
 ```javascript
-await kwil.auth.logout();
+await kwil.auth.logoutKGW();
 ```
 
 For advanced authentication usage, see [read access control advanced usage](/docs/getting-started/read-access-control#advanced-usage).
