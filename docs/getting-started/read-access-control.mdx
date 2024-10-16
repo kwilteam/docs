@@ -14,11 +14,13 @@ Additionally, Kwil supports two authentication methods for enforcing read access
 - [Private RPC Mode](#private-rpc-mode)
 - [Kwil Gateway](#kwil-gateway)
 
+The main difference between Private RPC and Kwil Gateway is that Private RPC requires the user to sign for authentication ***with each call request***, whereas the Kwil Gateway enables a user to ***sign once*** for all call requests in a session.
+
 ## Private RPC Mode
 
-Private RPC is a server-side configuration in kwild that enforces user authentication for each call request. Learn more about private mode [here](/docs/node/private-rpc).
+Private RPC is a server-side configuration in `kwild` that enforces user authentication for each call request. Learn more about private mode [here](/docs/node/private-rpc).
 
-Private RPC mode requires a user to sign a message with their [account](/docs/concepts#accounts) keys for each call request. If the signature is valid, the call will return the query result. If the signature is invalid or not provided, the call will return an error.
+By default, data in Kwil is public. To enable private data and read access control, Private RPC mode requires a user to identify themselves via signing a message with each call request. If the signature is valid, the call will return the query result. If the signature is invalid or not provided, the call will return an error.
 
 :::tip
 Private RPC mode is not enabled on the Longhorn Testnet. If you would like to test private mode, run a [local node with private RPC enabled](/docs/node/private-rpc#quickstart).
@@ -104,15 +106,13 @@ async function authenticatedProcedure() {
 
 ## Kwil Gateway
 
-The Kwil Gateway requires a user to sign a message with their [account](/docs/concepts#accounts) keys. Once the signature is verified, the gateway will return the user a cookie to be passed with all subsequent requests.
-
-The main difference between Private RPC and Kwil Gateway is that Private RPC requires the user to sign a message ***for each call request***, whereas the Kwil Gateway enables a user to ***sign in once*** and call multiple procedures.
+The Kwil Gateway requires a user to sign a message with their private key. Once the signature is verified, the gateway will return the user a cookie to be passed with all subsequent requests.
 
 :::tip
 The gateway is still in private beta.  If you would like access, please contact our team.
 :::
 
-KGW cookies are partitioned by origin. This means that multiple users can be authenticated at the same time, and users authenticated from one origin (e.g., `https://website1.com`) will not be authenticated on another origin (e.g., `https://website2.com`).
+KGW cookies are partitioned by account and origin. This means that multiple users can be authenticated at the same time, and users authenticated from one origin (e.g., `https://website1.com`) will not be authenticated on another origin (e.g., `https://website2.com`).
 
 ### Require Authentication in Kuneiform
 
@@ -243,7 +243,7 @@ async function logoutUser() {
 
 ### Disable Auto Authentication
 
-By default, the Kwil SDK will automatically prompt the user to authenticate to authenticate when required (for both Private RPC and Kwil Gateway). To disable this behavior, set the `autoAuthenticate` option to `false`.
+By default, the Kwil SDK will automatically prompt the user to authenticate when required (for both Private RPC and Kwil Gateway). To disable this behavior, set the `autoAuthenticate` option to `false`.
 
 ```typescript
 const kwil = new WebKwil({
