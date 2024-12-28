@@ -11,7 +11,7 @@ DDL (data definition language) in Kuneiform is comprised of "tables" that contai
 
 ## Database Declaration in Kuneiform Language
 
-At the top of every Kuneiform file is the database declaration. Note that the database name **must** be followed by semi-colon, otherwise you will get an error when the the file is parsed. Database names must be unique for the wallet deploying them. A global
+At the top of every Kuneiform file is the database declaration. Note that the database name **must** be followed by semi-colon, otherwise you will get an error when the file is parsed. Database names must be unique for the wallet deploying them. A global
 unique identifier (DBID) is assigned to each database when it is deployed. The DBID is derived from the deployer's wallet address
 and the schema name.
 
@@ -96,7 +96,7 @@ table posts {
 Below are a list of operations that available for the foreign key declaration:
 
 - ```no action``` No operation is triggered.
-- ```restrict``` Other calls to the other refrenced column will fail to update the column.
+- ```restrict``` Other calls to the other referenced column will fail to update the column.
 - ```set null``` The column is set to null.
 - ```set default``` The column is set to the column's default value (if specified in the table declaration).
 - ```cascade``` The change in the reference column cascades to the specified column.  In the case of a deletion, it will delete the entire record.
