@@ -114,7 +114,7 @@ func processBlock(ctx context.Context, eventstore listeners.EventStore, client *
 
 In order to listen to Ethereum, we will need to read in our local node's configuration, create a client, and listen for new blocks.
 If the configuration is not set, or if the configuration is invalid, we will immediately shut down the listener. We will also stop the listener
-if the context is cancelled.
+if the context is canceled.
 
 ```go title="credit_listener.go"
 package main
@@ -163,7 +163,7 @@ func EthListener(ctx context.Context, service *common.Service, eventstore listen
 	defer sub.Unsubscribe()
 
 	// we will now listen for new blocks and process them
-	// if the context is cancelled, we will stop listening
+	// if the context is canceled, we will stop listening
 	for {
 		select {
 		case <-ctx.Done():
