@@ -216,7 +216,7 @@ Generates a database ID based on the database schema's name and the deployers ad
 
 Parses a text timestamp with a formatting directive in the format `YYYY-MM-DD HH24:MI:SS` into a Unix timestamp.
 The first argument is the timestamp to parse, and the second argument is the formatting directive (e.g. `parse_unix_timestamp('2022-01-01 00:00:00', 'YYYY-MM-DD HH24:MI:SS')`).
-It returns the Unix timestamp as a `decimnal(16,6)`, where the integer part is the number of seconds since the Unix epoch,
+It returns the Unix timestamp as a `decimal(16,6)`, where the integer part is the number of seconds since the Unix epoch,
 and the fractional part is the number of microseconds.
 
 `format_unix_timestamp(DECIMAL(16,6), TEXT) -> TEXT`*
