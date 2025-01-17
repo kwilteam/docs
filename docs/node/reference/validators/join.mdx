@@ -1,0 +1,50 @@
+---
+sidebar_position: 2
+sidebar_label: "join"
+id: "kwild-validators-join"
+title: "kwild validators join"
+description: "Request to join the validator set."
+slug: /ref/kwild/validators/join
+---
+
+## kwild validators join
+
+Request to join the validator set.
+
+### Synopsis
+
+The `join` command submits a request to join the validator set. This node will be the subject of the request. The node will be added to the validator set if the join request is approved by the current validator set. The status of a join request can be queried using the `join-status` command.
+
+```
+kwild validators join [flags]
+```
+
+### Examples
+
+```
+# Request to join the validator set
+kwild validators join
+```
+
+### Options
+
+```
+  -h, --help   help for join
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

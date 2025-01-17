@@ -1,0 +1,44 @@
+---
+sidebar_position: 1
+sidebar_label: "abort"
+id: "kwild-block-abort"
+title: "kwild block abort"
+description: "Abort active execution of the current block."
+slug: /ref/kwild/block/abort
+---
+
+## kwild block abort
+
+Abort active execution of the current block.
+
+### Synopsis
+
+Aborts the execution of the current block if it is at given height, and removes specified transactions from the mempool.
+
+```
+kwild block abort <block_height> [flags]
+```
+
+### Options
+
+```
+  -h, --help           help for abort
+  -t, --txns strings   Transaction IDs to remove from the mempool
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild block](/docs/ref/kwild/block)	 - Leader block execution commands
+

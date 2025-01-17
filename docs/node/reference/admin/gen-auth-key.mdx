@@ -1,0 +1,53 @@
+---
+sidebar_position: 2
+sidebar_label: "gen-auth-key"
+id: "kwild-admin-gen-auth-key"
+title: "kwild admin gen-auth-key"
+description: "Generate a new key pair for use with an authenticated admin RPC service."
+slug: /ref/kwild/admin/gen-auth-key
+---
+
+## kwild admin gen-auth-key
+
+Generate a new key pair for use with an authenticated admin RPC service.
+
+### Synopsis
+
+The `gen-auth-key`command generates a new key pair for use with an authenticated admin RPC service.
+	
+The key pair is generated and stored in the node's configuration directory, in the files `auth.key` and `auth.cert`. The key pair is used to authenticate the admin tool to the node.
+
+```
+kwild admin gen-auth-key [flags]
+```
+
+### Examples
+
+```
+# Generate a new TLS key pair to talk to the node
+kwild admin gen-auth-key
+# kwild admin commands uses auth.{key,cert}, while kwild uses clients.pem
+```
+
+### Options
+
+```
+  -h, --help             help for gen-auth-key
+      --tlscert string   output path for the new client certificate (default "auth.cert")
+      --tlskey string    output path for the new client key file (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+```
+
+### SEE ALSO
+
+* [kwild admin](/docs/ref/kwild/admin)	 - Administrative commands using the secure admin RPC service
+

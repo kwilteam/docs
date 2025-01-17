@@ -1,0 +1,49 @@
+---
+sidebar_position: 1
+sidebar_label: "add"
+id: "kwild-whitelist-add"
+title: "kwild whitelist add"
+description: "Add a peer to the node's connection whitelist."
+slug: /ref/kwild/whitelist/add
+---
+
+## kwild whitelist add
+
+Add a peer to the node's connection whitelist.
+
+### Synopsis
+
+The `add` command adds a peer to the node's whitelist of peers to accept connections from.
+
+```
+kwild whitelist add <peerID> [flags]
+```
+
+### Examples
+
+```
+kwild whitelist add <peerID>
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+  -h, --help                  help for add
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild whitelist](/docs/ref/kwild/whitelist)	 - Manage a node's peer whitelist
+

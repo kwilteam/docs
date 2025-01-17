@@ -26,7 +26,7 @@ For multi-node deployments, see the guide on [how to gracefully halt a network](
 Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the PostgresDB instance. **Only state that exists in Postgres when this
 snapshot is taken will be included in the new network.** This tool connects directly to the database to capture its state
 and does not require the `kwild` process to be running. For more details on how snapshots can be taken, refer to the
-[create database snapshots](/docs/ref/kwil-admin/snapshot/create) documentation.
+[create database snapshots](/docs/ref/kwild/snapshot/create) documentation.
 
 ```sh
 kwil-admin snapshot create --snapdir ./network_snapshot --dbname postgres --host localhost --port 5432 --user kwild

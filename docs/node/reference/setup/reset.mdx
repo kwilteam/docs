@@ -1,0 +1,53 @@
+---
+sidebar_position: 3
+sidebar_label: "reset"
+id: "kwild-setup-reset"
+title: "kwild setup reset"
+description: "Reset blockchain data and the application state."
+slug: /ref/kwild/setup/reset
+---
+
+## kwild setup reset
+
+Reset blockchain data and the application state.
+
+### Synopsis
+
+To delete all of a Kwil node's data files, use the `reset` command. If the root directory is not specified, the node's default root directory will be used.
+
+WARNING: This command should not be used on production systems. This should only be used to reset disposable test nodes.
+
+```
+kwild setup reset [flags]
+```
+
+### Examples
+
+```
+# Delete all of a Kwil node's data files
+kwild setup reset -r "~/.kwild"
+```
+
+### Options
+
+```
+      --all               reset all data, if this is not set, only the app state will be reset
+      --dbname string     Name of the database in the PostgreSQL server (default "kwild")
+  -h, --help              help for reset
+      --host string       Host of the database (default "localhost")
+      --password string   Password for the database user
+      --port string       Port of the database (default "5432")
+      --user string       User with administrative privileges on the database (default "postgres")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild setup](/docs/ref/kwild/setup)	 - Tools for creating and managing node configuration and data
+

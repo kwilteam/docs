@@ -1,0 +1,52 @@
+---
+sidebar_position: 4
+sidebar_label: "propose"
+id: "kwild-consensus-propose"
+title: "kwild consensus propose"
+description: "Submit a migration proposal."
+slug: /ref/kwild/consensus/propose
+---
+
+## kwild consensus propose
+
+Submit a migration proposal.
+
+### Synopsis
+
+Submit a proposal to update the consensus parameters.
+
+```
+kwild consensus propose [flags]
+```
+
+### Examples
+
+```
+...
+```
+
+### Options
+
+```
+  -d, --description string   Description of the consensus parameter update proposal.
+  -h, --help                 help for propose
+  -u, --updates string       Parameter updates in JSON format. (default "{}")
+  -y, --yes                  Skip confirmation prompt.
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild consensus](/docs/ref/kwild/consensus)	 - Functions for dealing with consensus update proposals
+

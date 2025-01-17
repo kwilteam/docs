@@ -1,0 +1,45 @@
+---
+sidebar_position: 4
+sidebar_label: "testnet"
+id: "kwild-setup-testnet"
+title: "kwild setup testnet"
+description: "Generate configuration for a new test network with multiple nodes"
+slug: /ref/kwild/setup/testnet
+---
+
+## kwild setup testnet
+
+Generate configuration for a new test network with multiple nodes
+
+### Synopsis
+
+The `testnet` command generates a configuration for a new test network with multiple nodes. For a configuration set that can be run on the same host, use the `--unique-ports` flag.
+
+```
+kwild setup testnet [flags]
+```
+
+### Options
+
+```
+      --db-owner string   owner of the database
+  -h, --help              help for testnet
+      --no-pex            disable peer exchange
+  -n, --non-vals int      number of non-validators (default 0)
+  -o, --out-dir string    output directory for generated node root directories (default ".testnet")
+  -p, --port uint         starting P2P port for the nodes (default 6600)
+  -u, --unique-ports      use unique ports for each node
+  -v, --vals int          number of validators (includes the one leader) (default 3)
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild setup](/docs/ref/kwild/setup)	 - Tools for creating and managing node configuration and data
+

@@ -1,0 +1,50 @@
+---
+sidebar_position: 1
+sidebar_label: "gen"
+id: "kwild-key-gen"
+title: "kwild key gen"
+description: "Generate a private key for validator use."
+slug: /ref/kwild/key/gen
+---
+
+## kwild key gen
+
+Generate a private key for validator use.
+
+### Synopsis
+
+The `gen` command generates a private key for use by validators.
+
+```
+kwild key gen [<keytype>] [flags]
+```
+
+### Examples
+
+```
+# Generate a new key and save it to ./priv_key
+kwild key gen --key-file ./priv_key
+
+# Generate a raw private key
+kwild key gen --raw
+```
+
+### Options
+
+```
+  -h, --help              help for gen
+  -o, --key-file string   file to which the new private key is written (stdout by default)
+  -R, --raw               just print the private key hex without other encodings, public key, or node ID
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild key](/docs/ref/kwild/key)	 - Tools for private key generation and inspection
+

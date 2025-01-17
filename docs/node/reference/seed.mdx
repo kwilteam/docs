@@ -1,0 +1,41 @@
+---
+sidebar_position: 7
+sidebar_label: "seed"
+id: "kwild-seed"
+title: "kwild seed"
+description: "Run a network seeder"
+slug: /ref/kwild/seed
+---
+
+## kwild seed
+
+Run a network seeder
+
+### Synopsis
+
+The `seed` command starts a peer seeder process to crawl and bootstrap the network. This does not use the kwild node config. It will bind to TCP port 6609, and store config and data in the specified directory.
+
+```
+kwild seed [flags]
+```
+
+### Options
+
+```
+      --bootnodes strings   bootstrap nodes
+      --chain-id string     chain ID of the network to crawl (default "kwil-testnet")
+      --dir string          seeder data directory (default "~/.kwilseed")
+  -h, --help                help for seed
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild](/docs/ref/kwild)	 - Kwil daemon
+
