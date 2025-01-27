@@ -1,0 +1,145 @@
+---
+sidebar_position: 6
+sidebar_label: The "info" Namespace
+id: info-namespace
+title: The "info" Namespace
+description: The "info" namespace.
+slug: /language/info-namespace
+---
+
+The `info` namespace is a special namespace that holds information regarding the structure of all other namespaces.
+It informs the user of other tables, columns, actions, and more that are available. The `info` namespace can only
+be queried, and it cannot be modified.
+
+## Tables in the "info" Namespace
+
+### "namespaces" Table
+
+The `namespaces` table contains information about all the namespaces in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| name | TEXT | The name of the namespace |
+| type | TEXT | The type of the namespace (one of 'USER', 'SYSTEM', or 'EXTENSION') |
+
+### "tables" Table
+
+The `tables` table contains information about all the tables in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| name | TEXT | The name of the table |
+| namespace | TEXT | The namespace the table belongs to |
+
+### "columns" Table
+
+The `columns` table contains information about all the columns in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace the column belongs to |
+| table_name | TEXT | The table the column belongs to |
+| name | TEXT | The name of the column |
+| data_type | TEXT | The type of the column |
+| is_nullable | BOOL | Whether the column can be null |
+| default_value | TEXT | The default value of the column |
+| is_primary_key | BOOL | Whether the column is part of the primary key |
+| ordinal_position | INT8 | The position of the column in the table |
+
+### "indexes" Table
+
+The `indexes` table contains information about all the indexes in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace the index belongs to |
+| table_name | TEXT | The table the index belongs to |
+| name | TEXT | The name of the index |
+| is_primary_key | BOOL | Whether the index is a primary key |
+| is_unique | BOOL | Whether the index is unique |
+| columns | TEXT[] | The columns the index is on |
+
+### "constraints" Table
+
+The `constraints` table contains information about all the constraints in the database. It does not include
+foreign key constraints.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace the constraint belongs to |
+| table_name | TEXT | The table the constraint belongs to |
+| name | TEXT | The name of the constraint |
+| constraint_type | TEXT | The type of the constraint ('CHECK' or 'UNIQUE') |
+| columns | TEXT[] | The columns the constraint is on |
+| expression | TEXT | The expression for the constraint, if it is a 'CHECK' constraint |
+
+### "foreign_keys" Table
+
+The `foreign_keys` table contains information about all the foreign key constraints in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace the foreign key belongs to |
+| table_name | TEXT | The table the foreign key belongs to |
+| name | TEXT | The name of the foreign key |
+| columns | TEXT[] | The columns the foreign key is on |
+| ref_table | TEXT | The table the foreign key references |
+| ref_columns | TEXT[] | The columns in the referenced table the foreign key references |
+| on_update | TEXT | The action to take on update ('CASCADE', 'SET NULL', 'SET DEFAULT', 'RESTRICT', or 'NO ACTION') |
+| on_delete | TEXT | The action to take on delete ('CASCADE', 'SET NULL', 'SET DEFAULT', 'RESTRICT', or 'NO ACTION') |
+
+### "actions" Table
+
+The `actions` table contains information about all the actions in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace the action belongs to |
+| name | TEXT | The name of the action |
+| raw_statement | TEXT | The text body of the action |
+| access_modifiers | TEXT[] | The access modifiers of the action ('PUBLIC', 'SYSTEM', 'PRIVATE', 'OWNER', or 'VIEW') |
+| parameter_names | TEXT[] | The ordered names of the parameters of the action |
+| parameter_types | TEXT[] | The ordered types of the parameters of the action |
+| return_names | TEXT[] | The ordered names of the return values of the action, if they exist |
+| return_types | TEXT[] | The ordered types of the return values of the action, if they exist |
+| returns_table | BOOL | Whether the action returns a table |
+| built_in | BOOL | Whether the action is built-in as a precompile |
+
+### "roles" Table
+
+The `roles` table contains information about all the roles in the database.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| name | TEXT | The name of the role |
+| built_in | BOOL | Whether the role is built-in or is user-define |
+
+### "role_privileges" Table
+
+The `role_privileges` table contains information about the privileges that each role has.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| role_name | TEXT | The name of the role |
+| privilege | TEXT | The privilege the role has ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'CALL', 'ROLES', or 'USE') |
+| namespace | TEXT | The namespace the privilege is on, if it is not global |
+
+### "user_roles"
+
+The `user_roles` table contains information about the roles that each user has.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| role_name | TEXT | The name of the role |
+| user_identifier | TEXT | The identifier of the user (usually a wallet address or public key) |
+
+### "extensions" Table
+
+The `extensions` table contains information about the extensions currently being used.
+
+| Column | Data Type | Description |
+|--------|-----------|-------------|
+| namespace | TEXT | The namespace that the extension is registered under |
+| extension | TEXT | The name of the extension |
+| parameters | TEXT[] | The parameter keys that the extension was initialized with |
+| values | TEXT[] | The parameter values that the extension was initialized with, ordered according to their corresponding parameter name |

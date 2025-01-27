@@ -1,0 +1,225 @@
+---
+sidebar_position: 9
+sidebar_label: "SQL"
+id: sql
+title: SQL
+description: How to use the INSERT, UPDATE, DELETE, and SELECT statements.
+slug: /language/sql
+---
+
+This page documents the supported features for INSERT, UPDATE, DELETE, and SELECT statements in Kwil's SQL dialect.
+Kwil supports a subset of the SQL standard, with a few minor additions and changes. It is most similar to PostgreSQL.
+
+## Top-Level Statements
+
+A top-level statement is a standalone INSERT/UPDATE/DELETE/SELECT statement that can be executed either directly against
+the database, or within an action. Any top-level statement can begin with one or more common table expressions:
+
+```sql
+WITH <common_table_expression> [, <common_table_expression> ...]
+<top_level_statement>
+```
+
+Common table expressions can either specify their return column names, or omit them, in which case they will be inferred:
+
+```sql
+-- Explicit column names
+WITH names_above_30 (name) AS (SELECT name FROM users WHERE age > 30)
+...
+
+-- Inferred column names
+WITH names_above_30 AS (SELECT name FROM users WHERE age > 30)
+```
+
+Common table expressions can also be made recursive using the `WITH RECURSIVE` syntax. Recursive common table expressions
+specify an anchor (or base) query and a recursive query that refers to the CTE itself:
+
+```sql
+WITH RECURSIVE numbers_cte AS (
+    -- Base case: Start with the number 1
+    SELECT 1 AS number
+    UNION ALL
+    -- Recursive case: Increment the number by 1 until it reaches 10
+    SELECT number + 1
+    FROM numbers_cte
+    WHERE number < 10
+)
+```
+
+## INSERT Statement
+
+The INSERT statement allows you to add new rows to a table. It supports inserting data via literal values or from
+the results of a SELECT statement. Additionally, it offers an upsert mechanism via ON CONFLICT to handle duplicate key scenarios.
+
+### Basic Syntax
+```sql
+INSERT INTO <table_name> [AS <alias>] 
+    [ ( <column_list> ) ]
+    { 
+       VALUES ( <expr1>, <expr2>, ... ) [ , ( <expr1>, <expr2>, ... ) ] 
+       | <select_statement>
+    }
+    [ <upsert_clause> ]
+```
+
+### Upsert Clause
+Kwil's SQL dialect supports an upsert mechanism, allowing you to handle conflicts arising from unique or primary key constraints. The upsert clause is specified via ON CONFLICT:
+
+```sql
+ON CONFLICT 
+    [ ( <conflict_column_list> ) [ WHERE <conflict_condition> ] ]
+    DO { NOTHING | UPDATE SET <column> = <expr> [ , <column> = <expr> ] [ WHERE <update_condition> ] }
+```
+
+### Insert from Select
+Instead of providing literal values, you can supply a SELECT statement:
+
+```sql
+INSERT INTO target_table (col1, col2)
+SELECT source_col1, source_col2 
+FROM source_table
+WHERE ...
+```
+
+The number of columns in the SELECT must match the number of columns in the INSERT list (or the full table definition if the list is omitted).
+All rows returned by the SELECT statement are inserted.
+
+## Examples:
+
+#### Insert Single Row
+
+```sql
+INSERT INTO users (id, username, email)
+VALUES (1, 'alice', 'alice@example.com');
+```
+#### Insert Multiple Rows
+
+```sql
+INSERT INTO users (id, username, email)
+VALUES
+    (2, 'bob', 'bob@example.com'),
+    (3, 'charlie', 'charlie@example.com');
+```
+
+#### Insert from Select
+
+```sql
+INSERT INTO archived_users (id, username, email)
+SELECT id, username, email
+FROM users
+WHERE age > 65;
+```
+
+#### Upsert with DO NOTHING
+
+```sql
+INSERT INTO users (id, username)
+VALUES (100, 'dave')
+ON CONFLICT (id) 
+DO NOTHING;
+```
+
+#### Upsert with DO UPDATE
+
+```sql
+INSERT INTO users (id, username)
+VALUES (100, 'dave')
+ON CONFLICT (id) 
+DO UPDATE SET username = EXCLUDED.username;
+```
+
+## UPDATE Statement
+
+The UPDATE statement allows you to modify existing rows in a table. It supports updating multiple columns in a single
+statement, and can reference other tables in the FROM clause.
+
+### Basic Syntax
+
+```sql
+UPDATE <table_name> [AS <alias>]  
+SET <column1> = <expr1> [, <column2> = <expr2>, ...]  
+[FROM <relation> [JOIN ...]]  
+[WHERE <condition>]  
+```
+
+### Example
+
+```sql
+UPDATE users AS u
+SET name = 'Alice', age = 30
+FROM roles r
+INNER JOIN user_roles ur ON ur.role_id = r.id
+WHERE u.id = ur.user_id 
+  AND r.name = 'admin';
+```
+
+## DELETE Statement
+
+The DELETE statement allows you to remove rows from a table. It supports filtering rows using a WHERE clause.
+
+### Basic Syntax
+
+```sql
+DELETE FROM <table_name> [AS <alias>]
+[WHERE <condition>]
+```
+
+### Example
+
+```sql
+DELETE FROM users
+WHERE age < 18;
+```
+
+## SELECT Statement
+
+The SELECT statement allows you to query data from one or more tables. It supports features
+like filtering, grouping, ordering, joins, and window functions.
+
+### Basic Syntax
+
+```sql
+SELECT [DISTINCT] <result_columns>  
+FROM <table_name> [AS <alias>]
+[JOIN <table_name> ON <join_condition> ...]
+[WHERE <condition>]
+[GROUP BY <group_by_columns> [HAVING <condition>]]  
+[WINDOW <window_name> AS [<window_specification>] [,...]]
+[ { UNION [ALL] | INTERSECT | EXCEPT } <select_statement> ]
+[ORDER BY <ordering_columns> [ASC|DESC] [NULLS FIRST|LAST]]  
+[LIMIT <row_count>]  
+[OFFSET <offset_count>];
+```
+
+### Examples
+
+#### Using a Group By
+
+```sql
+SELECT user_id, COUNT(*) AS total
+FROM events
+GROUP BY user_id
+HAVING COUNT(*) > 10
+ORDER BY user_id ASC
+LIMIT 100;
+```
+
+#### Using a Window Function
+
+```sql
+SELECT user_id, COUNT(*) OVER (PARTITION BY user_id) AS total
+FROM events
+ORDER BY user_id ASC
+LIMIT 100;
+```
+
+#### Using Recursive a CTE
+
+```sql
+with recursive r as (
+	select 1 as n
+	union all
+	select n+1 from r where n < 6
+)
+select * from r;
+```

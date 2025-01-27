@@ -1,15 +1,47 @@
 ---
-sidebar_position: 2
-sidebar_label: "Reading and Writing Data"
-id: 'read-write-data'
-title: "Reading and Writing Data"
-description: Write data to a database and read it back.
+sidebar_position: 3
+sidebar_label: "Using the JS/TS SDK"
+id: 'using-js-sdk'
+title: "Using the JavaScript SDK"
+description: Learn how to execute and call actions using the Kwil JavaScript SDK.
 ---
 
 In this tutorial, we will use the JavaScript SDK to write and read data from a database.
-**We will using the schema we created in the [schema tutorial](create-a-database).**
-
 Full SDK documentation can be found [here](../sdks/js-ts/overview).
+
+## Prerequisites
+
+- Ethereum Wallet Provider - You will need an Ethereum wallet provider in your browser to sign transactions. We recommend
+using [MetaMask](https://metamask.io/).
+- Kwil RPC - You will need the RPC endpoint of the Kwil network you are deploying to. This can be obtained by either running a [node
+locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login>).
+- A schema deployed to your database. We will use the schema in the dropdown below for this tutorial. To learn how to deploy a schema,
+see the [Create a Table](/docs/getting-started/create-a-table) tutorial.
+
+<details>
+    <summary> schema.sql </summary>
+
+```sql showLineNumbers
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    age INT NOT NULL,
+    address TEXT NOT NULL UNIQUE // user wallet addresses
+);
+
+CREATE ACTION create_user($username TEXT, $age INT) PUBLIC {
+    INSERT INTO users (id, username, age, address)
+    VALUES (uuid_generate_kwil(@txid), $username, $age, @caller);
+};
+
+CREATE ACTION get_user($name username) PUBLIC VIEW RETURNS (id UUID, username TEXT, age INT, address TEXT) {
+    for $row in SELECT * FROM users WHERE username = $name {
+        return $row.id, $row.username, $row.age, $row.address;
+    }
+    error('User not found');
+};
+```
+</details>
 
 ## Install the SDK
 
@@ -33,8 +65,8 @@ The Kwil class is the main class for interacting with Kwil. It is used to initia
 import { WebKwil } from '@kwilteam/kwil-js';
 
 const kwil = new WebKwil({
-    kwilProvider: "https://longhorn.kwil.com",
-    chainId: "longhorn-2",
+    kwilProvider: "YOUR_KWIL_URL",
+    chainId: "YOUR_CHAIN_ID",
 });
 ```
 
@@ -54,18 +86,6 @@ async function getSigner() {
 }
 ```
 
-### DBID
-
-DBIDs are network-wide unique identifiers for databases.  They are derived from the database owner's wallet address and the database name.
-
-Make sure to replace `your_wallet_here` with your wallet address.
-
-```typescript
-import { Utils } from '@kwilteam/kwil-js';
-
-const dbid = Utils.generateDBID('your_wallet_here', 'social_media');
-```
-
 ## Write Data
 
 To write data, we can use the `execute()` method to execute a procedure:
@@ -75,7 +95,6 @@ async function createUser(id, username, age) {
     const kwilSigner = await getSigner();
 
     const result = await kwil.execute({
-        dbid,
         name: "create_user",
         inputs: [
             {
@@ -97,7 +116,6 @@ To read data, we will call a `view` procedure on the schema.  This will return t
 ```typescript
 async function getUser(username) {
     const result = await kwil.call({
-        dbid,
         name: "get_user",
         inputs: [
             {

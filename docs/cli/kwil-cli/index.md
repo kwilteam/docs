@@ -25,7 +25,7 @@ Command line interface client for using Kwil.
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
   -h, --help                 help for kwil-cli
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
@@ -36,8 +36,11 @@ Command line interface client for using Kwil.
 ### SEE ALSO
 
 * [kwil-cli account](/docs/ref/kwil-cli/account)	 - Account related commands.
+* [kwil-cli call-action](/docs/ref/kwil-cli/call-action)	 - Call a view action.
 * [kwil-cli configure](/docs/ref/kwil-cli/configure)	 - Configure the Kwil CLI with persistent global settings.
-* [kwil-cli database](/docs/ref/kwil-cli/database)	 - The database command is a parent command containing subcommands for interacting with databases.
+* [kwil-cli exec-action](/docs/ref/kwil-cli/exec-action)	 - Execute an action against the database.
+* [kwil-cli exec-sql](/docs/ref/kwil-cli/exec-sql)	 - Execute SQL against a database
+* [kwil-cli query](/docs/ref/kwil-cli/query)	 - Execute a SELECT statement against the database
 * [kwil-cli utils](/docs/ref/kwil-cli/utils)	 - Various CLI utility commands.
-* [kwil-cli version](/docs/ref/kwil-cli/version)	 - Displays the cli version information.
+* [kwil-cli version](/docs/ref/kwil-cli/version)	 - Display the application version
 

@@ -1,0 +1,91 @@
+---
+sidebar_position: 7
+sidebar_label: Roles
+id: roles
+title: Roles
+description: Roles in Kwil
+slug: /language/roles
+---
+
+Roles in Kwil allow you to define privileges that can be held by users, defining how users can interact with the database.
+Using roles, you can designate rules for how schemas can change, who can execute ad-hoc SQL statements, set access control
+rules for namespaces.
+
+## Creating Roles
+
+To create a new role, use the `CREATE ROLE` statement:
+
+```sql
+CREATE ROLE [IF NOT EXISTS] role_name;
+```
+
+To drop a role, use the `DROP ROLE` statement:
+
+```sql
+DROP ROLE [IF EXISTS] role_name;
+```
+
+There are two built-in roles in Kwil:
+
+- `owner`: the owner is a special role that has all privileges on the database. There can only ever be one owner. Privileges cannot
+be revoked from the owner role.
+- `default`: the default role is held by all users, and cannot be revoked. By default, the `default` role can call all actions and
+execute ad-hoc SELECT statements, however these privileges can be revoked.
+
+The initial database owner is specified in a network's genesis configuration. The owner can transfer ownership to another wallet
+using the `TRANSFER OWNERSHIP` statement:
+
+```sql
+TRANSFER OWNERSHIP TO 'some_wallet_address';
+```
+
+## Privileges
+
+Kwil has a pre-defined set of privileges that can be granted to roles. All privileges can be granted globally. Some privileges can be
+granted on a namespace. For example, if the `insert` privilege is granted on the `main` namespace, the role can execute ad-hoc INSERT
+statements against the `main` namespace, but not into any other namespace.
+
+Kwil supports the following privileges. If "Global-Only" is marked as "Yes", the privilege can only be granted globally. If
+"Global-Only" is marked as "No", the privilege can be granted globally or on a namespace:
+
+| Privilege | Global-Only | Description |
+| --------- | ----------- | ----------- |
+| `SELECT` | No | Allows the role to execute ad-hoc SELECT statements. |
+| `INSERT` | No | Allows the role to execute ad-hoc INSERT statements. |
+| `UPDATE` | No | Allows the role to execute ad-hoc UPDATE statements. |
+| `DELETE` | No | Allows the role to execute ad-hoc DELETE statements. |
+| `CREATE` | No | Allows the role to create tables, actions, and other database objects. |
+| `DROP` | No | Allows the role to drop tables, actions, and other database objects. |
+| `ALTER` | No | Allows the role to alter tables, actions, and other database objects. |
+| `CALL` | No | Allows the role to call actions. |
+| `ROLES` | Yes | Allows the role to create, grant, and revoke roles. |
+| `USE` | Yes | Allows the roles to initialize a new extension. |
+
+## Granting and Revoking Privileges
+
+To grant a privilege to a role, use the `GRANT` statement:
+
+```sql
+GRANT [IF NOT GRANTED] privilege_name [, privilege_name] [ON namespace_name] TO role_name;
+REVOKE [IF GRANTED] privilege_name [, privilege_name] [ON namespace_name] FROM role_name;
+```
+
+Roles can be granted to users using the same syntax:
+
+```sql
+GRANT [IF NOT GRANTED] role_name TO {'some_wallet_address' | $user_variable };
+REVOKE [IF GRANTED] role_name FROM {'some_wallet_address' | $user_variable };
+```
+
+## Example
+
+In this example, we create a new role called `editor`, and grant it the `INSERT` and `UPDATE` privileges on the `main` namespace.
+We then grant the `editor` role to a user with the wallet address `0x1234`.
+
+```sql
+CREATE ROLE editor;
+
+GRANT INSERT, UPDATE ON main TO editor;
+
+GRANT editor TO '0x1234';
+```

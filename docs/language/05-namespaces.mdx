@@ -1,0 +1,111 @@
+---
+sidebar_position: 5
+sidebar_label: "Namespaces"
+id: namespaces
+title: Namespaces
+description: Namespaces in Kwil.
+slug: /language/namespaces
+---
+
+Namespaces allow users to separate their database into different logical units. They are used to group together related tables,
+actions, and other database objects, while avoiding naming conflicts between different parts of the database. They are functionally
+similar to [schemas in Postgres](<https://www.postgresql.org/docs/current/ddl-schemas.html>), and are simply given a different name
+to avoid confusion.
+
+Each database comes with two built-in schemas: `main` and `info`. If no namespace is specified, the `main` schema is used by default.
+`info` stores metadata about the other namespaces (such as the tables and actions they contain), and cannot be written to directly.
+
+## Creating Namespaces
+
+To create a new namespace, use the `CREATE NAMESPACE` statement:
+
+```sql
+CREATE NAMESPACE [IF NOT EXISTS] my_namespace;
+```
+
+This will create a new namespace called `my_namespace`. If the namespace already exists, an error will be thrown unless the `IF NOT EXISTS`.
+
+To drop a namespace, use the `DROP NAMESPACE` statement:
+
+```sql
+DROP NAMESPACE [IF EXISTS] my_namespace;
+```
+
+This will remove the namespace `my_namespace` and all of its contents. If the namespace does not exist, an error will be thrown
+unless the `IF EXISTS`.
+
+## Using Namespaces
+
+Namespaces can be specified in 2 places:
+
+- when executing ad-hoc SQL (INSERT/UPDATE/DELETE/SELECT) or DDL ('CREATE TABLE'/'CREATE ACTION') statements
+- when executing an action
+
+### Namespaces in Ad-Hoc SQL
+
+To specify a namespace while executing ad-hoc SQL, prefix the statement with {namespace_name}:
+
+```sql
+CREATE NAMESPACE my_namespace;
+{my_namespace} INSERT INTO my_table ...
+```
+
+This will execute the statement in the `my_namespace` namespace. **This syntax cannot be used if the statement is within
+an action body, and can only be used for top-level statements.**
+
+The syntax to specify a namespace while executing DDL (e.g. creating tables, actions, etc.) is the same:
+
+```sql
+CREATE NAMESPACE my_namespace;
+{my_namespace} CREATE TABLE my_table ...
+{my_namespace} CREATE ACTION my_action ...
+```
+
+### Namespaces in Actions
+
+Namespaces cannot be specified within an action body. Instead, actions can only insert, update, and delete data from tables
+within the same namespace. They _can_ read data from tables in other namespaces, but cannot write to them.
+Take, for example, the following schema:
+
+```sql
+CREATE NAMESPACE my_namespace;
+CREATE NAMESPACE other;
+
+{my_namespace} CREATE TABLE my_table (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+{other}CREATE TABLE other_table (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+{my_namespace}CREATE ACTION my_action($name TEXT) PUBLIC {
+    INSERT INTO my_table (id, name) SELECT * FROM other.other_table;
+};
+```
+
+The action `my_action` can only insert data into `my_table`, but can read data from `other_table` in the `other`.
+
+Actions can also call actions from other namespaces (assuming they are not `PRIVATE`). For example:
+
+```sql
+CREATE NAMESPACE my_namespace;
+CREATE NAMESPACE other;
+
+{other}CREATE TABLE other_table (
+    id UUID PRIMARY KEY,
+    name TEXT NOT NULL
+);
+
+{other} CREATE ACTION other_action($name TEXT) PUBLIC RETURNS (UUID) {
+    $id := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+    INSERT INTO other_table (id, name) VALUES ($id, $name);
+    RETURN $id;
+};
+
+{my_namespace} CREATE ACTION my_action($name TEXT) PUBLIC {
+    $id := other.other_action($name);
+};
+```

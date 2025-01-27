@@ -7,7 +7,8 @@ description: Core Concepts of Kwil
 slug: /concepts
 ---
 
-Because Kwil database [networks](#kwil-network) are sovereign blockchains, there are a few concepts that are unique or borrowed from other blockchain platforms. These concepts are transversal across Kwil (frontends, SDKs, Nodes, etc.).
+Because Kwil database [networks](#kwil-network) are sovereign blockchains, there are a few concepts that are unique or borrowed from other
+blockchain platforms. These concepts are transversal across Kwil (frontends, SDKs, Nodes, etc.).
 
 <div style={{ display: "flex", justifyContent: "center" }}>
     <img src={require('../static/img/kwil-concepts.png').default} alt="Concepts Overview" />
@@ -15,43 +16,40 @@ Because Kwil database [networks](#kwil-network) are sovereign blockchains, there
 
 ## Accounts
 
-Accounts are public / private keypairs that represent a single user or entity on a Kwil Network. Accounts are used to deploy databases and execute CRUD operations.
+Accounts are public / private keypairs that represent a single user or entity on a Kwil Network. Accounts hold a balance of tokens, and are used to identify
+the sender of a transaction. Accounts can also be assigned privileges, allowing them to modify and interact with the database in different ways.
 
-Each account has an identifier (either the hex-encoded public key, or address), nonce, and balance.
+Unlike other blockchains, Kwil allows accounts with many different types of keypairs (e.g. Secp256k1, ED25519, etc). Because of this, accounts in Kwil
+are identified by a combination of:
+- the accounts "native" identifier (e.g. an `0x` address for Ethereum keys, or a public key for validators).
+- a key type (e.g. `secp256k1` or `ed25519`).
 
-Accounts are identified by public keys. Natively, Kwil supports Secp256k1 keys (used in EVM) and ED25519 keys (used in Solana, NEAR, etc).
-
-## Databases
-
-In Kwil, databases refer to relational database schemas on a Kwil Network. The Kwil [SQL engine](/docs/category/sql-as-understood-by-kwil) is based on Postgres with modifications to support deterministic execution and consensus.
-
-### Kuneiform
-
-[Kuneiform](/docs/category/kuneiform) is a simple syntax language for defining a database on Kwil. You can think of Kuneiform as a smart contract language (e.g. [Solidity](https://soliditylang.org/)), but for relational databases.
-
-In a Kuneiform file, you can define:
-
-- Tables - The structure of the database.
-- Procedures - SQL Queries and business logic that can be executed on the database.
-- Actions - CRUD Operations that can be executed on the database, and call [extensions](/docs/kuneiform/advanced-features#extensions-precompiles).
-- Extensions - Import additional logic that can be executed on the database.
-- Foreign Procedures: Define an interface for interacting with procedures in another database.
-
-### Database Identifiers
-
-Database identifiers (DBIDs) are unique identifiers for a database on a [Kwil Network](#kwil-network). DBIDs are generated from database name and database owner's public key. A DBID is a SHA224 hash of the database owner's account public key and database name.
+For example, an end user with the Ethereum address `0x99659fdA2aF37FbD2c6abEf9Fb9161129F159E0f` would have a user identifier of:
+- `0x99659fdA2aF37FbD2c6abEf9Fb9161129F159E0f` (the native identifier)
+- `secp256k1` (the key type)
 
 ### Transactions
 
-Transactions are database deployments, database drops, and state changing (create, update, delete) procedures/actions that are executed on a database. Transactions are signed by an account and are propagated to the Kwil Network. Transactions are executed deterministically on each node in the network and are validated by the nodes.
+Transactions are messages that are signed by a private key and sent to the network. Transactions are the _only_ way to change the state of the database,
+and therefore are used for operations like creating tables, inserting data, and calling actions. Transactions are executed deterministically on each node.
 
-### View Procedures/Actions
+### Actions
 
-View procedures/actions are the primary way of reading data from a database. View procedures/actions are called from a single node and may or may not require signature. The advantage of view procedures/actions is that they can be executed without the need to wait for consensus.
+[Actions](/docs/language/actions) are the primary way in which SQL Smart Contracts are defined. They are pre-defined functions that can be executed by end users.
+Since end users likely will not have permissions to execute arbitrary INSERT/UPDATE/DELETE statements against your database,
+they will need to execute pre-defined actions that you have created. Using actions, you can define the SQL statements and associated
+logic that end users can execute.
+
+### View Actions
+
+View actions are the primary way of reading data from a database. View actions are called from a single node. They typically do not require a signature,
+however they may if the node is storing private data and requires a signature to access it.
+
+The advantage of view actions is that they can be executed without the need to wait for consensus.
 
 ## Kwil Network
 
-A Kwil Network is a sovereign blockchain that is used to deploy databases and execute CRUD operations. Kwil Networks are composed of one or more [Kwil Nodes](#kwil-node). A project may have its own Kwil Network, or multiple projects may share a Kwil Network.
+A Kwil Network is a sovereign blockchain that manages a SQL database. Kwil Networks are composed of one or more [Kwil Nodes](#kwil-node).
 
 ## Kwil Node
 
@@ -63,8 +61,4 @@ Kwil Nodes run the [Kwil Daemon](/docs/category/node) and are the infrastructure
 - Propagating transactions to other nodes
 - Maintaining consensus
 
-Each node has a public / private ED25519 keypair that is used to sign transactions and blocks. Note that the Node keypair is only for validating the blockchain, and is different from the [account](#accounts) keypair.
-
-## Extensions
-
-[Extensions](/docs/extensions/overview) are modules that customize the behavior of a Kwil Network. Extensions can be used to customize the cyrptographic signature used for verifying [accounts](#accounts), import libraries into [Kuneiform](#kuneiform), and implement built-in network oracles and governance rules. Extensions are written in Go and compiled with the Kwild binary.
+Each node has a private jet that is used to sign transactions and blocks.

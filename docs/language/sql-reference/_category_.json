@@ -1,0 +1,9 @@
+{
+  "label": "SQL Reference",
+  "position": 10,
+  "link": {
+    "type": "generated-index",
+    "description": "Reference documentation for SQL on Kwil"
+  },
+  "collapsed": true
+}

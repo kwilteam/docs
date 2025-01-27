@@ -1,0 +1,79 @@
+---
+sidebar_position: 2
+sidebar_label: "call-action"
+id: "kwil-cli-call-action"
+title: "kwil-cli call-action"
+description: "Call a view action."
+slug: /ref/kwil-cli/call-action
+---
+
+## kwil-cli call-action
+
+Call a view action.
+
+### Synopsis
+
+Call a view action.
+	
+This command calls a view action against the database, and formats the results in a table.
+It can only be used to call view actions, not write actions.
+
+It is not required to have a private key configured, unless the RPC you are calling is in
+private mode, or you are talking to Kwil Gateway.
+
+```
+kwil-cli call-action [flags]
+```
+
+### Examples
+
+```
+# Call the action 'get-accounts' with no parameters
+kwil-cli call-action get-accounts
+
+# Call the action 'get-posts' with one positional parameter
+kwil-cli call-action get-posts int:1
+
+# Call the action 'get-posts' with one named parameter
+kwil-cli call-action get-posts --param id:int=1
+
+# Call the action 'get-account' in the namespace 'users'
+kwil-cli call-action get-account --namespace users
+
+# Call the action 'get-account' and authenticate with a private RPC
+kwil-cli call-action get-account --rpc-auth
+
+# Call the action 'get-account' and authenticate with Kwil Gateway
+kwil-cli call-action get-account --gateway-auth
+```
+
+### Options
+
+```
+      --gateway-auth        signals that the call is being made to a gateway and should be authenticated with the private key
+  -h, --help                help for call-action
+      --logs                result will include logs from notices raised during the call
+      --max-row-width int   Set the maximum width of the row. Text beyond this width will be truncated.
+  -n, --namespace string    namespace to execute the action in
+  -p, --param stringArray   named parameters that will override any positional parameters., format: "key:type=value"
+      --row-border          Show border lines between rows.
+      --rpc-auth            signals that the call is being made to a kwil node and should be authenticated with the private key
+  -w, --width int           Set the width of the table columns. Text beyond this width will be wrapped.
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
+
