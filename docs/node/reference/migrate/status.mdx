@@ -1,0 +1,46 @@
+---
+sidebar_position: 6
+sidebar_label: "status"
+id: "kwild-migrate-status"
+title: "kwild migrate status"
+description: "Get the migration status of the network."
+slug: /ref/kwild/migrate/status
+---
+
+## kwild migrate status
+
+Get the migration status of the network.
+
+```
+kwild migrate status [flags]
+```
+
+### Examples
+
+```
+# Get the migration status of the network.
+		kwild migrate status
+```
+
+### Options
+
+```
+  -h, --help   help for status
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild migrate](/docs/ref/kwild/migrate)	 - Management of migration proposals
+

@@ -48,7 +48,7 @@ kwild -r /path/to/root/dir --chain.p2p.private-mode --chain.p2p.whitelist-peers=
 
 The current set of validators, persistent peers and seed nodes are automatically added to the whitelist. Therefore, the `whitelist_peers` field is used to restrict which non-validating read-only nodes can sync data from your node's P2P endpoint.
 
-The whitelist can also be updated dynamically using the `kwil-admin whitelist` commands. Refer to the [Kwil Admin Peers Subcommand](/docs/ref/kwil-admin/peers) documentation for more information.
+The whitelist can also be updated dynamically using the `kwil-admin whitelist` commands. Refer to the [Kwil Admin Peers Subcommand](/docs/ref/kwild/peers) documentation for more information.
 
 :::note
 Seed nodes and persistent peers are automatically whitelisted. In order for a new node to maintain a connection with an existing node that is not a seed or persistent peer, the existing node must also add the new node to its whitelist and vice versa.

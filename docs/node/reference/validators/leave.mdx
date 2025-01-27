@@ -1,0 +1,50 @@
+---
+sidebar_position: 4
+sidebar_label: "leave"
+id: "kwild-validators-leave"
+title: "kwild validators leave"
+description: "Leave the validator set (your node must be a validator)."
+slug: /ref/kwild/validators/leave
+---
+
+## kwild validators leave
+
+Leave the validator set (your node must be a validator).
+
+### Synopsis
+
+The `leave` command submits a transaction to leave the validator set. This node will be removed from the validator set if the transaction is included in a block.
+
+```
+kwild validators leave [flags]
+```
+
+### Examples
+
+```
+# Leave the validator set
+kwild validators leave
+```
+
+### Options
+
+```
+  -h, --help   help for leave
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

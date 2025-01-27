@@ -1,0 +1,53 @@
+---
+sidebar_position: 6
+sidebar_label: "list-join-requests"
+id: "kwild-validators-list-join-requests"
+title: "kwild validators list-join-requests"
+description: "List all pending join requests."
+slug: /ref/kwild/validators/list-join-requests
+---
+
+## kwild validators list-join-requests
+
+List all pending join requests.
+
+### Synopsis
+
+The `list-join-requests` command lists all pending join requests.
+	
+Join requests are created when a validator wants to join the validator set. The validator must be approved by 2/3 of the current validator set to be added to the validator set.
+Each join request has an expiration block height, after which it is no longer valid.
+
+```
+kwild validators list-join-requests [flags]
+```
+
+### Examples
+
+```
+# List all pending join requests
+kwild validators list-join-requests
+```
+
+### Options
+
+```
+  -h, --help   help for list-join-requests
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

@@ -1,0 +1,50 @@
+---
+sidebar_position: 5
+sidebar_label: "version"
+id: "kwild-admin-version"
+title: "kwild admin version"
+description: "Print the node's version."
+slug: /ref/kwild/admin/version
+---
+
+## kwild admin version
+
+Print the node's version.
+
+### Synopsis
+
+The `version` command retrieves and prints the node's version information. The version is the Kwil's version string, set at compile time.
+
+```
+kwild admin version [flags]
+```
+
+### Examples
+
+```
+# Print the node's version information
+kwild node version --rpcserver /tmp/kwild.socket
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+  -h, --help                  help for version
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild admin](/docs/ref/kwild/admin)	 - Administrative commands using the secure admin RPC service
+

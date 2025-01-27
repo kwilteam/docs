@@ -1,0 +1,50 @@
+---
+sidebar_position: 3
+sidebar_label: "join-status"
+id: "kwild-validators-join-status"
+title: "kwild validators join-status"
+description: "Get the status of a pending validator join request."
+slug: /ref/kwild/validators/join-status
+---
+
+## kwild validators join-status
+
+Get the status of a pending validator join request.
+
+### Synopsis
+
+The `query` command gets the status of a pending validator join request.
+
+```
+kwild validators join-status <joiner> [flags]
+```
+
+### Examples
+
+```
+# Query the status of a pending validator join request, by providing the validator info in format <hexPubkey#pubkeytype>
+kwild validators join-status 6ecaca8e9394c939a858c2c7b47acb1db26a96d7ab38bd702fa3820c5034e9d0#0
+```
+
+### Options
+
+```
+  -h, --help   help for join-status
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

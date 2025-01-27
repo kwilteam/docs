@@ -1,0 +1,43 @@
+---
+sidebar_position: 5
+sidebar_label: "update-status"
+id: "kwild-consensus-update-status"
+title: "kwild consensus update-status"
+description: "Pending consensus update proposal status."
+slug: /ref/kwild/consensus/update-status
+---
+
+## kwild consensus update-status
+
+Pending consensus update proposal status.
+
+### Synopsis
+
+Get the status of a pending consensus update proposal.
+
+```
+kwild consensus update-status <proposal_id> [flags]
+```
+
+### Options
+
+```
+  -h, --help   help for update-status
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild consensus](/docs/ref/kwild/consensus)	 - Functions for dealing with consensus update proposals
+

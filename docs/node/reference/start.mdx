@@ -1,0 +1,91 @@
+---
+sidebar_position: 10
+sidebar_label: "start"
+id: "kwild-start"
+title: "kwild start"
+description: "Start the node (default command if none given)"
+slug: /ref/kwild/start
+---
+
+## kwild start
+
+Start the node (default command if none given)
+
+### Synopsis
+
+The `start` command starts the Kwil DB blockchain node.
+
+```
+kwild start [flags]
+```
+
+### Examples
+
+```
+kwild start -r .testnet
+```
+
+### Options
+
+```
+      --log-level string                             log level
+                                                     possible values: 'debug', 'info', 'warn', and 'error' (default "info")
+      --log-format string                            log format
+                                                     possible values: 'json', 'text' (kv), and 'plain' (fmt-style) (default "plain")
+      --log-output strings                           output paths for the log (default [stdout,kwild.log])
+      --profile-mode string                          profile mode (http, cpu, mem, mutex, or block)
+      --profile-file string                          profile output file path (e.g. cpu.pprof)
+      --p2p.listen string                            address in host:port format to listen on for P2P connections (default "0.0.0.0:6600")
+      --p2p.pex                                      enable peer exchange (default true)
+      --p2p.bootnodes strings                        bootnodes to connect to on startup
+      --p2p.private                                  operate in private mode using a node ID whitelist
+      --p2p.whitelist strings                        allowed node IDs when in private mode
+      --consensus.propose-timeout duration           timeout for proposing a block (applies to leader) (default 1s)
+      --consensus.block-proposal-interval duration   interval between block proposal reannouncements by the leader (default 1s)
+      --consensus.block-ann-interval duration        interval between block commit reannouncements by the leader, and votes reannouncements by validators (default 3s)
+      --db.host string                               postgres host name (IP or UNIX socket path) (default "127.0.0.1")
+      --db.port string                               postgres TCP port (leave empty for UNIX socket) (default "5432")
+      --db.user string                               postgres role/user name (default "kwild")
+      --db.pass string                               postgres password if required for the user and host
+      --db.dbname string                             postgres database name (default "kwild")
+      --db.read-timeout duration                     timeout on read transactions from user RPC calls and queries (default 45s)
+      --db.max-connections uint                      maximum number of DB connections to permit (default 60)
+      --rpc.listen string                            address in host:port format on which the RPC server will listen (default "0.0.0.0:8484")
+      --rpc.broadcast-tx-timeout duration            duration to wait for a tx to be committed when transactions are authored with --sync flag (default 15s)
+      --rpc.timeout duration                         user request duration limit after which it is cancelled (default 20s)
+      --rpc.max-req-size int                         largest permissible user request size (default 6000000)
+      --rpc.private                                  enable private mode that requires challenge authentication for each call
+      --rpc.challenge-expiry duration                lifetime of a server-generated challenge (default 30s)
+      --rpc.challenge-rate-limit float               maximum number of challenges per second that a user can request (default 10)
+      --admin.enable                                 enable the admin RPC service (default true)
+      --admin.listen string                          address in host:port format or UNIX socket path on which the admin RPC server will listen (default "/tmp/kwild.socket")
+      --admin.pass string                            optional password for the admin service
+      --admin.notls                                  disable TLS when the listen address is not a loopback IP or UNIX socket
+      --admin.cert string                            TLS certificate for use with a non-loopback listen address when notls is not true (default "admin.cert")
+      --admin.key string                             TLS key for use with a non-loopback listen address when notls is not true (default "admin.key")
+      --snapshots.enable                             enable creating and providing snapshots for peers using statesync
+      --snapshots.recurring-height uint              snapshot creation period in blocks (default 14400)
+      --snapshots.max-snapshots uint                 number of snapshots to keep, after the oldest is removed when creating a new one (default 3)
+      --state-sync.enable                            enable using statesync rather than blocksync
+      --state-sync.trusted-providers strings         trusted snapshot providers in node ID format (see bootnodes)
+      --state-sync.discovery-time duration           how long to discover snapshots before selecting one to use (default 30s)
+      --state-sync.max-retries uint                  how many times to try after failing to apply a snapshot before switching to blocksync (default 3)
+      --genesis-state string                         path to the genesis state file, relative to the root directory
+      --migrations.enable                            enable zero downtime migrations
+      --migrations.migrate-from string               JSON-RPC listening address of the node to replicate the state from
+  -a, --autogen                                      auto generate private key, genesis file, and config file if not exist
+  -d, --db-owner string                              owner of the database. This is either a hex pubkey or an address string
+  -h, --help                                         help for start
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild](/docs/ref/kwild)	 - Kwil daemon
+

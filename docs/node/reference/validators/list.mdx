@@ -1,0 +1,50 @@
+---
+sidebar_position: 5
+sidebar_label: "list"
+id: "kwild-validators-list"
+title: "kwild validators list"
+description: "List the current validator set of the network."
+slug: /ref/kwild/validators/list
+---
+
+## kwild validators list
+
+List the current validator set of the network.
+
+### Synopsis
+
+List the current validator set of the network.
+
+```
+kwild validators list [flags]
+```
+
+### Examples
+
+```
+# List the current validator set of the network
+kwild validators list
+```
+
+### Options
+
+```
+  -h, --help   help for list
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "/home/jon/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

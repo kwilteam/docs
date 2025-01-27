@@ -1,0 +1,54 @@
+---
+sidebar_position: 2
+sidebar_label: "genesis-state"
+id: "kwild-migrate-genesis-state"
+title: "kwild migrate genesis-state"
+description: "Download the genesis state corresponding to the ongoing migration."
+slug: /ref/kwild/migrate/genesis-state
+---
+
+## kwild migrate genesis-state
+
+Download the genesis state corresponding to the ongoing migration.
+
+### Synopsis
+
+Download the genesis state for the new network from a trusted node on the source network. The genesis state includes the genesis info file (`genesis_info.json`) and genesis snapshot (`snapshot.sql.gz`). The genesis state is saved in the root directory specified by the `--out-dir` flag. If there is no approved migration or if the migration has not started yet, the command will return a message indicating that there is no genesis state to download. The genesis info file includes the app hash, validators and the migration settings required to manually start the new network.
+
+```
+kwild migrate genesis-state [flags]
+```
+
+### Examples
+
+```
+# Download the genesis state to the default output directory (~/.genesis-state)
+kwild migrate genesis-state
+
+# Download the genesis state to a custom root directory
+kwild migrate genesis-state --out-dir /path/to/out/dir
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+  -h, --help                  help for genesis-state
+  -o, --out-dir string        The target directory for downloading the genesis state files. (default "~/.genesis-state")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild migrate](/docs/ref/kwild/migrate)	 - Management of migration proposals
+

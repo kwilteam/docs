@@ -1,0 +1,50 @@
+---
+sidebar_position: 3
+sidebar_label: "peers"
+id: "kwild-admin-peers"
+title: "kwild admin peers"
+description: "Print a list of the node's peers, with their public information."
+slug: /ref/kwild/admin/peers
+---
+
+## kwild admin peers
+
+Print a list of the node's peers, with their public information.
+
+### Synopsis
+
+The `peers` command retrieves and print a list of the node's peers, with their public information.
+
+```
+kwild admin peers [flags]
+```
+
+### Examples
+
+```
+# Print a list of the node's peers
+kwild admin peers --rpcserver /tmp/kwild.socket
+```
+
+### Options
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+  -h, --help                  help for peers
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### Options inherited from parent commands
+
+```
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/jon/.kwild")
+```
+
+### SEE ALSO
+
+* [kwild admin](/docs/ref/kwild/admin)	 - Administrative commands using the secure admin RPC service
+
