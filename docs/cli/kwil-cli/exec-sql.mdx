@@ -1,0 +1,68 @@
+---
+sidebar_position: 6
+sidebar_label: "exec-sql"
+id: "kwil-cli-exec-sql"
+title: "kwil-cli exec-sql"
+description: "Execute SQL against a database"
+slug: /ref/kwil-cli/exec-sql
+---
+
+## kwil-cli exec-sql
+
+Execute SQL against a database
+
+### Synopsis
+
+Execute SQL statements against a database.
+
+This command executes SQL and DDL statements against a database.  It is meant to be used for statements that
+do not return data, such as INSERT, UPDATE, DELETE, CREATE TABLE, etc. For SELECT statements, use the 'query'
+command.
+
+This command requires a private key. Each statement issued will use the private key to author a transaction
+to the network.
+
+```
+kwil-cli exec-sql [flags]
+```
+
+### Examples
+
+```
+# Execute a create table statement
+kwil-cli exec-sql "CREATE TABLE my_table (id int primary key, name text)"
+
+# Execute a create table statement from a file
+kwil-cli exec-sql --file /path/to/file.sql
+
+# Execute an insert statement with parameters
+kwil-cli exec-sql "INSERT INTO my_table (id, name) VALUES ($id, $name)" --param id:int=1 --param name:text=foo
+```
+
+### Options
+
+```
+  -f, --file string         the file containing the SQL statement(s) to execute
+  -h, --help                help for exec-sql
+  -N, --nonce int           nonce override (-1 means request from server) (default -1)
+  -p, --param stringArray   the parameters to pass to the SQL statement. format: "key:type=value"
+  -s, --stmt string         the SQL statement to execute
+      --sync                synchronous broadcast (wait for it to be included in a block)
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
+

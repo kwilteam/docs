@@ -1,0 +1,67 @@
+---
+sidebar_position: 7
+sidebar_label: "query"
+id: "kwil-cli-query"
+title: "kwil-cli query"
+description: "Execute a SELECT statement against the database"
+slug: /ref/kwil-cli/query
+---
+
+## kwil-cli query
+
+Execute a SELECT statement against the database
+
+### Synopsis
+
+Execute a SELECT statement against the database.
+
+This command executes a SELECT statement against the database and formats the results in a table.
+It can only be used to execute SELECT statements, and cannot be used with any other type of SQL statement.
+If you need to execute a SQL statement that modifies the database, use the 'exec-sql' command.
+
+It is not required to have a private key configured, unless the RPC you are calling is in private mode, or
+you are talking to Kwil Gateway.
+
+```
+kwil-cli query [flags]
+```
+
+### Examples
+
+```
+# Execute a simple SELECT statement
+kwil-cli query "SELECT * FROM my_table"
+
+# Execute a SELECT statement with a named parameter
+kwil-cli query "SELECT * FROM my_table WHERE id = $id" --param id:int=1
+```
+
+### Options
+
+```
+      --gateway-auth        signals that the call is being made to a gateway and should be authenticated with the private key
+  -h, --help                help for query
+      --max-row-width int   Set the maximum width of the row. Text beyond this width will be truncated.
+  -p, --param stringArray   named parameters that will be used in the query. format: "key:type=value"
+      --row-border          Show border lines between rows.
+      --rpc-auth            signals that the call is being made to a kwil node and should be authenticated with the private key
+  -s, --stmt string         the SELECT statement to execute
+  -w, --width int           Set the width of the table columns. Text beyond this width will be wrapped.
+```
+
+### Options inherited from parent commands
+
+```
+  -Y, --assume-yes           Assume yes for all prompts
+      --chain-id string      the expected/intended Kwil Chain ID
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+      --output string        the format for command output - either 'text' or 'json' (default "text")
+      --private-key string   the private key of the wallet that will be used for signing
+      --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
+  -S, --silence              Silence logs
+```
+
+### SEE ALSO
+
+* [kwil-cli](/docs/ref/kwil-cli)	 - Command line interface client for using Kwil.
+

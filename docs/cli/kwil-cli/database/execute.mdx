@@ -1,54 +1,53 @@
 ---
-sidebar_position: 5
+sidebar_position: 3
 sidebar_label: "execute"
 id: "kwil-cli-database-execute"
 title: "kwil-cli database execute"
-description: "Execute an action against a database."
+description: "Execute SQL or an action against a database."
 slug: /ref/kwil-cli/database/execute
 ---
 
 ## kwil-cli database execute
 
-Execute an action against a database.
+Execute SQL or an action against a database.
 
 ### Synopsis
 
-Execute an action against a database.
+Execute SQL or an action against a database.
 
-The action name is specified as a required "--action" flag, and the action parameters as arguments.
-In order to specify an action parameter, you first need to specify the parameter name, then the parameter value, delimited by a colon.
+To execute a SQL statement against the database, use the --sql flag.  The SQL statement will be executed with the
+arguments passed as parameters.  The arguments are specified as $name:value.  For example, to execute the SQL
+statement "SELECT * FROM users WHERE age > 25", you would specify the following:
+`kwil-cli database execute --sql "INSERT INTO ids (id) VALUES ($age);" age:25`
 
-For example, for action `get_user($username)`, you would specify the action as follows:
-`username:satoshi` --action=get_user
-
-You can either specify the database to execute this against with the `--name` and `--owner`
-flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
-flag is passed and no `--owner` flag is passed, the owner will be inferred from your configured wallet.
+To specify an action to execute, you can pass the action name as the first positional argument, or as the --action flag.
+The action name is specified as the first positional argument, and the action parameters as all subsequent arguments.
 
 ```
-kwil-cli database execute <parameter_1:value_1> <parameter_2:value_2> ... [flags]
+kwil-cli database execute --sql <sql_stmt> <parameter_1:value_1> <parameter_2:value_2> ... [flags]
 ```
 
 ### Examples
 
 ```
-# Executing the `create_user($username, $age)` action on the "mydb" database
-kwil-cli database execute username:satoshi age:32 --action create_user --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64
+# Executing a CREATE TABLE statement on the "mydb" database
+kwil-cli database execute --sql "CREATE TABLE users (id UUID, name TEXT, age INT8);" --namespace mydb
+	
+# Executing the `create_user($username, $age)` procedure on the "mydb" database
+kwil-cli database execute --action create_user username:satoshi age:32 --namespace mydb
 
-# Executing the `create_user($username, $age)` action on a database using a dbid
-kwil-cli database execute username:satoshi age:32 --action create_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64
 ```
 
 ### Options
 
 ```
-  -a, --action string   the target action name (required)
-  -i, --dbid string     the target database id
-  -h, --help            help for execute
-  -n, --name string     the target database name
-  -N, --nonce int       nonce override (-1 means request from server) (default -1)
-  -o, --owner string    the target database owner
-      --sync            synchronous broadcast (wait for it to be included in a block)
+  -a, --action string      the target action name
+  -h, --help               help for execute
+  -n, --namespace string   the target database namespace
+  -N, --nonce int          nonce override (-1 means request from server) (default -1)
+  -s, --sql string         the SQL statement to execute
+  -f, --sql-file string    the file containing the SQL statement to execute
+      --sync               synchronous broadcast (wait for it to be included in a block)
 ```
 
 ### Options inherited from parent commands
@@ -56,7 +55,7 @@ kwil-cli database execute username:satoshi age:32 --action create_user --dbid 0x
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")

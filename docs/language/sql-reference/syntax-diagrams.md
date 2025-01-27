@@ -5,7 +5,7 @@ sidebar_label: "Syntax Diagrams"
 id: syntax-diagrams
 title: Syntax Diagrams
 description: Syntax Diagrams
-slug: /syntax-diagrams
+slug: /language/syntax-diagrams
 ---
 
 ### Kuneiform DML

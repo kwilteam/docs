@@ -1,0 +1,9 @@
+{
+    "label": "Language",
+    "position": 4,
+    "link": {
+      "type": "generated-index",
+      "description": "Learn about the features offered by the Kwil's database language."
+    },
+    "collapsed": true
+}

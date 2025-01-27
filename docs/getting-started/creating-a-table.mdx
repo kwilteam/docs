@@ -1,0 +1,71 @@
+---
+sidebar_position: 1
+sidebar_label: "Create a Table"
+id: create-a-table
+title: Create a Table
+description: Learn how to create, write to, and read from a table.
+slug: /getting-started/create-a-table
+---
+
+In this tutorial, you will create, write to, and read from your first table within Kwil. This guide uses the [Kwil CLI](/docs/category/cli).
+
+## Prerequisites
+
+- [Kwil CLI](https://github.com/kwilteam/kwil-db/releases) - Download from the Kwil Binary Releases.
+- Ethereum Private Key - You will need an Ethereum private key to sign transactions to Kwil.
+If you do not have one, you can generate one using the [`kwil-cli utils generate-key`](/docs/ref/kwil-cli/utils/generate-key#examples) command.
+- Kwil RPC - You will need the RPC endpoint of the Kwil network you are deploying to. This can be obtained by either running a [node
+locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login>).
+
+## Creating a Table
+
+Define a table in a file called `social_media.sql`:
+
+```sql title="social_media.sql"
+CREATE TABLE users (
+    id INT PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    age INT NOT NULL,
+    address TEXT NOT NULL UNIQUE // user wallet addresses
+);
+```
+
+To deploy the table, use the `kwil-cli exec-sql` command. This command executes either a single statement or a file containing
+multiple statements. The example below include the `--sync` flag, which instructs the CLI to wait for the transaction to be
+mined and display the result of the transaction. Without the `--sync` flag, the command will return immediately after sending
+the transaction and display only the transaction hash, without any information as to whether the transaction succeeded or failed.
+
+```shell
+$ kwil-cli --private-key <YOUR_ETHEREUM_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
+    exec-sql --file social_media.sql --sync
+```
+
+:::tip
+The above example passes a private key and provider endpoint as flags. To avoid having to do this for every interaction,
+you can configure default values for these flags using `kwil-cli configure`.
+
+To learn more about configuring the Kwil CLI, see the [Configuration](/docs/kwil-cli/configuration) guide.
+:::
+
+## Inserting Data
+
+To insert data into the table, use the same `kwil-cli exec-sql` command. The example below passes a statement from the command
+line, rather than a file. The example also uses the @caller variable, which will insert your own private key's wallet address
+into the table.
+
+```shell
+$ kwil-cli --private-key <YOUR_ETHEREUM_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
+    exec-sql --stmt "INSERT INTO users (id, username, age, address) VALUES (1, 'Alice', 25, @caller);" --sync
+```
+
+## Querying Data
+
+To query data from the table, use the `kwil-cli query` command. This command executes a read-only SQL statement and returns the
+result. It does not require a private key, unless you are interacting with an RPC that requires authentication.
+
+```shell
+$ kwil-cli --provider <YOUR_PROVIDER_URL> query --stmt 'SELECT * FROM users;'
+|                  address                   | age | id | username |
++--------------------------------------------+-----+----+----------+
+| 0xAfFDC06cF34aFD7D5801A13d48C92AD39609901D |  25 |  1 | Alice    |
+```

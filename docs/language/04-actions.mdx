@@ -1,0 +1,393 @@
+---
+sidebar_position: 4
+sidebar_label: "Actions"
+id: actions
+title: Actions
+description: Creating actions in Kwil.
+slug: /language/actions
+---
+
+Actions are the primary way in which SQL Smart Contracts are defined. They are pre-defined functions that can be executed by end users.
+Since end users likely will not have permissions to execute arbitrary INSERT/UPDATE/DELETE statements against your database,
+they will need to execute pre-defined actions that you have created. Using actions, you can define the SQL statements and associated
+logic that users can execute.
+
+## Defining Actions
+
+Actions can be created with a `CREATE ACTION` statement:
+
+```sql
+CREATE [OR REPLACE] ACTION [IF NOT EXISTS] <action_name>
+($<param_1> <data_type> [, $<param_2> <data_type>, ...]) modifier [...] [RETURNS <return_definition>] {
+    <action_body>
+}
+```
+
+For example, if we wanted to create an action called `create_user` that took a user's name and age, and returned a generated
+user ID, we could define it like this:
+
+```sql
+CREATE ACTION create_user($name text, $age int) PUBLIC RETURNS (uuid) {
+    $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
+    INSERT INTO users (id, name, age) VALUES ($uuid, $name, $age);
+    RETURN $uuid;
+}
+```
+
+## Return Definitions
+
+There are three types of return definitions that can be used in an action:
+- `(void)`: The action does not return any value.
+- `RETURNS ([name_1] value_type_1 [, [name_2] value_type_2, ...])`: The action returns a single row of one or more values. Each
+column can be given a name (which will be used to materialize a table), but one will be auto-generated if not provided
+- `RETURNS TABLE (name_1 value_type_1 [, name_2 value_type_2, ...])`: The action returns a table of rows, each with one or more values.
+Each column _must_ specify a return name.
+
+### Action With No Returns
+
+```sql
+CREATE ACTION delete_user($id uuid) PUBLIC {
+    -- ...
+}
+```
+
+### Action With Single Return Value
+
+```sql
+CREATE ACTION get_user($id uuid) PUBLIC RETURNS (text, int) {
+    -- ...
+}
+-- or
+CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name text, age int) {
+    -- ...
+}
+```
+
+### Action With Table Return
+
+```sql
+CREATE ACTION get_users() PUBLIC RETURNS TABLE (name text, age int) {
+    -- ...
+}
+```
+
+## Access Modifiers
+
+Access modifiers specify when an action can be called. There are 3 primary access modifiers, and 2 optional access modifiers.
+Each action must have exactly one primary access modifier, and can have zero or more optional access modifiers.
+
+| Modifier | Primary | Description |
+|----------|---------|-------------|
+| `PUBLIC` | Yes     | The action can be called by anyone externally, or by any other action. |
+| `SYSTEM` | Yes     | The action can only be called by other actions. |
+| `PRIVATE` | Yes    | The action can only be called by other actions within the same namespace. |
+| `OWNER` | No       | The action can only be called by the database owner's wallet. |
+| `VIEW` | No        | The action does not mutate state, and can be called without submitting a blockchain transaction. |
+
+## Action Body
+
+The action body contains logic that will be executed when the action is called. The body can contain any valid INSERT/UPDATE/DELETE/SELECT
+statements, as well as basic logic defining control flow, access control logic, and arithmetic.
+
+### Declaring and Assigning Variables
+
+All variables are strongly typed. Variables can be assigned at declaration, or can be nil and assigned after declaration.
+They can also be type casted:
+
+```sql
+CREATE ACTION declare_vars() public {
+    -- declare and assign new int var:
+    $var1 int := 1;
+
+    -- declare a new var to be assigned to later
+    $var2 text;
+
+    -- assign to $var2. type cast $var1 (of type int) to match type text:
+    $var2 := $var1::text; -- $var2 is now '1'
+
+    -- declare and assign a new variable. The type will be inferred as text:
+    $var3 := 'hello world';
+}
+```
+
+### Arithmetic
+
+Basic arithmetic operations can be performed on variables:
+
+```sql
+CREATE ACTION do_math($num1 INT, $num2 INT) public {
+    -- add and divide, with precedence:
+    $avg int := ($num1 + $num2)/2;
+
+    -- modulo:
+    $mod int := $num2%10;
+
+    -- negate, multiply
+    $neg_mul int := (-$avg)*$mod;
+
+    -- exponentiation
+    $exp := $num1^2;
+}
+```
+
+### Handling Arrays
+
+Actions can perform basic array and slice operations. **Arrays are 1-indexed**.
+
+```sql
+CREATE ACTION handle_arrays() public {
+    -- create an array
+    $arr text[] := ['hello', 'world'];
+
+    -- append to the array
+    $arr := array_append($arr, 'goodbye');
+    $len int := array_length($arr); -- 3
+
+    -- get the first element
+    $first text := $arr[1]; -- 'hello'
+
+    -- get a slice of the array
+    $slice text[] := $arr[2:3]; -- ['world', 'goodbye']
+}
+```
+
+### If Statements
+
+If/elseif/else statements can be used to conditionally execute logic. They can also use AND and OR, as well as parentheses for grouping.
+
+```sql
+CREATE ACTION age_conditional($age int) public {
+    if ($age < 0) OR ($age > 200 AND $age < 300) {
+        -- do something
+    } elseif $age < 18 {
+        -- do something
+    } else {
+        -- something else
+    }
+}
+```
+
+### Loops
+
+There are three types of loops in Kwil: array loops (loops over each element in an array), range loops (loops over an integer between a range),
+and SQL loops (loops over a record for each row returned from a SQL query).
+
+Loops can be controlled using breaks, continues, and returns.
+
+#### Array Loop
+
+```sql
+CREATE ACTION iterate_over_array($names text[]) public {
+    for $name IN ARRAY $names {
+        -- $name is of type `text`
+        if $name is null {
+            return; -- will exit the action
+        }
+        -- do something
+    }
+}
+```
+
+#### Range Loop
+
+```sql
+CREATE ACTION iterate_over_range() public {
+    for $i in 1..10 {
+        -- $i is an integer from 1 to 10
+        if $i%2 == 0 {
+            continue; -- will skip to the next iteration
+        }
+    }
+}
+```
+
+#### SQL Loop
+
+```sql
+CREATE ACTION iterate_over_sql() public {
+    for $row in SELECT name::TEXT, age::INT FROM users {
+        -- $row.name is a text, $row.age is an int
+        if $row.age < 18 {
+            break; -- will exit the loop
+        }
+    }
+}
+```
+
+### Returning Values
+
+There are three ways to return values from an action:
+- `RETURN`: Returns a single row from the action and exits the action.
+- `RETURN SELECT ...`: Returns a table of rows from the action and exits the action.
+- `RETURN NEXT`: Returns a single row, but does not exit the action.
+
+#### Returning A Single Row
+
+```sql
+CREATE ACTION return_values() public RETURNS (name text, age int) {
+    RETURN 'Alice', 30;
+}
+```
+
+#### Returning A Table
+```sql
+CREATE ACTION return_values() public RETURNS TABLE (name text, age int) {
+    RETURN SELECT name, age FROM users;
+}
+```
+
+#### Returning Next
+
+```sql
+CREATE ACTION return_values() public RETURNS TABLE(name text, age int) {
+    for $name IN ARRAY ['Alice', 'Bob', 'Charlie'] {
+        RETURN NEXT $name, 30;
+    }
+}
+```
+
+### Special Functions
+
+Actions have a few special functions that provide functionality beyond basic SQL functions.
+
+#### `NOTICE(TEXT)`
+
+The `NOTICE` function logs a message to the Kwil console. For `VIEW` actions, notices will be returned to the caller as part
+of the response. For non-view actions (executing within a transaction), notices will be included as part of the transaction's
+execution result. **`NOTICE` cannot be used in SQL statements.**
+
+```sql
+CREATE ACTION log_message() public {
+    NOTICE('This is a log message');
+}
+
+CREATE ACTION illegal_notice() public {
+    -- notices cannot be used in INSERT/UPDATE/DELETE/SELECT statements
+    SELECT NOTICE('This is an illegal notice');
+}
+```
+
+#### `ERROR(TEXT)`
+
+The `ERROR` function raises an exception with the given message. It will halt execution when it is called,
+and rollback any changes made in the current transaction.
+
+```sql
+CREATE ACTION raise_error($id int) public {
+    if $id < 0 {
+        ERROR('ID must be positive');
+    }
+}
+
+CREATE ACTION error_in_sql() public {
+    -- unlike NOTICE, the ERROR function can be used in SQL statements
+    SELECT 
+        CASE
+            WHEN column = 1 THEN ERROR('This is an error message')
+            ELSE column
+        END
+    FROM table;
+}
+```
+
+### SQL Statements
+
+SQL statements can be used anywhere in actions to read from and write to the database. If an action is a `view` action, it can only
+contain `SELECT` statements. SQL statements _cannot_ be used if you are looping over a record from a SQL query.
+
+#### Using an INSERT Statement
+
+```sql
+CREATE ACTION create_user($name text, $age int) public {
+    INSERT INTO users (name, age) VALUES ($name, $age);
+}
+```
+
+#### Reading a Table
+
+```sql
+CREATE ACTION get_users() public RETURNS TABLE (name text, age int) {
+    RETURN SELECT name, age FROM users;
+}
+```
+
+#### Reading a Single Record from a Table
+
+```sql
+CREATE ACTION get_user($id uuid) public RETURNS (name text, age int) {
+    for $row in SELECT name, age FROM users WHERE id = $id {
+        -- return on the first iteration
+        RETURN $row.name, $row.age;
+    }
+    ERROR('User not found');
+}
+```
+
+#### Illegal Nested SQL
+
+```sql
+CREATE ACTION illegal_nested_sql() public {
+    for $row in SELECT * FROM users {
+        -- this is illegal, and will raise an error
+        SELECT * FROM users;
+    }
+
+    for $i in 1..10 {
+        -- this is legal
+        SELECT * FROM users;
+    }
+}
+```
+
+### Calling Other Actions
+
+Actions can call other actions, both within the same namespace and in other namespaces.
+
+#### Calling an Action that returns a Single Row
+
+```sql
+CREATE ACTION do_something() public returns (text, int) {
+    RETURN 'hello', 1;
+};
+
+CREATE ACTION call_other_action() public {
+    $text_result, $int_result := do_something();
+}
+```
+
+#### Calling an Action that returns a Table
+
+```sql
+CREATE ACTION do_something() public returns table(name text, age int) {
+    RETURN SELECT 'Alice', 30;
+};
+
+CREATE ACTION call_other_action() public {
+    for $row in do_something() {
+        -- $row.name is a text, $row.age is an int
+    }
+}
+```
+
+#### Calling an Action that Returns Nothing
+
+```sql
+CREATE ACTION do_something() public {
+    -- do something
+};
+
+CREATE ACTION call_other_action() public {
+    do_something();
+}
+```
+
+#### Calling an Action in a Different Namespace
+```sql
+{other_namespace} CREATE ACTION do_something() public returns (text, int) {
+    RETURN 'hello', 1;
+};
+
+CREATE ACTION call_other_action() public {
+    $test_result, $int_result := other_namespace.do_something();
+}
+```

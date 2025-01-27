@@ -13,17 +13,17 @@ Call a 'view' action, returning the result.
 
 ### Synopsis
 
-Call a `view` action, returning the result.
+Call a `view` procedure or action, returning the result.
 
-`view` actions are read-only actions that do not require gas to execute.  They are
+`view` procedure are read-only procedure that do not require gas to execute.  They are
 the primary way to query the state of a database. The `call` command is used to call
-a `view` action on a database.  It takes the action name as a required flag, and the
-action inputs as arguments.
+a `view` procedure on a database.  It takes the procedure name as the first positional
+argument, and the procedure inputs as all subsequent arguments.
 
-To specify an action input, you first need to specify the input name, then the input value, delimited by a colon.
-For example, for action `get_user($username)`, you would specify the action as follows:
+To specify a procedure input, you first need to specify the input name, then the input value, delimited by a colon.
+For example, for procedure `get_user($username)`, you would specify the procedure as follows:
 
-`username:satoshi` --action=get_user
+`call get_user username:satoshi`
 
 You can either specify the database to execute this against with the `--name` and `--owner`
 flags, or you can specify the database by passing the database id with the `--dbid` flag.  If a `--name`
@@ -32,30 +32,27 @@ flag is passed and no `--owner` flag is passed, the owner will be inferred from 
 If you are interacting with a Kwil gateway, you can also pass the `--authenticate` flag to authenticate the call with your private key.
 
 ```
-kwil-cli database call <parameter_1:value_1> <parameter_2:value_2> ... [flags]
+kwil-cli database call <procedure_or_action> <parameter_1:value_1> <parameter_2:value_2> ... [flags]
 ```
 
 ### Examples
 
 ```
-# Calling the `get_user($username)` action on the "mydb" database
-kwil-cli database call --action get_user --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 username:satoshi
+# Calling the `get_user($username)` procedure on the "mydb" database
+kwil-cli database call get_user --name mydb --owner 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 username:satoshi
 
-# Calling the `get_user($username)` action on a database using a dbid, authenticating with a private key
-kwil-cli database call --action get_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 username:satoshi --authenticate
+# Calling the `get_user($username)` procedure on a database using a dbid, authenticating with a private key
+kwil-cli database call get_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8Bef5f5DAd64 username:satoshi --authenticate
 ```
 
 ### Options
 
 ```
-  -a, --action string   the target action name (required)
-      --authenticate    authenticate signals that the call is being made to a gateway and should be authenticated with the private key
-      --callauth        authenticate call RPCs by signing a challenge response with the call data
-  -i, --dbid string     the target database id
-  -h, --help            help for call
-      --logs            result will include logs from notices raised during the call
-  -n, --name string     the target database schema name
-  -o, --owner string    the target database schema owner
+  -a, --action string      the target action name
+      --authenticate       authenticate signals that the call is being made to a gateway and should be authenticated with the private key
+  -h, --help               help for call
+      --logs               result will include logs from notices raised during the call
+  -n, --namespace string   the target database namespace
 ```
 
 ### Options inherited from parent commands
@@ -63,7 +60,7 @@ kwil-cli database call --action get_user --dbid 0x9228624C3185FCBcf24c1c9dB76D8B
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")

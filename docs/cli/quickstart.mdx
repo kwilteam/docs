@@ -35,32 +35,40 @@ kwil-cli --provider=http://your.kwil.provider:port --private-key=your_private_ke
 
 Global flags take precedence over persistent configs.
 
-## Deploying a Database
+## Executing SQL
 
-To deploy a database, you need to have a file containing the database schema in Kuneiform or JSON format:
-
-```bash
-kwil-cli database deploy ./path_to_schema_file.kf
-```
-
-## Executing a Procedure/Action
-
-Execute an action or procedure against a database by providing the action/procedure name and parameters.
+To execute a raw SQL statement (e.g. to create a table), use the `kwil-cli exec-sql` command:
 
 ```bash
-kwil-cli database execute procedure_name parameter_1:value_1 parameter_2:value_2 --dbid target_dbid
+kwil-cli exec-sql --sql "CREATE TABLE users (id INT PRIMARY KEY, username TEXT NOT NULL UNIQUE, age INT NOT NULL, address TEXT NOT NULL UNIQUE)"
 ```
 
-## Calling a View Procedure/Action
+:::note
+The `exec-sql` command is only for executing SQL statements that are modifying state, and can not be used to read data.
+:::
 
-Call a view (read-only) procedure on a database using the following command:
+## Executing an Action
+
+Execute an action against a database by providing the action name and parameters. For example, if we have an action called
+`create_user`, and it takes parameters of `username` (of type text) and `age` (of type int8), you can execute it like so:
 
 ```bash
-kwil-cli database call view_procedure_name parameter_1:value_1 --dbid target_dbid
+kwil-cli exec-action create_user text:satoshi int8:32
 ```
 
-## Note
+## Reading Data with a SELECT Statement
 
-Remember to replace placeholders such as `your.kwil.provider:port`, `your_private_key`, `your_chain_id`,  `path_to_schema_file`, `target_dbid`, `procedure_name`, `parameter:value`, and `view_procedure_name` with actual values based on your database and setup.
+To execute a SELECT statement on a database, use the `kwil-cli query` command:
 
-For a more detailed usage of each command, refer to the appropriate section of the Kwil CLI reference guide.
+```bash
+kwil-cli query --sql "SELECT * FROM users"
+```
+
+## Reading Data with a View Action
+
+To call a view (read-only) action on a database, use the `kwil-cli call-action` command. For example, if we have a view action called `get_user`,
+and it takes a parameter of `username` (of type text), you can call it like so:
+
+```bash
+kwil-cli call-action get_user text:satoshi
+```

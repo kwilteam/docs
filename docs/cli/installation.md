@@ -11,7 +11,7 @@ slug: /kwil-cli/installation
 
 ## Download the `kwil-cli` Executable
 
-The Kwil CLI (`kwil-cli`) is packaged together with Kwil Daemon (`kwild`) and Kwil Admin Tool (`kwil-admin`), which can be [downloaded from the main Kwil repo](https://github.com/kwilteam/kwil-db/releases). One downloaded, extract the `kwil-cli` file from the archive and put it
+The Kwil CLI (`kwil-cli`) is packaged together with Kwil Daemon (`kwild`), which can be [downloaded from the main Kwil repo](https://github.com/kwilteam/kwil-db/releases). One downloaded, extract the `kwil-cli` file from the archive and put it
 into a folder that is in your `PATH` environment.
 
 ## Verify Installation

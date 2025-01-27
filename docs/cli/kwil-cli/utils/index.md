@@ -26,7 +26,7 @@ Various CLI utility commands.
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
@@ -41,7 +41,7 @@ Various CLI utility commands.
 * [kwil-cli utils decode-tx](/docs/ref/kwil-cli/utils/decode-tx)	 - Decodes a raw transaction.
 * [kwil-cli utils generate-dbid](/docs/ref/kwil-cli/utils/generate-dbid)	 - `dbid` generates a dbid for a given schema name and deployer.
 * [kwil-cli utils generate-key](/docs/ref/kwil-cli/utils/generate-key)	 - Generates a new key pair.
-* [kwil-cli utils parse](/docs/ref/kwil-cli/utils/parse)	 - Parse a Kuneiform schema
+* [kwil-cli utils parse](/docs/ref/kwil-cli/utils/parse)	 - Parses SQL and returns the AST.
 * [kwil-cli utils ping](/docs/ref/kwil-cli/utils/ping)	 - Ping the kwil provider endpoint.  If successful, returns 'pong'.
 * [kwil-cli utils print-config](/docs/ref/kwil-cli/utils/print-config)	 - Print the current CLI configuration.
 * [kwil-cli utils query-tx](/docs/ref/kwil-cli/utils/query-tx)	 - Queries a transaction from the blockchain. Requires 1 argument: the hex encoded transaction id.

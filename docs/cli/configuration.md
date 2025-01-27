@@ -30,10 +30,10 @@ The configuration file will be stored at `~/.kwil-cli/config.json`.
 
 ## Global Flags
 
-Global flags override the values in the configuration file at runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to the latest testnet, `https://longhorn.kwil.com`, using a config flag:
+Global flags override the values in the configuration file at runtime, without modifying the configuration file itself.  Below is an example of a `kwil-cli` command that is configured to connecting to `https://your.kwild.rpc.here` using a config flag:
 
 ```bash
-kwil-cli database list --provider=https://longhorn.kwil.com
+kwil-cli --provider=https://your.kwild.rpc.here
 ```
 
 ## Available Configs

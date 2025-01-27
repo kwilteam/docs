@@ -1,0 +1,57 @@
+---
+sidebar_position: 2
+sidebar_label: "Indexes"
+id: indexes
+title: Indexes
+description: How to create and drop indexes.
+slug: /language/indexes
+---
+
+
+Indexes are database structures that improve the speed of data retrieval operations on database tables.
+They provide faster access to data by creating a separate data structure that the database engine can search quickly.
+
+## Types of Indexes
+
+We support two types of btree indexes:
+
+1. Regular btree indexes
+2. Unique btree indexes
+
+Both use the B-tree data structure for efficient searching, insertion, and deletion operations.
+
+## Creating Indexes
+
+To create an index on an existing table:
+
+```sql
+CREATE [IF NOT EXISTS] INDEX [index_name] ON table_name (column_name);
+```
+
+### Creating Unique Indexes
+
+To create a unique index:
+
+```sql
+CREATE UNIQUE INDEX [index_name] ON table_name (column_name);
+```
+
+### Multi-Column Indexes
+
+Create indexes on multiple columns:
+
+```sql
+CREATE INDEX idx_name ON table_name (column1, column2, column3);
+```
+
+The order of columns is important. The index can be used for queries referencing the first column, first two columns, first three columns, and so on, in order.
+
+## Dropping Indexes
+
+Remove an index using:
+
+```sql
+DROP INDEX [IF EXISTS] index_name;
+```
+
+The `IF EXISTS` clause is optional and prevents an error if the index doesn't exist.

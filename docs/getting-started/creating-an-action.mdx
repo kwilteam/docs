@@ -1,0 +1,109 @@
+---
+sidebar_position: 2
+sidebar_label: "Create an Action"
+id: create-an-action
+title: Create an Action
+description: Creating an action in Kwil.
+slug: /getting-started/create-an-action
+---
+
+This tutorial shows you how to create an action. Actions are pre-defined functions that can be executed by end users. Since end users
+likely will not have permissions to execute arbitrary INSERT/UPDATE/DELETE statements against your database, they will need to execute
+pre-defined actions that you have created. Using actions, you can define the SQL statements and associated logic that users can execute.
+
+## Prerequisites
+
+- [Kwil CLI](https://github.com/kwilteam/kwil-db/releases) - Download from the Kwil Binary Releases.
+- Ethereum Private Key - You will need an Ethereum private key to sign transactions to Kwil.
+If you do not have one, you can generate one using the [`kwil-cli utils generate-key`](/docs/ref/kwil-cli/utils/generate-key#examples) command.
+- Kwil RPC - You will need the RPC endpoint of the Kwil network you are deploying to. This can be obtained by either running a [node
+locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login>).
+
+## Creating the Schema
+
+We will define our schema in a single file `users.sql`. We will start by defining a table `users` that our actions will interact with:
+
+```sql title="users.sql"
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    age INT NOT NULL,
+    address TEXT NOT NULL UNIQUE // user wallet addresses
+);
+```
+
+Next, we will define an action `create_user`. This action will insert a new user into the `users` table. It generates a UUID for the user
+using the incoming transaction's ID, and uses the `@caller` variable to insert the wallet address of the key that signed the transaction
+into the `address` column. It is given a `PUBLIC` modifier, which allows anyone to call it.
+
+```sql title="users.sql"
+CREATE ACTION create_user($username TEXT, $age INT) PUBLIC {
+    INSERT INTO users (id, username, age, address)
+    VALUES (uuid_generate_kwil(@txid), $username, $age, @caller);
+};
+```
+
+Finally, we will define an action `get_users`. This action returns a full list of users in the `users` table. It is given a `PUBLIC` modifier,
+which allows anyone to call it. It is also given a `VIEW` modifier, which indicates that it is a read-only action and can be called outside
+of a transaction.
+
+```sql title="users.sql"
+CREATE ACTION get_users() PUBLIC VIEW RETURNS table(id UUID, username TEXT, age INT, address TEXT) {
+    return SELECT * FROM users;
+};
+```
+
+### Full Example
+The full schema we created can be found in the dropdown below:
+
+<details>
+    <summary> social_media.sql </summary>
+
+```sql showLineNumbers
+CREATE TABLE users (
+    id UUID PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    age INT NOT NULL,
+    address TEXT NOT NULL UNIQUE // user wallet addresses
+);
+
+CREATE ACTION create_user($username TEXT, $age INT) PUBLIC {
+    INSERT INTO users (id, username, age, address)
+    VALUES (uuid_generate_kwil(@txid), $username, $age, @caller);
+};
+
+CREATE ACTION get_users() PUBLIC VIEW RETURNS table(id UUID, username TEXT, age INT, address TEXT) {
+    return SELECT * FROM users;
+};
+```
+</details>
+
+## Deploying the Schema
+
+To deploy the schema, use the `kwil-cli exec-sql` command. You will also need to pass your private key and provider URL as flags. The
+`--sync` flag will wait for the transaction to be mined and display the result of the transaction.
+
+```shell
+$ kwil-cli --private-key <YOUR_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
+    exec-sql --file users.sql --sync
+```
+
+## Executing the Actions
+
+To execute an action, use the `kwil-cli exec-action` command. It takes the action name as the first argument, and the parameters as
+the subsequent arguments:
+
+```shell
+$ kwil-cli --private-key <YOUR_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
+    exec-action create_user text:alice int:25
+```
+
+To call a view action, use the `kwil-cli call-action` command. It takes the action name as the first argument, and the parameters as
+the subsequent arguments:
+
+```shell
+$ kwil-cli --provider <YOUR_PROVIDER_URL> call-action get_users
+|                  id                  | username | age |                  address                   |
++--------------------------------------+----------+-----+--------------------------------------------+
+| 39a12a4e-d9b8-54e3-810d-45571485e817 | alice    |  25 | 0xAfFDC06cF34aFD7D5801A13d48C92AD39609901D |
+```

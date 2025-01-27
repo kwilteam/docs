@@ -1,0 +1,87 @@
+---
+sidebar_position: 3
+sidebar_label: "Foreign Keys"
+id: foreign_keys
+title: Foreign Key Constraints
+description: Creating foreign key constraints in SQL.
+slug: /language/fk-constraints
+---
+
+Foreign keys in a table definition establish relationships between tables, ensuring referential integrity. They help maintain consistency by linking a column in one table to the primary key or unique key of another table.
+
+Foreign key constraints can define specific actions to be taken when the referenced data is updated or deleted. These actions are specified using the `ON UPDATE` and `ON DELETE` clauses, which determine the behavior when changes occur in the parent table. There are five key actions that can be applied:
+
+1. **`SET NULL`**:  
+    Sets the foreign key column to `NULL` when the referenced key is updated or deleted. This requires that the foreign key column allows null values.
+    
+2. **`SET DEFAULT`**:  
+    Sets the foreign key column to its default value when the referenced key is updated or deleted. The default value must be explicitly defined for the foreign key column.
+    
+3. **`RESTRICT`**:  
+    Prevents any update or deletion of the referenced key if there are related rows in the child table. This action ensures referential integrity by blocking changes that could orphan the dependent records.
+    
+4. **`NO ACTION`**:  
+    This is the default behavior when no action is specified. It does nothing immediately when an update or delete occurs, but will cause a constraint violation at the end of the statement if the foreign key constraint is violated.
+    
+5. **`CASCADE`**:  
+    Automatically updates or deletes the foreign key in the child table to match the action performed on the referenced key in the parent table. For example, deleting a row in the parent table will delete all rows in the child table that reference it.
+## Defining Foreign Keys
+
+Foreign keys can be specified in two main ways: in-line within the column definition, or as a separate constraint in the table definition. Both approaches allow for the same flexibility in specifying the actions for `ON UPDATE` and `ON DELETE`.
+### In-line Foreign Key Definition
+
+You can specify a foreign key directly in the column definition:
+
+```sql
+CREATE TABLE posts (
+	id UUID PRIMARY KEY,
+	user_id UUID REFERENCES users(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+```
+
+In this example, the `user_id` column references the `id` column in the `users` table, and any updates or deletions in the `users` table are cascaded to the `posts` table.
+### Constraint Foreign Key Definition
+
+Alternatively, you can define a foreign key as a separate constraint:
+
+```sql
+CREATE TABLE followers (
+	id UUID PRIMARY KEY,
+	user_id UUID,
+	CONSTRAINT user_id_fk
+		FOREIGN KEY (user_id)
+		REFERENCES users(id)
+		ON UPDATE CASCADE
+		ON DELETE CASCADE
+);
+```
+
+Here, the foreign key is defined as a constraint, allowing you to give it a custom name (`user_id_fk`), which can make it easier to reference in database management and troubleshooting.
+
+## Additional Foreign Key Management Options
+
+In addition to specifying foreign key constraints in the table definition, there are other ways to manage and modify foreign key behavior:
+
+### Adding a Foreign Key to an Existing Table
+
+You can add a foreign key constraint to an existing table using the `ALTER TABLE` statement:
+
+```sql
+ALTER TABLE posts
+ADD CONSTRAINT fk_user_id
+FOREIGN KEY (user_id)
+REFERENCES users(id)
+ON UPDATE CASCADE
+ON DELETE RESTRICT;
+```
+
+This will add a foreign key to the `posts` table after the table has been created, enforcing referential integrity on the `user_id` column.
+### Dropping a Foreign Key Constraint
+
+To remove a foreign key constraint from a table, use the `ALTER TABLE` statement:
+
+```sql
+ALTER TABLE posts DROP CONSTRAINT fk_user_id;
+```
+
+This will drop the foreign key constraint, allowing changes to the referenced data without enforcing referential integrity.

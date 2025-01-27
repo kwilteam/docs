@@ -3,29 +3,33 @@ sidebar_position: 6
 sidebar_label: "parse"
 id: "kwil-cli-utils-parse"
 title: "kwil-cli utils parse"
-description: "Parse a Kuneiform schema"
+description: "Parses SQL and returns the AST."
 slug: /ref/kwil-cli/utils/parse
 ---
 
 ## kwil-cli utils parse
 
-Parse a Kuneiform schema
+Parses SQL and returns the AST.
 
 ### Synopsis
 
-Parse a Kuneiform schema and output the JSON schema.
+Parses SQL and returns the AST.
+
+It can either be given a file or a string on the command line to parse.
+It can be given an out file where it will write the AST to a file.
+If no out file is given, it will simply print whether it was successful or not.
 
 ```
-kwil-cli utils parse <file_path> [flags]
+kwil-cli utils parse [flags]
 ```
 
 ### Options
 
 ```
-  -d, --debug               Display debug information
-  -h, --help                help for parse
-  -p, --include-positions   Include positions in the debug output
-  -o, --out string          Output file. If debug is true, errors will also be written to this file
+  -h, --help               help for parse
+  -i, --in string          A file that SQL should be read from.
+  -o, --out string         Output file to write the AST to.
+  -r, --remove-positions   Remove positions from the AST.
 ```
 
 ### Options inherited from parent commands
@@ -33,7 +37,7 @@ kwil-cli utils parse <file_path> [flags]
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")

@@ -14,20 +14,20 @@ Deploy a database schema to the target Kwil node.
 ### Synopsis
 
 Deploy a database schema to the target Kwil node.
-A path to a file containing the database schema must be provided using the --path flag.
+A path to a file containing the database schema must be provided as the first positional argument.
 
 Either a Kuneiform or a JSON file can be provided.  The file type is determined by the --type flag.
 By default, the file type is kf (Kuneiform).  Pass --type json to deploy a JSON file.
 
 ```
-kwil-cli database deploy [flags]
+kwil-cli database deploy <path> [flags]
 ```
 
 ### Examples
 
 ```
 # Deploy a database schema to the target Kwil node
-kwil-cli database deploy --path ./schema.kf
+kwil-cli database deploy ./schema.kf
 ```
 
 ### Options
@@ -36,7 +36,6 @@ kwil-cli database deploy --path ./schema.kf
   -h, --help          help for deploy
   -n, --name string   set the name of the database, overriding the name in the schema file
   -N, --nonce int     nonce override (-1 means request from server) (default -1)
-  -p, --path string   path to the database definition file (required)
       --sync          synchronous broadcast (wait for it to be included in a block)
   -t, --type string   file type of the database definition file (kf or json) (default "kf")
 ```

@@ -24,7 +24,7 @@ Paths to JSON files for tests are relative to the working directory, but
 schema filepaths specified in the JSON will be accessed relative to the
 respective JSON file.
 
-Test cases can be run by specifying the path to the JSON using the
+Test cases can be run by specyfing the path to the JSON using the
 `file` flag. Multiple test files can be specified by simply
 using the flag many times.
 
@@ -67,7 +67,7 @@ kwil-cli utils test --file ./test1.json --host localhost --port 5432 \
 
 ```
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")

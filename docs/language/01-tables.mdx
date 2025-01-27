@@ -1,0 +1,338 @@
+---
+sidebar_position: 1
+sidebar_label: "Tables"
+id: tables
+title: Tables
+description: Creating and managing tables.
+slug: /language/tables
+---
+
+## Creating Tables
+
+Tables are the fundamental structures used to store data in a relational database. To create a table, use the `CREATE TABLE`
+statement, followed by the table name and the column definitions.
+
+```sql
+CREATE TABLE [IF NOT EXISTS] table_name (
+    column_name data_type [constraints],
+    [CONSTRAINT constraint_name] constraint_type (column_name),
+    ...
+);
+```
+
+Each column must be defined with a name and a data type. Additional constraints or attributes (such as `NOT NULL`, `DEFAULT`, or
+`UNIQUE`) can be added to enforce rules on the data.
+
+### Column Definitions
+
+Columns are defined by specifying the column name, followed by its data type. Some common data types include:
+
+- **`INT8`**: A 64 bit integer.
+- **`TEXT`**: An arbitrary length string of text.
+- **`UUID`**: A universally unique identifier.
+- **`BOOLEAN`**: A true/false value.
+- **`BYTEA`**: A binary large object.
+- **`NUMERIC(PRECISION, SCALE)`**: A fixed-point number. Precision must be between 1 and 1000. Scale must be between 0
+and 1000.
+
+Arrays are also supported, e.g. `TEXT[]`
+
+Example:
+
+```sql
+CREATE TABLE users (
+	id UUID PRIMARY KEY,
+	name TEXT NOT NULL UNIQUE,
+	created_at INT8 DEFAULT 0,
+	nicknames TEXT[]
+);
+```
+
+### Primary Keys
+
+**All tables must have a primary key**. The primary key uniquely identifies each row in a table and ensures that no two
+rows have the same key. A primary key also automatically applies the `NOT NULL` constraint, preventing null values in the key columns.
+
+There are two ways to define primary keys:
+
+#### 1. In-line Primary Key
+
+For a single-column primary key, you can define the key directly in the column declaration by adding the `PRIMARY KEY` flag:
+
+```sql
+CREATE TABLE users (
+	id UUID PRIMARY KEY,
+	-- other columns
+);
+```
+
+This makes `id` the primary key of the `users` table.
+
+#### 2. Composite Primary Key
+
+If you need a primary key that consists of multiple columns (a composite key), define it after the column declarations. This
+allows you to specify a combination of columns that uniquely identifies each row:
+
+```sql
+CREATE TABLE followers (
+	follower_id UUID,
+	following_id UUID,
+	PRIMARY KEY (follower_id, following_id)
+);
+```
+
+Here, the combination of `follower_id` and `following_id` must be unique for each row, forming a composite primary key.
+
+### Constraints
+
+Apart from primary keys, several other constraints can be added to enforce data integrity:
+
+#### Unique Constraints
+
+A **`UNIQUE`** constraint ensures that all values in a column (or a set of columns) are unique across the table. This is useful
+for columns like email addresses, where duplicates should not be allowed:
+
+```sql
+CREATE TABLE users (
+	id UUID PRIMARY KEY,
+	email TEXT UNIQUE
+);
+```
+
+You can also create a composite unique constraint on multiple columns. A name for the unique constraint can be specified using
+the `CONSTRAINT` keyword:
+
+```sql
+CREATE TABLE posts (
+	id UUID PRIMARY KEY,
+	title TEXT,
+	owner_id UUID REFERENCES users(id),
+	CONSTRAINT my_con_name UNIQUE(title, owner_id)
+)
+```
+
+If no constraint name is specified, it will be given an auto-generated name:
+
+```sql
+CREATE TABLE posts (
+	id UUID PRIMARY KEY,
+	title TEXT,
+	owner_id UUID REFERENCES users(id),
+	UNIQUE(title, owner_id)
+)
+```
+
+#### Check Constraints
+
+A **`CHECK`** constraint allows you to enforce custom conditions on the data. For example, to ensure that an `age` column only
+contains positive values:
+
+```sql
+CREATE TABLE persons (
+	id UUID PRIMARY KEY,
+	age INT CHECK (age > 0)
+);
+```
+
+Check constraints can also be put on many columns:
+
+```sql
+CREATE TABLE blog (
+	id UUID PRIMARY KEY,
+	snippet TEXT,
+	full_content TEXT,
+	CHECK (LENGTH(snippet) <= LENGTH(full_content))
+);
+```
+
+Check constraints can also be named:
+
+```sql
+CREATE TABLE blog (
+	id UUID PRIMARY KEY,
+	snippet TEXT,
+	full_content TEXT,
+	CONSTRAINT snippet_content_len
+		CHECK (LENGTH(snippet) <= LENGTH(full_content))
+);
+```
+
+If check constrains are not named, they will be given a random name.
+
+#### NOT NULL Constraint
+
+The **`NOT NULL`** constraint ensures that a column cannot have a NULL value. This is useful for columns that should always contain
+a value. For example:
+
+```sql
+CREATE TABLE employees (
+	id UUID PRIMARY KEY,
+	first_name TEXT NOT NULL,
+	last_name TEXT NOT NULL,
+	email TEXT
+);
+```
+
+In this example, `first_name` and `last_name` are required fields and cannot be left empty, while `email` is optional.
+
+#### DEFAULT Constraint
+
+The **`DEFAULT`** constraint specifies a default value for a column when no value is explicitly provided during an insert operation.
+This is useful for setting default values like status flags. For example:
+
+```sql
+CREATE TABLE orders (
+	id UUID PRIMARY KEY,
+	product_name TEXT NOT NULL,
+	status TEXT DEFAULT 'pending'
+);
+```
+
+In this example, if no `status` is provided, it will default to 'pending'.
+
+### Altering Tables After Creation
+
+:::warning
+Remember that when making structural changes to tables, especially in production environments,
+it's important to consider the impact on existing data and any dependencies (like actions referencing the table)
+that might be affected by these changes.
+:::
+
+
+#### Add Column
+
+To add a new column to an existing table, use the `ALTER TABLE` statement with the `ADD COLUMN` clause:
+
+```sql
+ALTER TABLE table_name
+ADD COLUMN column_name data_type [constraints];
+```
+
+You can also add multiple columns in a single statement:
+
+```sql
+ALTER TABLE users
+ADD COLUMN date_of_birth DATE,
+ADD COLUMN age INT;
+```
+
+#### Drop Column
+
+To remove a column from a table, use the `ALTER TABLE` statement with the `DROP COLUMN` clause:
+
+```sql
+ALTER TABLE table_name
+DROP COLUMN column_name;
+```
+
+You can drop multiple columns in a single statement:
+
+```sql
+ALTER TABLE users
+DROP COLUMN age,
+DROP COLUMN date_of_birth;
+```
+
+#### Rename Column
+
+To rename a column, use the `ALTER TABLE` statement with the `RENAME COLUMN` clause:
+
+```sql
+ALTER TABLE table_name
+RENAME COLUMN old_column_name TO new_column_name;
+```
+
+#### Rename Table
+
+To rename a table, use the `ALTER TABLE` statement with the `RENAME TO` clause:
+
+```sql
+ALTER TABLE old_table_name
+RENAME TO new_table_name;
+```
+
+Sometimes you need to add or modify constraints after a table has been created and deployed. Here's how you can do that for
+NOT NULL and DEFAULT constraints:
+
+#### Adding or Removing NOT NULL Constraint
+
+To add a NOT NULL constraint to an existing column:
+
+```sql
+ALTER TABLE table_name 
+ALTER COLUMN column_name SET NOT NULL;
+```
+
+To remove a NOT NULL constraint:
+
+```sql
+ALTER TABLE table_name 
+ALTER COLUMN column_name DROP NOT NULL;
+```
+
+Note: When adding a NOT NULL constraint to an existing column, ensure that the column doesn't already contain NULL values, or
+the operation will fail.
+
+#### Adding or Modifying DEFAULT Constraint
+
+To add a DEFAULT constraint to an existing column:
+
+```sql
+ALTER TABLE table_name 
+ALTER COLUMN column_name SET DEFAULT default_value;
+```
+
+To modify an existing DEFAULT constraint:
+
+```sql
+ALTER TABLE table_name 
+ALTER COLUMN column_name SET DEFAULT new_default_value;
+```
+
+To remove a DEFAULT constraint:
+
+```sql
+ALTER TABLE table_name 
+ALTER COLUMN column_name DROP DEFAULT;
+```
+
+#### Examples
+
+Let's say we have a `users` table and we want to make some changes:
+
+1. Add a NOT NULL constraint to the `email` column:
+
+```sql
+ALTER TABLE users
+ALTER COLUMN email SET NOT NULL;
+```
+
+2. Add a DEFAULT value to the `status` column:
+
+```sql
+ALTER TABLE users
+ALTER COLUMN status SET DEFAULT 'active';
+```
+
+3. Remove the NOT NULL constraint from the `phone` column:
+
+```sql
+ALTER TABLE users
+ALTER COLUMN phone DROP NOT NULL;
+```
+
+#### Add Check Constraint
+
+Check constraints can be added retroactively using `ALTER TABLE <table_name> ADD CONSTRAINT ...`:
+
+
+```sql
+ALTER TABLE employees ADD CONSTRAINT check_age CHECK (age >= 18);
+```
+#### Drop Constraint
+
+Constraints can be dropped using a `ALTER TABLE <table_name> DROP CONSTRAINT <constraint_name>` command:
+
+```sql
+ALTER TABLE users DROP CONSTRAINT users_email_key;
+```

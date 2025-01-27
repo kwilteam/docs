@@ -1,0 +1,68 @@
+---
+sidebar_position: 8
+sidebar_label: Extensions
+id: extensions
+title: Extensions
+description: Extensions in Kwil
+slug: /language/extensions
+---
+
+Extensions in Kwil allow you to extend the language with new features. This can be as simple as adding new functions, or as complex
+as bridging tokens from a blockchain into your database. This guide does not cover how to implement extensions, but rather how to use them.
+To learn how to implement extensions, see the [Extensions Guide](/docs/extensions).
+
+## Using Extensions
+
+To use an extension, use the `USE` statement. The `USE` statement references the extension's name (defined in the extension's implementation),
+and can optionally pass a set of options. The extension can then be aliased to a name, which can be used to reference this specific instance
+of the extension. **The `USE` statement will create a namespace of the same name as the alias.**
+
+```sql
+USE extension_name [{
+    option_name: option_value,
+    ...
+}] AS alias;
+```
+
+Similarly, you can use the `UNUSE` statement to remove the extension:
+
+```sql
+UNUSE alias;
+```
+
+For example, if we are using a hypothetical extension `hashing`, we might use it like this:
+
+```sql
+USE hashing {
+    algorithm: "sha256"
+    ...
+} AS sha256;
+```
+
+This will create a namespace called `sha256` that contains the extension's functions. Any methods defined on the extension
+can now be called within an action. Let's assume that the `hashing` extension has a method `hash` that hashes a string:
+
+```sql
+CREATE ACTION use_hashing() public {
+    $hash = sha256.hash("hello world");
+}
+```
+
+Extension methods _cannot_ be called within SQL statements. They can only be called within an action's body. For example, **the following
+action is invalid:**
+
+```sql
+CREATE ACTION use_hashing() public {
+    -- this will fail, because the extension method cannot be called in a SQL statement
+    SELECT * FROM table WHERE column = sha256.hash("hello world");
+}
+```
+
+Instead, you must call the extension method within an action:
+
+```sql
+CREATE ACTION use_hashing() public {
+    $hash = sha256.hash("hello world");
+    SELECT * FROM table WHERE column = $hash;
+}
+```

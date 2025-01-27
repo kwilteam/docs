@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 4
 sidebar_label: "query"
 id: "kwil-cli-database-query"
 title: "kwil-cli database query"
@@ -38,10 +38,10 @@ kwil-cli database query "SELECT * FROM users WHERE age > 25" --name mydb --owner
 ### Options
 
 ```
-  -i, --dbid string    the target database id
-  -h, --help           help for query
-  -n, --name string    the target database name
-  -o, --owner string   the target database owner
+  -h, --help                help for query
+      --max-row-width int   Set the maximum width of the row. Text beyond this width will be truncated.
+      --row-border          Show border lines between rows.
+  -w, --width int           Set the width of the table columns. Text beyond this width will be wrapped.
 ```
 
 ### Options inherited from parent commands
@@ -49,7 +49,7 @@ kwil-cli database query "SELECT * FROM users WHERE age > 25" --name mydb --owner
 ```
   -Y, --assume-yes           Assume yes for all prompts
       --chain-id string      the expected/intended Kwil Chain ID
-      --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
+  -c, --config string        the path to the Kwil CLI persistent global settings file (default "/Users/brennanlamey/.kwil-cli/config.json")
       --output string        the format for command output - either 'text' or 'json' (default "text")
       --private-key string   the private key of the wallet that will be used for signing
       --provider string      the Kwil provider RPC endpoint (default "http://127.0.0.1:8484")
