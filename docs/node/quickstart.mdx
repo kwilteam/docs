@@ -13,9 +13,17 @@ test `kwild`. To prepare a production deployment, see
 [Installation](/docs/daemon/installation), and either [Running a Kwil Node](/docs/daemon/kwild)
 or the [Production Deployment guide](/docs/node/production).
 
+## Prerequisites
+
+Ensure that you have the following prerequisites installed:
+
+- [Docker](<https://docs.docker.com/get-docker/>)
+- [`kwild`](<https://github.com/kwilteam/kwil-db/releases>)
+- An Ethereum address that can be designated as the database's owner
+
 ## Installation
 
-To run either a single Kwil node, or a network of nodes, you will need to download the binaries.  Kwil releases
+To run either a single Kwil node, or a network of nodes, you will need to download the `kwild` binary.  Kwil releases
 binaries on [Github](https://github.com/kwilteam/kwil-db/releases).
 
 Kwil also requires a dedicated PostgreSQL host configured for `kwild`.
@@ -38,7 +46,7 @@ This will automatically generate a genesis file, private key, and more in the
 `~/.kwild` directory.
 
 ```bash
-kwild --autogen
+kwild start --autogen --db-owner <YOUR_ETHEREUM_ADDRESS>
 ```
 
 :::note
@@ -62,14 +70,14 @@ docker container rm -f kwil-postgres
 
 ## Multi-Node
 
-To run a local Kwil network, you can use the `kwil-admin` tool to generate multiple node configs.
+To run a local Kwil network, you can use `kwild` to generate multiple node configs.
 
 ### Generate Configs
 
 To generate the configs for 3 validators in `./kwil-testnet`, run:
 
 ```bash
-kwil-admin setup testnet -v 3 --hostnames "localhost,localhost,localhost" --output-dir ./kwil-testnet
+kwild setup testnet -v 3 --out-dir ./kwil-testnet --db-owner <YOUR_ETHEREUM_ADDRESS>
 ```
 
 This creates three nodes that can run on the same host for evaluation.
@@ -97,19 +105,19 @@ Use `docker container ls` to check the `postgres` container status. When done te
 to stop and delete them.
 :::
 
-To run the nodes, we can use the `kwild` binary in 3 separate terminals.  We will need to specify the `--root_dir` flag to
+To run the nodes, we can use the `kwild` binary in 3 separate terminals.  We will need to specify the `--root` flag to
 point to the directory where the node config is located.
 
 ```bash title="Terminal 1"
-kwild --root-dir ./kwil-testnet/node0 --app.pg-db-port 5440
+kwild start --root ./kwil-testnet/node0 --db.port 5440
 ```
 
 ```bash title="Terminal 2"
-kwild --root-dir ./kwil-testnet/node1 --app.pg-db-port 5441
+kwild start --root ./kwil-testnet/node1 --db.port 5441
 ```
 
 ```bash title="Terminal 3"
-kwild --root-dir ./kwil-testnet/node2 --app.pg-db-port 5442
+kwild start --root ./kwil-testnet/node2 --db.port 5442
 ```
 
 Once the nodes are running, they will begin mining blocks.  You can now connect to their JSON-RPC

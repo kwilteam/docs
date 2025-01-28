@@ -11,7 +11,10 @@ This page illustrates the process of deploying a new production network comprisi
 
 ## Overview
 
-The [Tutorial page](/docs/node/tutorial) illustrates the process of creating a new network of nodes by running each one on a single development machine. While that is a quick and concise demonstration of how nodes interact and the validator management process, a real production network requires the deployment of nodes on different host machines that typically operate in remote locations. This page demonstrates the deployment of such a network, with attention to the relevant settings and considerations in such a setting.
+The [Tutorial page](/docs/node/tutorial) illustrates the process of creating a new network of nodes by running each one on a single development machine.
+While that is a quick and concise demonstration of how nodes interact and the validator management process, a real production network requires the
+deployment of nodes on different host machines that typically operate in remote locations. This page demonstrates the deployment of such a network,
+with attention to the relevant settings and considerations in such a setting.
 
 ## Concepts
 
@@ -19,131 +22,119 @@ There are several important concepts to understand when creating a network of in
 
 ### Peers and Node IDs
 
-Every Kwil node has a "node ID" that is derived from the node's public key. This plays an important role creating secure authenticated connections between nodes over the internet.
+Every Kwil node has a "node ID" that is derived from the node's public key. This plays an important role creating secure authenticated connections
+between nodes over the internet.
 
-A peer is always specified in the format `<nodeID>@<IP address>:<port>`.  For example, given a node with ID `f664bfc6060231b12421aafbad971a58a27611f8` that is reachable at IP address `10.1.2.3` on TCP port `26656`, the notation used to specify this node as a peer is `f664bfc6060231b12421aafbad971a58a27611f8@10.1.2.3:26656`.
+A peer is always specified in the format `<public key>#<key type>@<IP address>:<port>`.  For example, given a node with public
+key `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb` and key type `secp256k1` that is reachable at IP address `10.1.2.3`
+on TCP port `6600`, the notation used to specify this node as a peer is `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb#secp256k1@10.1.2.3:6600`.
 
 :::tip
-
 An operator can determine their node ID in different ways:
 
-1. Use the `kwil-admin key info` command, which derives and displays the node ID given the private key.
-2. Use the `kwil-admin node status` command, which requests the node ID from the running node's admin RPC service.
+1. Use the `kwild key info` command, which derives and displays the node ID given the private key.
+2. Use the `kwild admin status` command, which requests the node ID from the running node's admin RPC service.
 3. Locate the node ID in the node logs. An info-level log entry with the message "P2P Node ID" contains the ID.
 
-The node ID is also displayed when the private key is initially generated with the `key gen` subcommand.
+The node ID is also displayed when the private key is initially generated with the `kwild key gen` subcommand.
 
 :::
-
-### Exposing Listening TCP Ports
-
-For a node to be reachable, incoming TCP traffic on the P2P port must be allowed by firewall rules, both on the host machine and any network security policies enforced by the provider.
-
-The node's P2P server must also be listening on a routable network interface that may be reached from remote peers. The default `chain.p2p.listen_address` setting of `0.0.0.0:26656` permits this. If changing this value, be sure it uses a non-loopback interface that is reachable by other peers.
-
-:::note
-If a node is **not** configured to permit incoming P2P connections, it may still operate by connecting to the network with outgoing connections, but other peers will not be able to bootstrap from the node.
-:::
-
-Finally, depending on the host machine's IP address assignment, it is often necessary to specify the actual external IP address that routes to the host machine's network interface using the `chain.p2p.external_address` setting. For instance, if the host machine is assigned a public IP address of `53.35.53.35` that transparently routes traffic to a VPC address of `10.1.2.3` on the host OS, it is helpful to set `chain.p2p.external_address = 53.35.53.35:26656` so that the Kwil node advertises itself on a reachable network address that is otherwise undiscoverable to `kwild` itself.
 
 ### Peer Exchange
 
-In a healthy network, nodes have many peers to prevent single points of failure or unintended network partitions, and to support efficient network gossip. The feature that facilitates this is called peer exchanges (PEX). This is also enabled by default with the `chain.p2p.pex = true` setting. Disable this setting only if a node must not share its peers with other nodes.
+In a healthy network, nodes have many peers to prevent single points of failure or unintended network partitions, and to support efficient
+network gossip. The feature that facilitates this is called peer exchanges (PEX). This is also enabled by default with the `p2p.pex = true`
+setting. Disable this setting only if a node must not share its peers with other nodes.
 
 ### Network Bootstrapping
 
-There are two supported ways of bootstapping a node's connection to a network: specifying a "seed" node and "persistent" peers. Both may be used in conjunction with [PEX](#peer-exchange). These are described below.
+There are two supported ways of bootstapping a node's connection to a network: specifying a "seed" node and "persistent" peers. Both may be used
+in conjunction with [PEX](#peer-exchange). These are described below.
 
-#### Persistent Peers
+#### Boot Nodes
 
-The simplest method, particularly for a small new network, is to list known peers to which the node should always attempt to connect. This is done using the peer notation described above.
+The simplest method, particularly for a small new network, is to list known peers to which the node should always attempt to connect. This is done
+using the peer notation described above.
 
 For example, to specify two remote peers to always connect to on startup, list them as follows:
 
 ```toml
-[chain.p2p]
-persistent_peers = "f664bfc6060231b12421aafbad971a58a27611f8@10.1.2.3:26656,5585aff2fbb0a21a3c4f03e9d82657530af1ce84@10.6.7.8:26656"
+[p2p]
+boot_nodes = "02ae12856a766c277842e1319fd7e450711b706ef90942e8ad5be9369e5d22817c#secp256k1@10.1.2.3:6600,02cace485e891cb5e5bd22b008986980791677f9f553fd3bb3f864e6b84e011cdb#secp256k1@10.6.7.8:6600"
 ```
-
-#### Seeder and Seed nodes
-
-For larger networks, and in particular organically growing networks, special "seed" nodes may be set up to facilitate node onboarding. To connect to a seed node, configure the `chain.p2p.seeds` setting.
-
-Like the persistent peers setting, this is a comma-separated list of nodes using the same `<nodeID>@<IP address>:<port>` notation. Unlike persistent peers, the connections to these nodes are transient, disconnecting after obtaining a list of their peers.
-
-:::info
-The `chain.p2p.seeds` setting should be used with `chain.p2p.pex = true`.
-:::
-
-A seed may be thought of as a network crawler, which performs no functions other than to continually connect to other peers, discovering new peer addresses, and sharing discovered addresses with peers making incoming connections. The recommended way to create a seed is with the [cometseed](https://github.com/kwilteam/cometseed) tool. A mature network should have one or more seeds that all nodes may use for bootstrapping.
 
 ### Validators
 
-While not a networking concept, it is important to understand the role of validators as it pertains to block production. The consensus engine used by Kwil requires *greater than* 2/3 of validators to approve proposed blocks.
-Thus, if the network is not well connected and validators are unable to communicate efficiently, block production may be slowed or even stopped in the case of a network partition.
+While not a networking concept, it is important to understand the role of validators as it pertains to block production. The consensus
+engine used by Kwil requires *greater than* 1/2 of validators to approve proposed blocks. Thus, if the network is not well connected and
+validators are unable to communicate efficiently, block production may be slowed or even stopped in the case of a network partition.
 
-Not all nodes in a network must be validators. Non-validator nodes called "sentry" nodes are typically created to function as RPC service providers or just to support network health by relaying transactions, blocks, and misbehavior evidence.
+Not all nodes in a network must be validators. Non-validator nodes called "sentry" nodes are typically created to function as RPC service
+providers or just to support network health by relaying transactions, blocks, and misbehavior evidence.
 
 ### Compatible Versions
 
-A final important concept is version compatibility. On a production network, it is important to only run nodes built from the same release branch, such as the `release-v0.8` branch, or a release tag with the same `MAJOR.MINOR` version.
-Different patch versions are compatible, but large releases that change the application's state machine logic cannot be run on the same network.
-For example, it is not possible to run `v0.8.4` and `v0.9.1` on the same network. To update a network between such major releases, it is necessary to perform a [migration](/docs/node/migrations).
+A final important concept is version compatibility. On a production network, it is important to only run nodes built from the same release
+branch, such as the `release-v0.8` branch, or a release tag with the same `MAJOR.MINOR` version. Different patch versions are compatible,
+but large releases that change the application's state machine logic cannot be run on the same network. For example, it is not possible to
+run `v0.8.4` and `v0.9.1` on the same network. To update a network between such major releases, it is necessary to perform a [migration](/docs/node/migrations).
 
 ## Walkthrough
 
-This section illustrates the process for launching a small network of independent remote nodes. It will begin with two validators at genesis, followed by the addition of a sentry node using block sync, and finally the new node will become a validator.
+This section illustrates the process for launching a small network of independent remote nodes. It will begin with two validators at genesis,
+followed by the addition of a sentry node using block sync, and finally the new node will become a validator.
 
 ### Deploying Genesis Nodes and Validators
 
-Starting a network with a single validator is possible, however, we will demonstrate starting with two validators from genesis since this also illustrates the consensus considerations described above in [Validators](#validators).
+Starting a network with a single validator is possible, however, we will demonstrate starting with two validators from genesis since this also
+illustrates the consensus considerations described above in [Validators](#validators).
 
 #### Generating Node Private Keys
 
 :::warning
-Securely generate and store private keys. Anyone in possession of a private key can imitate and act on behalf of a node. In the case of a validator, this impacts the security of the network.
+Securely generate and store private keys. Anyone in possession of a private key can imitate and act on behalf of a node. In the case of a
+validator, this impacts the security of the network.
 :::
 
-Every node has a unique identity, which is determined by its private key. We will generate a private key using the `kwil-admin key gen` command:
+Every node has a unique identity, which is determined by its private key. We will generate a private key using the `kwild key gen` command:
 
 ```sh
-kwil-admin key gen --key-file ./private_key
+kwild key gen --key-file ./private_key
 ```
 
-This will write a file named `private_key` in the current directory that contains the ed25519 private key for a new node. Each node **must** have a different private key.
+This will write a file named `private_key` in the current directory that contains the ed25519 private key for a new node. Each node **must**
+have a different private key.
 
-We can inspect the key using the `kwil-admin key info` command as follows:
+We can inspect the key using the `kwild key info` command as follows:
 
 ```sh
-$ kwil-admin key info --key-file ./private_key
+$ kwild key info --key-file ./private_key
+Key type: secp256k1
 Private key (hex): d058de92183058efee63512d7997be7040cfbbfbf6d37c6b9f1157ba421dc2699020d218f830106fad8ce378a606531719bec4f4efee6127a371f25d393ed39e
-Private key (base64): 0FjekhgwWO/uY1EteZe+cEDPu/v203xrnxFXukIdwmmQINIY+DAQb62M43imBlMXGb7E9O/uYSejcfJdOT7Tng==
-Public key (base64): kCDSGPgwEG+tjON4pgZTFxm+xPTv7mEno3HyXTk+054=
-Public key (cometized hex): PubKeyEd25519{9020D218F830106FAD8CE378A606531719BEC4F4EFEE6127A371F25D393ED39E}
 Public key (plain hex): 9020d218f830106fad8ce378a606531719bec4f4efee6127a371f25d393ed39e
-Address (string): 317E0230F8897D38157743D470731EE98FCC1326
-Node ID: 317e0230f8897d38157743d470731ee98fcc1326
 ```
 
-This displays different encodings of the private key, and the corresponding public key and node ID. The "Public key (plain hex)" value is used in the `genesis.json` file to specify the initial validator set as described in the next section.
+The "Public key (plain hex)" and "Key type" value is used in the `genesis.json` file to specify the initial validator set as described in the next section.
 
 #### Creating the Genesis Document
 
-Before starting the first nodes, it is necessary is to create a genesis file for the new network. The file specifies the validator set at genesis, initial account funding allocations, and other network parameters. All nodes must use the exact same `genesis.json` file since its parameters affect the consensus rules for the network.
+Before starting the first nodes, it is necessary is to create a genesis file for the new network. The file specifies the validator set at genesis,
+initial account funding allocations, and other network parameters. All nodes must use the exact same `genesis.json` file since its parameters affect 
+he consensus rules for the network.
 
-Unlike the node quick start guide where all genesis validator keys are generated with the `kwil-admin setup testnet` command run once on one machine, we will create a genesis file with the `kwil-admin setup genesis` command. This takes as input:
+Unlike the node quick start guide where all genesis validator keys are generated with the `kwild setup testnet` command run once on one machine,
+we will create a genesis file with the `kwild setup genesis` command. This takes as input:
 
-1. the name, plain hex *public* keys, and power of each genesis validator (formatted as `name:pubkey:power`)
+1. the plain hex *public* keys, key types, and power of each genesis validator (formatted as `name:pubkey:power`)
 2. the "chain ID" string that is the new network's name
 3. any other default parameter overrides
 
 Consider we want to start a new network called **"prod-chain"** with two genesis validators:
 
 ```sh
-$ kwil-admin setup genesis \
-  --validator "node0:8e11018570091d79b6105d5954cbbc4f1570cd3a02df2214b362e7c3f22c0459:1" \
-  --validator "node1:1e3ab63c62ad165d01627d53c6c4c61e59626ceeeb26653527cf3df18eff7a23:1" \
+$ kwild setup genesis \
+  --validator "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1:1" \
+  --validator "03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1:1" \
   --chain-id "prod-chain" --out ./prod-chain
 Created genesis.json file at /home/user/prod-chain/genesis.json
 ```
@@ -152,50 +143,34 @@ The resulting genesis file has the chain ID and validators customized, with defa
 
 ```json title="genesis.json"
 {
-  "genesis_time": "2024-10-03T19:00:42.192646924Z",
   "chain_id": "prod-chain",
-  "initial_height": 1,
-  "app_hash": null,
-  "activations": null,
-  "consensus_params": {
-    "block": {
-      "max_bytes": 6291456,
-      "max_gas": -1,
-      "abci_max_bytes": false
-    },
-    "evidence": {
-      "max_age_num_blocks": 100000,
-      "max_age_duration": 172800000000000,
-      "max_bytes": 1048576
-    },
-    "validator": {
-      "pub_key_types": [
-        "ed25519"
-      ],
-      "join_expiry": 100800
-    },
-    "votes": {
-      "vote_expiry": 14400,
-      "max_votes_per_tx": 100
-    },
-    "abci": {
-      "vote_extensions_enable_height": 0
-    },
-    "migration": {},
-    "without_gas_costs": true
-  },
+  "initial_height": 0,
   "validators": [
     {
-      "pub_key": "8e11018570091d79b6105d5954cbbc4f1570cd3a02df2214b362e7c3f22c0459",
-      "power": 1,
-      "name": "node0"
+      "pubkey": "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82",
+      "type": "secp256k1",
+      "power": 1
     },
     {
-      "pub_key": "1e3ab63c62ad165d01627d53c6c4c61e59626ceeeb26653527cf3df18eff7a23",
-      "power": 1,
-      "name": "node1"
+      "pubkey": "03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30",
+      "type": "secp256k1",
+      "power": 1
     }
-  ]
+  ],
+  "migration": {
+    "start_height": 0,
+    "end_height": 0
+  },
+  "leader": {
+    "type": "secp256k1",
+    "key": "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82"
+  },
+  "db_owner": "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82",
+  "max_block_size": 6291456,
+  "join_expiry": "24h0m0s",
+  "disabled_gas_costs": true,
+  "max_votes_per_tx": 200,
+  "migration_status": "NoActiveMigration"
 }
 ```
 
@@ -209,34 +184,29 @@ The `kwil-admin setup init` command is used to initialize a node's "root" direct
 
 Consider we have prepared the keys and addresses for the two nodes described above as follows:
 
-|                  | node0                                    | node1                                    |
-|------------------|------------------------------------------|------------------------------------------|
-| external IP      | `23.45.67.89`                              | `98.76.54.32`                              |
-| node ID          | `2a8b9eb0d94be766ad34cb2591f2924477fc397c` | `2164057e1d8248f42aadb8ef00afcc123180571d` |
+|                  | node0                                                                          | node1                                                                          |
+|------------------|--------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| external IP      | `23.45.67.89`                                                                  | `98.76.54.32`                                                                  |
+| node ID          | `0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1` | `03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1` |
 
 To have them connect to each other, we will set their `persistent_peer` settings appropriately.
 
-On `node0`, we can initialize the root directory and the `config.toml` there with the following command, which specifies its external IP address and `node1` in the persistent peers:
+On `node0`, we can initialize the root directory and the `config.toml` there with the following command:
 
 ```sh title="node0"
-[node0]:~$ kwil-admin setup init --genesis prod-chain/genesis.json \
-  --chain.moniker "node0" \
-  --chain.p2p.external-address "23.45.67.89:26656" --chain.p2p.persistent-peers \
-    "2164057e1d8248f42aadb8ef00afcc123180571d@98.76.54.32:26656" \
-  --root-dir /data/kwil-node0
+[node0]:~$ kwild setup init --genesis prod-chain/genesis.json \
+  --root /data/kwil-node0
 Initialized node in /data/kwil-node0
 ```
 
 Then copy the `private_key` file created previously for this node into the root directory.
 
-On `node1`, do the same, but with its external IP address and `node0` in the persistent peers:
+On `node1`, do the same, but with `node0` as a bootnode
 
 ```sh title="node1"
-[node1]:~$ kwil-admin setup init --genesis prod-chain/genesis.json \
-  --chain.moniker "node1" \
-  --chain.p2p.external-address "98.76.54.32:26656" --chain.p2p.persistent-peers \
-    "2a8b9eb0d94be766ad34cb2591f2924477fc397c@23.45.67.89:26656" \
-  --root-dir /data/kwil-node1
+[node1]:~$ kwild setup init --genesis prod-chain/genesis.json \
+  --p2p.bootnodes "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1@23.45.67.89:6600" \
+  --root /data/kwil-node1
 Initialized node in /data/kwil-node1
 ```
 
@@ -259,83 +229,86 @@ Install Postgres create a `kwild` database on each node. Refer to the [Postgres 
 Start the nodes on each of the remote machines, specifying the path to the root directory if it is not at the default location (`~/.kwild`):
 
 ```sh title="node0"
-[node0]:~$ kwild -r /data/kwil-node0
+[node0]:~$ kwild start -r /data/kwil-node0
 ```
 
 ```sh title="node1"
-[node1]:~$ kwild -r /data/kwil-node1
+[node1]:~$ kwild start -r /data/kwil-node1
 ```
 
 Once the nodes connect, the first block will be produced shortly after:
 
 ```plain
-2024-09-19T12:01:23.443-05:00   info    kwild.cometbft  finalizing commit of block      {"module": "consensus", "height": 1, "hash": "010806C959A3CB3F186C1216745E9C9C22F38F98A8D6C8673848BFF79FBD6C81", "root": "B4D2AE49E40746CB1C5C1F1B89D3B30F4927A566E0E0D7F7EDBC6C5A1F540B18", "num_txs": 0}
-2024-09-19T12:01:23.465-05:00   info    kwild.cometbft  finalized block {"module": "state", "height": 1, "num_txs_res": 0, "num_val_updates": 0, "block_app_hash": "5DF6E0E2761359D30A8275058E299FCC0381534545F55CF43E41983F5D4C9456"}
+2025-01-27 18:46:01.558 [INF] CONS: Executed block {height=1 blkID=31b73d85af0ece994263f8b9622f31425c116ea34a5ddd0113535e6b34b4de90 numTxs=0 appHash=2d8f3ceeff2c836527da823d7b654d33d3e44b6159b172235c160001e0c9b4db}
+2025-01-27 18:46:01.559 [INF] CONS: Majority of the validators have accepted the block, proceeding to commit the block {height=1 hash=31b73d85af0ece994263f8b9622f31425c116ea34a5ddd0113535e6b34b4de90 acks=1 nacks=0}
 ```
 
-Recall that *both* of the validators need to be started and able to communicate before blocks can be created, as discussed in the [Validators section](#validators). If the nodes are unable to connect, look for peer-related errors in the logs, and check your persistent peers settings and firewall rules.
+Recall that *both* of the validators need to be started and able to communicate before blocks can be created, as discussed in the
+[Validators section](#validators). If the nodes are unable to connect, look for peer-related errors in the logs, and check your persistent
+peers settings and firewall rules.
 
 ### Adding a New Node
 
-Now that our network of two validators is running and producing blocks, we will create and synchronize a new node to the network, and once it is synchronized, promote the node to a validator.
+Now that our network of two validators is running and producing blocks, we will create and synchronize a new node to the network, and once
+it is synchronized, promote the node to a validator.
 
 #### Starting as a Sentry Node
 
-Now we will add a third note to the network as a sentry node. Since this node is not a genesis validator, its public key is not included in the genesis file, which is now immutable. The `kwil-admin setup init` command can be used to simultaneously initialize a new node's root directory and generate a new private key.
+Now we will add a third note to the network as a sentry node. Since this node is not a genesis validator, its public key is not included
+in the genesis file, which is now immutable. The `kwild setup init` command can be used to simultaneously initialize a new node's root
+directory and generate a new private key.
 
 :::important
 When adding a node to the network, start it as a non-validator / sentry node.
 Always completely synchronize the node to the network before attempting to promote it to a validator.
 :::
 
-Like before, we will specify the location of the network's `genesis.json` file, the host's external IP address, and one or more persistent peers. However, we will use the generated private key:
+Like before, we will specify the location of the network's `genesis.json` file, the host's external IP address, and one or more persistent
+peers. However, we will use the generated private key:
 
 ```sh title="node2"
-[node2]:~$ kwil-admin setup init --genesis prod-chain/genesis.json \
-  --chain.moniker "node2" \
-  --chain.p2p.external-address "2.3.4.5:26656" --chain.p2p.persistent-peers \
-    "2164057e1d8248f42aadb8ef00afcc123180571d@98.76.54.32:26656" \
-  --root-dir /data/kwil-node2
+[node2]:~$ kwild setup init --genesis prod-chain/genesis.json \
+  --p2p.bootnodes "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1@23.45.67.89:6600" \
+  --root /data/kwil-node2
 Initialized node in /data/kwil-node2
 ```
 
 We can see the ID of `node2` before starting it:
 
 ```sh title="node2"
-[node2]:~$ kwil-admin key info --key-file /data/kwil-node2/private_key | grep "Node ID"
-Node ID: bd56ce5a93c47b532be71531ff6ed469b341e61f
+[node2]:~$ kwild key info --key-file /data/kwil-node2/private_key | grep "Node ID"
+Node ID: 03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1
 ```
 
 #### Verifying Successful Node Synchronization
 
 Before adding the node as a validator, ensure that `node2` has completely synchronized with the network. You can do this with either the `kwil-admin` tool, or with the public user service using `kwil-cli`.
 
-Using `kwil-admin node status`, inspect the `.sync.best_block_height` and `.sync.syncing` values:
+Using `kwild admin status`, inspect the `.sync.best_block_height` and `.sync.syncing` values:
 
 ```sh title="node2"
-[node2]:~$ kwil-admin node status
+[node2]:~$ kwild node status
 {
   "node": {
-    "chain_id": "prod-chain",
-    "name": "node2",
-    "node_id": "bd56ce5a93c47b532be71531ff6ed469b341e61f",
-    "proto_ver": 8,
+    "chain_id": "kwil-test-chain",
+    "node_id": "03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1",
     "app_ver": 1,
-    "block_ver": 11,
-    "listen_addr": "tcp://127.0.0.2:27656",
-    "rpc_addr": "tcp://127.0.0.2:26657"
+    "listen_addr": "127.0.0.1:6600",
+    "role": "validator",
+    "rpc_addr": "/tmp/admin.sock"
   },
   "sync": {
-    "app_hash": "0e0674b0b88abc26cc60da6e64883dfef802f3431f19296b88c8bc1db8f4f4ae",
-    "best_block_hash": "1d5a4ef85927dce3c90168e89fdfb32219c5c95bb5ed3332eb69e20bbe7346da",
-    "best_block_height": 109,
-    "best_block_time": "2024-10-03T18:01:38.585-05:00",
+    "app_hash": "537935ed434a25f23bfb18324b36ba1936e8be5d0df1a330eab413d848304d96",
+    "best_block_hash": "9a38b3c78d2a4361c7615db779f8beb073b46819bb275295716283d2c700a6ac",
+    "best_block_height": 337,
+    "best_block_time": "2025-01-27T18:45:00.199-06:00",
     "syncing": false
   },
   "validator": {
-    ...
-  },
-  "app": null
+    "pubkey": "03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22",
+    "type": "secp256k1",
+    "power": 1
+  }
 }
 ```
 
@@ -375,15 +348,15 @@ We have now submitted a request to become a validator, which the existing valida
 ```sh
 $ kwil-admin validators list-join-requests
 Pending join requests (1 approval needed):
- Candidate                                                        | Power | Approvals | Expiration
-------------------------------------------------------------------+-------+-----------+------------
- 7c02692ed4e1f165791b43742274edb4f9587f6da02d54a0c111386b7110bb64 |     1 |         0 | 14627
+ Candidate                                                                    | Power | Approvals | Expiration
+------------------------------------------------------------------------------+-------+-----------+------------
+ 03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1 |     1 |         0 | 14627
 ```
 
 Both validators are required to approve this request since 1/2 does not meet the threshold of greater than 2/3 of the validators. This is done by running the following on **each validator**:
 
 ```sh
-$ kwil-admin validators approve 7c02692ed4e1f165791b43742274edb4f9587f6da02d54a0c111386b7110bb64
+$ kwil-admin validators approve 03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1
 TxHash: cab4b66d12cd6ecee256ba73dd9500a3ea7b21ba03bd38d5db7701268a0f8ecb
 ```
 
@@ -392,17 +365,9 @@ Once the approval transactions are mined, `node2` will become part of the valida
 ```sh
 $ kwil-admin validators list
 Current validator set:
-  0. {pubkey = 8e11018570091d79b6105d5954cbbc4f1570cd3a02df2214b362e7c3f22c0459, power = 1}
-  1. {pubkey = 1e3ab63c62ad165d01627d53c6c4c61e59626ceeeb26653527cf3df18eff7a23, power = 1}
-  2. {pubkey = 7c02692ed4e1f165791b43742274edb4f9587f6da02d54a0c111386b7110bb64, power = 1}
-```
-
-On the block where the final approval transaction was mined, the `kwild` logs for `node2` will display:
-
-```plain
-{"level":"info","ts":1727997606.6760225,"logger":"kwild.cometbft","msg":"finalized block","module":"state","height":291,"num_txs_res":1,"num_val_updates":1,"block_app_hash":"F67E090714D70095DB4DF0EF3BF592A8E60FEC0CEEE58B5FB4D55CBD92E8BC40"}
-{"level":"info","ts":1727997606.6823015,"logger":"kwild.cometbft","msg":"updates to validators","module":"state","updates":"2EA4B9CA4A6FCBAF5102E4C8AB335D785F5D4772:1"}
-{"level":"info","ts":1727997606.6865957,"logger":"kwild.listener-manager","msg":"Node is a validator and caught up with the network, starting listeners"}
+  0. {pubkey = 0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1, power = 1}
+  1. {pubkey = 03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1, power = 1}
+  2. {pubkey = 03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1, power = 1}
 ```
 
 The node is now a validator.  Keep it running and [monitor its health](#verifying-successful-node-synchronization).

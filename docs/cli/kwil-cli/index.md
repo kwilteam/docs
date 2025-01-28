@@ -13,7 +13,7 @@ Command line interface client for using Kwil.
 
 ### Synopsis
 
-Command line interface client for using Kwil.
+Command line interface client for using `Kwil`.
 	
 `kwil-cli` is a command line interface for interacting with Kwil. It can be used to deploy, update, and query databases.
 	
