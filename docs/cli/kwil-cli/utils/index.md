@@ -39,7 +39,6 @@ Various CLI utility commands.
 * [kwil-cli utils authenticate](/docs/ref/kwil-cli/utils/authenticate)	 - Authenticate with a Kwil Gateway using a private key.
 * [kwil-cli utils chain-info](/docs/ref/kwil-cli/utils/chain-info)	 - Display information about the connected Kwil network.
 * [kwil-cli utils decode-tx](/docs/ref/kwil-cli/utils/decode-tx)	 - Decodes a raw transaction.
-* [kwil-cli utils generate-dbid](/docs/ref/kwil-cli/utils/generate-dbid)	 - `dbid` generates a dbid for a given schema name and deployer.
 * [kwil-cli utils generate-key](/docs/ref/kwil-cli/utils/generate-key)	 - Generates a new key pair.
 * [kwil-cli utils parse](/docs/ref/kwil-cli/utils/parse)	 - Parses SQL and returns the AST.
 * [kwil-cli utils ping](/docs/ref/kwil-cli/utils/ping)	 - Ping the kwil provider endpoint.  If successful, returns 'pong'.
