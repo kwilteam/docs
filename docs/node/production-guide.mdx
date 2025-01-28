@@ -22,7 +22,7 @@ There are several important concepts to understand when creating a network of in
 
 ### Peers and Node IDs
 
-Every Kwil node has a "node ID" that is derived from the node's public key. This plays an important role creating secure authenticated connections
+Every Kwil node has a "node ID" that is includes the node's public key and network address. This plays an important role creating secure authenticated connections
 between nodes over the internet.
 
 A peer is always specified in the format `<public key>#<key type>@<IP address>:<port>`.  For example, given a node with public
@@ -34,9 +34,9 @@ An operator can determine their node ID in different ways:
 
 1. Use the `kwild key info` command, which derives and displays the node ID given the private key.
 2. Use the `kwild admin status` command, which requests the node ID from the running node's admin RPC service.
-3. Locate the node ID in the node logs. An info-level log entry with the message "P2P Node ID" contains the ID.
+3. Locate the node ID in the node logs. An info-level log entry with the message "NODE: This node is" contains the node identity (public key and key type) and all listening addresses
 
-The node ID is also displayed when the private key is initially generated with the `kwild key gen` subcommand.
+The node's public key is also displayed when the private key is initially generated with the `kwild key gen` subcommand.
 
 :::
 
@@ -60,8 +60,10 @@ For example, to specify two remote peers to always connect to on startup, list t
 
 ```toml
 [p2p]
-boot_nodes = "02ae12856a766c277842e1319fd7e450711b706ef90942e8ad5be9369e5d22817c#secp256k1@10.1.2.3:6600,02cace485e891cb5e5bd22b008986980791677f9f553fd3bb3f864e6b84e011cdb#secp256k1@10.6.7.8:6600"
+bootnodes = "02ae12856a766c277842e1319fd7e450711b706ef90942e8ad5be9369e5d22817c#secp256k1@10.1.2.3:6600,02cace485e891cb5e5bd22b008986980791677f9f553fd3bb3f864e6b84e011cdb#secp256k1@10.6.7.8:6600"
 ```
+
+This may also be specified on the command line with the `--p2p.bootnodes` option, which may be specified multiple times for each peer rather than a comma-separated list.
 
 ### Validators
 
@@ -99,19 +101,19 @@ validator, this impacts the security of the network.
 Every node has a unique identity, which is determined by its private key. We will generate a private key using the `kwild key gen` command:
 
 ```sh
-kwild key gen --key-file ./private_key
+kwild key gen --key-file ./private_key.json
 ```
 
-This will write a file named `private_key` in the current directory that contains the ed25519 private key for a new node. Each node **must**
+This will write a file named `private_key.json` in the current directory that contains the ed25519 private key for a new node. Each node **must**
 have a different private key.
 
 We can inspect the key using the `kwild key info` command as follows:
 
 ```sh
-$ kwild key info --key-file ./private_key
+$ kwild key info --key-file ./private_key.json
 Key type: secp256k1
-Private key (hex): d058de92183058efee63512d7997be7040cfbbfbf6d37c6b9f1157ba421dc2699020d218f830106fad8ce378a606531719bec4f4efee6127a371f25d393ed39e
-Public key (plain hex): 9020d218f830106fad8ce378a606531719bec4f4efee6127a371f25d393ed39e
+Private key (hex): da1ad3ad3e80d200ff66beb6515360337f6e61f14ce958e5bda717fef5aad9f5
+Public key (plain hex): 02d3575f74ffcdb17f781f003d42284a4d1adf271558d0417423b8372ec3f34750
 ```
 
 The "Public key (plain hex)" and "Key type" value is used in the `genesis.json` file to specify the initial validator set as described in the next section.
@@ -133,9 +135,10 @@ Consider we want to start a new network called **"prod-chain"** with two genesis
 
 ```sh
 $ kwild setup genesis \
-  --validator "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1:1" \
-  --validator "03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1:1" \
-  --chain-id "prod-chain" --out ./prod-chain
+  --validators "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1:1" \
+  --validators "03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1:1" \
+  --leader "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1" \
+  --chain-id "prod-chain" --out ~/prod-chain
 Created genesis.json file at /home/user/prod-chain/genesis.json
 ```
 
