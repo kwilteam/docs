@@ -264,7 +264,7 @@ const res = await kwil.call(body);
 </TabItem>
 </Tabs>
 
-If the view procedure uses a `@caller` [contextual variable](/docs/kuneiform/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view procedure to access the caller's account identifier. The user does not need to sign for view procedures.
+If the view procedure uses a `@caller` [contextual variable](/docs/language/introduction#contextual-variables), you should also pass the `kwilSigner` to the `kwil.call()` method. This will allow the view procedure to access the caller's account identifier. The user does not need to sign for view procedures.
 
 ```javascript
 await kwil.call(body, kwilSigner)
@@ -367,7 +367,12 @@ const res = await kwil.call(body, kwilSigner);
 
 ### Kwil Gateway Authentication
 
-Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures. Learn more about the Kwil Gateway [here](/docs/getting-started/read-access-control#kwil-gateway).
+Kwil Gateway is an optional service on Kwil networks that allows for authenticating users with their signatures for read queries / view procedures.
+Learn more about the Kwil Gateway here.
+
+:::warning
+Advanced read access control is under development. Please check back soon for updates.
+:::
 
 :::tip
 The Kwil Gateway is in private beta.  If you would like access, please [contact](https://discord.com/invite/HzRPZ59Kay/) our team.
@@ -392,4 +397,8 @@ To log out of the Kwil Gateway, you can call the `kwil.auth.logoutKGW()` method.
 await kwil.auth.logoutKGW();
 ```
 
-For advanced authentication usage, see [read access control advanced usage](/docs/getting-started/read-access-control#advanced-usage).
+For advanced authentication usage, see read access control advanced usage.
+
+:::warning
+Advanced read access control is under development. Please check back soon for updates.
+:::
