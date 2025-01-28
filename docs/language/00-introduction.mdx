@@ -1,0 +1,59 @@
+---
+sidebar_position: 0
+sidebar_label: "Introduction"
+id: language-introduction
+title: Introduction
+description: Introduction to Kwil's Database Language
+slug: /language/introduction
+---
+
+Kwil's database language is the world's first SQL Smart Contract language. It is designed to be a powerful, expressive, and secure language
+for building decentralized applications. Kwil's language features a subset of standard SQL, with additional features for building data smart contracts.
+
+## Features
+
+### SQL Compatibility
+
+Kwil's language supports standard SQL syntax, such as `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements. It also supports normal DDL
+statements like `CREATE TABLE`, `CREATE INDEX`, etc. This makes it easy for developers to get started with Kwil, as they can leverage their
+existing SQL knowledge.
+
+There are some features that are not supported in Kwil's language, due to them either being insecure for a smart contract language, or
+simply because they have not been implemented yet. Below is a list of features that are commonly supported in SQL, but are not supported in Kwil:
+- Floating point numbers (only integers and fixed-point decimals are supported)
+- VIEWs (these simply haven't been implemented yet, so if you find yourself wanting these, please let us know!)
+- TRIGGERs (these are not supported because they are insecure for a smart contract language)
+- Stored Procedures (these are not supported because they are insecure for a smart contract language, howevever we do have an "action" feature that is similar)
+- RETURNING clause at the end of an INSERT, UPDATE, or DELETE statement (this simply hasn't been implemented yet, so if you find yourself wanting this, please let us know!)
+
+### Actions
+
+[Actions](/docs/language/actions) are the primary way in which SQL Smart Contracts are defined. They are pre-defined functions that can be executed by end users.
+Since end users likely will not have permissions to execute arbitrary INSERT/UPDATE/DELETE statements against your database,
+they will need to execute pre-defined actions that you have created. Using actions, you can define the SQL statements and associated
+logic that end users can execute.
+
+### Contextual Variables
+
+Kwil's language supports contextual variables, which allows you to access information about the current transaction, such as the sender's wallet address.
+This allows you to build smart contracts that respond to the current transaction, and can enforce rules based on the sender's identity. Contextual variables
+can be referenced using `@` followed by the variable name. For example, to access the caller's wallet address in an INSERT statement, you would do:
+
+```sql
+INSERT INTO table_name (column_name) VALUES (@caller);
+```
+
+A full list of contextual variables can be found below:
+
+| Variable Name | Description |
+|---------------|-------------|
+| `@caller` | The wallet address (text) of the caller of the current transaction, equivalent to Solidity's `msg.sender` |
+| `@txid` | The transaction ID of the current transaction |
+| `@signer` | The wallet address (bytea) that signed the current transaction |
+| `@height` | The block height of the current transaction |
+| `@block_timestamp` | The timestamp of the current block |
+| `@authenticator` | The authenticator of the current transaction |
+
+## Next Steps
+
+To get started with Kwil's language, check out the [Tables](/docs/language/tables) guide to learn how to create and manage tables.
