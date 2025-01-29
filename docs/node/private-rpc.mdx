@@ -12,8 +12,8 @@ network data, facilitating data privacy.
 
 ## Overview 
 
-This RPC service mode requires authenticated call requests, disables ad-hoc SQL
-queries, and omits raw transaction data from transaction status queries.
+This RPC service mode requires authenticated call requests, disables direct SQL
+queries (outside of transactions), and omits raw transaction data from transaction status queries.
 
 :::warning
 
@@ -26,23 +26,23 @@ service makes all data available to any other Kwil node that can reach it.
 
 ## Node Configuration
 
-The `app.private_rpc` setting is used to enable the private RPC mode.  Enable it
+The `rpc.private` setting is used to enable the private RPC mode.  Enable it
 in the `config.toml` file:
 
 ```toml
-[app]
+[rpc]
 
 # Enforce data privacy: authenticate JSON-RPC call requests using challenge-based
 # authentication. the node will only accept JSON-RPC requests that has a valid signed
 # challenge response. This also disables ad hoc queries, and no raw transaction retrieval.
-private_rpc = true
+private = true
 ```
 
 When enabled, `kwild` does the following:
 
 1. "Call" requests must be signed, and contain a challenge provided by the RPC
    service for replay protection.
-2. Ad-hoc SQL queries are disabled.
+2. Ad-hoc SQL queries outside of transactions are disabled.
 3. Transaction status responses omit verbose transaction details that would
    contain the transaction body where any user data may be present.
 
@@ -56,10 +56,10 @@ node [config reference](/docs/daemon/config/settings) for details.
 
 ### Quickstart
 
-To quickly enable private RPC mode, use the `--app.private-rpc` flag when starting `kwild`:
+To quickly enable private RPC mode, use the `--rpc.private` flag when starting `kwild`:
 
 ```shell
-kwild --app.private-rpc
+kwild start --rpc.private
 ```
 
 See the [Node Quickstart](/docs/node/quickstart) guide for more information.
