@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 sidebar_label: "Node Setup"
 id: admin-setup
 title: Node Setup and Configuration Tools
@@ -12,6 +12,7 @@ configuration and data, including:
 
 * performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
 * updating genesis config a hash of the initial database state (`genesis-hash`)
+* generating a new genesis file (`genesis`)
 * resetting node state and all data files (`reset`)
 
 ## Quick Setup of a Single Kwil Node
@@ -24,17 +25,17 @@ For example, to create a node configuration for a new network in a node root
 folder at `~/.kwild-new`:
 
 ```
-$ kwil-admin setup init --root-dir ~/.kwild-new
-Initialized node in /home/user/.kwild-new
+$ kwild setup init --root ~/.kwild-new
+Kwil node configuration generated at /home/jon/.kwild-new
 ```
 
-The above command also generated a new `config.toml` and `private_key` file in
-the node directory.
+The above command generates new `config.toml`, `genesis.json`. and
+`nodekey.json` files in the node's root directory.
 
 Additional nodes may join this new network by specifying the existing node as a
-persistent peer in `kwild`'s configuration and in the validators section of the
-genesis configuration. See [Kwil Daemon Configuration](/docs/category/configuration) for
-more information on node setup.
+bootstrap peer in `kwild`'s configuration, and using the same `genesis.json`
+file. See [Kwil Daemon Configuration](/docs/category/configuration) for more
+information on node setup.
 
 ## Creating a New Test Network of Several Nodes
 
@@ -43,9 +44,8 @@ with the same genesis config, and pre-configured to connect to each other. This
 command has several options:
 
 ```
-kwil-admin setup testnet [--validators V] [--non-validators N] [--config FILE]
-  [--output-dir DIR] [--node-dir-prefix PRE] [--hostname-prefix PRE]
-  [--hostname-suffix SUF] [--starting-ip IP] [--hostnames HOSTNAMES] [--p2p-port PORT]
+kwild setup testnet [--vals/-v V] [--non-vals/-n N] [--out-dir DIR]
+  [--port/-p PORT] [--unique-ports/-u] [--db-owner OWNER]
 ```
 
 There are defaults for each flag, with the output writing to a folder called
@@ -53,13 +53,13 @@ There are defaults for each flag, with the output writing to a folder called
 new test network with 8 total nodes comprising 4 validators and 4 non-validators:
 
 ```
-$ kwil-admin setup testnet -o ~/.kwild-testnet-xyz
-Successfully initialized 3 node directories: /home/jon/.kwild-testnet-xyz
+$ kwild s setup testnet -o ~/.kwild-testnet-xyz
+Generated testnet configuration in .kwild-testnet-xyz
 
 $ tree ~/.kwild-testnet-xyz
 /home/user/.kwild-testnet-xyz
 ├── node0
-│   ├── abci
+│   ├── abci  !!!!!!!!
 │   │   ├── config
 │   │   │   └── genesis.json
 │   │   └── data
@@ -79,7 +79,7 @@ generally only practical for small test networks with fewer than 12 nodes.
 For more information on usage, configurations, and more, use the `--help` flag:
 
 ```
-kwil-admin setup testnet --help
+kwild setup testnet --help
 ```
 
 ## Updating Genesis Config with Initial Postgres Data
@@ -88,7 +88,7 @@ If preparing a network with initial databases, it is required to update the "app
 hash" in `kwild`'s genesis configuration to reflect the initial state of a Postgres database. The syntax is:
 
 ```
-kwil-admin setup genesis-hash [--genesis GENESIS] [--root-dir ROOTDIR] [--snapshot SNAPSHOT] \
+kwild setup genesis-hash [--genesis GENESIS] [--root ROOTDIR] [--snapshot SNAPSHOT] \
   [--dbname DBNAME] [--host HOST] [--port PORT] [--user USER] [--password PASSWORD]
 ```
 
@@ -107,11 +107,11 @@ To delete all of a Kwil node's data files, use the `reset` command.
 only be used to reset disposable test nodes.**
 
 ```
-kwil-admin setup reset [--root-dir DIR] [--force] [--dbname DBNAME] [--host HOST] \
+kwild setup reset [--root DIR] [--force] [--dbname DBNAME] [--host HOST] \
   [--port PORT] [--user USER] [--password PASSWORD]
 ```
 
-This command only requires one: (a) `--root-dir` to specify a node root
+This command only requires one: (a) `--root` to specify a node root
 directory containing the files to reset, or (b) `--force` to automatically reset
 the files in the default node root directory at `~/.kwild`.
 

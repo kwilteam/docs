@@ -102,3 +102,47 @@ pre {
 p {
   font-size: 18px; /* Adjust the size as needed */
 }
+
+.cmd-desc-table table {
+  border-collapse: collapse;
+  font-size: 16px;
+  width: 100%;
+}
+
+.cmd-desc-table tr {
+  line-height: 1.5;
+  height: 28px;
+}
+
+.cmd-desc-table td, .cmd-desc-table th {
+  padding: 4px 8px;
+}
+
+.cmd-desc-table thead, 
+.cmd-desc-table tbody, 
+.cmd-desc-table tr {
+  width: 100%;
+  display: table;
+  table-layout: fixed;
+}
+
+.cmd-desc-table th:first-child, 
+.cmd-desc-table td:first-child {
+  min-width: 120px;
+  max-width: 200px;
+  width: max-content;
+  /*width: 20%;*/
+}
+
+.cmd-desc-table th:last-child, 
+.cmd-desc-table td:last-child {
+  width: auto;
+}
+
+.cmd-desc-table th, 
+.cmd-desc-table td {
+  padding: 4px 8px;
+  text-align: left;
+  width: auto;
+  white-space: nowrap; /* Prevents weird wrapping */
+}
