@@ -24,9 +24,6 @@ kwild setup genesis [flags]
 ### Examples
 
 ```
-# Create a new genesis.json file in the current directory
-kwild setup genesis
-
 # Create a new genesis.json file in a specific directory with a specific chain ID and a validator with 1 power
 kwild setup genesis --out /path/to/directory --chain-id mychainid --validator 890fe7ae9cb1fa6177555d5651e1b8451b4a9c64021c876236c700bc2690ff1d:1
 
@@ -37,17 +34,17 @@ kwild setup genesis --alloc 0x7f5f4552091a69125d5dfcb7b8c2659029395bdf:100
 ### Options
 
 ```
-      --allocs strings            address and initial balance allocation(s)
+      --alloc strings             address and initial balance allocation(s) in the format id#keyType:amount
       --chain-id string           chainID for the genesis.json file
       --db-owner string           owner of the database
       --genesis-snapshot string   path to genesis state snapshot file
   -h, --help                      help for genesis
-      --join-expiry int           Number of blocks before a join proposal expires
+      --join-expiry duration      Number of blocks before a join proposal expires
       --leader string             public key of the block proposer
       --max-block-size int        maximum block size
       --max-votes-per-tx int      Maximum votes per transaction
-      --out string                Output directory for the genesis.json file
-      --validators strings        public key, keyType and power of initial validator(s)
+      --out genesis.json          Output directory for the genesis.json file. The file will be named genesis.json.
+      --validator strings         public key, keyType and power of initial validator(s), may be specified multiple times
       --with-gas                  include gas costs in the genesis.json file
 ```
 

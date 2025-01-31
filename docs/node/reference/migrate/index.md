@@ -23,8 +23,8 @@ The `migrate` commands provide functions for managing network migration proposal
       --output string         the format for command output - either 'text' or 'json' (default "text")
       --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
   -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
-      --tlscert string        kwild's TLS client certificate file for server to authenticate us (default "auth.cert")
-      --tlskey string         kwild's TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+      --tlscert string        TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
 ```
 
 ### Options inherited from parent commands
