@@ -29,7 +29,13 @@ A peer is always specified in the format `<public key>#<key type>@<IP address>:<
 key `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb` and key type `secp256k1` that is reachable at IP address `10.1.2.3`
 on TCP port `6600`, the notation used to specify this node as a peer is `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb#secp256k1@10.1.2.3:6600`.
 
-:::tip
+:::note
+Since Kwil supports multiple node key types, and DB user addresses are in their own
+formats that may be defined by extensions, such as checksummed Ethereum
+addresses, we use this explicit public-key notation for Nodes rather than
+another address node format for clarity and simplicity. This may change in the future.
+:::
+
 An operator can determine their node ID in different ways:
 
 1. Use the `kwild key info` command, which derives and displays the node ID given the private key.
@@ -38,7 +44,6 @@ An operator can determine their node ID in different ways:
 
 The node's public key is also displayed when the private key is initially generated with the `kwild key gen` subcommand.
 
-:::
 
 ### Peer Exchange
 
