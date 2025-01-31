@@ -11,9 +11,10 @@ The `setup` command provides functions for creating and managing node
 configuration and data, including:
 
 * performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
-* updating genesis config a hash of the initial database state (`genesis-hash`)
-* generating a new genesis file (`genesis`)
 * resetting node state and all data files (`reset`)
+* generating just a new genesis file (`genesis`)
+
+<>{/* updating genesis config a hash of the initial database state (`genesis-hash`)*/}</>
 
 ## Quick Setup of a Single Kwil Node
 
@@ -50,7 +51,7 @@ kwild setup testnet [--vals/-v V] [--non-vals/-n N] [--out-dir DIR]
 
 There are defaults for each flag, with the output writing to a folder called
 `.testnet` in the current folder.  For example, the following command creates a
-new test network with 8 total nodes comprising 4 validators and 4 non-validators:
+new test network with 3 total nodes, all of which are validators:
 
 ```
 $ kwild s setup testnet -o ~/.kwild-testnet-xyz
@@ -59,17 +60,17 @@ Generated testnet configuration in .kwild-testnet-xyz
 $ tree ~/.kwild-testnet-xyz
 /home/user/.kwild-testnet-xyz
 ├── node0
-│   ├── abci  !!!!!!!!
-│   │   ├── config
-│   │   │   └── genesis.json
-│   │   └── data
 │   ├── config.toml
-│   └── private_key
+│   ├── genesis.json
+│   └── nodekey.json
 ├── node1
-│   ├── abci
-│   │   ├── config
-│   │   │   └── genesis.json
-...
+│   ├── config.toml
+│   ├── genesis.json
+│   └── nodekey.json
+└── node2
+    ├── config.toml
+    ├── genesis.json
+    └── nodekey.json
 ```
 
 The config files for each of the nodes will specify all of the other nodes as
@@ -81,23 +82,6 @@ For more information on usage, configurations, and more, use the `--help` flag:
 ```
 kwild setup testnet --help
 ```
-
-## Updating Genesis Config with Initial Postgres Data
-
-If preparing a network with initial databases, it is required to update the "app
-hash" in `kwild`'s genesis configuration to reflect the initial state of a Postgres database. The syntax is:
-
-```
-kwild setup genesis-hash [--genesis GENESIS] [--root ROOTDIR] [--snapshot SNAPSHOT] \
-  [--dbname DBNAME] [--host HOST] [--port PORT] [--user USER] [--password PASSWORD]
-```
-
-Both inputs are optional, using default paths. `GENESIS` is the path to the
-genesis file to patch, which is `~/.kwild/abci/config/genesis.json` by default.
-The `ROOTDIR` argument is the root directory of a node, which is `~/.kwild` by
-default. Alternatively, configurations for a Postgres connection can be provided,
-or a path to a snapshot file can be specified.
-Use the `--help` flag for more information.
 
 ## Resetting All Application Data
 
@@ -117,3 +101,14 @@ the files in the default node root directory at `~/.kwild`.
 
 Extra Postgres configurations can be provided if needed, but the command will attempt
 to connect using the configurations in the `config.toml` file in the node root.
+
+## Generating a Genesis File
+
+A less common operation provided by the `setup genesis` command is the ability
+to generate a new genesis file without creating a root directory (as with `setup init`)
+or multiple root directories for a testnet (as with `setup testnet`). This is of use in the following case:
+
+1. When you already have a node private key and config file and want to create a genesis file for a new network. This scenario is described in the [Production Guide](/docs/node/production-guide#creating-a-genesis-file).
+2. When you want to prepare a genesis file to provide to the `setup init` command with the `--genesis` flag, as when preparing for a network migration, as described in the [Migration Tutorial](/docs/node/migrations/zero-downtime-migrations/tutorial#setting-up-the-new-nodes).
+
+Please see the above links for more information on this command.

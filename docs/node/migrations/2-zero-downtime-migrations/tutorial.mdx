@@ -2,7 +2,7 @@
 sidebar_position: 3
 sidebar_label: "Tutorial"
 id: zero-downtime-migrations-tutorial
-title: Tutorial
+title: Migration Tutorial
 description: "Tutorial on how to upgrade a network using zero-downtime migrations"
 slug: /node/migrations/zero-downtime-migrations/tutorial
 ---
@@ -25,7 +25,7 @@ gives node operators time to set up their new nodes. We will use 100 blocks in t
 2000 blocks in this example.
 
 ```shell
-kwil-admin migrate propose --activation-period 100 --duration 2000
+kwild migrate propose --activation-period 100 --duration 2000
 ```
 
 To ensure that the proposal was submitted successfully, you can check the list of pending migration proposals:
@@ -34,7 +34,7 @@ To ensure that the proposal was submitted successfully, you can check the list o
 # NOTE: If you are running a single node network, you won't see any migrations in this list.
 # Proposed migrationa are automatically approved by the authoring validator. Therefore if
 # you are the only validator, the migration is automatically approved.
-$ kwil-admin migrate proposals
+$ kwild migrate proposals
 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e:
         activationPeriod: 100
         migrationDuration: 2000
@@ -46,14 +46,14 @@ Now that the migration proposal exists, >2/3 of the validators need to approve i
 the migration proposal. The command requires the proposal ID as an argument. In this example, the proposal ID is `4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e`.
 
 ```shell
-kwil-admin migrate approve 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+kwild migrate approve 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
 ```
 
 To see which validators have already approved a proposal, and which have not, you can use the `kwil-admin migrate proposal-status` command. This command also requires
 the proposal ID as an argument.
 
 ```shell
-$ kwil-admin migrate proposal-status 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
+$ kwild migrate proposal-status 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
 Migration Status:
         Proposal ID: 4b0d1ad8-f9a5-5252-97e6-387d47b1ee9e
         ExpiresAt: 100810
@@ -65,10 +65,10 @@ Migration Status:
 ```
 
 Once the migration has been approved by >2/3 of the validators, the activation period will begin. You can check its status using the
-`kwil-admin migrate status` command:
+`kwild migrate status` command:
 
 ```shell
-$ kwil-admin migrate status
+$ kwild migrate status
 Migration Status: ActivationPeriod
         Start Height: 80000
         End Height: 82000
@@ -79,17 +79,20 @@ Migration Status: ActivationPeriod
 
 Once the activation period has begun, node operators can start setting up their new nodes. This will require you to create and distributes a new genesis file
 for the new network. Each node will complete the genesis file with the genesis state, validator set, initial height, and other information once the activation
-period has ended. Use the `kwil-admin setup genesis` command to create a genesis file that can be used with migrations. This will be generated at `./genesis.json`.
+period has ended.
+
+**One** operator or network planner will use the `kwil-admin setup genesis` command to create a genesis file that can be used with migrations. This will be generated at `./genesis.json`.
 
 ```shell
-kwil-admin setup genesis --chain-id kwil-chain-2
+kwild setup genesis --chain-id kwil-chain-2
 ```
 
-To set up our new node, use the `kwil-admin setup init` command with the new genesis file. Each node operator will need to run this command on their new node.
+To set up our new node, use the `kwild setup init` command with the new genesis file.
+**Each** node operator will need to run this command on their new node.
 **New nodes should be run on a different machine than the old node.**
 
 ```shell
-kwil-admin setup init --genesis /path/to/genesis.json
+kwild setup init --genesis /path/to/genesis.json
 ```
 
 Run the migration node, and point it at the RPC endpoint of the old node. The new node will use this RPC endpoint to sync data from the old network.
@@ -113,18 +116,18 @@ To verify that a node is running in migration mode, search for a log resembling 
 
 ### Verify The New Network Is Syncing
 
-To verify that the new network is syncing changes from the old network, you can use the `kwil-admin migrate status` command. When used on the old node,
+To verify that the new network is syncing changes from the old network, you can use the `kwild migrate status` command. When used on the old node,
 this command will tell you whether the network is still replicating changes to the new network, or if it has reached the end height and stopped accepting transactions.
 If the new network is syncing, you will see a message like the following:
 
 ```shell
-$ kwil-admin migrate status
+$ kwild migrate status
 Genesis migration in progress.
 ```
 
 Once the new network has finished syncing, you will see a message like the following:
 
 ```shell
-$ kwil-admin migrate status
+$ kwild migrate status
 Genesis migration complete. No active migration on the network.
 ```

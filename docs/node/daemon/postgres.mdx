@@ -171,13 +171,13 @@ Depending on `kwild` configuration, is may be necessary to create a `postgres`
 
 The relevant `kwild` settings are:
 
-- `app.pg-db-host` is the host name for the `postgres` server. Default is
+- `db.host` is the host name for the `postgres` server. Default is
   127.0.0.1, but may also be a path to a UNIX socket such as `/var/run/postgresql`.
   Most PostgreSQL packages are configured to listen on both by default.
-- `app.pg-db-port` is the TCP port for the `postgres` server. Default is 5432.
-  This setting is ignored if a UNIX socket is used for `app.pg-db-host`.
-- `app.pg-db-user` is the name of the role (like a user). Default is `kwild`.
-- `app.pg-db-pass` is the password for the role specified by `app.pg-db-user`.
+- `db.port` is the TCP port for the `postgres` server. Default is 5432.
+  This setting is ignored if a UNIX socket is used for `db.host`.
+- `db.user` is the name of the role (like a user). Default is `kwild`.
+- `db.pass` is the password for the role specified by `db.user`.
   Default is unset. Required if a password is set for the role, and not using
   "trust" authentication.
 
