@@ -1,20 +1,24 @@
 ---
-sidebar_position: 4
-sidebar_label: "Using kwild"
+sidebar_position: 1
+sidebar_label: "Introduction to kwild"
 id: daemon-kwild
 title: Running a Kwil Node
 description: How to deploy a Kwil node using kwild
 slug: /daemon/kwild
 ---
 
-The `kwild` application has commands to start a blockchain node with the database services of Kwil. It also includes commands to manage the node's configuration and data.
+The `kwild` application runs the blockchain node, which provides the database
+services of Kwil. It also includes commands to manage the node's configuration
+and data.
 
-This page introduces important configuration concepts, and links to other other documentation pages to describe specific use cases.
+This page introduces important configuration concepts, and links to other other
+documentation pages to describe specific use cases.
 
 ## Requirements
 
-The `kwild` commands on this page assume you have configured a PostgreSQL host
-as described in [Installation](/docs/daemon/installation).
+Running `kwild` requires a configured PostgreSQL host as described in
+[Installation](/docs/daemon/installation). Before running `kwild`, follow the
+instructions to install the application and configure PostgreSQL.
 
 ## Commands
 
@@ -22,7 +26,7 @@ The Kwil node is started with the `kwild start` command.  All other commands, wh
 
 ## Root Directory
 
-This is the default directory to store all the configuration and data such as blockchain data, SQL database data, signed messages, etc, unless specified otherwise. The default root directory is `~/.kwild`. You can override this configuration by setting the `KWILD_ROOT` environment variable or using the `--root` command line flag.
+The "root" directory is a file system path used to store all the configuration and data such as blockchain data, SQL database data, signed messages, etc, unless specified otherwise. The default root directory is `~/.kwild`. You can override this configuration by setting the `KWILD_ROOT` environment variable or using the `--root` command line flag.
 
 ## Configuration Files
 
