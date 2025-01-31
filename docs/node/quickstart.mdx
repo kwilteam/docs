@@ -17,8 +17,8 @@ or the [Production Deployment guide](/docs/node/production).
 
 Ensure that you have the following prerequisites installed:
 
-- [Docker](<https://docs.docker.com/get-docker/>)
-- [`kwild`](<https://github.com/kwilteam/kwil-db/releases>)
+- [Docker](https://docs.docker.com/get-started/get-docker/)
+- [`kwild`](https://github.com/kwilteam/kwil-db/releases)
 - An Ethereum address that can be designated as the database's owner
 
 ## Installation
@@ -52,7 +52,7 @@ kwild start --autogen --db-owner <YOUR_ETHEREUM_ADDRESS>
 :::note
 The `--autogen` flag generates a random chain ID, which is the network's identity, as well as a new initial validator private key.
 The node will be the one initial validator.
-As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set.
+As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set. See the [Production Guide](/docs/node/production) page for more information.
 :::
 
 ### Cleanup

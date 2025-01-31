@@ -22,24 +22,29 @@ There are several important concepts to understand when creating a network of in
 
 ### Peers and Node IDs
 
-Every Kwil node has a "node ID" that is includes the node's public key and network address. This plays an important role creating secure authenticated connections
-between nodes over the internet.
+Every Kwil node has a "node ID" that is includes the node's public key and
+network address. This plays an important role creating secure authenticated
+connections between nodes over the internet.
 
 A peer is always specified in the format `<public key>#<key type>@<IP address>:<port>`.  For example, given a node with public
 key `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb` and key type `secp256k1` that is reachable at IP address `10.1.2.3`
 on TCP port `6600`, the notation used to specify this node as a peer is `02977e1f9bcec8c1b1905cf45cc5cfcfbabf9ca579d42d1b1a228e9b0f1c6adecb#secp256k1@10.1.2.3:6600`.
 
 :::note
-Since Kwil supports multiple node key types, and DB user addresses are in their own
-formats that may be defined by extensions, such as checksummed Ethereum
-addresses, we use this explicit public-key notation for Nodes rather than
-another address node format for clarity and simplicity. This may change in the future.
+
+Unlike node IDs, which are used to secure P2P node communication, Kwil DB user
+addresses are in their own formats, such as checksummed Ethereum addresses, to
+support native integration with web3 wallets for database access control and
+user identification. The set of supported P2P key types is also different from
+the types of user addresses supported, so an explicit public key format is
+used for peers.
+
 :::
 
 An operator can determine their node ID in different ways:
 
 1. Use the `kwild key info` command, which derives and displays the node ID given the private key.
-2. Use the `kwild admin status` command, which requests the node ID from the running node's admin RPC service.
+2. Use the `kwild admin status` command, which retrieves the public key and its type from the running node's admin RPC service.
 3. Locate the node ID in the node logs. An info-level log entry with the message "NODE: This node is" contains the node identity (public key and key type) and all listening addresses
 
 The node's public key is also displayed when the private key is initially generated with the `kwild key gen` subcommand.
@@ -53,22 +58,27 @@ setting. Disable this setting only if a node must not share its peers with other
 
 ### Network Bootstrapping
 
-There are two supported ways of bootstapping a node's connection to a network: specifying a "seed" node and "persistent" peers. Both may be used
-in conjunction with [PEX](#peer-exchange). These are described below.
+The `p2p.bootnodes` setting specifies a list of peers to connect to on startup.
+This is useful for bootstrapping a new node, especially when used in conjunction
+with [PEX](#peer-exchange). To specify two remote peers to always connect to on
+startup, list them as follows:
 
-#### Boot Nodes
-
-The simplest method, particularly for a small new network, is to list known peers to which the node should always attempt to connect. This is done
-using the peer notation described above.
-
-For example, to specify two remote peers to always connect to on startup, list them as follows:
+<div className="wrapcode">
 
 ```toml
 [p2p]
 bootnodes = "02ae12856a766c277842e1319fd7e450711b706ef90942e8ad5be9369e5d22817c#secp256k1@10.1.2.3:6600,02cace485e891cb5e5bd22b008986980791677f9f553fd3bb3f864e6b84e011cdb#secp256k1@10.6.7.8:6600"
 ```
 
-This may also be specified on the command line with the `--p2p.bootnodes` option, which may be specified multiple times for each peer rather than a comma-separated list.
+</div>
+
+This may also be specified on the command line with the `--p2p.bootnodes` option, which may be specified multiple times for each peer rather than a comma-separated list. For example:
+
+```sh
+kwild start \
+  --p2p.bootnodes 02ae12856a766c277842e1319fd7e450711b706ef90942e8ad5be9369e5d22817c#secp256k1@10.1.2.3:6600 \
+  --p2p.bootnodes 02cace485e891cb5e5bd22b008986980791677f9f553fd3bb3f864e6b84e011cdb#secp256k1@10.6.7.8:6600
+```
 
 ### Validators
 
@@ -103,19 +113,19 @@ Securely generate and store private keys. Anyone in possession of a private key 
 validator, this impacts the security of the network.
 :::
 
-Every node has a unique identity, which is determined by its private key. We will generate a private key using the `kwild key gen` command:
+Every node has a unique identity, which is determined by its private key. We will generate a private key using the `kwild key gen` command on the `node0` host machine:
 
 ```sh
-kwild key gen --key-file ./nodekey.json
+[node0]:~$ kwild key gen --key-file ~/nodekey.json
 ```
 
-This will write a file named `nodekey.json` in the current directory that contains the ed25519 private key for a new node. Each node **must**
-have a different private key.
+This will write a file named `nodekey.json` that contains the ed25519 private key for the new node into the user's home directory. Each node **must**
+have a different private key. This command should be run **independently** by each validator operator.
 
 We can inspect the key using the `kwild key info` command as follows:
 
 ```sh
-$ kwild key info --key-file ./nodekey.json
+[node0]:~$ kwild key info --key-file ~/nodekey.json
 Key type: secp256k1
 Private key (hex): da1ad3ad3e80d200ff66beb6515360337f6e61f14ce958e5bda717fef5aad9f5
 Public key (plain hex): 02d3575f74ffcdb17f781f003d42284a4d1adf271558d0417423b8372ec3f34750
@@ -139,7 +149,7 @@ we will create a genesis file with the `kwild setup genesis` command. This takes
 Consider we want to start a new network called **"prod-chain"** with two genesis validators:
 
 ```sh
-$ kwild setup genesis \
+[organizer]:~$ kwild setup genesis \
   --validator "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1:1" \
   --validator "03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1:1" \
   --leader "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1" \
@@ -186,51 +196,47 @@ Provide this **same** `genesis.json` file to all node operators. The genesis fil
 
 #### Node Configuration
 
-Unlike `genesis.json`, which contains network-wide settings, the `config.toml` file is used to configure a Kwil node for its own purpose and network configuration. Create the `config.toml` file for each node separately, setting the listen addresses, external address, persistent peers, and seeds as appropriate for the node.
+Unlike `genesis.json`, which contains network-wide settings, the `config.toml` file is used to configure a Kwil node for its own purpose and network configuration. Use the `kwild setup init` command to create the `config.toml` file for each node separately, setting the listen addresses, external address, persistent peers, and seeds as appropriate for the node.
 
-The `kwild setup init` command is used to initialize a node's "root" directory, which by default is `~/.kwild`. We will use the agreed upon genesis file using the `--genesis` flag. Since these are genesis validators, we must also copy the `nodekey.json` file that we manually generated for each node above into the created root directory (rather than the private key that is generated by the `setup init` command). Other nodes that are not validators specified in `genesis.json` may use the private key that is generated by the `setup init` command.
+The `kwild setup init` command initializes a node's "root" directory, which by default is `~/.kwild`. We will use the agreed upon genesis file using the `--genesis` flag. Since these are genesis validators, we also use the `--key-file` flag to specify the `nodekey.json` file that was generated above on each node. Other nodes that are not genesis validators may allow `setup init` to generate a new key by omitting this flag.
 
 Consider we have prepared the keys and addresses for the two nodes described above as follows:
 
-| Node     | IP Address    | Node ID    |
+|          | IP Address    | Node ID    |
 |----------|---------------|------------|
 | `node0`  | `23.45.67.89` | `0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1` |
 | `node1`  | `98.76.54.32` | `03b0eedfb09ac1e19fa6f5eb1d5ade53c120ef32d988e60bb40ab08133b573ba30#secp256k1` |
 
 To have them connect to each other, we will set their `p2p.bootnodes` settings appropriately.
 
-On `node0`, we can initialize the root directory and the `config.toml` there with the following command:
+On `node0`, we can initialize the root directory and the `config.toml` there with the following command, specifying the path to the key file that was generated on this machine:
 
 ```sh title="node0"
 [node0]:~$ kwild setup init --genesis prod-chain/genesis.json \
-  --root /data/kwil-node0
+  --root /data/kwil-node0 --key-file ~/nodekey.json
 Kwil node configuration generated successfully at: /data/kwil-node0
 ```
-
-Then copy the `nodekey.json` file created previously for this node into the root directory.
 
 On `node1`, do the same, but with `node0` as a bootnode
 
 ```sh title="node1"
 [node1]:~$ kwild setup init --genesis prod-chain/genesis.json \
   --p2p.bootnodes "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1@23.45.67.89:6600" \
-  --root /data/kwil-node1
+  --root /data/kwil-node1  --key-file ~/nodekey.json
 Kwil node configuration generated successfully at: /data/kwil-node1
 ```
 
-Finally, copy this node's `nodekey.json` file into the root directory.
-
 #### Initial Startup and Block Production
 
-Now that both of the validators have been prepared with the same `genesis.json` file and their persistent peer configurations pointing to each other, it is time to start the nodes.
+Now that both of the validators have been prepared with the same `genesis.json` file, and with `node1`'s boot peer configuration pointing to `node0`, it is time to start the nodes.
 
 :::tip
 Depending on how the nodes are deployed, `kwild` would be run as a service, container, or in a terminal multiplexer.
 :::
 
-##### Postgres Database
+##### PostgreSQL Database
 
-Install Postgres create a `kwild` database on each node. Refer to the [Postgres setup guide](/docs/daemon/running-postgres) for more information and quick start instructions.
+On each node, install PostgreSQL and create a `kwild` database. Refer to the [Postgres setup guide](/docs/daemon/running-postgres) for more information and quick start instructions.
 
 ##### Start Kwild
 
@@ -247,8 +253,7 @@ Start the nodes on each of the remote machines, specifying the path to the root 
 Once the nodes connect, the first block will be produced shortly after:
 
 ```plain
-2025-01-27 18:46:01.558 [INF] CONS: Executed block {height=1 blkID=31b73d85af0ece994263f8b9622f31425c116ea34a5ddd0113535e6b34b4de90 numTxs=0 appHash=2d8f3ceeff2c836527da823d7b654d33d3e44b6159b172235c160001e0c9b4db}
-2025-01-27 18:46:01.559 [INF] CONS: Majority of the validators have accepted the block, proceeding to commit the block {height=1 hash=31b73d85af0ece994263f8b9622f31425c116ea34a5ddd0113535e6b34b4de90 acks=1 nacks=0}
+2025-01-31 17:21:29.992 [INF] CONS: Committed Block {height=1 hash=6dc4f373a39fba30db5c167a328320d735ba62e9e8ca5ef878e31142de50a1eb appHash=2d8f3ceeff2c836527da823d7b654d33d3e44b6159b172235c160001e0c9b4db updates=null}
 ```
 
 Recall that *both* of the validators need to be started and able to communicate before blocks can be created, as discussed in the
@@ -278,15 +283,17 @@ peers. However, we will use the generated private key:
 [node2]:~$ kwild setup init --genesis prod-chain/genesis.json \
   --p2p.bootnodes "0277fb40d1b745c8f96f411ab57915e2df3bc86efde70f0e687f4273beb6708b82#secp256k1@23.45.67.89:6600" \
   --root /data/kwil-node2
-Initialized node in /data/kwil-node2
+Kwil node configuration generated at /data/kwil-node2
 ```
 
 We can see the ID of `node2` before starting it:
 
 ```sh title="node2"
-[node2]:~$ kwild key info --key-file /data/kwil-node2/private_key | grep "Node ID"
+[node2]:~$ kwild key info --key-file /data/kwil-node2/nodekey.json | grep "Node ID"
 Node ID: 03dbe22b9922b5c0f8f60c230446feaa1c132a93caa9dae83b5d4fab16c3404a22#secp256k1
 ```
+
+Start `node2` using the `kwild start -r /data/kwil-node2` command.
 
 #### Verifying Successful Node Synchronization
 
@@ -295,7 +302,7 @@ Before adding the node as a validator, ensure that `node2` has completely synchr
 Using `kwild admin status`, inspect the `.sync.best_block_height` and `.sync.syncing` values:
 
 ```sh title="node2"
-[node2]:~$ kwild node status
+[node2]:~$ kwild admin status
 {
   "node": {
     "chain_id": "kwil-test-chain",
