@@ -1,0 +1,92 @@
+---
+sidebar_position: 1
+sidebar_label: "Usage"
+id: admin-use
+title: Using the Kwil Administrative Commands
+description: How to use the Kwil admin commands
+slug: /admin/usage
+---
+
+`kwild` provides several functions for node setup and administration that
+are accessible through sub-commands.
+
+Running `kwild` with no arguments or the `--help`/`-h` flag will display the available commands.
+The available commands are summarized below.
+
+<div className="cmd-desc-table">
+
+| Command     | Description                                           |
+|-------------|-------------------------------------------------------|
+| `admin`     | Administrative commands using the secure admin RPC service |
+| `block`     | Leader block execution commands                      |
+| `consensus` | Functions for dealing with consensus update proposals |
+| `help`      | Help about any command                               |
+| `key`       | Tools for private key generation and inspection      |
+| `migrate`   | Management of migration proposals                    |
+| `print-config` | Print the node configuration                     |
+| `seed`      | Run a network seeder                                |
+| `setup`     | Tools for creating and managing node configuration and data |
+| `snapshot`  | Snapshot related actions                             |
+| `start`     | Start the node                                       |
+| `utils`     | Miscellaneous utility commands                      |
+| `validators` | Validator related actions                          |
+| `version`   | Display the application version                     |
+| `whitelist` | Manage a node's peer whitelist                      |
+
+</div>
+
+Many commands contain sub-commands. For example, to list the `key` sub-commands:
+
+```
+$ kwild key
+The 'key' command provides subcommands for private key generation and inspection. These are the
+private keys that identify the node on the network and provide validator transaction signing
+capability.
+
+Usage:
+  kwild key [command]
+
+Available Commands:
+  gen         Generate a private key for validator use.
+  info        Display information about a private key.
+
+Flags:
+  -h, --help            help for key
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+
+Global Flags:
+  -r, --root string   root directory (default "/home/user/.kwild")
+
+Use "kwild key [command] --help" for more information about a command.
+```
+
+To see usage of the `key info` sub command:
+
+```
+$ kwild key info -h
+Display information about a private key.
+
+The private key can either be passed as a key file path, or as a hex-encoded string.
+
+Usage:
+  kwild key info [flags]
+
+Examples:
+# Using a key file
+kwild key info --key-file ~/.kwild/nodekey.json
+
+# Using a hex-encoded string
+kwild key info 381d28cf348c9efbf7d26ea54b647e2cb646d3b98cdeec0f1053a5ff599a036a0aa381bd4aad1670a39977d5416bfac7bd060765adc58a4bb16bbbafeefbae34
+
+Flags:
+  -h, --help              help for info
+  -o, --key-file string   file containing the private key to display
+
+Global Flags:
+      --output string   the format for command output - either 'text' or 'json' (default "text")
+  -r, --root string     root directory (default "/home/user/.kwild")
+```
+
+The following sections will describe each of the commands provided by
+`kwild`. Always reference the syntax and full set of options shown by
+appending the `-h` (or `--help`) flag to the full command in question.

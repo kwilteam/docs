@@ -9,9 +9,9 @@ slug: /node/tutorial
 
 In this tutorial, we will:
 
-1. Create a node and start a new network;
-2. Create a second node and configure it to join the network;
-3. Add the second node to the network as a non-validating peer;
+1. Create a node and start a new network.
+2. Create a second node and configure it to join the network.
+3. Add the second node to the network as a non-validating peer.
 4. Upgrade the second node to a validator.
 
 :::tip
@@ -23,7 +23,7 @@ as well as have [`docker`](<https://docs.docker.com/engine/install/>) installed.
 
 ### Creating The Node's Files
 
-To create the node's configuration files, a new `genesis.json`, and a new keypair, we will use the `kwild setup` command:
+To create the node's configuration files, a new `genesis.json`, and a new key pairs, we will use the `kwild setup` command:
 
 ```shell
 kwild setup init --root ./testnet/node0 --db-owner <YOUR_ETHEREUM_ADDRESS>
@@ -98,7 +98,7 @@ Using `kwild` to create the second node's directories and configs, we can specif
 peers that it should try to connect to when starting up. Since both nodes are running locally, we need to specify
 new addresses for the different endpoints, so that the second node does not conflict with the first node:
 
-**Ensure that you replace `02e804dfd8e28cbd791fd3439149b909e5300d7b7cc6cbd0e94e2178e7ed21e120` with your own node's ID.**
+**Ensure that you replace `02e804dfd8e28cbd791fd3439149b909e5300d7b7cc6cbd0e94e2178e7ed21e120` with your own node's ID obtained from the `kwild admin status` command above.**
 
 ```shell
 kwild setup init --root ./testnet/node1 --genesis ./testnet/node0/genesis.json \
@@ -118,7 +118,7 @@ docker run -d -p 5431:5432 --name kwil-postgres-1 -e "POSTGRES_HOST_AUTH_METHOD=
 kwild start --root=./testnet/node1 --db.port 5431
 ```
 
-If done correctly, you should be able to see the second node's logs, and it should be able to read the network logs.
+If done correctly, you should be able to see the second node's logs, where it will have completed block synchronization with the first node. The first node's logs should also show that it has a new peer.
 
 ## Upgrading The Second Node To A Validator
 
@@ -146,20 +146,24 @@ Pending join requests (1 approval needed):
 +--------------------------------------------------------------------------------+-------+-----------+-------------------------------+
 | '0385480e6c66e9c98e05a4d7dd597a096058b918a0bac4e337c25363be649e484b#secp256k1' |     1 |         0 | 2025-01-28 14:42:10 -0600 CST |
 ```
-*<!-- (this line is not seen by users) The Candidate is usually not wrapped in quotes, but doing so formats it nicer in Docusaurus-->*
+<>{/* (this line is not seen by users) The Candidate is usually not wrapped in quotes, but doing so formats it nicer in Docusaurus*/}</>
 
 ### Approving The Request
 
 The first node can vote to approve the second node by running the `kwild validators approve` command and passing the second node's public key:
 
 ```shell
-kwild validators approve <node_pubkey> \
-  --rpcserver /tmp/node0.sock
+kwild validators approve <node_pubkey> --rpcserver /tmp/node0.sock
 ```
+
+For example, with second node above, `<node_pubkey>` would be `0385480e6c66e9c98e05a4d7dd597a096058b918a0bac4e337c25363be649e484b#secp256k1`.
 
 :::tip
 If the requesting node's public key is unknown, all pending requests and their public keys can be retrieved with the `kwild validators list-join-requests` command.
 :::
+
+The `validators approve` command will return a transaction hash of the approval transaction.
+When the transaction is included in a block, the second node will be promoted to a validator.
 
 And that's it! The second node should now be a validator on the network.  To verify this, we can use `kwild validators list` to get the list of validators:
 
@@ -171,6 +175,8 @@ $ kwild validators list --rpcserver /tmp/node0.sock
 | '0385480e6c66e9c98e05a4d7dd597a096058b918a0bac4e337c25363be649e484b#secp256k1' |     1 |
 ```
 
+The logs for the second node should also show that it has been promoted to a validator: `[INF] CONS: Role updated {from=sentry to=validator}`.
+
 ## Cleanup
 
 If you wish to reset this tutorial, you will need to stop the nodes and Postgres containers, remove the `testnet` directory, and remove the Postgres container:
@@ -178,13 +184,8 @@ If you wish to reset this tutorial, you will need to stop the nodes and Postgres
 ```shell
 # Stop the nodes using Ctrl+C
 
-# Stop the Postgres containers
-docker stop kwil-postgres
-docker stop kwil-postgres-1
-
-# Remove the Postgres containers
-docker rm kwil-postgres
-docker rm kwil-postgres-1
+# Stop and remove the Postgres containers and their volumes
+docker rm -f -v kwil-postgres kwil-postgres-1
 
 # Remove the testnet directory
 rm -rf ./testnet
@@ -194,7 +195,7 @@ rm -rf ./testnet
 
 In this tutorial, we have:
 
-1. Created a node and started a network;
-2. Created a second node and configured it to join the network;
-3. Added the second node to the network as a non-validating peer;
-4. Upgraded the second node to a validator.
+1. Created a node and started a network.
+2. Created a second node and configured it to join the network.
+3. Added the second node to the network as a non-validating peer.
+4. Promoted the second node to a validator.

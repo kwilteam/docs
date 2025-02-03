@@ -7,162 +7,109 @@ description: Genesis specification
 slug: /daemon/config/genesis
 ---
 
-A genesis file defines the initial state and parameters needed to bootstrap a new blockchain network. It serves as the starting point for the entire blockchain system by defining key aspects of the network, including its initial validators, initial height, consensus rules, and more. All the nodes in the network need to have the same genesis file to start with the same initial conditions. Any discrepancies or errors in the genesis file could prohibit the node from joining the network or producing blocks.
+## Genesis File
 
-## Minimal Configuration
+The genesis file defines the initial state and parameters needed to bootstrap a
+new blockchain network. It serves as the starting point for the entire
+blockchain by configuring key aspects of the network, including its initial
+validators, the DB administrator, initial height, and other consensus
+parameters.
 
-Below is a sample `genesis.json` file featuring a basic configuration:
+All the nodes in the network **must** have the same genesis file to start with
+the same initial conditions. Any discrepancies or errors in the genesis file
+could prohibit the node from joining the network or producing blocks.
 
-```json title="sample genesis.json file"
+## Example
+
+Below is an example `genesis.json` file featuring a basic configuration:
+
+```json title="example genesis.json file"
 {
-  "genesis_time": "2024-09-10T22:20:11.75149Z",
-  "chain_id": "kwil-chain-YLyVNOKZ",
-  "initial_height": 1,
-  "consensus_params": {
-    "block": {
-      "max_bytes": 6291456,
-      "max_gas": -1,
-      "abci_max_bytes": false
-    },
-    "evidence": {
-      "max_age_num_blocks": 100000,
-      "max_age_duration": 172800000000000,
-      "max_bytes": 1048576
-    },
-    "validator": {
-      "pub_key_types": [
-        "ed25519"
-      ],
-      "join_expiry": 14400
-    },
-    "votes": {
-      "vote_expiry": 14400,
-      "max_votes_per_tx": 100
+  "chain_id": "kwil-testnet",
+  "initial_height": 0,
+  "app_hash": null,
+  "db_owner": "0xE0f13c95225F34f86E99f83984e286dcaF321E37",
+  "alloc": [
+    {
+      "id": "0xDC18F4993e93b50486e3e54e27d91D57cEE1dA07",
+      "key_type": "secp256k1",
+      "amount": 1234567890000000000000
     }
-  },
+  ],
   "validators": [
     {
-      "pub_key": "45a41991ce11839115e5a47d70c6589de28eea8780295a251ea16b62ec1accdd",
-      "power": 1,
-      "name": "validator-0"
+      "pubkey": "0226b3ff29216dac187cea393f8af685ad419ac9644e55dce83d145c8b1af213bd",
+      "type": "secp256k1",
+      "power": 1
+    },
+    {
+      "pubkey": "02c57268fc884fa88425c7e5c19d3af263d1c64dd8b8f3f8c0fb31bb622d1fdab8",
+      "type": "secp256k1",
+      "power": 1
     }
-  ]
+  ],
+  "leader": {
+    "type": "secp256k1",
+    "key": "0226b3ff29216dac187cea393f8af685ad419ac9644e55dce83d145c8b1af213bd"
+  },
+  "max_block_size": 6291456,
+  "join_expiry": "24h0m0s",
+  "disabled_gas_costs": true,
+  "max_votes_per_tx": 200
 }
 ```
 
-## Genesis File Contents
-
-### Genesis Time
-
- `genesis_time`: This field specifies the official time (ISO 8601 format) at which the blockchain is initialized.
+## Parameters
 
 ### Chain ID
 
- `chain_id`: This field uniquely identifies the blockchain network and should not exceed 50 characters.
+`chain_id`: Uniquely identifies the blockchain network and should not exceed 50 characters.
 
 ### Initial Height
 
- `initial_height`: This field sets the initial height the blockchain should begin at. By default, it should be set to 1.
+`initial_height`: The initial height the blockchain should begin at. It should be set to 0 for a new chain that is not migrated from a previous chain. This should be considered the genesis height. Thus, first block produced will be one greater than this value.
 
-### Genesis Validators
+### DB Owner
 
- `validators`: This field sets the list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
-  - `pub_key`: This field specifies the validator's public key bytes (hex).
+`db_owner`: The owner owner (administrator) of the Kwil database schemas. This is given in the string format used by the Kwil engine's `@caller` variable, which is derived from the user's public key. Typically this will be the corresponding Ethereum address.
+
+### Initial Funding Allocations
+
+`alloc`: A list of Kwil accounts and their initial balances at the genesis. This field is optional and is used to pre-fund Kwil accounts with balance. The `id` field is the Kwil account ID string, which may be an ethereum address in the case of user funding or a public key in the case of validator funding. The `key_type` field specifies the type of the account's public key, which is "secp256k1" for Ethereum users. The `amount` field specifies the initial balance of the account.
+
+### Validators
+
+`validators`: The list of the initial set of validators. Each validator has a cryptographic key-pair and an associated voting power.
+  - `pubkey`: The validator's public key bytes (hexadecimal).
+  - `type`: The type of the validator's public key (e.g. `secp256k1`).
   - `power`: The validator's voting power. Power 0 indicates that the node is a non-validator.
-  - `name`: The validator's name. 
 
-### Genesis App Hash
+### Leader
 
- `app_hash`: The app hash is a hash generated from the initial application state.
+`leader`: The initial leader of the blockchain. The leader is a special validator that is responsible for proposing new blocks.
 
-### Genesis Allocs
- `alloc`: This field specifies the Kwil accounts and their initial balances at the genesis. The `alloc` field is optional and is used to pre-fund Kwil accounts with balance.
- This is a JSON dictionary object where the keys are account `identifiers` of type hexadecimal bytes and the values are the account balances. By default, Kwil supports both
- 0x prefixed ethereum addresses and ed25519 public keys as account identifiers.
+### App Hash
 
-## Advanced Configurations
+`app_hash`: The hash generated from the initial application state, which is only used in the case of a migration where the `genesis_state` setting in the `config.toml` specifies the path to the snapshot file of the previous chain.
 
-### Consensus Params
+### Block Rules:
 
-The genesis file can also be used to establish a predefined set of consensus rules such as:
-#### Block Rules:
+`max_block_size`: The maximum block size, in bytes.
 
-  - `block`: 
-      - `max_bytes`: This field specifies the maximum block size, in bytes.
-      - `max_height`: This field specifies the maximum gas per block.
+### Validator Join Request Expiry:
 
-#### Validator Type:
+`join_expiry`: The duration after which the validator join request expires if not approved. The default expiry is 24hrs blocks, which is equivalent to 1 day if blocks are produced at the rate of 1 block/sec.
 
-  - `validator`:
-    -  `pub_key_types`: This field sets the public key types validators can use. Currently, only the `ed25519` key type is supported.
+### Disabled Gas Costs
 
-    -  `join_expiry`: This field sets the number of blocks after which the validator join request expires if not approved. The default expiry is 86400 blocks, which is equivalent to 1 day if blocks are produced at the rate of 1 block/sec.
+`disable_gas_costs`:  Whether gas costs should be enabled for the transactions. With gas costs disabled, no fees are incurred for transactions.
 
-#### ABCI App Version:
+### Max Votes Per Tx
 
-  - `version`:
-    - `app_version`: This field sets the ABCI application version. 
+`max_votes_per_tx`: The maximum number of validator resolution votes that can be included in a single transaction.
 
-#### Migrations:
-  
-  - `migration`:
-    - `start_height`: The start height of the migration on the old network. Specifies the height from which the state changes are to be replicated onto the new network.
-    - `end_height`: The end height of the migration on the old network. Specifies the height until which the state changes are to be replicated onto the new network.
+### Migrations:
 
-#### General
-
-  - `without_gas_costs`:  This field sets whether gas costs should be enabled for the transactions. By default, gas costs are disabled, resulting in no fees incurred for each transaction.
-
-## Complete Genesis Configuration
-
-Below is an example of a genesis file with complete configuration:
-
-```json title="sample genesis.json file"
-{
-  "genesis_time": "2024-09-10T22:37:12.960766Z",
-  "chain_id": "kwil-chain-wcHt2Qul",
-  "initial_height": 1,
-  "app_hash": null,
-  "activations": null,
-  "consensus_params": {
-    "block": {
-      "max_bytes": 6291456,
-      "max_gas": -1,
-      "abci_max_bytes": false
-    },
-    "evidence": {
-      "max_age_num_blocks": 100000,
-      "max_age_duration": 172800000000000,
-      "max_bytes": 1048576
-    },
-    "version": {
-      "app": 0
-    },
-    "validator": {
-      "pub_key_types": [
-        "ed25519"
-      ],
-      "join_expiry": 14400
-    },
-    "votes": {
-      "vote_expiry": 14400,
-      "max_votes_per_tx": 100
-    },
-    "abci": {
-      "vote_extensions_enable_height": 0
-    },
-    "migration": {
-      "start_height": 0,
-      "end_height": 0
-    },
-    "without_gas_costs": true
-  },
-  "validators": [
-    {
-      "pub_key": "6ec435ec737629ffade7d0f4679f4e89f285529487a72beb1945326c3b59be4a",
-      "power": 1,
-      "name": "validator-0"
-    }
-  ]
-}
-```
+`migration`:
+  - `start_height`: The start height of the migration on the old network. Specifies the height from which the state changes are to be replicated onto the new network.
+  - `end_height`: The end height of the migration on the old network. Specifies the height until which the state changes are to be replicated onto the new network.

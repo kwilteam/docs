@@ -17,8 +17,8 @@ or the [Production Deployment guide](/docs/node/production).
 
 Ensure that you have the following prerequisites installed:
 
-- [Docker](<https://docs.docker.com/get-docker/>)
-- [`kwild`](<https://github.com/kwilteam/kwil-db/releases>)
+- [Docker](https://docs.docker.com/get-started/get-docker/)
+- [`kwild`](https://github.com/kwilteam/kwil-db/releases)
 - An Ethereum address that can be designated as the database's owner
 
 ## Installation
@@ -52,7 +52,7 @@ kwild start --autogen --db-owner <YOUR_ETHEREUM_ADDRESS>
 :::note
 The `--autogen` flag generates a random chain ID, which is the network's identity, as well as a new initial validator private key.
 The node will be the one initial validator.
-As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set.
+As such, this mode is primarily useful for a quick deployment for evaluation and testing; production networks will define their own chain ID and initial validator set. See the [Production Guide](/docs/node/production) page for more information.
 :::
 
 ### Cleanup
@@ -77,17 +77,16 @@ To run a local Kwil network, you can use `kwild` to generate multiple node confi
 To generate the configs for 3 validators in `./kwil-testnet`, run:
 
 ```bash
-kwild setup testnet -v 3 --out-dir ./kwil-testnet --db-owner <YOUR_ETHEREUM_ADDRESS>
+kwild setup testnet -v 3 -u --out-dir ./kwil-testnet --db-owner <YOUR_ETHEREUM_ADDRESS>
 ```
 
-This creates three nodes that can run on the same host for evaluation.
+This creates three nodes that can run on the same host for evaluation. Note the `-u` flag, which assigns unique ports for each node.
 A production network would comprise nodes on different machines, but with the same `genesis.json` file.
 
 ### Run Nodes
 
 First start `postgres` containers for each of the nodes. Use the following
-commands to start all three running in the background, with different named
-volumes, and listening on ports 5440-5442.
+commands to start all three running in the background and listening on ports 5440-5442.
 
 ```bash
 docker run -d -p 5440:5432 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
@@ -100,9 +99,7 @@ docker run -d -p 5442:5432 -e "POSTGRES_HOST_AUTH_METHOD=trust" \
 
 :::tip
 Use `docker container ls` to check the `postgres` container status. When done testing
-`kwild`, use `docker container rm -f node0 node1 node2` and
-`docker volume rm kwil0-testnet-pgdata kwil1-testnet-pgdata kwil2-testnet-pgdata`
-to stop and delete them.
+`kwild`, use `docker container rm -f -v node0 node1 node2` to stop and delete them.
 :::
 
 To run the nodes, we can use the `kwild` binary in 3 separate terminals.  We will need to specify the `--root` flag to
@@ -122,6 +119,17 @@ kwild start --root ./kwil-testnet/node2 --db.port 5442
 
 Once the nodes are running, they will begin mining blocks.  You can now connect to their JSON-RPC
 endpoints to interact with your local network.
+
+### Cleanup
+
+To clean up when done testing, delete the `./kwil-testnet` folder and the Postgres containers:
+
+```shell
+# Remove kwild node data
+rm -rf ./kwil-testnet
+# Stop and remove the postgres containers and their anonymous volumes
+docker container rm -f -v node0 node1 node2
+```
 
 ## For Developers
 

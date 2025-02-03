@@ -15,7 +15,7 @@ Generate a new key pair for use with an authenticated admin RPC service.
 
 The `gen-auth-key`command generates a new key pair for use with an authenticated admin RPC service.
 	
-The key pair is generated and stored in the node's configuration directory, in the files `auth.key` and `auth.cert`. The key pair is used to authenticate the admin tool to the node.
+The key pair is generated and stored in the node's configuration directory, in the files `adminclient.key` and `adminclient.cert`. The key pair is used to authenticate the admin tool to the node.
 
 ```
 kwild admin gen-auth-key [flags]
@@ -26,15 +26,15 @@ kwild admin gen-auth-key [flags]
 ```
 # Generate a new TLS key pair to talk to the node
 kwild admin gen-auth-key
-# kwild admin commands uses auth.{key,cert}, while kwild uses clients.pem
+# kwild admin commands uses adminclient.{key,cert}, while kwild uses clients.pem
 ```
 
 ### Options
 
 ```
   -h, --help             help for gen-auth-key
-      --tlscert string   output path for the new client certificate (default "auth.cert")
-      --tlskey string    output path for the new client key file (default "auth.key")
+      --tlscert string   output path for the new client certificate (default "adminclient.cert")
+      --tlskey string    output path for the new client key file (default "adminclient.key")
 ```
 
 ### Options inherited from parent commands

@@ -1,12 +1,90 @@
 ---
-sidebar_position: 4
-sidebar_label: "Using kwild"
+sidebar_position: 1
+sidebar_label: "Introduction to kwild"
 id: daemon-kwild
 title: Running a Kwil Node
 description: How to deploy a Kwil node using kwild
 slug: /daemon/kwild
 ---
 
-:::warning
-This page is under construction.
+The `kwild` application runs the blockchain node, which provides the database
+services of Kwil. It also includes commands to manage the node's configuration
+and data.
+
+This page introduces important configuration concepts, and links to other other
+documentation pages to describe specific use cases.
+
+## Requirements
+
+Running `kwild` requires a configured PostgreSQL host as described in
+[Installation](/docs/daemon/installation). Before running `kwild`, follow the
+instructions to install the application and configure PostgreSQL.
+
+## Commands
+
+The Kwil node is started with the `kwild start` command.  All other commands, which may be listed with `kwild --help`, are used to manage the node. See the `kwild` [Reference](/docs/ref/kwild) page for details on each command.
+
+## Root Directory
+
+The "root" directory is a file system path used to store all the configuration and data such as blockchain data, SQL database data, signed messages, etc, unless specified otherwise. The default root directory is `~/.kwild`. You can override this configuration by setting the `KWILD_ROOT` environment variable or using the `--root` command line flag.
+
+## Configuration Files
+
+Running a Kwil node requires `genesis.json`, `config.toml` and `nodekey.json` files. All these configuration files must be present under the root directory. This section describes in detail on how to initialize the root directory with these configuration files.
+
+### Genesis File (genesis.json)
+
+The genesis file defines important parameters of the blockchain such as the initial state of the blockchain, the initial set of validators, and the initial parameters of the consensus algorithm.
+Each node on the network must have the same genesis file.
+
+Refer to the [genesis specification](/docs/daemon/config/genesis#advanced-configurations) for advanced configuration options.
+
+To connect a node to an existing network, obtain the genesis file from the desired network and set it as the genesis file for that node.
+
+### Config File (config.toml)
+
+The `config.toml` file contains runtime configuration options for the node, such as P2P network configuration, database connection details, and logging settings. These do not affect consensus, but are required to configure the node for the needs of the host environment.
+
+Refer to the [configuration specification](/docs/daemon/config/settings) for more options on tuning a Kwil application.
+
+### Command Line Flags and Environment Variables
+
+The Kwil application supports the ability to override the configuration at node startup through the command line flags and environment variables.
+Use `--help` or `-h` for detailed information on all the parameters that can be overwritten through command line flags.
+
+For instance, to modify the log level and chain RPC address during the node startup, you can use one of the following methods:
+
+```bash title="Environment variables"
+KWILD_LOG_LEVEL=debug
+KWILD_RPC_LISTEN="127.0.0.1:8484"
+
+kwild star --root "path/to/root/dir"
+```
+
+```bash title="Command line flags"
+kwild start --root "/path/to/root/dir" --log.level "debug" --rpc.listen "127.0.0.1:8484"
+```
+
+```bash title="Both environment variables and command line flags"
+KWILD_LOG_LEVEL=debug
+KWILD_RPC_LISTEN="127.0.0.1:8484"
+
+kwild start --root "/path/to/root/dir" --log.level "info" --rpc.listen "192.168.1.20:30000"
+```
+
+If both flags and env variables are set, flags take precedence over environment variables. Therefore, in this example, the Kwil application uses `info` log level and RPC listen address as `192.168.1.20:30000`.
+
+:::tip
+Option names in the TOML configuration file and environment variables use underscores ("_") to separate words within the name, while the command line flags use dashes ("-").
 :::
+
+Refer to the [translation guide](/docs/daemon/config/settings#config-override) for more information on mapping the config parameters to the command line flags and environment variables.
+
+## Getting started
+
+See the following sections for more information on how to deploy and operate a Kwil node:
+
+- [Quickstart](/docs/node/quickstart)
+- [Tutorial](/docs/node/tutorial)
+- [Production Guide](/docs/node/production)
+- [Administering a Kwil Network](/docs/admin)

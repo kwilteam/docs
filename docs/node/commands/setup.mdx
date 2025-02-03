@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 sidebar_label: "Node Setup"
 id: admin-setup
 title: Node Setup and Configuration Tools
@@ -11,8 +11,10 @@ The `setup` command provides functions for creating and managing node
 configuration and data, including:
 
 * performing quick setup of a standalone Kwil node (`init`) and Kwil test networks (`testnet`)
-* updating genesis config a hash of the initial database state (`genesis-hash`)
 * resetting node state and all data files (`reset`)
+* generating just a new genesis file (`genesis`)
+
+<>{/* updating genesis config a hash of the initial database state (`genesis-hash`)*/}</>
 
 ## Quick Setup of a Single Kwil Node
 
@@ -24,17 +26,17 @@ For example, to create a node configuration for a new network in a node root
 folder at `~/.kwild-new`:
 
 ```
-$ kwil-admin setup init --root-dir ~/.kwild-new
-Initialized node in /home/user/.kwild-new
+$ kwild setup init --root ~/.kwild-new
+Kwil node configuration generated at /home/jon/.kwild-new
 ```
 
-The above command also generated a new `config.toml` and `private_key` file in
-the node directory.
+The above command generates new `config.toml`, `genesis.json`. and
+`nodekey.json` files in the node's root directory.
 
 Additional nodes may join this new network by specifying the existing node as a
-persistent peer in `kwild`'s configuration and in the validators section of the
-genesis configuration. See [Kwil Daemon Configuration](/docs/category/configuration) for
-more information on node setup.
+bootstrap peer in `kwild`'s configuration, and using the same `genesis.json`
+file. See [Kwil Daemon Configuration](/docs/category/configuration) for more
+information on node setup.
 
 ## Creating a New Test Network of Several Nodes
 
@@ -43,33 +45,32 @@ with the same genesis config, and pre-configured to connect to each other. This
 command has several options:
 
 ```
-kwil-admin setup testnet [--validators V] [--non-validators N] [--config FILE]
-  [--output-dir DIR] [--node-dir-prefix PRE] [--hostname-prefix PRE]
-  [--hostname-suffix SUF] [--starting-ip IP] [--hostnames HOSTNAMES] [--p2p-port PORT]
+kwild setup testnet [--vals/-v V] [--non-vals/-n N] [--out-dir DIR]
+  [--port/-p PORT] [--unique-ports/-u] [--db-owner OWNER]
 ```
 
 There are defaults for each flag, with the output writing to a folder called
 `.testnet` in the current folder.  For example, the following command creates a
-new test network with 8 total nodes comprising 4 validators and 4 non-validators:
+new test network with 3 total nodes, all of which are validators:
 
 ```
-$ kwil-admin setup testnet -o ~/.kwild-testnet-xyz
-Successfully initialized 3 node directories: /home/jon/.kwild-testnet-xyz
+$ kwild s setup testnet -o ~/.kwild-testnet-xyz
+Generated testnet configuration in .kwild-testnet-xyz
 
 $ tree ~/.kwild-testnet-xyz
 /home/user/.kwild-testnet-xyz
 ├── node0
-│   ├── abci
-│   │   ├── config
-│   │   │   └── genesis.json
-│   │   └── data
 │   ├── config.toml
-│   └── private_key
+│   ├── genesis.json
+│   └── nodekey.json
 ├── node1
-│   ├── abci
-│   │   ├── config
-│   │   │   └── genesis.json
-...
+│   ├── config.toml
+│   ├── genesis.json
+│   └── nodekey.json
+└── node2
+    ├── config.toml
+    ├── genesis.json
+    └── nodekey.json
 ```
 
 The config files for each of the nodes will specify all of the other nodes as
@@ -79,25 +80,8 @@ generally only practical for small test networks with fewer than 12 nodes.
 For more information on usage, configurations, and more, use the `--help` flag:
 
 ```
-kwil-admin setup testnet --help
+kwild setup testnet --help
 ```
-
-## Updating Genesis Config with Initial Postgres Data
-
-If preparing a network with initial databases, it is required to update the "app
-hash" in `kwild`'s genesis configuration to reflect the initial state of a Postgres database. The syntax is:
-
-```
-kwil-admin setup genesis-hash [--genesis GENESIS] [--root-dir ROOTDIR] [--snapshot SNAPSHOT] \
-  [--dbname DBNAME] [--host HOST] [--port PORT] [--user USER] [--password PASSWORD]
-```
-
-Both inputs are optional, using default paths. `GENESIS` is the path to the
-genesis file to patch, which is `~/.kwild/abci/config/genesis.json` by default.
-The `ROOTDIR` argument is the root directory of a node, which is `~/.kwild` by
-default. Alternatively, configurations for a Postgres connection can be provided,
-or a path to a snapshot file can be specified.
-Use the `--help` flag for more information.
 
 ## Resetting All Application Data
 
@@ -107,13 +91,24 @@ To delete all of a Kwil node's data files, use the `reset` command.
 only be used to reset disposable test nodes.**
 
 ```
-kwil-admin setup reset [--root-dir DIR] [--force] [--dbname DBNAME] [--host HOST] \
+kwild setup reset [--root DIR] [--force] [--dbname DBNAME] [--host HOST] \
   [--port PORT] [--user USER] [--password PASSWORD]
 ```
 
-This command only requires one: (a) `--root-dir` to specify a node root
+This command only requires one: (a) `--root` to specify a node root
 directory containing the files to reset, or (b) `--force` to automatically reset
 the files in the default node root directory at `~/.kwild`.
 
 Extra Postgres configurations can be provided if needed, but the command will attempt
 to connect using the configurations in the `config.toml` file in the node root.
+
+## Generating a Genesis File
+
+A less common operation provided by the `setup genesis` command is the ability
+to generate a new genesis file without creating a root directory (as with `setup init`)
+or multiple root directories for a testnet (as with `setup testnet`). This is of use in the following case:
+
+1. When you already have a node private key and config file and want to create a genesis file for a new network. This scenario is described in the [Production Guide](/docs/node/production-guide#creating-a-genesis-file).
+2. When you want to prepare a genesis file to provide to the `setup init` command with the `--genesis` flag, as when preparing for a network migration, as described in the [Migration Tutorial](/docs/node/migrations/zero-downtime-migrations/tutorial#setting-up-the-new-nodes).
+
+Please see the above links for more information on this command.

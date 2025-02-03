@@ -1,0 +1,131 @@
+---
+sidebar_position: 4
+sidebar_label: "Node RPC"
+id: admin-node
+title: Administration of a Running Node
+description: Controlling a running node on the authenticated RPC service
+slug: /admin/node
+---
+
+The `admin` command is used to control a running Kwil node via its authenticated
+RPC service.
+
+The subcommands share the following syntax:
+
+```
+kwild admin [--rpcserver RPCSERVER] [--pass ADMIN-PASS] [--authrpc-cert AUTHRPC-CERT]
+  [--tlskey TLSKEY] [--tlscert TLSCERT]  <command> [<args>]
+```
+
+## Setup
+
+There are multiple ways that `kwild admin` may communicate with a running node:
+
+- UNIX socket (local file path)
+- TCP on a loopback interface (local access)
+- TCP on a routable address with TLS (for remote access)
+
+A local UNIX socket is the default, and requires no additional setup. A
+loopback TCP interfaces (e.g. 127.0.0.1) also requires no additional setup,
+but requires additional system security measures and/or password protection.
+Finally, a routable TCP address requires TLS setup, which is detailed below.
+
+:::warning Restrict access to the admin service
+
+The assumption is that the user of `kwild admin` is the node
+operator. Access must not be granted to untrusted parties.
+
+:::
+
+The relevant settings in `config.toml` are in the `[admin]` section:
+
+```toml
+# Admin RPC service configuration
+[admin]
+# enable the admin RPC service
+enable = true
+# address in host:port format or UNIX socket path on which the admin RPC server will listen
+listen = '/tmp/kwild.socket'
+# optional password for the admin service
+pass = ''
+# disable TLS when the listen address is not a loopback IP or UNIX socket
+notls = false
+```
+
+With the service enabled and the `listen` address set, the service should be
+secured appropriately. The following sections describe the remaining settings.
+
+### TLS
+
+When `kwild`'s admin service is configured with a routable TCP address, or if
+the listen address is prefixed with `https://`, TLS is automatically enabled to
+secure communications. A TLS key and certificate for the node's admin RPC
+service are automatically generated when the node is initialized.  This may be overridden with the `notls` setting.
+
+When the server has TLS enabled, the RPC client used by the `kwild admin`
+commands must use the node's TLS certificate to authenticate the server on
+connection, regardless of the client authentication method used, which are
+described in the following sections. When run from the same host as the node,
+the client will automatically attempt to use the node's TLS certificate from
+`kwild`'s root directory. If it is not accessible, or if the `kwild admin`
+command is run from a different host, the command must specify the path to the
+node's TLS certificate with `--authrpc-cert`. The certificate is found in the
+node's root directory as `admin.cert`.
+
+### Password Authentication
+
+Any type of listen address (UNIX, loopback TCP, or remote TCP) may be combined
+with a password to control access. The password is set with the `admin.pass` setting.
+
+:::warning
+When combining password authentication with a routable TCP address, a secure transport is required.
+:::
+
+With a password set, the `kwild admin` command must be run with the `--pass` flag.
+
+### Mutual TLS Authentication
+
+The most secure method of authentication is mutual TLS (mTLS), whereby TLS
+authentication is performed by both the client and the server. Typically, TLS is
+only used for encryption and to authenticate the server to the client; with
+mTLS, the server authenticates the client in the the TLS handshake as well.
+
+Setup of mTLS is more complex as each side has their own key pair, where the
+client's is used to authenticate itself with the node. Thus, setup involves
+generating credentials for the RPC client used by the `kwild admin` command, and
+setting them as an authorized RPC client on the node.
+
+Use of the `admin` command with mTLS requires the following:
+
+- The node's TLS (encrypted transport) certificate, specified with
+  `--authrpc-cert`. For remote access, this would be retrieved from the node
+  where it is located at `~/.kwild/admin.cert`.
+- Client credentials. This is a key pair used to authenticate the `kwild admin`
+  client with the RPC server on the running node.  The key and
+  certificate parts are specified to the command with the
+  `--tlskey` and `--tlscert` flags.
+- Adding the client certificate to the node's list of allowed clients, which is
+  located on the node machine as `~/.kwild/clients.pem`.
+
+Described below are two ways to generate and set client credentials.
+
+#### Generation of Credentials on the Node
+
+If the `--autogen` flag is provided, the node will generate new *client*
+credentials on start up if the file `~/.kwild/clients.pem` does not exist. The
+generated `adminclient.{cert,key}` files may then be used with `kwild admin`
+commands for remote access to the node.
+
+:::note
+This approach is intended for "quickstart" workflows. The following
+method using the `kwild admin gen-auth-key` command for generation is preferred.
+:::
+
+#### Generation of Credentials with `gen-auth-key`
+
+The `kwild admin gen-auth-key` command may be used to generate new client credentials.
+
+If `kwild admin` is being used on the same machine as the running node, it
+automatically adds the generated key to the list of authorized clients in the
+`clients.pem` file. Otherwise, the contents of the genereated `adminclient.cert`
+file must be appended to the node's `clients.pem` file. i.e. `cat adminclient.cert >> ~/.kwild/clients.pem`. Either way requires restarting the node.

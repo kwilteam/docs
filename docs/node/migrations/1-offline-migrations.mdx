@@ -23,13 +23,13 @@ so that users are aware that the network is being upgraded. For single node depl
 For multi-node deployments, see the guide on [how to gracefully halt a network](/docs/node/migrations/halting-a-network).
 :::
 
-Use the `kwil-admin snapshot` tool to take a snapshot of the final state of the PostgresDB instance. **Only state that exists in Postgres when this
+Use the `kwild snapshot` tool to take a snapshot of the final state of the PostgresDB instance. **Only state that exists in Postgres when this
 snapshot is taken will be included in the new network.** This tool connects directly to the database to capture its state
 and does not require the `kwild` process to be running. For more details on how snapshots can be taken, refer to the
 [create database snapshots](/docs/ref/kwild/snapshot/create) documentation.
 
 ```sh
-kwil-admin snapshot create --snapdir ./network_snapshot --dbname postgres --host localhost --port 5432 --user kwild
+kwild snapshot create --snapdir ./network_snapshot --dbname postgres --host localhost --port 5432 --user kwild
 ```
 
 This generates a compressed snapshot file and a template genesis file required to start the new network as shown below.
@@ -61,15 +61,15 @@ Install the new version of the `kwild` binaries. Refer to the [Installation](/do
 
 ### Setup Root directory
 
-Setup the new node's root directory with the genesis file and the snapshot data using the `kwil-admin setup init` command.
+Setup the new node's root directory with the genesis file and the snapshot data using the `kwild setup init` command.
 
 ```
-kwil-admin setup init --root-dir /new/node/dir --genesis ./path/to/genesis.json --genesis-state ./path/to/snapshot.sql.gz
+kwild setup init --root /new/node/dir --genesis ./path/to/genesis.json --genesis-state ./path/to/snapshot.sql.gz
 ```
 
 :::note
-Ensure that the `private_key` corresponding to the validator node are securely copied to the new node's root directory.
-Alternatively, new private keys can be generated using the `kwil-admin key gen` command. If new keys are generated,
+Ensure that the `nodekey.json` corresponding to the validator node are securely copied to the new node's root directory.
+Alternatively, new private keys can be generated using the `kwild key gen` command. If new keys are generated,
 ensure that the genesis file is updated with their corresponding public keys.
 :::
 
@@ -78,9 +78,9 @@ ensure that the genesis file is updated with their corresponding public keys.
 Start `kwild` by pointing it to the root directory configured above.
 
 ```bash
-kwild --root-dir /new/node/dir
+kwild start --root /new/node/dir
 ```
 
-:::tip
-If your `genesis.json` file has multiple validators, you will need to start >2/3 of the validators before the network can start producing blocks.
+:::note
+If your `genesis.json` file has multiple validators, you will need to start >1/2 of the validators before the network can start producing blocks.
 :::

@@ -34,7 +34,9 @@ kwild print-config [flags]
       --p2p.bootnodes strings                        bootnodes to connect to on startup
       --p2p.private                                  operate in private mode using a node ID whitelist
       --p2p.whitelist strings                        allowed node IDs when in private mode
-      --consensus.propose-timeout duration           timeout for proposing a block (applies to leader) (default 1s)
+      --p2p.target-connections int                   target number of connections to maintain (default 20)
+      --consensus.propose-timeout duration           minimum duration to wait before proposing a block with transactions (applies to leader). This value should be greater than 500ms. (default 1s)
+      --consensus.empty-block-timeout duration       timeout for proposing an empty block. If set to 0, disables empty blocks, leader will wait indefinitely until transactions are available to produce a block. (default 1m0s)
       --consensus.block-proposal-interval duration   interval between block proposal reannouncements by the leader (default 1s)
       --consensus.block-ann-interval duration        interval between block commit reannouncements by the leader, and votes reannouncements by validators (default 3s)
       --db.host string                               postgres host name (IP or UNIX socket path) (default "127.0.0.1")
@@ -55,14 +57,12 @@ kwild print-config [flags]
       --admin.listen string                          address in host:port format or UNIX socket path on which the admin RPC server will listen (default "/tmp/kwild.socket")
       --admin.pass string                            optional password for the admin service
       --admin.notls                                  disable TLS when the listen address is not a loopback IP or UNIX socket
-      --admin.cert string                            TLS certificate for use with a non-loopback listen address when notls is not true (default "admin.cert")
-      --admin.key string                             TLS key for use with a non-loopback listen address when notls is not true (default "admin.key")
       --snapshots.enable                             enable creating and providing snapshots for peers using statesync
       --snapshots.recurring-height uint              snapshot creation period in blocks (default 14400)
       --snapshots.max-snapshots uint                 number of snapshots to keep, after the oldest is removed when creating a new one (default 3)
       --state-sync.enable                            enable using statesync rather than blocksync
       --state-sync.trusted-providers strings         trusted snapshot providers in node ID format (see bootnodes)
-      --state-sync.discovery-time duration           how long to discover snapshots before selecting one to use (default 30s)
+      --state-sync.discovery-time duration           how long to discover snapshots before selecting one to use (default 15s)
       --state-sync.max-retries uint                  how many times to try after failing to apply a snapshot before switching to blocksync (default 3)
       --genesis-state string                         path to the genesis state file, relative to the root directory
       --migrations.enable                            enable zero downtime migrations
