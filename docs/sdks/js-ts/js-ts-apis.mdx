@@ -21,10 +21,10 @@ interface Config {
     kwilProvider: string;
     chainId: string;
     unconfirmedNonce?: boolean;
+    autoAuthenticate?: boolean
     timeout?: number;
     logging?: boolean;
-    logger?: Function;
-    cache?: seconds;
+    logger?: (msg: string) => any;
 }
 ```
 
@@ -33,13 +33,13 @@ Creates a new instance of the Kwil class. Can be initialized with `WebKwil` in b
 #### Parameters
 
 - `config`: The configuration object for the Kwil class.
-- `config.kwilProvider`: The URL of the Kwil provider.
+- `config.kwilProvider`: The JSON RPC address of the Kwil node.
 - `config.chainId`: The chain ID of the Kwil network.
 - `config.unconfirmedNonce`: (optional) If true, the SDK will use the unconfirmed nonce for the account. If false, the SDK will use the confirmed nonce for the account. Default is false. This is useful when sending multiple transactions in parallel.
-- `config.timeout`: (optional) The timeout for the Kwil provider. Default is 10000ms.
+- `config.autoAuthenticate`: (optional) If true, the SDK will automatically try to authenticate the user when using Kwild in private mode or Kwil Gateway.  Default is true.
+- `config.timeout`: (optional) The timeout for JSON RPC requests to the Kwil node. Default is 10000ms.
 - `config.logging`: (optional) If true, the SDK will log debug messages to the console. Default is false.
 - `config.logger`: (optional) A custom logger function. If provided, the SDK will use this function to log debug messages.
-- `config.cache`: (optional) The TTL cache for the SDK. Default is 600 seconds (10 minutes). See the [TTL Cache](/docs/sdks/js-ts/overview#optional-configuration) section for more information.
 
 #### Returns
 
@@ -56,28 +56,46 @@ The `auth` property accesses the authentication methods for the Kwil Gateway. Se
 ### call()
 
 ```typescript
-async call(actionBody: ActionBody, kwilSigner?: KwilSigner): Promise<GenericResponse<MessageReceipt>>
+async call(callBody: CallBody, kwilSigner?: KwilSigner): Promise<GenericResponse<MessageReceipt>>
 
 interface ActionBody {
+    namespace: string;
     name: string;
-    dbid: string;
-    inputs?: ActionInput[] | Entries[];
+    inputs?: NamesParams | PositionalParams
     description?: string;
+    authBody?: AuthBody;
+    cookie?: string; // only if using NodeKwil
 }
 
-type Entries = { [key: string]: string | number | null };
+interface AuthBody {
+    signature: Base64String
+    challenge: HexString
+}
+
+type NamedParams = { [key: string]: string | number | null };
+type PositionalParams = ValueType[]
+
+type ValueType =
+  | string
+  | number
+  | null
+  | undefined
+  | Array<ValueType>
+  | boolean
+  | Uint8Array
+  | UUID;
 ```
 
 Calls a `view` procedure on the network. The `kwilSigner` is required if any of the following conditions are met:
 - The procedure uses a `@caller` contextual variable.
 - The Kwil network is running in Private mode.
-- The Kwil network is connected to a Kwil Gateway and the procedure has the `@kgw(authn='true')` annotation.
+- The Kwil network is connected to a Kwil Gateway.
 
 For the last two conditions, the SDK will automatically prompt the user to authenticate. 
 
 #### Parameters
 
-- `actionBody`: The message to call. This object should match the `ActionBody` interface and contain the procedure name and database ID. The `inputs` array must only have one entry.
+- `callBody`: The message to call. This object should match the `CallBody` interface and contain the namespace, action name, and inputs (if required).
 - `kwilSigner` (optional): The kwilSigner for the call request. This is required if the procedure uses a `@caller` contextual variable, the Kwil network is running in Private mode, or you are using KGW and the action/procedure has the @kgw(authn='true') annotation. The SDK will use the `identifier` in the `kwilSigner` to fill in the `@caller` contextual variable.
 
 #### Returns
@@ -105,55 +123,36 @@ Retrieves the chain id, latest block height, and latest block hash on the specif
 
 A promise that resolves to a `ChainInfo` object, containing the chain id, latest block height, and latest block hash.
 
-### deploy()
+### execSql()
 
 ```typescript
-async deploy(deployBody: DeployBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
+async execSql(
+    query: string,
+    params: QueryParams,
+    signer: KwilSigner,
+    synchronous?: boolean
+): Promise<GenericResponse<TxReceipt>>
 
-interface DeployBody {
-    schema: CompiledKuneiform;
-    description?: string;
-};
+type QueryParams = Record<string, ValueType>;
+type ValueType =
+  | string
+  | number
+  | null
+  | undefined
+  | Array<ValueType>
+  | boolean
+  | Uint8Array
+  | UUID;
 ```
 
-Deploys a new database to the Kwil network.
+Executes a state changing SQL query (CREATE/INSERT/UPDATE/DELETE/ALTER).
 
 #### Parameters
 
-- `deployBody`: The deploy body to execute. This object should match the `DeployBody` interface and contain the compiled Kuneiform schema. It can also contain a custom signature message. You can create a compile Kuneiform file by right clicking a compiled file in the Kuneiform IDE and selecting "Export to JSON".
-
-- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
-
+- `query`: The query string to execute. E.g., `INSERT INTO table (col) VALUES ($str)`.
+- `params`: The query parameters, if defined on the query. If none, pass `{}`. E.g., `{$str: 'helo world'}`
+- `signer`: The signer for the transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 - `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
-
-#### Returns
-
-A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
-
-### drop()
-
-```typescript
-async drop(dropBody: DropBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
-
-interface DropBody {
-    dbid: string;
-    description?: string;
-};
-```
-
-Drops a database from the Kwil network.
-
-#### Parameters
-
-- `dropBody`: The drop body to execute. This object should match the `DropBody` interface and contain the database ID. It can also contain a custom signature message.
-
-- `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
-
-- `synchronous`: If true, the SDK will wait for the transaction to be confirmed on the chain before returning. If false, the SDK will return the `tx_hash` immediately after the transaction is sent. Default is false.
-
-#### Returns
-
-A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
 
 ### execute()
 
@@ -161,20 +160,32 @@ A promise that resolves to the `hash` of the transaction. The status of the tran
 async execute(actionBody: ActionBody, kwilSigner: KwilSigner, synchronous: boolean): Promise<GenericResponse<TxReceipt>>
 
 interface ActionBody {
+    namespace: string
     name: string;
-    dbid: string;
-    inputs?: ActionInput[] | Entries[];
+    inputs?: NamedParams[] | PositionalParams[];
     description?: string;
+    nonce?: string;
 }
 
-type Entries = { [key: string]: string | number | null };
+type NamedParams = { [key: string]: string | number | null };
+type PositionalParams = ValueType[]
+
+type ValueType =
+  | string
+  | number
+  | null
+  | undefined
+  | Array<ValueType>
+  | boolean
+  | Uint8Array
+  | UUID;
 ```
 
-Executes a state-changing (Create, Update, Delete) procedure on the Kwil network.
+Executes a state-changing (Create, Update, Delete) action on the Kwil database.
 
 #### Parameters
 
-- `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the procedure name and database ID. It can also contain an array of `ActionInput`s and a custom signature message.
+- `actionBody`: The action body to execute. This object should match the `ActionBody` interface and contain the action name and its namespace. It should also include an array of inputs, if inputs are required. Pass multiple `NamedParams` or `PositionalParams` to execute the action multiple times in a single transaction.
 
 - `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
@@ -190,84 +201,25 @@ A promise that resolves to the `hash` of the transaction. The status of the tran
 kwil.funder: funder
 ```
 
-The `funder` property accesses the funding methods for the Kwil network.' See the [Funder](#funder) section below for more information.
+The `funder` property accesses the funding methods for the Kwil network.' See the [Funder](#funder-1) section below for more information.
 
 ### getAccount()
 
 ```typescript
-async getAccount(owner: string): Promise<GenericResponse<Account>>
+async getAccount(owner: string | Uint8Array, keyType?: string): Promise<GenericResponse<Account>>
 ```
 
-Retrieves an account using the owner's account identifier.
+Retrieves account info using the owner's account identifier.
 
 #### Parameters
 
-- `owner`: The owner's account identifier
+- `owner`: The owner's account identifier. If string, it should be the hex encoded representation of the owner's identifier.
+- `keyType`: (optional) The name of the signer type. This is only required if your database uses a custom signer. This is not required if you are using a `secp256k1` (EVM) or `ed25519` signer.
 
 #### Returns
 
 A promise that resolves to an `Account` object. The account object includes the owner's identifier, balance, and nonce.
 
-### getDBID()
-
-```typescript
-getDBID(owner: string, name: string): string
-```
-
-Generates a unique database identifier (DBID) from the provided owner's identifier (e.g. wallet address, public key, etc.) and a database name.
-
-#### Parameters
-
-- `owner`: The owner's identifier (e.g. wallet address, public key, etc.)
-- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
-
-#### Returns
-
-A string that represents the unique identifier for the database.
-
-### getSchema()
-
-```typescript
-async getSchema(dbid: string): Promise<GenericResponse<Database<string>>>
-```
-
-Retrieves the schema of a database given its unique identifier (DBID).
-
-#### Parameters
-
-- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
-
-#### Returns
-
-A promise that resolves to the schema of the database.
-
-:::tip
-
-The result of `.getSchema()` is stored in the [TTL cache](/docs/sdks/js-ts/overview#optional-configuration) for 10 minutes. You can customize or disable the TTL cache by setting the `cache` option in the `WebKwil` or `NodeKwil` constructor.
-
-:::
-
-### listDatabases()
-
-```typescript
-async listDatabases(owner?: string): Promise<GenericResponse<DatasetInfo[]>>
-
-interface DatasetInfo {
-    name: string;
-    owner: Uint8Array;
-    dbid: string;
-}
-```
-
-Lists all databases owned by a particular owner. If no owner is provided, it will list all databases on the network.
-
-#### Parameters
-
-- `owner`(optional): The owner's identifier (e.g. wallet address, public key, etc.).
-
-#### Returns
-
-A promise that resolves to an array of `DatasetInfo` objects. Each object contains the database name, owner's identifier, and database ID.
 
 ### ping()
 
@@ -284,7 +236,9 @@ A promise that resolves to a string indicating the server's response.
 ### selectQuery()
 
 ```typescript
-async selectQuery(dbid: string, query: string): Promise<GenericResponse<Object[]>>
+async selectQuery(query: string, params?: QueryParams): Promise<GenericResponse<Object[]>>
+
+type QueryParams = Record<string, ValueType>;
 ```
 
 Performs a SELECT query on a database. The query must be a read-only query.
@@ -293,8 +247,8 @@ Note: `selectQuery()` will error if the Kwil network is running in Private mode.
 
 #### Parameters
 
-- `dbid`: The unique identifier of the database. The DBID can be generated using the `getDBID` method.
-- `query`: The SELECT query to execute.
+- `query`: The select query to execute. E.g., `SELECT * FROM posts WHERE msg = $msg`
+- `params`: (optional) The paramers in the `query` string, if provided. E.g., `{$msg: 'hello world'}`.
 
 #### Returns
 
@@ -325,7 +279,7 @@ The `KwilSigner` is a class that is used to sign transactions and messages on Kw
 ```typescript
 constructor(signer: EthSigner, identifier: HexString | Uint8Array): KwilSigner;
 
-constructor(signer: (msg: Uint8Array) => Promise<Uint8Array>, publicKey: HexString | Uint8Array, signatureType: SignatureType): KwilSigner;
+constructor(signer: (msg: Uint8Array) => Promise<Uint8Array>, identifier: HexString | Uint8Array, signatureType: string): KwilSigner;
 ```
 
 Creates a new instance of the KwilSigner class.
@@ -342,7 +296,7 @@ The following signature types and corresponding identifiers can be used:
 
 | Type      |       Identifier        | Enumerator     | Description                                                                                                                                                            |
 | :-------- | :---------------------: | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| Secp256k1 | Ethereum Wallet Address | 'secp256k1_ep' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| Secp256k1 | Ethereum Wallet Address | 'secp256k1' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
 | ED25519   |   ED25519 Public Key    | 'ed25519'      | The Kwil Signer will use an ED25519 signature.                                                                                                                         | signature. |
 
 #### Returns
@@ -364,7 +318,7 @@ The auth class is automatically initialized with the Kwil class. It can be acces
 ### authenticateKGW()
 
 ```typescript
-async authenticateKGW(signer: KwilSigner): Promise<GenericResponse<AuthSuccess<T>>>
+async authenticateKGW<T extends EnvironmentType>(signer: KwilSigner): Promise<GenericResponse<AuthSuccess<T>>>
 
 // AuthSuccess interface browser (WebKwil)
 interface AuthSuccess<EnvironmentType.Browser> {
@@ -391,7 +345,7 @@ A promise that resolves to an `AuthSuccess` object. The object contains the resu
 ### authenticatePrivateMode()
 
 ```typescript
-authenticatePrivateMode(actionBody: ActionBody, signer: KwilSigner): Promise<AuthBody>;
+async authenticatePrivateMode(actionBody: ActionBody, signer: KwilSigner): Promise<AuthBody>;
 
 interface AuthBody {
     signature: Base64String;
@@ -408,12 +362,12 @@ Authenticates a user in Private mode.
 
 #### Returns
 
-A promise that resolves an `AuthBody` object, consisting of a signature and a challenge. Both a signature and a challenge are needed to authenticate a user in Private mode.
+A promise that resolves an `AuthBody` object, consisting of a signature and a challenge. `AuthBody` can be passed to [`CallBody`](/docs/sdks/js-ts/apis#call) to manually authenticate users.
 
-### logout()
+### logoutKGW()
 
 ```typescript
-logout(signer?: KwilSigner): Promise<GenericResponse<LogoutResponse<T>>>;
+async logoutKGW<T extends EnvironmentType>(signer?: KwilSigner): Promise<GenericResponse<LogoutResponse<T>>>;
 
 // LogoutResponse interface browser (WebKwil)
 interface LogoutResponse<EnvironmentType.Browser> {
@@ -453,13 +407,14 @@ async transfer(transferBody: TransferBody, kwilSigner: KwilSigner, synchronous: 
 interface TransferBody {
     to: string | Uint8Array;
     amount: BigInt;
+    keyType?: string;
     description?: string;
 };
 ```
 
 #### Parameters
 
-- `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message.
+- `transferBody`: The transfer body to execute. This object should match the `TransferBody` interface and contain the recipient's identifier and the amount to transfer. Funds amount should be in `BigInt` format, e.g. `BigInt(1 * 10 ** 18)` for 1 token on the Kwil Network. It can also contain a custom signature message. `keyType` is required if the account you are transferring to uses a custom signer (i.e., any account that is not `secp256k1` or  `ed25519`).
 
 - `kwilSigner`: The signer for the procedure transaction. This can be created with the [`KwilSigner`](#kwilsigner) class.
 
@@ -468,300 +423,3 @@ interface TransferBody {
 #### Returns
 
 A promise that resolves to the `hash` of the transaction. The status of the transaction can be checked with the `kwil.txInfo()` method and passing the `hash` of the transaction.
-
-## Action Inputs
-
-The `ActionInput` class is a utility class to build inputs to be passed and executed in a procedure transaction. It is found in the `Utils` namespace, which can be imported from the `kwil` package.
-
-### constructor()
-
-```typescript
-constructor(): ActionInput
-```
-
-Creates a new instance of the `ActionInput` class.
-
-#### Returns
-
-A new instance of the `ActionInput` class.
-
-### put()
-
-```typescript
-put(key: string, value: any): ActionInput
-```
-
-Adds or replaces a value for a single input.
-
-#### Parameters
-
-- `key`: The input name.
-- `value`: The value to put for the input.
-
-#### Returns
-
-The `ActionInput` instance for chaining.
-
-### putIfAbsent()
-
-```typescript
-putIfAbsent(key: string, value: any): ActionInput
-```
-
-Adds a value for a single input if the key is not already present.
-
-#### Parameters
-
-- `key`: The input name.
-- `value`: The value to put for the input.
-
-#### Returns
-
-The current `ActionInput` class for chaining.
-
-### replace()
-
-```typescript
-replace(key: string, value: any): ActionInput
-```
-
-Replaces a value for a single input if the key is already present.
-
-#### Parameters
-
-- `key`: The input name.
-- `value`: The value to replace for the input.
-
-#### Returns
-
-The current `ActionInput` class for chaining.
-
-### get()
-
-```typescript
-get(key: string): any
-```
-
-Retrieves an input value given its key.
-
-#### Parameters
-
-- `key`: The input name.
-
-#### Returns
-
-The value associated with the input name.
-
-### getOrDefault()
-
-```typescript
-getOrDefault(key: string, defaultValue: any): any
-```
-
-Retrieves a value by its input name, or a default value if the input name is not present.
-
-#### Parameters
-
-- `key`: The input name.
-- `defaultValue`: The default value to return if the key is not present.
-
-#### Returns
-
-The value associated with the key, or the default value.
-
-### containsKey()
-
-```typescript
-containsKey(key: string): boolean
-```
-
-Checks if the map contains a specific input name.
-
-#### Parameters
-
-- `key`: The input name.
-
-#### Returns
-
-True if the input name is present, false otherwise.
-
-### remove()
-
-```typescript
-remove(key: string): boolean
-```
-
-Removes an input name and its associated value from the map.
-
-#### Parameters
-
-- `key`: The input name to remove.
-
-#### Returns
-
-True if the key was present and is now removed, false otherwise.
-
-### toArray()
-
-```typescript
-toArray(filter?: Predicate): ReadonlyArray<EntryType>
-```
-
-Converts the map of inputs to an array of entries.
-
-#### Parameters
-
-- `filter`: An optional filter function.
-
-#### Returns
-
-A read-only array of entries.
-
-### putFromObject()
-
-```typescript
-putFromObject(obj: object): ActionInput
-```
-
-Adds or replaces values from and object of procedure name/key-value pairs.
-
-#### Parameters
-
-- `obj`: The object from which to extract procedure name/key-value pairs.
-
-#### Returns
-
-The current `ActionInput` instance for chaining.
-
-### putIfAbsentFromObject()
-
-```typescript
-putIfAbsentFromObject(obj: object): ActionInput
-```
-
-Adds values from and object of procedure name/key-value pairs if the key is not already present.
-
-#### Parameters
-
-- `obj`: The object from which to extract procedure name/key-value pairs.
-
-#### Returns
-
-The current `ActionInput` instance for chaining.
-
-### replaceFromObject()
-
-```typescript
-replaceFromObject(obj: object): ActionInput
-```
-
-Replaces values from and object of procedure name/key-value pairs if the key is already present.
-
-#### Parameters
-
-- `obj`: The object from which to extract procedure name/key-value pairs.
-
-#### Returns
-
-The current `ActionInput` instance for chaining.
-
-### putFromObjects()
-
-```typescript
-putFromObjects(objs: object[]): ActionInput[]
-```
-
-Creates multiple `ActionInput` instances from an array of objects.
-
-#### Parameters
-
-- `objs`: An array of objects from which to create `ActionInput` instances.
-
-#### Returns
-
-An array of `ActionInput` instances.
-
-### static of()
-
-```typescript
-static of(): ActionInput
-```
-
-Factory method to create a new instance of `ActionInput`.
-
-#### Returns
-
-A new `ActionInput` instance.
-
-### static from()
-
-```typescript
-static from(entries: Iterable<EntryType>): ActionInput
-```
-
-Creates a new `ActionInput` instance from an iterable array of entries.
-
-#### Parameters
-
-- `entries`: The iterable of set of entries. Entries should be formatted as an array of `[inputName, value]`.
-
-#### Returns
-
-A new `ActionInput` instance.
-
-### static fromObject()
-
-```typescript
-static fromObject(obj: object): ActionInput
-```
-
-Creates a new `ActionInput` instance from an object.
-
-#### Parameters
-
-- `obj`: The object from which to create the `ActionInput`.
-
-#### Returns
-
-A new `ActionInput` instance.
-
-### static fromObjects()
-
-```typescript
-static fromObjects(objs: objects[]): ActionInput[]
-```
-
-Creates multiple `ActionInput` instances from an array of objects.
-
-#### Parameters
-
-- `objs`: An array of objects from which to create `ActionInput` instances.
-
-#### Returns
-
-An array of `ActionInput` instances.
-
-## Utils
-
-The `Utils` namespace contains utility functions or classes for interacting with the Kwil network.
-
-### ActionInput
-
-Please see the [ActionInput](#action-inputs) section above.
-
-### generateDBID()
-
-```typescript
-generateDBID(owner: string, name: string): string
-```
-
-An alternative to the kwil.getDBID() method, allowing developers to retrieve a database ID without instantiating the Kwil class.
-
-#### Parameters
-
-- `owner`: The owner's account identifier.
-- `name`: The name of the database. This should be the name of the database as defined in Kuneiform.
-
-#### Returns
-
-A string that represents the unique identifier for the database.
