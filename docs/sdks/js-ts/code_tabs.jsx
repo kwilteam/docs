@@ -17,23 +17,14 @@ function CodeTabs({ tabsData }) {
     );
 }
 
-const initJsWeb = `import { BrowserProvider } from 'ethers';
-import { WebKwil } from '@kwilteam/kwil-js';
-
-// to be used for funding and signing transactions
-const provider = new BrowserProvider(window.ethereum)
+const initJsWeb = `import { WebKwil } from '@kwilteam/kwil-js';
 
 const kwil = new WebKwil({
     kwilProvider: "kwil_provider_endpoint",
     chainId: "your_kwil_chain_id"
 });`
 
-const initJsNode = `const { Wallet } = require('ethers');
-const kwiljs = require('@kwilteam/kwil-js');
-
-// to be used for signing transactions
-// instead of a provider, nodeJS requires a wallet
-const wallet = new Wallet("my_ethereum_private_key")
+const initJsNode = `const kwiljs = require('@kwilteam/kwil-js');
 
 const kwil = new kwiljs.NodeKwil({
     kwilProvider: "kwil_provider_endpoint",
@@ -44,7 +35,7 @@ export function InitTabs() {
     const tabsData = [
         {
             value: 'js-web',
-            label: 'Web',
+            label: 'Browser',
             code: initJsWeb
         },
         {
