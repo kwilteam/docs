@@ -43,6 +43,7 @@ const kwil = new WebKwil({
     kwilProvider: 'http://localhost:8484';
     chainId: 'kwil-testnet';
     // optional configuration
+    autoAuthenticate?: boolean; // automatically authenticate with Kwil Gateway / Kwild private RPC, default true
     unconfirmedNonce?: boolean; // sends transactions and returns getAccount with unconfirmed nonce, default false
     timeout?: number; // timeout for requests, default 30000
     logging?: boolean; // enable logging, default false
@@ -50,7 +51,7 @@ const kwil = new WebKwil({
 });
 ```
 
-To verify you have the correct `chainId`, you can use the [`chainInfo()`](#get-chain-info) method.
+To verify you have the correct `chainId`, you can use the [`chainInfo()`](#chainid-and-status) method.
 
 ## Identifiers
 
@@ -63,9 +64,9 @@ Secp256k1 signers use **Ethereum wallet addresses** as account identifiers. ED25
 
 ## Signers
 
-Certain operations in Kwil require signature authentication from the user (e.g. deploy database, drop database, execute CUD procedures, read actions in private mode, etc).
+Certain operations in Kwil require signature authentication from the user (e.g. execute action, INSERT/UPDATE/DELETE/CREATE/DROP, transfer funds, etc).
 
-To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [EthersJS](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a custom signing callback function (see [below](#custom-signers)).
+To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [ethers.js](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a custom signing callback function (see [below](#custom-signers)).
 
 <Tabs
     defaultValue="b"
@@ -114,14 +115,14 @@ const kwilSigner = new KwilSigner(signer, identifier);
 
 #### Custom Signers
 
-If you wish to sign with something other than an EtherJS signer, you may pass a callback function that accepts and returns a `Uint8Array()` and the enumerator for the signature type used.
+If you wish to sign with something other than an ethers signer, you may pass a callback function that accepts and returns a `Uint8Array()` and the enumerator for the signature type used.
 
 Currently, Kwil supports two signature types:
 
 | Type      |   Identifier   |   Enumerator   | Description |
 | :-------- | :------------: | ----------- | ----------- |
-| Secp256k1 | Ethereum Wallet Address | 'secp256k1' | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
-| ED25519   | ED25519 Public Key |   'ed25519'    | The Kwil Signer will use an ED25519 signature. |signature. 
+| Secp256k1 | Ethereum Wallet Address | `secp256k1` | The Kwil Signer will use a secp256k1 elliptic curve signature, which is the same signature used in Ethereum's [personal sign](https://eips.ethereum.org/EIPS/eip-191). |
+| ED25519   | ED25519 Public Key |   `ed25519`    | The Kwil Signer will use an ED25519 signature. |signature. 
 
 To use an ed25519 signature:
 
@@ -139,19 +140,6 @@ const kwilSigner = new KwilSigner(customSigner, keys.publicKey, "ed25519");
 ## Writing Data
 
 To write data on Kwil, you can (1) execute an ad-hoc SQL query or (2) execute an action.
-
-:::tip
-
-If using TypeScript, you can import interfaces for each API from the `types` namespace.
-
-```typescript
-import { Types } from '@kwilteam/kwil-js'
-
-const actionBody: Types.ActionBody = {...}
-const callBody: Types.CallBody = { ... }
-```
-
-:::
 
 ### Ad-Hoc SQL
 
@@ -207,6 +195,19 @@ const res = await kwil.execute(
 */
 ```
 
+:::tip
+
+If using TypeScript, you can import interfaces for each API from the `types` namespace.
+
+```typescript
+import { Types } from '@kwilteam/kwil-js'
+
+const actionBody: Types.ActionBody = {...}
+const callBody: Types.CallBody = { ... }
+```
+
+:::
+
 ## Reading Data
 
 To read data on Kwil, you can (1) execute ad-hoc SELECT queries or (2) call view actions.
@@ -232,7 +233,7 @@ const res = await kwil.selectQuery(
 
 View actions are read-only actions that return data without having to wait for a transaction to be mined on Kwil.
 
-If the `view` actions uses a `@caller` contextual variable, you must pass a `KwilSigner` as the second argument to the `kwil.call()` method to identify the caller.
+If the `view` action uses a `@caller` contextual variable, you must pass a `KwilSigner` as the second argument to the `kwil.call()` method to identify the caller.
 
 ```javascript
 const res = await kwil.call(
