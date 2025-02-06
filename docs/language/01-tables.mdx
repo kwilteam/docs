@@ -211,9 +211,8 @@ ADD COLUMN column_name data_type [constraints];
 You can also add multiple columns in a single statement:
 
 ```sql
-ALTER TABLE users
-ADD COLUMN date_of_birth DATE,
-ADD COLUMN age INT;
+ALTER TABLE users ADD COLUMN date_of_birth TEXT;
+ALTER TABLE users ADD COLUMN age INT;
 ```
 
 #### Drop Column
@@ -228,9 +227,8 @@ DROP COLUMN column_name;
 You can drop multiple columns in a single statement:
 
 ```sql
-ALTER TABLE users
-DROP COLUMN age,
-DROP COLUMN date_of_birth;
+ALTER TABLE users DROP COLUMN age;
+ALTER TABLE users DROP COLUMN date_of_birth;
 ```
 
 #### Rename Column

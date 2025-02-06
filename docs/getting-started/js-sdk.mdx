@@ -23,7 +23,7 @@ see the [Create a Table](/docs/getting-started/create-a-table) tutorial.
 
 ```sql showLineNumbers
 CREATE TABLE users (
-    id INT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
     age INT NOT NULL,
     address TEXT NOT NULL UNIQUE // user wallet addresses
@@ -61,30 +61,17 @@ Kwil has different initialization logic for Web and NodeJS.
 
 The Kwil class is the main class for interacting with Kwil. It is used to initialize the SDK, and to execute procedures.
 
-```typescript
-import { WebKwil } from '@kwilteam/kwil-js';
+import { InitTabs } from "../sdks/js-ts/init_tabs";
 
-const kwil = new WebKwil({
-    kwilProvider: "YOUR_KWIL_URL",
-    chainId: "YOUR_CHAIN_ID",
-});
-```
+<InitTabs />
 
 ### Signer
 
 The signer is used to sign transactions going to the Kwil network.
 
-```typescript
-import { BrowserProvider } from 'ethers';
-import { KwilSigner } from '@kwilteam/kwil-js';
+import { SignerTabs } from "../sdks/js-ts/signer_tabs";
 
-async function getSigner() {
-    const provider = new BrowserProvider(window.ethereum);
-    const ethSigner = await provider.getSigner();
-    const ethAddress = await ethSigner.getAddress();
-    return new KwilSigner(ethSigner, ethAddress);
-}
-```
+<SignerTabs />
 
 ## Write Data
 
@@ -117,11 +104,7 @@ To read data, we will call a `view` procedure on the schema.  This will return t
 async function getUser(username) {
     const result = await kwil.call({
         name: "get_user",
-        inputs: [
-            {
-                $username: username
-            }
-        ]
+        inputs: [ username ]
     });
 
     return result.data;

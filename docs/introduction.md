@@ -13,7 +13,7 @@ slug: /introduction
 
 Kwil is a framework for leveraging relational databases as standalone, byzantine fault tolerant networks. Kwil extends the functionality of traditional relational databases by providing a practical Byzantine Fault Tolerant (pBFT) layer on top of existing engines, enforcing rules necessary for building secure, decentralized data stores.
 
-Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine how, where, and by whom nodes are run in their blockchain
+Each Kwil network runs its own permissionless Proof-of-Stake (PoS) or permissioned Proof-of-Authority (PoA) blockchain, enabling projects to have a high-degree of configurability over their networks. With Kwil, applications and products can determine how, where, and by whom nodes are run in their blockchain.
 
 **Have a question? Join our [Discord](<https://discord.com/invite/HzRPZ59Kay>)!**
 

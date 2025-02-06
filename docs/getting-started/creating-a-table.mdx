@@ -15,7 +15,7 @@ In this tutorial, you will create, write to, and read from your first table with
 - Ethereum Private Key - You will need an Ethereum private key to sign transactions to Kwil.
 If you do not have one, you can generate one using the [`kwil-cli utils generate-key`](/docs/ref/kwil-cli/utils/generate-key#examples) command.
 - Kwil RPC - You will need the RPC endpoint of the Kwil network you are deploying to. This can be obtained by either running a [node
-locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login>).
+locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/).
 
 ## Creating a Table
 
@@ -23,7 +23,7 @@ Define a table in a file called `social_media.sql`:
 
 ```sql title="social_media.sql"
 CREATE TABLE users (
-    id INT PRIMARY KEY,
+    id UUID PRIMARY KEY,
     username TEXT NOT NULL UNIQUE,
     age INT NOT NULL,
     address TEXT NOT NULL UNIQUE // user wallet addresses
@@ -55,7 +55,8 @@ into the table.
 
 ```shell
 $ kwil-cli --private-key <YOUR_ETHEREUM_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
-    exec-sql --stmt "INSERT INTO users (id, username, age, address) VALUES (1, 'Alice', 25, @caller);" --sync
+    exec-sql --stmt "INSERT INTO users (id, username, age, address) VALUES ('90cc39f3-4ad5-425d-b127-3b0f62b5abd3'::uuid, 'Alice', 25, @caller);" \
+    --sync
 ```
 
 ## Querying Data

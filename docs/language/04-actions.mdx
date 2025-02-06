@@ -27,9 +27,9 @@ For example, if we wanted to create an action called `create_user` that took a u
 user ID, we could define it like this:
 
 ```sql
-CREATE ACTION create_user($name text, $age int) PUBLIC RETURNS (uuid) {
+CREATE ACTION create_user($name text, $age int) public RETURNS (uuid) {
     $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
-    INSERT INTO users (id, name, age) VALUES ($uuid, $name, $age);
+    INSERT intO users (id, name, age) VALUES ($uuid, $name, $age);
     RETURN $uuid;
 }
 ```
@@ -39,14 +39,14 @@ CREATE ACTION create_user($name text, $age int) PUBLIC RETURNS (uuid) {
 There are three types of return definitions that can be used in an action:
 - `(void)`: The action does not return any value.
 - `RETURNS ([name_1] value_type_1 [, [name_2] value_type_2, ...])`: The action returns a single row of one or more values. Each
-column can be given a name (which will be used to materialize a table), but one will be auto-generated if not provided
+column can be given a name (which will be used to materialize a table), but one will be auto-generated if not provided.
 - `RETURNS TABLE (name_1 value_type_1 [, name_2 value_type_2, ...])`: The action returns a table of rows, each with one or more values.
 Each column _must_ specify a return name.
 
 ### Action With No Returns
 
 ```sql
-CREATE ACTION delete_user($id uuid) PUBLIC {
+CREATE ACTION delete_user($id uuid) public {
     -- ...
 }
 ```
@@ -54,11 +54,11 @@ CREATE ACTION delete_user($id uuid) PUBLIC {
 ### Action With Single Return Value
 
 ```sql
-CREATE ACTION get_user($id uuid) PUBLIC RETURNS (text, int) {
+CREATE ACTION get_user($id uuid) public RETURNS (text, int) {
     -- ...
 }
 -- or
-CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name text, age int) {
+CREATE ACTION get_user($id uuid) public RETURNS (name text, age int) {
     -- ...
 }
 ```
@@ -66,15 +66,15 @@ CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name text, age int) {
 ### Action With Table Return
 
 ```sql
-CREATE ACTION get_users() PUBLIC RETURNS TABLE (name text, age int) {
+CREATE ACTION get_users() public RETURNS TABLE (name text, age int) {
     -- ...
 }
 ```
 
 ## Access Modifiers
 
-Access modifiers specify when an action can be called. There are 3 primary access modifiers, and 2 optional access modifiers.
-Each action must have exactly one primary access modifier, and can have zero or more optional access modifiers.
+Access modifiers specify when an action can be called. Each action must have exactly one primary access modifier, and can have zero or more optional access modifiers.
+There are 3 primary access modifiers, and 2 optional access modifiers.
 
 | Modifier | Primary | Description |
 |----------|---------|-------------|
@@ -115,7 +115,7 @@ CREATE ACTION declare_vars() public {
 Basic arithmetic operations can be performed on variables:
 
 ```sql
-CREATE ACTION do_math($num1 INT, $num2 INT) public {
+CREATE ACTION do_math($num1 int, $num2 int) public {
     -- add and divide, with precedence:
     $avg int := ($num1 + $num2)/2;
 
@@ -205,7 +205,7 @@ CREATE ACTION iterate_over_range() public {
 
 ```sql
 CREATE ACTION iterate_over_sql() public {
-    for $row in SELECT name::TEXT, age::INT FROM users {
+    for $row in SELECT name::text, age::int FROM users {
         -- $row.name is a text, $row.age is an int
         if $row.age < 18 {
             break; -- will exit the loop
@@ -299,7 +299,7 @@ contain `SELECT` statements. SQL statements _cannot_ be used if you are looping 
 
 ```sql
 CREATE ACTION create_user($name text, $age int) public {
-    INSERT INTO users (name, age) VALUES ($name, $age);
+    INSERT intO users (name, age) VALUES ($name, $age);
 }
 ```
 

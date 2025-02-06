@@ -17,21 +17,32 @@ function CodeTabs({ tabsData }) {
     );
 }
 
-const initJsWeb = `import { WebKwil } from '@kwilteam/kwil-js';
+const initJsWeb = `import { KwilSigner } from '@kwilteam/kwil-js';
+import { BrowserProvider } from 'ethers';
 
-const kwil = new WebKwil({
-    kwilProvider: "kwil_provider_endpoint",
-    chainId: "your_kwil_chain_id"
-});`
+// get ethers signer
+const provider = new BrowserProvider(window.ethereum)
+const signer = await provider.getSigner();
 
-const initJsNode = `const kwiljs = require('@kwilteam/kwil-js');
+// get ethereum address
+const identifier = await signer.getAddress();
 
-const kwil = new kwiljs.NodeKwil({
-    kwilProvider: "kwil_provider_endpoint",
-    chainId: "your_kwil_chain_id"
-});`
+// create kwil signer
+const kwilSigner = new KwilSigner(signer, identifier);`
 
-export function InitTabs() {
+const initJsNode = `import { KwilSigner } from '@kwilteam/kwil-js';
+import { Wallet } from 'ethers';
+
+// create ethers signer
+const signer = new Wallet("my_ethereum_private_key");
+
+// get eth address
+const identifier = await signer.getAddress();
+
+// create kwil signer
+const kwilSigner = new KwilSigner(signer, identifier);`
+
+export function SignerTabs() {
     const tabsData = [
         {
             value: 'js-web',
