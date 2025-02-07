@@ -6,7 +6,7 @@ description: Using the Kwil JS SDK
 slug: /sdks/js-ts/overview
 ---
 
-import { InitTabs } from "./code_tabs.jsx";
+import { InitTabs } from "./init_tabs.jsx";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
@@ -17,7 +17,7 @@ Below is a quick overview of how to use the Kwil JS SDK. For more detailed infor
 The Kwil JS SDK can be installed using npm.
 
 ```bash
-npm install @kwilteam/kwil-js ethers
+npm install @kwilteam/kwil-js@beta ethers
 ```
 
 ## Initialize
@@ -68,50 +68,9 @@ Certain operations in Kwil require signature authentication from the user (e.g. 
 
 To manage signing, Kwil-JS uses a `KwilSigner` class. Out of the box, Kwil-JS supports signers from [ethers.js](https://github.com/ethers-io/ethers.js) (v5 and v6). You can also pass a custom signing callback function (see [below](#custom-signers)).
 
-<Tabs
-    defaultValue="b"
-    values={[
-        { label: 'Browser', value: 'b', },
-        { label: 'NodeJS', value: 'n', },
-    ]}
->
-<TabItem value="b">
+import { SignerTabs } from "./signer_tabs.jsx";
 
-```javascript
-import { KwilSigner } from '@kwilteam/kwil-js';
-import { BrowserProvider } from 'ethers';
-
-// get ethers signer
-const provider = new BrowserProvider(window.ethereum)
-const signer = await provider.getSigner();
-
-// get ethereum address
-const identifier = await signer.getAddress();
-
-// create kwil signer
-const kwilSigner = new KwilSigner(signer, identifier);
-```
-
-</TabItem>
-<TabItem value="n">
-
-```javascript
-import { KwilSigner } from '@kwilteam/kwil-js';
-import { Wallet } from 'ethers';
-
-// create ethers signer
-const signer = new Wallet("my_ethereum_private_key");
-
-// get eth address
-const identifier = await signer.getAddress();
-
-// create kwil signer
-const kwilSigner = new KwilSigner(signer, identifier);
-```
-
-</TabItem>
-</Tabs>
-
+<SignerTabs />
 
 #### Custom Signers
 
@@ -176,11 +135,10 @@ const res = await kwil.execute(
     {
         namespace: 'db_namespace' // e.g., 'main',
         name: 'action_name', // e.g., 'create_user',
-        // execute the same action three times:
+        // execute the same action two times:
         inputs: [
-            ['input_value_1', 'input_value_2', 'input_value_3'],
-            ['input_value_1', 'input_value_2', 'input_value_3'],
-            ['input_value_1', 'input_value_2', 'input_value_3']
+            ['iter_1_value_1', 'iter_1_value_2', 'iter_1_value_3'],
+            ['iter_2_value_1', 'iter_2_value_2', 'iter_2_value_3'],
         ],
         description: 'Click sign to execute'
     },

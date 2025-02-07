@@ -27,7 +27,7 @@ For example, if we wanted to create an action called `create_user` that took a u
 user ID, we could define it like this:
 
 ```sql
-CREATE ACTION create_user($name text, $age int) PUBLIC RETURNS (uuid) {
+CREATE ACTION create_user($name TEXT, $age INT) PUBLIC RETURNS (uuid) {
     $uuid := uuid_generate_v5('f541de32-5ede-4083-bdbc-b29c3f02be9e'::uuid, @txid);
     INSERT INTO users (id, name, age) VALUES ($uuid, $name, $age);
     RETURN $uuid;
@@ -39,7 +39,7 @@ CREATE ACTION create_user($name text, $age int) PUBLIC RETURNS (uuid) {
 There are three types of return definitions that can be used in an action:
 - `(void)`: The action does not return any value.
 - `RETURNS ([name_1] value_type_1 [, [name_2] value_type_2, ...])`: The action returns a single row of one or more values. Each
-column can be given a name (which will be used to materialize a table), but one will be auto-generated if not provided
+column can be given a name (which will be used to materialize a table), but one will be auto-generated if not provided.
 - `RETURNS TABLE (name_1 value_type_1 [, name_2 value_type_2, ...])`: The action returns a table of rows, each with one or more values.
 Each column _must_ specify a return name.
 
@@ -54,11 +54,11 @@ CREATE ACTION delete_user($id uuid) PUBLIC {
 ### Action With Single Return Value
 
 ```sql
-CREATE ACTION get_user($id uuid) PUBLIC RETURNS (text, int) {
+CREATE ACTION get_user($id uuid) PUBLIC RETURNS (TEXT, INT) {
     -- ...
 }
 -- or
-CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name text, age int) {
+CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name TEXT, age INT) {
     -- ...
 }
 ```
@@ -66,15 +66,15 @@ CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name text, age int) {
 ### Action With Table Return
 
 ```sql
-CREATE ACTION get_users() PUBLIC RETURNS TABLE (name text, age int) {
+CREATE ACTION get_users() PUBLIC RETURNS TABLE (name TEXT, age INT) {
     -- ...
 }
 ```
 
 ## Access Modifiers
 
-Access modifiers specify when an action can be called. There are 3 primary access modifiers, and 2 optional access modifiers.
-Each action must have exactly one primary access modifier, and can have zero or more optional access modifiers.
+Access modifiers specify when an action can be called. Each action must have exactly one primary access modifier, and can have zero or more optional access modifiers.
+There are 3 primary access modifiers, and 2 optional access modifiers.
 
 | Modifier | Primary | Description |
 |----------|---------|-------------|
@@ -95,17 +95,17 @@ All variables are strongly typed. Variables can be assigned at declaration, or c
 They can also be type casted:
 
 ```sql
-CREATE ACTION declare_vars() public {
-    -- declare and assign new int var:
-    $var1 int := 1;
+CREATE ACTION declare_vars() PUBLIC {
+    -- declare and assign new INT var:
+    $var1 INT := 1;
 
     -- declare a new var to be assigned to later
-    $var2 text;
+    $var2 TEXT;
 
-    -- assign to $var2. type cast $var1 (of type int) to match type text:
-    $var2 := $var1::text; -- $var2 is now '1'
+    -- assign to $var2. type cast $var1 (of type INT) to match type TEXT:
+    $var2 := $var1::TEXT; -- $var2 is now '1'
 
-    -- declare and assign a new variable. The type will be inferred as text:
+    -- declare and assign a new variable. The type will be inferred as TEXT:
     $var3 := 'hello world';
 }
 ```
@@ -115,15 +115,15 @@ CREATE ACTION declare_vars() public {
 Basic arithmetic operations can be performed on variables:
 
 ```sql
-CREATE ACTION do_math($num1 INT, $num2 INT) public {
+CREATE ACTION do_math($num1 INT, $num2 INT) PUBLIC {
     -- add and divide, with precedence:
-    $avg int := ($num1 + $num2)/2;
+    $avg INT := ($num1 + $num2)/2;
 
     -- modulo:
-    $mod int := $num2%10;
+    $mod INT := $num2%10;
 
     -- negate, multiply
-    $neg_mul int := (-$avg)*$mod;
+    $neg_mul INT := (-$avg)*$mod;
 
     -- exponentiation
     $exp := $num1^2;
@@ -135,19 +135,19 @@ CREATE ACTION do_math($num1 INT, $num2 INT) public {
 Actions can perform basic array and slice operations. **Arrays are 1-indexed**.
 
 ```sql
-CREATE ACTION handle_arrays() public {
+CREATE ACTION handle_arrays() PUBLIC {
     -- create an array
-    $arr text[] := ['hello', 'world'];
+    $arr TEXT[] := ['hello', 'world'];
 
     -- append to the array
     $arr := array_append($arr, 'goodbye');
-    $len int := array_length($arr); -- 3
+    $len INT := array_length($arr); -- 3
 
     -- get the first element
-    $first text := $arr[1]; -- 'hello'
+    $first TEXT := $arr[1]; -- 'hello'
 
     -- get a slice of the array
-    $slice text[] := $arr[2:3]; -- ['world', 'goodbye']
+    $slice TEXT[] := $arr[2:3]; -- ['world', 'goodbye']
 }
 ```
 
@@ -156,7 +156,7 @@ CREATE ACTION handle_arrays() public {
 If/elseif/else statements can be used to conditionally execute logic. They can also use AND and OR, as well as parentheses for grouping.
 
 ```sql
-CREATE ACTION age_conditional($age int) public {
+CREATE ACTION age_conditional($age INT) PUBLIC {
     if ($age < 0) OR ($age > 200 AND $age < 300) {
         -- do something
     } elseif $age < 18 {
@@ -177,9 +177,9 @@ Loops can be controlled using breaks, continues, and returns.
 #### Array Loop
 
 ```sql
-CREATE ACTION iterate_over_array($names text[]) public {
+CREATE ACTION iterate_over_array($names TEXT[]) PUBLIC {
     for $name IN ARRAY $names {
-        -- $name is of type `text`
+        -- $name is of type `TEXT`
         if $name is null {
             return; -- will exit the action
         }
@@ -191,7 +191,7 @@ CREATE ACTION iterate_over_array($names text[]) public {
 #### Range Loop
 
 ```sql
-CREATE ACTION iterate_over_range() public {
+CREATE ACTION iterate_over_range() PUBLIC {
     for $i in 1..10 {
         -- $i is an integer from 1 to 10
         if $i%2 == 0 {
@@ -204,9 +204,9 @@ CREATE ACTION iterate_over_range() public {
 #### SQL Loop
 
 ```sql
-CREATE ACTION iterate_over_sql() public {
+CREATE ACTION iterate_over_sql() PUBLIC {
     for $row in SELECT name::TEXT, age::INT FROM users {
-        -- $row.name is a text, $row.age is an int
+        -- $row.name is a TEXT, $row.age is an INT
         if $row.age < 18 {
             break; -- will exit the loop
         }
@@ -224,14 +224,14 @@ There are three ways to return values from an action:
 #### Returning A Single Row
 
 ```sql
-CREATE ACTION return_values() public RETURNS (name text, age int) {
+CREATE ACTION return_values() PUBLIC RETURNS (name TEXT, age INT) {
     RETURN 'Alice', 30;
 }
 ```
 
 #### Returning A Table
 ```sql
-CREATE ACTION return_values() public RETURNS TABLE (name text, age int) {
+CREATE ACTION return_values() PUBLIC RETURNS TABLE (name TEXT, age INT) {
     RETURN SELECT name, age FROM users;
 }
 ```
@@ -239,7 +239,7 @@ CREATE ACTION return_values() public RETURNS TABLE (name text, age int) {
 #### Returning Next
 
 ```sql
-CREATE ACTION return_values() public RETURNS TABLE(name text, age int) {
+CREATE ACTION return_values() PUBLIC RETURNS TABLE(name TEXT, age INT) {
     for $name IN ARRAY ['Alice', 'Bob', 'Charlie'] {
         RETURN NEXT $name, 30;
     }
@@ -257,11 +257,11 @@ of the response. For non-view actions (executing within a transaction), notices 
 execution result. **`NOTICE` cannot be used in SQL statements.**
 
 ```sql
-CREATE ACTION log_message() public {
+CREATE ACTION log_message() PUBLIC {
     NOTICE('This is a log message');
 }
 
-CREATE ACTION illegal_notice() public {
+CREATE ACTION illegal_notice() PUBLIC {
     -- notices cannot be used in INSERT/UPDATE/DELETE/SELECT statements
     SELECT NOTICE('This is an illegal notice');
 }
@@ -273,13 +273,13 @@ The `ERROR` function raises an exception with the given message. It will halt ex
 and rollback any changes made in the current transaction.
 
 ```sql
-CREATE ACTION raise_error($id int) public {
+CREATE ACTION raise_error($id INT) PUBLIC {
     if $id < 0 {
         ERROR('ID must be positive');
     }
 }
 
-CREATE ACTION error_in_sql() public {
+CREATE ACTION error_in_sql() PUBLIC {
     -- unlike NOTICE, the ERROR function can be used in SQL statements
     SELECT 
         CASE
@@ -298,7 +298,7 @@ contain `SELECT` statements. SQL statements _cannot_ be used if you are looping 
 #### Using an INSERT Statement
 
 ```sql
-CREATE ACTION create_user($name text, $age int) public {
+CREATE ACTION create_user($name TEXT, $age INT) PUBLIC {
     INSERT INTO users (name, age) VALUES ($name, $age);
 }
 ```
@@ -306,7 +306,7 @@ CREATE ACTION create_user($name text, $age int) public {
 #### Reading a Table
 
 ```sql
-CREATE ACTION get_users() public RETURNS TABLE (name text, age int) {
+CREATE ACTION get_users() PUBLIC RETURNS TABLE (name TEXT, age INT) {
     RETURN SELECT name, age FROM users;
 }
 ```
@@ -314,7 +314,7 @@ CREATE ACTION get_users() public RETURNS TABLE (name text, age int) {
 #### Reading a Single Record from a Table
 
 ```sql
-CREATE ACTION get_user($id uuid) public RETURNS (name text, age int) {
+CREATE ACTION get_user($id uuid) PUBLIC RETURNS (name TEXT, age INT) {
     for $row in SELECT name, age FROM users WHERE id = $id {
         -- return on the first iteration
         RETURN $row.name, $row.age;
@@ -326,7 +326,7 @@ CREATE ACTION get_user($id uuid) public RETURNS (name text, age int) {
 #### Illegal Nested SQL
 
 ```sql
-CREATE ACTION illegal_nested_sql() public {
+CREATE ACTION illegal_nested_sql() PUBLIC {
     for $row in SELECT * FROM users {
         -- this is illegal, and will raise an error
         SELECT * FROM users;
@@ -346,25 +346,25 @@ Actions can call other actions, both within the same namespace and in other name
 #### Calling an Action that returns a Single Row
 
 ```sql
-CREATE ACTION do_something() public returns (text, int) {
+CREATE ACTION do_something() PUBLIC returns (TEXT, INT) {
     RETURN 'hello', 1;
 };
 
-CREATE ACTION call_other_action() public {
-    $text_result, $int_result := do_something();
+CREATE ACTION call_other_action() PUBLIC {
+    $TEXT_result, $INT_result := do_something();
 }
 ```
 
 #### Calling an Action that returns a Table
 
 ```sql
-CREATE ACTION do_something() public returns table(name text, age int) {
+CREATE ACTION do_something() PUBLIC returns table(name TEXT, age INT) {
     RETURN SELECT 'Alice', 30;
 };
 
-CREATE ACTION call_other_action() public {
+CREATE ACTION call_other_action() PUBLIC {
     for $row in do_something() {
-        -- $row.name is a text, $row.age is an int
+        -- $row.name is a TEXT, $row.age is an INT
     }
 }
 ```
@@ -372,22 +372,22 @@ CREATE ACTION call_other_action() public {
 #### Calling an Action that Returns Nothing
 
 ```sql
-CREATE ACTION do_something() public {
+CREATE ACTION do_something() PUBLIC {
     -- do something
 };
 
-CREATE ACTION call_other_action() public {
+CREATE ACTION call_other_action() PUBLIC {
     do_something();
 }
 ```
 
 #### Calling an Action in a Different Namespace
 ```sql
-{other_namespace} CREATE ACTION do_something() public returns (text, int) {
+{other_namespace} CREATE ACTION do_something() PUBLIC returns (TEXT, INT) {
     RETURN 'hello', 1;
 };
 
-CREATE ACTION call_other_action() public {
-    $test_result, $int_result := other_namespace.do_something();
+CREATE ACTION call_other_action() PUBLIC {
+    $test_result, $INT_result := other_namespace.do_something();
 }
 ```

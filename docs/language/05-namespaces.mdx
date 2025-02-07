@@ -23,7 +23,7 @@ To create a new namespace, use the `CREATE NAMESPACE` statement:
 CREATE NAMESPACE [IF NOT EXISTS] my_namespace;
 ```
 
-This will create a new namespace called `my_namespace`. If the namespace already exists, an error will be thrown unless the `IF NOT EXISTS`.
+This will create a new namespace called `my_namespace`. If the namespace already exists, an error will be thrown unless the `IF NOT EXISTS` clause is used.
 
 To drop a namespace, use the `DROP NAMESPACE` statement:
 
@@ -32,11 +32,11 @@ DROP NAMESPACE [IF EXISTS] my_namespace;
 ```
 
 This will remove the namespace `my_namespace` and all of its contents. If the namespace does not exist, an error will be thrown
-unless the `IF EXISTS`.
+unless the `IF EXISTS` clause is used.
 
 ## Using Namespaces
 
-Namespaces can be specified in 2 places:
+Namespaces can be specified in two places:
 
 - when executing ad-hoc SQL (INSERT/UPDATE/DELETE/SELECT) or DDL ('CREATE TABLE'/'CREATE ACTION') statements
 - when executing an action
@@ -86,7 +86,7 @@ CREATE NAMESPACE other;
 };
 ```
 
-The action `my_action` can only insert data into `my_table`, but can read data from `other_table` in the `other`.
+The action `my_action` can only insert data into `my_table`, but can read data from `other_table` in the `other` namespace.
 
 Actions can also call actions from other namespaces (assuming they are not `PRIVATE`). For example:
 

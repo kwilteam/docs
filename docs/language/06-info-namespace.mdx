@@ -8,8 +8,7 @@ slug: /language/info-namespace
 ---
 
 The `info` namespace is a special namespace that holds information regarding the structure of all other namespaces.
-It informs the user of other tables, columns, actions, and more that are available. The `info` namespace can only
-be queried, and it cannot be modified.
+It informs the user of other tables, columns, actions, and more that are available. The `info` namespace is read-only; it cannot be modified.
 
 ## Tables in the "info" Namespace
 
@@ -112,7 +111,7 @@ The `roles` table contains information about all the roles in the database.
 | Column | Data Type | Description |
 |--------|-----------|-------------|
 | name | TEXT | The name of the role |
-| built_in | BOOL | Whether the role is built-in or is user-define |
+| built_in | BOOL | Whether the role is built-in or is user-defined |
 
 ### "role_privileges" Table
 
@@ -124,7 +123,7 @@ The `role_privileges` table contains information about the privileges that each 
 | privilege | TEXT | The privilege the role has ('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'CREATE', 'DROP', 'ALTER', 'CALL', 'ROLES', or 'USE') |
 | namespace | TEXT | The namespace the privilege is on, if it is not global |
 
-### "user_roles"
+### "user_roles" Table
 
 The `user_roles` table contains information about the roles that each user has.
 

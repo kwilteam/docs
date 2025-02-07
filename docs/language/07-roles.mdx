@@ -8,7 +8,7 @@ slug: /language/roles
 ---
 
 Roles in Kwil allow you to define privileges that can be held by users, defining how users can interact with the database.
-Using roles, you can designate rules for how schemas can change, who can execute ad-hoc SQL statements, set access control
+Using roles, you can designate rules for how schemas can change, who can execute ad-hoc SQL statements, and set access control
 rules for namespaces.
 
 ## Creating Roles
@@ -28,7 +28,7 @@ DROP ROLE [IF EXISTS] role_name;
 There are two built-in roles in Kwil:
 
 - `owner`: the owner is a special role that has all privileges on the database. There can only ever be one owner. Privileges cannot
-be revoked from the owner role.
+be revoked from the `owner` role.
 - `default`: the default role is held by all users, and cannot be revoked. By default, the `default` role can call all actions and
 execute ad-hoc SELECT statements, however these privileges can be revoked.
 
@@ -59,7 +59,7 @@ Kwil supports the following privileges. If "Global-Only" is marked as "Yes", the
 | `ALTER` | No | Allows the role to alter tables, actions, and other database objects. |
 | `CALL` | No | Allows the role to call actions. |
 | `ROLES` | Yes | Allows the role to create, grant, and revoke roles. |
-| `USE` | Yes | Allows the roles to initialize a new extension. |
+| `USE` | Yes | Allows the role to initialize a new extension. |
 
 ## Granting and Revoking Privileges
 

@@ -212,7 +212,7 @@ You can also add multiple columns in a single statement:
 
 ```sql
 ALTER TABLE users
-ADD COLUMN date_of_birth DATE,
+ADD COLUMN date_of_birth TEXT,
 ADD COLUMN age INT;
 ```
 
@@ -228,7 +228,7 @@ DROP COLUMN column_name;
 You can drop multiple columns in a single statement:
 
 ```sql
-ALTER TABLE users
+ALTER TABLE users 
 DROP COLUMN age,
 DROP COLUMN date_of_birth;
 ```

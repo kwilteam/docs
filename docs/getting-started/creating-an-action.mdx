@@ -17,7 +17,7 @@ pre-defined actions that you have created. Using actions, you can define the SQL
 - Ethereum Private Key - You will need an Ethereum private key to sign transactions to Kwil.
 If you do not have one, you can generate one using the [`kwil-cli utils generate-key`](/docs/ref/kwil-cli/utils/generate-key#examples) command.
 - Kwil RPC - You will need the RPC endpoint of the Kwil network you are deploying to. This can be obtained by either running a [node
-locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login>).
+locally](/docs/node/quickstart), or by obtaining an endpoint from [Kwil Firebird](https://admin.kwil.com/firebird/login).
 
 ## Creating the Schema
 
@@ -95,7 +95,7 @@ the subsequent arguments:
 
 ```shell
 $ kwil-cli --private-key <YOUR_PRIVATE_KEY> --provider <YOUR_PROVIDER_URL> \
-    exec-action create_user text:alice int:25
+    exec-action create_user text:alice int:25 --sync
 ```
 
 To call a view action, use the `kwil-cli call-action` command. It takes the action name as the first argument, and the parameters as
