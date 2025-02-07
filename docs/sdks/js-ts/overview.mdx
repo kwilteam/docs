@@ -135,11 +135,10 @@ const res = await kwil.execute(
     {
         namespace: 'db_namespace' // e.g., 'main',
         name: 'action_name', // e.g., 'create_user',
-        // execute the same action three times:
+        // execute the same action two times:
         inputs: [
-            ['input_value_1', 'input_value_2', 'input_value_3'],
-            ['input_value_1', 'input_value_2', 'input_value_3'],
-            ['input_value_1', 'input_value_2', 'input_value_3']
+            ['iter_1_value_1', 'iter_1_value_2', 'iter_1_value_3'],
+            ['iter_2_value_1', 'iter_2_value_2', 'iter_2_value_3'],
         ],
         description: 'Click sign to execute'
     },
