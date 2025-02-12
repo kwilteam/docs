@@ -12,7 +12,7 @@ actions, and other database objects, while avoiding naming conflicts between dif
 similar to [schemas in Postgres](<https://www.postgresql.org/docs/current/ddl-schemas.html>), and are simply given a different name
 to avoid confusion.
 
-Each database comes with two built-in schemas: `main` and `info`. If no namespace is specified, the `main` schema is used by default.
+Each database comes with two built-in namespaces: `main` and `info`. If no namespace is specified, the `main` namespace is used by default.
 `info` stores metadata about the other namespaces (such as the tables and actions they contain), and cannot be written to directly.
 
 ## Creating Namespaces
@@ -65,7 +65,7 @@ CREATE NAMESPACE my_namespace;
 
 Namespaces cannot be specified within an action body. Instead, actions can only insert, update, and delete data from tables
 within the same namespace. They _can_ read data from tables in other namespaces, but cannot write to them.
-Take, for example, the following schema:
+Take, for example, the following database schema:
 
 ```sql
 CREATE NAMESPACE my_namespace;
