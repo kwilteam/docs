@@ -1,0 +1,112 @@
+---
+sidebar_position: 1
+sidebar_label: "Setup"
+id: erc20-bridge-setup
+title: Setup
+description: Setup the ERC20 Bridge
+slug: /erc20-bridge/setup
+---
+
+:::info
+Right now, the Kwil team still manually deploys each bridge contract. We are working on automation to make this process easier.
+In the meantime, please [reach out to us](<mailto:brennan@kwil.com>) if you would like us to deploy a bridge contract for you.
+:::
+
+This page will guide you through setting up an ERC20 bridge to a Kwil database. There are a few prerequisites you will need:
+- An ERC20 token contract that is already deployed. **The token cannot be a [Rebase Token](<https://unchainedcrypto.com/what-is-a-rebase-token/>)**
+- A list of Ethereum addresses (1-10) which will make up the multisig that controls tokens held in escrow, and the threshold for the multisig. Alternatively,
+you can provide an already-deployed Safe multisig address.
+
+### Step 1: Deploy the Escrow Contract and Relayer
+
+_While the system is still manual, the Kwil team will perform this step on your behalf. This is simply here to illustrate the full deployment scenario._
+
+The first step is to deploy the escrow contract and the relayer. The escrow contract is responsible for holding tokens, and releasing them in batch
+when the multisig approves a release. The relayer is responsible for submitting transactions to the escrow contract on behalf of the multisig. **The
+relayer itself is not part of the multisig, and is merely responsible for expending ETH gas to submit transactions.**
+
+### Step 2: Deploy Kwil Validators with Bridge Oracles
+
+The `kwild` node software comes with a built-in bridge oracle that allows the Kwil node to listen to and come to consensus on Ethereum events.
+**Greater than 1/2 of your network's validator power must be running a Kwil node with the bridge oracle enabled in order for deposits to be processed.**
+To configure the bridge oracle, node operators will need to have an Ethereum RPC from which they can read events. There are three configurations that
+can be set for each chain:
+
+- `rpc`[required]: The Ethereum RPC endpoint from which to read events. It must be a websocket endpoint.
+- `block_sync_chunk_size`[optional]: The number of blocks to sync in each chunk. To allow fast syncing between the Kwil node and the target chain,
+Kwil nodes will sync blocks in chunks, where all events for a single chunk are retrieved in one request to the Ethereum RPC. The default value is 1000000.
+For bridges with a high volume of transfers, it may be necessary to decrease this value as to not overload the Ethereum RPC.
+
+Below are example configurations showing how a validator can configure Ethereum RPCs. It assumes that the target chain is the Ethereum Sepolia testnet:
+
+
+**config.toml**
+
+```toml title="config.toml"
+# ...
+# ERC20 bridge configuration
+[erc20_bridge]
+# REQUIRED: evm websocket RPC; format: chain_name='rpc_url'
+[erc20_bridge.rpc]
+sepolia = "wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER"
+
+# OPTIONAL: rpc option block sync chunk size; format: chain_name='chunk_size'
+[erc20_bridge.block_sync_chuck_size]
+sepolia = "1000000"
+# ...
+```
+
+**kwild command**
+
+```bash
+kwild start <...> --erc20-bridge.rpc 'sepolia=wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER' \
+    --erc20-bridge.block_sync_chunk_size 'sepolia=1000000'
+```
+
+### Step 3: Deploy Kwil Nodes with the Multisig
+
+All keys in the multisig must run their own local Kwil node to sign transactions authoring the release of tokens. The nodes do not have to be validators,
+and can instead be read-only sentry nodes. There are two configurations needed for each multisig:
+
+- `rpc`[required]: The Kwil RPC endpoint to which the multisig will submit transactions. This is the same configuration as the `rpc` config in the section above.
+- `signer`[required]: The filepath of the private key that is part of the Safe multisig wallet.
+
+Below are example configurations showing how a multisig can configure Kwil nodes. It assumes that the Kwil network is running on the localhost talking
+to Sepolia, and that the bridge is targeting USDC on Sepolia, and we have an escrow contract for the USDC
+at `0x1234567890abcdef1234567890abcdef12345678`:
+
+**initializing the bridge**
+```sql
+USE erc20_bridge {
+    chain: 'sepolia',
+    escrow: '0x1234567890abcdef1234567890abcdef12345678',
+} AS my_bridged_usdc;
+```
+:::tip
+This step can be performed _after_ the Kwil nodes have been set up. Your node's configuration can reference an
+extension that does not yet exist.
+More information on the erc20_bridge `USE` statement can be found in the [Usage](/docs/erc20-bridge/usage) docs.
+:::
+
+**config.toml**
+
+```toml title="config.toml"
+# ...
+# ERC20 bridge configuration
+[erc20_bridge]
+# REQUIRED: kwil websocket RPC; format: chain_name='rpc_url'
+[erc20_bridge.rpc]
+sepolia = "wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER"
+
+# REQUIRED: signer option; format: chain_name='signer_file'
+[erc20_bridge.signer]
+my_bridged_usdc = "/path/to/your/signer/key"
+# ...
+```
+
+**kwild command**
+
+```bash
+kwild start <...> --erc20-bridge.rpc 'sepolia=wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER' \
+    --erc20-bridge.signer 'my_bridged_usdc=/path/to/your/signer/key'
+```

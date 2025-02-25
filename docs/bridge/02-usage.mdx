@@ -1,0 +1,149 @@
+---
+sidebar_position: 2
+sidebar_label: "Usage"
+id: erc20-bridge-usage
+title: Usage
+description: Using the ERC20 Bridge
+slug: /erc20-bridge/usage
+---
+
+This page will guide you through how to use the ERC20 bridge once it has been set up. For information on setting
+up the bridge, see the [Setup](/docs/erc20-bridge/setup) page.
+
+## Initializing the Bridge Extension
+
+Balances for bridged tokens are managed using a built-in extension in the Kwil database. All distributions
+of `kwild` have this extension included by default. To initialize the extension, use the [`USE` statement](/docs/language/extensions).
+The `erc20_bridge` initialization has the following fields:
+
+- `chain`[required]: The chain name of the EVM chain the bridge is connected to. Currently Kwil supports `sepolia` and `ethereum`, but if you need another chain, please let us know as it is easy to add.
+- `escrow`[required]: The address of the escrow smart contract.
+- `distribution_period`[optional]: The amount of time that should elapse between distribution epochs. The default is `10m`.
+Valid time units are "s", "m", "h". The minimum value is `1m` and the maximum value is `168h` (1 week).
+
+```sql
+USE erc20_bridge {
+    chain: 'sepolia',
+    escrow: '0x1234567890123456789012345678901234567890',
+    distribution_period: '1h'
+} AS my_bridged_token;
+```
+
+This statement initializes the bridge extension and assigns it the namespace `my_bridged_token`. This namespace
+can be used to interact with the bridge extension.
+
+## Depositing Tokens
+
+To deposit tokens to the bridge, you simply have to transfer tokens to the escrow smart contract. The network will
+listen to the erc20 `Transfer` event and mint the equivalent amount of tokens on the Kwil database to the wallet.
+
+All token deposits will take a few blocks to be processed, to ensure no re-orgs occur before the bridge is complete.
+This time period is chain-specific, with Ethereum mainnet taking 12 blocks to confirm.
+
+To check the balance of bridged tokens, you can call the `balance` action on the `my_bridged_token` namespace:
+
+```sql
+CREATE ACTION my_action() public {
+    $balance := my_bridged_token.balance('0x1234567890123456789012345678901234567890');
+}
+```
+
+## Transferring Tokens
+
+There are two ways to transfer tokens on a Kwil database:
+- Using the `transfer` action, which transfers the tokens between two wallet addresses.
+- Using the `lock` or `admin_lock` actions, which debit the tokens from the specified wallet and credit them to the database
+itself. This effectively allows a Kwil database to hold tokens itself, which it can later distribute to other wallets.
+
+### Transfer
+
+To transfer tokens between two wallet addresses, use the `transfer` action.
+**Note that all token balances are stored as `NUMERIC(78,0)`, which is a native Postgres data type
+capable of storing up to 78 digits of precision, which is enough to store the maximum possible uint256 value**.
+
+```sql
+CREATE ACTION my_transfer($to_address TEXT, $amount NUMERIC(78,0)) public {
+    my_bridged_token.transfer($to_address, $amount);
+}
+```
+
+### Lock
+
+To lock tokens, use either the `lock` or `admin_lock` action. The `lock` action locks tokens from the caller's wallet address.
+The `admin_lock` action locks tokens from a specified wallet address.
+
+```sql
+CREATE ACTION my_lock($amount NUMERIC(78,0)) public {
+    my_bridged_token.lock($amount);
+    my_bridged_token.lock_admin('0x1234567890123456789012345678901234567890', $amount);
+}
+```
+
+## Giving Tokens to Users
+
+There are three ways to give tokens to users:
+
+- Using the `bridge` action, which allows transfers tokens from a user's balance in the database back to the layer 1 network.
+- Using the `issue` action, which transfers locked tokens from the database to the layer 1 network, where a user can claim them.
+- Using the `unlock` action, which transfers locked tokens from the database to a user's balance in the database.
+
+### Bridge
+
+To allow a user to bridge their tokens back to the layer 1 network, use the `bridge` action.
+
+```sql
+CREATE ACTION my_bridge($amount NUMERIC(78,0)) public {
+    my_bridged_token.bridge($amount);
+}
+```
+
+### Issue
+
+To issue tokens held by the database to the user on the layer 1 network, use the `issue` action.
+
+```sql
+CREATE ACTION my_issue($to_address TEXT, $amount NUMERIC(78,0)) public {
+    my_bridged_token.issue($to_address, $amount);
+}
+```
+
+### Unlock
+
+To unlock tokens from the database to a user's balance, use the `unlock` action.
+
+```sql
+CREATE ACTION my_unlock($to_address TEXT, $amount NUMERIC(78,0)) public {
+    my_bridged_token.unlock($to_address, $amount);
+}
+```
+
+## Claiming Tokens
+
+To claim tokens from the escrow smart contract, users will need to perform two steps:
+1. Get the inclusion proof for the token distribution from the database.
+2. Call the escrow smart contract with the inclusion proof to claim the tokens.
+
+### Get Inclusion Proof
+
+To get all inclusion proofs for a user that can be claimed on chain, use the `list_wallet_rewards` action.
+
+```shell
+kwil-cli call-action list_wallet_rewards --namespace my_bridged_token text:YOUR_WALLET_ADDRESS
+```
+
+### Claim Tokens
+
+To claim tokens from the escrow smart contract, call the `claim` action on the escrow smart contract with the inclusion proof.
+The smart contract function has the following signature:
+
+```solidity
+function claimReward(
+    address recipient,
+    uint256 amount,
+    bytes32 kwilBlockHash,
+    bytes32 rewardRoot,
+    bytes32[] calldata proofs
+)
+```
+
+Alternatively, Kwil will also provide a simple UI that automates this process for users. This is still in development.

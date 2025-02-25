@@ -1,145 +1,11 @@
-Starting Kwil v0.10, Kwil allows you to build EVM bridge that supports bridging ERC20 token from and to EVM compatible chains, without worrying about security and centralization risks.
-
-ERC20 bridge also gives you the ability to programmely manage the ERC20 token using Kwil SQl contract, on Kwil, makes it suitable for many use cases:
-- sell private data on Kwil
-- use token to incentive user engaging in web2 product
-- need to apply complex logic on token, frequently and cheap
-
-In this page, we'll explain the mechanism, and we'll demonstrate how to use it.
-
-## The mechanism
-
-ERC20 bridge has three major components:
-- Kwil erc20-bridge extension: providing interface for DEV to manage erc20 tokens in Kwil SQL contract
-- GnosisSafe on EVM chains + signer in kwild: multi sign infra; kwild can be configured as a signer for GnosisSafe wallet
-- Escrow smart contract on EVM chains: manages ERC20 tokens on EVM chain
-
-and all components are decentralized out of the box.
-
-### Bridge ERC20 token from EVM chain to Kwil
-
-To bridge tokens to Kwil, you only need to transfer the ERC20 token to the Escrow contract.
-
-Kwil's oracle extension monitors the transfer event of the target ERC20 token.
-When Escrow contract receives tokens from a wallet, the same wallet will be credited the same amount of token on Kwil.
-
-### Bridge ERC20 token from Kwil to EVM chain
-
-To bridge token to EVM chains, you need to go through the following steps:
-- issue token to a wallet using erc20-bridge extension
-- the multi-sign parties see the issuance, they verify and sign the approval
-- providing enough signatures, any party then can post that issuance onto EVM chain, through GnosisSafe
-- the recipient then can go ahead to withdraw token out of the Escrow contract
-
-
-## An USDC giveaway example
-
-Let's create a simple example on Kwil to give away Sepolia USDC on Kwil.
-
-Here is how this APP works:
-- our APP will have a kwil action called `gm`
-- anyone can call this action, and get 0.1 Sepolia USDC on very call
-
-Let's assume we've deployed GnosisSafe and Escrow contract on Sepolia testnet, and the Escrow address is `0x0000000000000000000000000000beef`, and it manages USDC token.
-And the GnosisSafe setting is 1/x.
-
-Let's build it.
-
-### Config kwild to enable erc20-bridge
-
-To enable erc20-bridge, you need to config erc20_bridge section in your kwild config.
-
-```toml
-# ERC20 bridge configuration
-[erc20_bridge]
-# evm websocket RPC; format: chain_name='rpc_url'
-[erc20_bridge.rpc]
-sepolia = "wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER"
-
-# rpc option block sync chunk size; format: chain_name='chunk_size'
-[erc20_bridge.block_sync_chuck_size]
-seoplia = "1000000"
-
-# signer service configuration; format: ext_alias='file_path_to_private_key'
-[erc20_bridge.signer]
-usdc = "/path/to/your/privatekey"
-```
-
-The configuration tells kwild:
-- there is RPC for sepolia
-- and for sepolia, the block_sync_chunk_size is 1000000;
-- and for the bridge signer, use `/path/to/your/privatekey` as the private key for erc20 bridge `usdc`;  this also tells kwild that we'll be a Signer of our GnosisSafe wallet, so make sure you're using the right private key.
-
-We'll find out why we configured `usdc` in next section.
-
-### Bridge USDC to Kwil
-
-First, we tell Kwil that we have an escrow contract on Sepolia testnet, and we want to bridge the erc20 token it manages;
-every 10 minutes, an epoch should be created so that all the tokens issued on Kwil can be bridged back to Sepolia testnet; and our new bridge is called usdc.
-
-```
-kwil-cli exec-sql "
-USE erc20 {
-    chain: 'sepolia',
-    escrow: '0x0000000000000000000000000000beef',
-    distribution_period: '10m'
-} AS usdc;" --sync
-```
-
-Then, as the project owner, we need to fund our APP. we transfer some USDC on sepolia to `0x0000000000000000000000000000beef`.
-Kwil oracle will see this and credit same amount of token to your account on Kwil.
-
-Lastly, after we transfer, and wait a bit, you can check your balance on Kwil, by doing
-
-```
-kwil-cli call-action balance -n usdc text:YOUR_ETH_WALLET_ADDRESS
-```
-
-If you see non-zero balance, congratulation, we bridged USDC to Kwil!
-
-### Define our USDC giveaway app
-
-Our APP can be defined as:
-
-```
-CREATE NAMESPACE IF NOT EXISTS usdc_giveaway;
-
-{usdc_giveaway}CREATE ACTION gm() public {
-    usdc.issue(@caller, usdc.scale_up('0.1'));
-};
-```
-
-The code above does this:
-- First, we put our APP in  namespace `usdc_giveaway`
-- Second, we create an action `gm` to issue 0.01 USDC token to `@caller`;
-
-> NOTE: 'Builtin functions' section explains `issue` and `scale_up` function.
-
-
-Save this to `/tmp/giveaway.sql`, then execute it: `kwil-cli exec-sql -f /tmp/giveaway.sql --sync`
-
-### Let's give away some money
-
-Now let's use another user to grab some money.
-
-After you configure a new user, do `kwil-cli exec-action gm -n usdc_giveaway --sync`.
-
-After about 10 minutes or so, you can check if you have tokens you can claim on Sepolia testnet:
-`kwil-cli call-action list_wallet_rewards -n rewards text:YOUR_WALLET_ADDRESS --sync`.
-
-> NOTE: the output of this command will display BYTEA column as base64.
-
-
-### Claim our USDC on Sepolia testnet
-
-From the output of `kwil-cli call-action list_wallet_rewards -n rewards text:YOUR_WALLET_ADDRESS --sync`, there are few
-columns starts with `param_`, those are the correspond value you're supposed to use to claim token.
-
-Now, let's open this `https://sepolia.etherscan.io/address/0x0000000000000000000000000000beef#writeContract` in the browser, click `claimReward`,
-then you'll see 6 inputs, which correspond to our `param_` column, you can use those value to claim your token.
-
-
-## Builtin Functions provided by `erc20` extension
+---
+sidebar_position: 3
+sidebar_label: "Reference"
+id: erc20-bridge-reference
+title: Reference
+description: ERC20 Bridge Reference
+slug: /erc20-bridge/reference
+---
 
 ### info()
 
@@ -224,6 +90,16 @@ Params:
 | name | type | description |
 | ---- | ---- | ----------- |
 | user | TEXT | user wallet address |
+| amount | UINT256 |  amount|
+
+### bridge(amount)
+
+Bridge `amount` erc20 token to erc20 bridge.
+
+Params:
+
+| name | type | description |
+| ---- | ---- | ----------- |
 | amount | UINT256 |  amount|
 
 ### balance(user)
