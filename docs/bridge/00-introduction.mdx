@@ -7,3 +7,44 @@ description: Introduction to Kwil's ERC20 Bridge
 slug: /erc20-bridge/introduction
 ---
 
+Each Kwil database ships with a built-in ERC20 bridge that allows you to bi-directionally bridge ERC-20 tokens to and from any EVM-compatible chain and your Kwil database. Use cases for the ERC-20 token bridge include:
+
+- Rewarding users with ERC-20 tokens for participating in your application
+- Charging users ERC-20 tokens (or implementing gas fees) for using your application
+- Implementing staking and/or validator weights in your decentralized database
+- Creating validator rewards for your Kwil node operators
+
+Kwil also provides the necessary EVM contracts and other tooling to interact with the bridge. These contracts are open-source and audited by HashEx Security.
+
+## Architecture
+
+The ERC-20 bridge is composed of several components:
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+    <img src={require('../../static/img/bridge-arch.png').default} alt="ERC-20 Bridge Architecture" />
+</div>
+
+### Users
+
+Users deposit and, when authorized, claim tokens from the escrow smart contract. In the context of the ERC-20 Bridge, `Users` can be application users, a foundation, DAO, or any stakeholder that needs to bridge tokens to the Kwil database.
+
+### Escrow Contract
+
+The escrow contract ([`RewardDistributor.sol`](https://github.com/kwilteam/rewards_contracts/blob/main/contracts/RewardDistributor.sol)) is the main Solidity contract that manages the tokens to be bridged between the EVM chain and the Kwil database. When a user transfers tokens to the escrow contract, Kwil nodes will listen for the `transfer` event and mint the equivalent amount of tokens on the Kwil database to the wallet address that escrowed the tokens.
+
+When the SAFE Multi-sig Wallet posts a token distribution to the escrow smart contract, users can claim their tokens from the escrow contract.
+
+You can find the security audit for the escrow contract [here](https://github.com/kwilteam/rewards_contracts/blob/main/docs/RewardDistributor_HashEx_Audit.pdf).
+
+### Kwil Node with SAFE Signer
+
+Tokens are bridged back to the EVM chain via a select group of Kwil nodes that also act as signers for a multi-signature smart contract wallet (SAFE Wallet).
+
+Token distribution logic is written using [SQL Smart Contracts](/docs/language/introduction). When a user calls the `erc20.issue` method, (TODO - ADD LINK TO DESCRIPTION) the Kwil network collects the tokens and their recipients to be bridged back to the EVM chain. Rewards are collected during a 10-minute epoch. The total distribution for each epoch is signed by the Kwil Nodes with SAFE signers and relayed back to the escrow smart contract.
+
+### SAFE Multi-Sig Wallet
+
+The SAFE Multi-Sig Wallet is used to authorize distributions from the Escrow Smart Contract. The Network Operator (company, foundation, DAO, etc.) selects which nodes in its network ought to be signers in the multi-sig contract.
+
+Signature collections are aggregated via a relayer service (for gas optimization) and then posted to the SAFE Wallet. The SAFE Wallet then posts the distribution to the escrow contract, which allows users to claim their tokens.
+
