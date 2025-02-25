@@ -7,272 +7,265 @@ description: ERC20 Bridge Reference
 slug: /erc20-bridge/reference
 ---
 
-### info()
+This page lists all built-in actions provided by tbe erc20-bridge extension.
 
-Return current erc20 bridge info
+> See more about the [access modifiers](../language/04-actions.mdx#access-modifiers)
 
-Returns:
+### info() PUBLIC VIEW
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0 | chain | TEXT | chain name|
-| 1 | escrow | TEXT | erc20 escrow contract address|
-| 2 | epoch_period| TEXT | the epoch duration |
-| 3 | erc20   | TEXT | erc20 token address |
-| 4 | decimals | INT | erc20 token decimals|
-| 5 | balance  | UINT256 | total unspent balance|
-| 6 | synced   | BOOL | whether this info is synced|
-| 7 | synced_at| INT | block height when this info is synced|
-| 8 | enabled  | BOOL | whether this extension is enabled|
+Return current erc20 bridge info.
 
-### id()
+**Returns:**
+
+| index | name         | type    | description                           |
+|-------|--------------|---------|---------------------------------------|
+| 0     | chain        | TEXT    | chain name                            |
+| 1     | escrow       | TEXT    | erc20 escrow contract address         |
+| 2     | epoch_period | TEXT    | the epoch duration                    |
+| 3     | erc20        | TEXT    | erc20 token address                   |
+| 4     | decimals     | INT     | erc20 token decimals                  |
+| 5     | balance      | UINT256 | total unspent balance                 |
+| 6     | synced       | BOOL    | whether this info is synced           |
+| 7     | synced_at    | INT     | block height when this info is synced |
+| 8     | enabled      | BOOL    | whether this extension is enabled     |
+
+### id() PUBLIC VIEW
 
 Return current erc20 bridge id.
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   | id   | UUID | erc20 bridge id|
+| index | name | type | description     |
+|-------|------|------|-----------------|
+| 0     | id   | UUID | erc20 bridge id |
 
-### issue(user,amount)
+### issue(user,amount) SYSTEM
 
 Issue `amount` erc20 token to `user`.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| user | TEXT| wallet address |
-| amount | UINT256| uint256 amount |
+| name   | type    | description    |
+|--------|---------|----------------|
+| user   | TEXT    | wallet address |
+| amount | UINT256 | uint256 amount |
 
-### transfer(to, amount)
+### transfer(to, amount) PUBLIC
 
-Transfer `amount` erc20 token to `to`;
+Transfer `amount` erc20 token to `to`.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| to | TEXT | wallet address |
-| amount | UINT256 | transfer amount|
+| name   | type    | description     |
+|--------|---------|-----------------|
+| to     | TEXT    | wallet address  |
+| amount | UINT256 | transfer amount |
 
 
-### lock(amount)
+### lock(amount) PUBLIC
 
 Lock(or deposit) `amount` erc20 token to erc20 bridge.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| amount | UINT256 |  amount|
+| name   | type    | description |
+|--------|---------|-------------|
+| amount | UINT256 | amount      |
 
 
-### lock_admin(user, amount)
+### lock_admin(user, amount) SYSTEM
 
 Lock(or deposit) `amount` erc20 token to erc20 bridge, to `user`.
 
+**Params:**
 
-Params:
+| name   | type    | description         |
+|--------|---------|---------------------|
+| user   | TEXT    | user wallet address |
+| amount | UINT256 | amount              |
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| user | TEXT | user wallet address |
-| amount | UINT256 |  amount|
-
-### unlock(amount)
+### unlock(amount) SYSTEM
 
 Unlock(or withdraw) `amount` erc20 token from erc20 bridge.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| user | TEXT | user wallet address |
-| amount | UINT256 |  amount|
+| name   | type    | description         |
+|--------|---------|---------------------|
+| user   | TEXT    | user wallet address |
+| amount | UINT256 | amount              |
 
-### bridge(amount)
+### bridge(amount) PUBLIC
 
 Bridge `amount` erc20 token to erc20 bridge.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| amount | UINT256 |  amount|
+| name   | type    | description |
+|--------|---------|-------------|
+| amount | UINT256 | amount      |
 
-### balance(user)
+### balance(user) PUBLIC VIEW
 
 Return the erc20 token balance of `user`.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
+| name | type | description         |
+|------|------|---------------------|
 | user | TEXT | user wallet address |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   |  balance  | UINT256 | user's balance |
+| index | name    | type    | description    |
+|-------|---------|---------|----------------|
+| 0     | balance | UINT256 | user's balance |
 
-### decimals()
+### decimals() PUBLIC VIEW
 
 Return the erc20 token's decimals.
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   |  decimals  | INT | erc20 token decimals |
+| index | name     | type | description          |
+|-------|----------|------|----------------------|
+| 0     | decimals | INT  | erc20 token decimals |
 
-### scale_down(amount)
+### scale_down(amount) PUBLIC VIEW
 
-Accepts an uint256 `amount` and returns correspond user friendly value.
+Accepts an uint256 `amount` and returns correspond user-friendly value.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
+| name   | type | description                                              |
+|--------|------|----------------------------------------------------------|
 | amount | TEXT | scale down to UINT256, according to erc20 token decimals |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0 |  scaled  | UINT256 | . |
+| index | name   | type    | description |
+|-------|--------|---------|-------------|
+| 0     | scaled | UINT256 | .           |
 
 
-### scale_up(amount)
+### scale_up(amount) PUBLIC VIEW
 
 Accepts an user friendly `amount` and return its correspond uint256 value.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
+| name   | type | description                                              |
+|--------|------|----------------------------------------------------------|
 | amount | TEXT | scale down to UINT256, according to erc20 token decimals |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   |  scaled  | UINT256 | . |
+| index | name   | type    | description |
+|-------|--------|---------|-------------|
+| 0     | scaled | UINT256 | .           |
 
-### get_active_epochs()
+### get_active_epochs() PUBLIC VIEW
 
-Return current active epochs.
+Return current active epochs, always returns 2 epochs(expect the very first epoch):
+- finalized epoch, epoch is finalized but yet confirmed on EVM chains;
+- collecting epoch, epoch is currently collecting all issuance;
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0 | id | UUID | epoch id |
-| 1 | start_height| INT | epoch start block height |
-| 2 | start_timestamp | INT | epoch start timestamp |
-| 3 | end_height | INT | epoch end block height |
-| 4 | reward_root | BYTEA | merkle tree root of current epoch rewards |
-| 5 | reward_amount | UINT256 | total amount of token in this epoch |
-| 6 | end_block_hash | BYTEA | epoch end block hash |
-| 7 | confirmed | BOOL | whether confirmed on target EVM chains |
-| 8 | voters | []TEXT | voter address |
-| 9 | vote_nonces | []INT | safe nonce of current vote |
-| 10| voter_signatures | []BYTEA | signature of current vote |
+| index | name             | type    | description                               |
+|-------|------------------|---------|-------------------------------------------|
+| 0     | id               | UUID    | epoch id                                  |
+| 1     | start_height     | INT     | epoch start block height                  |
+| 2     | start_timestamp  | INT     | epoch start timestamp                     |
+| 3     | end_height       | INT     | epoch end block height                    |
+| 4     | reward_root      | BYTEA   | merkle tree root of current epoch rewards |
+| 5     | reward_amount    | UINT256 | total amount of token in this epoch       |
+| 6     | end_block_hash   | BYTEA   | epoch end block hash                      |
+| 7     | confirmed        | BOOL    | whether confirmed on target EVM chains    |
+| 8     | voters           | []TEXT  | voter address                             |
+| 9     | vote_nonces      | []INT   | safe nonce of current vote                |
+| 10    | voter_signatures | []BYTEA | signature of current vote                 |
 
 
-### list_epochs(after, limit)
+### list_epochs(after_block, limit) PUBLIC VIEW
 
 Return requested epochs based on given range.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| after | INT | list epochs after(not include) block height|
-| limit | INT | return size |
+| name  | type | description                                 |
+|-------|------|---------------------------------------------|
+| after | INT  | list epochs after(not include) block height |
+| limit | INT  | return size                                 |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0 | id | UUID | epoch id |
-| 1 | start_height| INT | epoch start block height |
-| 2 | start_timestamp | INT | epoch start timestamp |
-| 3 | end_height | INT | epoch end block height |
-| 4 | reward_root | BYTEA | merkle tree root of current epoch rewards |
-| 5 | reward_amount | UINT256 | total amount of token in this epoch |
-| 6 | end_block_hash | BYTEA | epoch end block hash |
-| 7 | confirmed | BOOL | whether confirmed on target EVM chains |
-| 8 | voters | []TEXT | voter address |
-| 9 | vote_nonces | []INT | safe nonce of current vote |
-| 10| voter_signatures | []BYTEA | signature of current vote |
+| index | name             | type    | description                               |
+|-------|------------------|---------|-------------------------------------------|
+| 0     | id               | UUID    | epoch id                                  |
+| 1     | start_height     | INT     | epoch start block height                  |
+| 2     | start_timestamp  | INT     | epoch start timestamp                     |
+| 3     | end_height       | INT     | epoch end block height                    |
+| 4     | reward_root      | BYTEA   | merkle tree root of current epoch rewards |
+| 5     | reward_amount    | UINT256 | total amount of token in this epoch       |
+| 6     | end_block_hash   | BYTEA   | epoch end block hash                      |
+| 7     | confirmed        | BOOL    | whether confirmed on target EVM chains    |
+| 8     | voters           | []TEXT  | voter address                             |
+| 9     | vote_nonces      | []INT   | safe nonce of current vote                |
+| 10    | voter_signatures | []BYTEA | signature of current vote                 |
 
-### get_epoch_rewards(epoch_id)
+### get_epoch_rewards(epoch_id) PUBLIC VIEW
 
 Return all rewards of an epoch.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| epoch_id | UUID | epoch id |
+| name     | type | description |
+|----------|------|-------------|
+| epoch_id | UUID | epoch id    |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   |  recipient  | TEXT | recipient wallet address |
-| 1 | amount | UINT256 | recipient's token amount |
+| index | name      | type    | description              |
+|-------|-----------|---------|--------------------------|
+| 0     | recipient | TEXT    | recipient wallet address |
+| 1     | amount    | UINT256 | recipient's token amount |
 
 
-### vote_epoch
+### vote_epoch(epoch_id, nonce, signature) PUBLIC
 
 Vote to approve an epoch, with signatures.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| epoch_id | UUID | epoch id |
-| nonce | INT | safe nonce |
+| name      | type  | description               |
+|-----------|-------|---------------------------|
+| epoch_id  | UUID  | epoch id                  |
+| nonce     | INT   | safe nonce                |
 | signature | BYTEA | signature of current vote |
 
 
-### list_wallet_rewards(wallet, with_pending)
+### list_wallet_rewards(wallet, with_pending) PUBLIC VIEW
 
-Return all rewards issused to `wallet`. If `with_pending` is true, return not confirmed rewards as well.
+Return all rewards issued to `wallet`. If `with_pending` is true, return not confirmed rewards as well.
 
-Params:
+**Params:**
 
-| name | type | description |
-| ---- | ---- | ----------- |
-| wallet | TEXT | wallet address |
+| name         | type | description                        |
+|--------------|------|------------------------------------|
+| wallet       | TEXT | wallet address                     |
 | with_pending | BOOL | include the rewards that's pending |
 
-Returns:
+**Returns:**
 
-| index | name | type | description |
-| ----- | ---- | ---- | ----------- |
-| 0   |  chain  | TEXT | chain name of the erc20 token |
-| 1 | chain_id | TEXT | chain id of the erc20 token |
-| 2 | contract | TEXT | escrow contract to claim erc20 token |
-| 3 | created_at | INT | block height when this REWARD is created |
-| 4 | param_recipeint | TEXT | the `recipient` argument to claim REWARD |
-| 5 | param_amount | UINT256 | the `amount` argument to claim REWARD |
-| 6 | param_block_hash | BYTEA | the `block_hash` argument to claim REWARD|
-| 7 | param_root | BYTEA | the `block_hash` arguemnt to claim REWARD |
-| 8 | param_proofs | []BYTEA | the `proofs` arguemnt to claim REWARD |
-
-> NOTE: REWARD is kind of awkward here
-
-
-## Create GnosisSafe and Escrow contract
-
-Kwil will provide a smart contract that you can use to create both Safe and Escrow contract.
-
-For now, contact us and we'll create this for you.
-
-
-
+| index | name             | type    | description                               |
+|-------|------------------|---------|-------------------------------------------|
+| 0     | chain            | TEXT    | chain name of the erc20 token             |
+| 1     | chain_id         | TEXT    | chain id of the erc20 token               |
+| 2     | contract         | TEXT    | escrow contract to claim erc20 token      |
+| 3     | created_at       | INT     | block height when this REWARD is created  |
+| 4     | param_recipeint  | TEXT    | the `recipient` argument to claim REWARD  |
+| 5     | param_amount     | UINT256 | the `amount` argument to claim REWARD     |
+| 6     | param_block_hash | BYTEA   | the `block_hash` argument to claim REWARD |
+| 7     | param_root       | BYTEA   | the `block_hash` arguemnt to claim REWARD |
+| 8     | param_proofs     | []BYTEA | the `proofs` arguemnt to claim REWARD     |
