@@ -19,7 +19,7 @@ The `erc20_bridge` initialization has the following fields:
 - `chain`[required]: The chain name of the EVM chain the bridge is connected to. Currently Kwil supports `sepolia` and `ethereum`, but if you need another chain, please let us know as it is easy to add.
 - `escrow`[required]: The address of the escrow smart contract.
 - `distribution_period`[optional]: The amount of time that should elapse between distribution epochs. The default is `10m`.
-Valid time units are "s", "m", "h". The minimum value is `1m` and the maximum value is `168h` (1 week).
+Valid time units are "s", "m", "h". The minimum value is `10m` and the maximum value is `168h` (1 week).
 
 ```sql
 USE erc20_bridge {
@@ -133,7 +133,7 @@ kwil-cli call-action list_wallet_rewards --namespace my_bridged_token text:YOUR_
 
 ### Claim Tokens
 
-To claim tokens from the escrow smart contract, call the `claim` action on the escrow smart contract with the inclusion proof.
+To claim tokens from the escrow smart contract, call the `claimReward` function on the escrow smart contract with the inclusion proof.
 The smart contract function has the following signature:
 
 ```solidity
