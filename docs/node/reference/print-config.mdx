@@ -35,10 +35,12 @@ kwild print-config [flags]
       --p2p.private                                  operate in private mode using a node ID whitelist
       --p2p.whitelist strings                        allowed node IDs when in private mode
       --p2p.target-connections int                   target number of connections to maintain (default 20)
+      --p2p.external-address string                  external address in host:port format to advertise to the network
       --consensus.propose-timeout duration           minimum duration to wait before proposing a block with transactions (applies to leader). This value should be greater than 500ms. (default 1s)
       --consensus.empty-block-timeout duration       timeout for proposing an empty block. If set to 0, disables empty blocks, leader will wait indefinitely until transactions are available to produce a block. (default 1m0s)
       --consensus.block-proposal-interval duration   interval between block proposal reannouncements by the leader (default 1s)
       --consensus.block-ann-interval duration        interval between block commit reannouncements by the leader, and votes reannouncements by validators (default 3s)
+      --mempool.max-size int                         maximum size of the mempool in bytes (default 200000000)
       --db.host string                               postgres host name (IP or UNIX socket path) (default "127.0.0.1")
       --db.port string                               postgres TCP port (leave empty for UNIX socket) (default "5432")
       --db.user string                               postgres role/user name (default "kwild")
@@ -46,11 +48,13 @@ kwild print-config [flags]
       --db.dbname string                             postgres database name (default "kwild")
       --db.read-timeout duration                     timeout on read transactions from user RPC calls and queries (default 45s)
       --db.max-connections uint                      maximum number of DB connections to permit (default 60)
+      --store.compression                            compress data when writing new data (default true)
       --rpc.listen string                            address in host:port format on which the RPC server will listen (default "0.0.0.0:8484")
       --rpc.broadcast-tx-timeout duration            duration to wait for a tx to be committed when transactions are authored with --sync flag (default 15s)
       --rpc.timeout duration                         user request duration limit after which it is cancelled (default 20s)
       --rpc.max-req-size int                         largest permissible user request size (default 6000000)
       --rpc.private                                  enable private mode that requires challenge authentication for each call
+      --rpc.compression                              use compression in RPC responses
       --rpc.challenge-expiry duration                lifetime of a server-generated challenge (default 30s)
       --rpc.challenge-rate-limit float               maximum number of challenges per second that a user can request (default 10)
       --admin.enable                                 enable the admin RPC service (default true)
@@ -67,6 +71,8 @@ kwild print-config [flags]
       --genesis-state string                         path to the genesis state file, relative to the root directory
       --migrations.enable                            enable zero downtime migrations
       --migrations.migrate-from string               JSON-RPC listening address of the node to replicate the state from
+      --checkpoint.height int                        checkpoint height for the leader. If the leader is behind this height, it will sync to this height before attempting to propose a new block.
+      --checkpoint.hash string                       checkpoint block hash.
   -h, --help                                         help for print-config
 ```
 
@@ -74,7 +80,7 @@ kwild print-config [flags]
 
 ```
       --output string   the format for command output - either 'text' or 'json' (default "text")
-  -r, --root string     root directory (default "/home/jon/.kwild")
+  -r, --root string     root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO

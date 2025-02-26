@@ -24,21 +24,29 @@ kwild setup testnet [flags]
 ### Options
 
 ```
-      --db-owner string   owner of the database
-  -h, --help              help for testnet
-      --no-pex            disable peer exchange
-  -n, --non-vals int      number of non-validators (default 0)
-  -o, --out-dir string    output directory for generated node root directories (default ".testnet")
-  -p, --port uint         starting P2P port for the nodes (default 6600)
-  -u, --unique-ports      use unique ports for each node
-  -v, --vals int          number of validators (includes the one leader) (default 3)
+      --alloc strings          address and initial balance allocation(s) in the format id#keyType:amount
+  -c, --chain-id string        chain ID for the network (default "kwil-testnet")
+      --db-owner string        owner of the database
+  -h, --help                   help for testnet
+  -H, --hostnames strings      comma separated list of hostnames for the nodes
+      --join-expiry duration   Number of blocks before a join proposal expires
+      --leader string          public key of the block proposer
+      --max-block-size int     maximum block size
+      --max-votes-per-tx int   Maximum votes per transaction
+      --no-pex                 disable peer exchange
+  -n, --non-vals int           number of non-validators (default 0)
+  -o, --out-dir string         output directory for generated node root directories (default ".testnet")
+  -p, --port uint              starting P2P port for the nodes (default 6600)
+  -u, --unique-ports           use unique ports for each node
+  -v, --vals int               number of validators (includes the one leader) (default 3)
+      --with-gas               include gas costs in the genesis.json file
 ```
 
 ### Options inherited from parent commands
 
 ```
       --output string   the format for command output - either 'text' or 'json' (default "text")
-  -r, --root string     root directory (default "/home/jon/.kwild")
+  -r, --root string     root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO

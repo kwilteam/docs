@@ -30,7 +30,7 @@ The `admin` command is used to get information about a running Kwil node using t
 ### Options inherited from parent commands
 
 ```
-  -r, --root string   root directory (default "/home/jon/.kwild")
+  -r, --root string   root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO

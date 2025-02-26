@@ -30,7 +30,7 @@ The validators command provides functions for creating and broadcasting validato
 ### Options inherited from parent commands
 
 ```
-  -r, --root string   root directory (default "/home/jon/.kwild")
+  -r, --root string   root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO
@@ -43,4 +43,5 @@ The validators command provides functions for creating and broadcasting validato
 * [kwild validators list](/docs/ref/kwild/validators/list)	 - List the current validator set of the network.
 * [kwild validators list-join-requests](/docs/ref/kwild/validators/list-join-requests)	 - List all pending join requests.
 * [kwild validators remove](/docs/ref/kwild/validators/remove)	 - Votes to remove a validator from the validator set (this node must be a validator).
+* [kwild validators replace-leader](/docs/ref/kwild/validators/replace-leader)	 - Promote a validator to leader starting from the specified height.
 

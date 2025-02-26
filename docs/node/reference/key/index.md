@@ -25,7 +25,7 @@ The `key` command provides subcommands for private key generation and inspection
 ### Options inherited from parent commands
 
 ```
-  -r, --root string   root directory (default "/home/jon/.kwild")
+  -r, --root string   root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO

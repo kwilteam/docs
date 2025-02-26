@@ -30,7 +30,7 @@ The `migrate` commands provide functions for managing network migration proposal
 ### Options inherited from parent commands
 
 ```
-  -r, --root string   root directory (default "/home/jon/.kwild")
+  -r, --root string   root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO
