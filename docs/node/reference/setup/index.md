@@ -27,7 +27,7 @@ The `setup` command provides functions for creating and managing node configurat
 
 ```
       --output string   the format for command output - either 'text' or 'json' (default "text")
-  -r, --root string     root directory (default "/home/jon/.kwild")
+  -r, --root string     root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO

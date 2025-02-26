@@ -30,7 +30,7 @@ The `utils` commands provide various miscellaneous utility commands such as `que
 ### Options inherited from parent commands
 
 ```
-  -r, --root string   root directory (default "/home/jon/.kwild")
+  -r, --root string   root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO
