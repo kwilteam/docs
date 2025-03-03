@@ -1,0 +1,50 @@
+---
+sidebar_position: 8
+sidebar_label: "replace-leader"
+id: "kwild-validators-replace-leader"
+title: "kwild validators replace-leader"
+description: "Promote a validator to leader starting from the specified height."
+slug: /ref/kwild/validators/replace-leader
+---
+
+## kwild validators replace-leader
+
+Promote a validator to leader starting from the specified height.
+
+### Synopsis
+
+This command promotes a new leader starting from the specified block height. If the majority of validators agree, the new leader will be promoted from the given height. It is crucial for the validator being promoted to also promote themselves, otherwise, they will not propose a block when required. The specified height must not be an already committed block height, or the command will be rejected. This command will create or update the leader-updates.json file in the node's root directory, and when these updates are applied by the node at the specified height, the file will be deleted.
+
+```
+kwild validators replace-leader <candidate> <height> [flags]
+```
+
+### Examples
+
+```
+# Promote a new leader starting from block height 1000
+kwild validators promote 02c57268fc884fa88425c7e5c19d3af263d1c64dd8b8f3f8c0fb31bb622d1fdab8#secp256k1 1000
+```
+
+### Options
+
+```
+  -h, --help   help for replace-leader
+```
+
+### Options inherited from parent commands
+
+```
+      --authrpc-cert string   kwild's TLS server certificate, required for HTTPS server
+      --output string         the format for command output - either 'text' or 'json' (default "text")
+      --pass string           admin server password (alternative to mTLS with tlskey/tlscert)
+  -r, --root string           root directory (default "~/.kwild")
+  -s, --rpcserver string      admin RPC server address (either UNIX socket path or TCP address) (default "/tmp/kwild.socket")
+      --tlscert string        TLS client certificate file for server to authenticate us (default "auth.cert")
+      --tlskey string         TLS client key file to establish a mTLS (authenticated) connection (default "auth.key")
+```
+
+### SEE ALSO
+
+* [kwild validators](/docs/ref/kwild/validators)	 - Validator related actions
+

@@ -20,7 +20,7 @@ Kwil node and utilities
 ```
   -h, --help            help for kwild
       --output string   the format for command output - either 'text' or 'json' (default "text")
-  -r, --root string     root directory (default "/home/jon/.kwild")
+  -r, --root string     root directory (default "~/.kwild")
 ```
 
 ### SEE ALSO
