@@ -28,11 +28,11 @@ kwild start -r .testnet
 ### Options
 
 ```
-      --log-level string                             log level
-                                                     possible values: 'debug', 'info', 'warn', and 'error' (default "info")
-      --log-format string                            log format
-                                                     possible values: 'json', 'text' (kv), and 'plain' (fmt-style) (default "plain")
-      --log-output strings                           output paths for the log (default [stdout,kwild.log])
+      --log.level string                             log level possible values: 'debug', 'info', 'warn', and 'error' (default "info")
+      --log.format string                            log format possible values: 'json', 'text' (kv), and 'plain' (fmt-style) (default "plain")
+      --log.output strings                           output paths for the log (default [stdout,kwild.log])
+      --log.file-roll-size int                       threshold in KB at which the log file rolls over and archives the current one (default 10000)
+      --log.retain-max-rolls int                     retention limit on the number of archived log files to keep (0 meaning retain all)
       --profile-mode string                          profile mode (http, cpu, mem, mutex, or block)
       --profile-file string                          profile output file path (e.g. cpu.pprof)
       --p2p.listen string                            address in host:port format to listen on for P2P connections (default "0.0.0.0:6600")
