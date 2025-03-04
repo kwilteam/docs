@@ -40,7 +40,7 @@ You can find the security audit for the escrow contract [here](https://github.co
 
 Tokens are bridged back to the EVM chain via a select group of Kwil nodes that also act as signers for a multi-signature smart contract wallet (SAFE Wallet).
 
-Token distribution logic is written using [SQL Smart Contracts](/docs/language/introduction). When a user calls the [`erc20.issue` method](./03-reference.mds#issueuseramount-system), the Kwil network collects the tokens and their recipients to be bridged back to the EVM chain.
+Token distribution logic is written using [SQL Smart Contracts](/docs/language/introduction). When a user calls the [`erc20.issue` method](/docs/erc20-bridge/usage#issue), the Kwil network collects the tokens and their recipients to be bridged back to the EVM chain.
 Rewards are collected over a period of time defined by the user (known as an epoch). The total distribution for each epoch is signed by the Kwil Nodes with SAFE signers and relayed back to the escrow smart contract.
 
 ### SAFE Multi-Sig Wallet
