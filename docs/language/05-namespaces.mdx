@@ -61,6 +61,15 @@ CREATE NAMESPACE my_namespace;
 {my_namespace} CREATE ACTION my_action ...
 ```
 
+If you are executing a set of statements in a single command, you can set the namespace at the beginning with the `SET CURRENT NAMESPACE` statement. This
+will only last for the duration of the command:
+
+```sql
+SET CURRENT NAMESPACE TO my_namespace;
+CREATE TABLE my_table ...
+CREATE ACTION my_action ...
+```
+
 ### Namespaces in Actions
 
 Namespaces cannot be specified within an action body. Instead, actions can only insert, update, and delete data from tables

@@ -193,13 +193,57 @@ Returns the number of rows in the current group.
 
 ---
 
-`sum(INT|DECIMAL|UINT256) -> INT|DECIMAL|UINT256`
+`sum(INT|DECIMAL) -> INT|DECIMAL`
 
 Returns the sum of all values in the current group.
+
+---
 
 `array_agg(any) -> any[]`
 
 Aggregates all values in the current group into an array.
+
+---
+
+`avg(DECIMAL) -> DECIMAL`*
+
+Returns the average of all values in the current group. It must be a decimal to avoid precision loss.
+
+## Window Functions
+
+`lead(any, INT, any?) -> any`
+
+Returns the value of the given column in the row that is `offset` rows after the current row. If the third argument is provided, it is used as the default value.
+
+---
+
+`lag(any, INT, any?) -> any`
+
+Returns the value of the given column in the row that is `offset` rows before the current row. If the third argument is provided, it is used as the default value.
+
+---
+
+`first_value(any) -> any`
+
+Returns the value of the given column in the first row of the current window frame.
+
+---
+
+`last_value(any) -> any`
+
+Returns the value of the given column in the last row of the current window frame.
+
+---
+
+`nth_value(any, INT) -> any`
+
+Returns the value of the given column in the row that is `offset` rows after the first row of the current window frame.
+
+---
+
+`row_number() -> INT`
+
+Returns the number of the current row within the current window frame.
 
 ## Misc Functions
 
@@ -208,9 +252,13 @@ Aggregates all values in the current group into an array.
 Error raises an exception with the given message. It halt execution when it is called,
 and rollback any changes made in the current transaction.
 
+---
+
 `generate_dbid(TEXT, BLOB) -> TEXT`*
 
 Generates a database ID based on the database schema's name and the deployers address.
+
+---
 
 `parse_unix_timestamp(TEXT, TEXT) -> DECIMAL(16,6)`*
 
@@ -219,13 +267,23 @@ The first argument is the timestamp to parse, and the second argument is the for
 It returns the Unix timestamp as a `decimal(16,6)`, where the integer part is the number of seconds since the Unix epoch,
 and the fractional part is the number of microseconds.
 
+---
+
 `format_unix_timestamp(DECIMAL(16,6), TEXT) -> TEXT`*
 
 Formats a Unix timestamp into a human-readable timestamp with a formatting directive.
 The first argument is the Unix timestamp to format, and the second argument is the formatting directive (e.g. `format_unix_timestamp(1640995200.000000, 'YYYY-MM-DD HH24:MI:SS')`).
 It returns the formatted timestamp as a text string.
 
+---
+
 `notice(TEXT) -> none`*
 
 Notice logs a message to the Kwil log. If used within a transaction, the log will be stored as part of the transaction result. If used in a read-only transaction,
 the log will be returned as part of the transaction result.
+
+---
+
+`uuid_generate_kwil(TEXT) -> UUID`*
+
+A special UUID generation function that deterministically generates a UUID based on the given text value. It uses `a247cac1-d817-4949-bac7-dc4b1dc41d09` as the namespace.
