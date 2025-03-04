@@ -12,7 +12,7 @@ slug: /language/syntax-diagrams
 
 <iframe
   id="diagram-iframe"
-  src="https://kwilteam.github.io/kwil-db/parse/grammar/rrdiagrams.html"
+  src="https://kwilteam.github.io/kwil-db/node/engine/parse/grammar/rrdiagrams.html"
   position="absolute"
   style={{
     border: "none",
