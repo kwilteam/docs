@@ -1,0 +1,96 @@
+---
+sidebar_position: 5
+sidebar_label: "Reference"
+id: "Reference"
+title: "Reference"
+description: "Reference"
+slug: /node/consensus/reference
+---
+
+This document provides an overview of the core data structures used in Kwil's consensus algorithm and how to interpret them.
+
+## Block
+
+A Kwil block consists of a header, transactions and the signature. 
+
+| Field       | Type        | Description    |
+|-------------|-------------|----------------|
+| Header      | [BlockHeader](#block-header) | Block header   |
+| Txns        | Transaction | List of transactions included in the block |
+| Signature   | []byte      | Signature of the block by the block proposer (leader) |
+
+## Block Header
+
+A BlockHeader contains metadata about the block, including its position in the blockchain, the previous block's hash, and other relevant information.
+
+| Field             | Type        | Description                                                                 |
+|-------------------|-------------|-----------------------------------------------------------------------------|
+| Version           | uint16      | Version of the block                                                        |
+| Height            | int64       | Height of the block in the blockchain                                       |
+| NumTxns           | uint32      | Number of transactions included in the block                                |
+| PrevHash          | Hash        | Hash of the previous block                                                  |
+| PrevAppHash       | Hash        | Application state hash from the execution of the previous block             |
+| Timestamp         | time.Time   | Timestamp when the block was created                                        |
+| MerkleRoot        | Hash        | Merkle tree reference to hash of all transactions included in the block            |
+| ValidatorSetHash  | Hash        | Hash of the current validator set used in the current consensus round|
+| NetworkParamsHash | Hash        | Hash of the network parameters for the block                                |
+| NewLeader         | crypto.PublicKey | Public key of the new leader if changed using non-transaction based approaches      |
+
+### Block Header Validation Rules
+
+
+
+
+
+
+
+
+## CommitInfo
+
+The CommitInfo includes the information about the commit of the block, such as the signatures of the validators agreeing to the block.
+
+| Field            | Type          | Description                                                                 |
+|------------------|---------------|-----------------------------------------------------------------------------|
+| AppHash          | Hash          | Application state hash from the execution of the block                      |
+| Votes            | []*[VoteInfo](#voteinfo)   | List of votes from validators                                               |
+| ParamUpdates     | ParamUpdates  | Updates to the network parameters, if any                                   |
+| ValidatorUpdates | []*Validator  | Updates to the validator set, if any                                        |
+
+## VoteInfo
+
+The VoteInfo represents the leader's interpretation of the AckRes vote received from the validator.
+
+| Field       | Type        | Description                                                                 |
+|-------------|-------------|-----------------------------------------------------------------------------|
+| AckStatus   | [AckStatus](#ackstatus)   | Status of the acknowledgment (Agree, Reject, Forked)                        |
+| AppHash     | *Hash       | Application state hash, provided only if AckStatus is AckStatusDiverged                   |
+| Signature   | [Signature](#signature)   | Signature of the vote                                                       |
+
+## AckStatus
+
+The AckStatus represents the different statuses of the acknowledgment.
+
+| Value       | Description                                                                 |
+|-------------|-----------------------------------------------------------------------------|
+| AckReject   | Validator did not accept the proposed block                                 |
+| AckAgree    | Validator accepted the proposed block and computed the same AppHash         |
+| AckForked   | Validator accepted the proposed block but diverged after processing it      |
+
+## Signature
+
+The Signature structure contains the public key and the signature data of the validator.
+
+| Field       | Type            | Description                                                                 |
+|-------------|-----------------|-----------------------------------------------------------------------------|
+| PubKeyType  | crypto.KeyType  | Type of the public key                                                      |
+| PubKey      | `[]byte`          | Public key of the validator                                                 |
+| Data        | []byte          | Signature data                                                             |
+
+## Validator
+The Validator structure represents a validator in the network.
+
+| Field       | Type            | Description                                                                 |
+|-------------|-----------------|-----------------------------------------------------------------------------|
+| Identifier  | []byte          | Public key of the validator                                                 |
+| PubKeyType  | crypto.KeyType  | Type of the public key                                                      |
+| Power       | int64           | Voting power of the validator                                               |
