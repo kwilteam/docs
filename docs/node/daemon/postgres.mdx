@@ -7,8 +7,9 @@ description: How to run PostgresSQL with the necessary configurations
 slug: /daemon/running-postgres
 ---
 
-Kwil is built on PostgreSQL, and requires an external PostgreSQL host running and configured for `kwild`. `kwild` currently requires PostgreSQL 16, from at least v16.1. Future major
-versions will require an update to Kwil.
+Kwil is built on PostgreSQL, and requires an external PostgreSQL host running
+and configured for `kwild`. `kwild` currently requires PostgreSQL 16, from at
+least v16.1. Future major versions will require an update to Kwil.
 
 ### Quickstart PostgreSQL
 
@@ -19,7 +20,7 @@ start a new container:
 
 ```bash
 docker run -p 5432:5432 --name kwil-postgres -e "POSTGRES_HOST_AUTH_METHOD=trust" \
-    --shm-size 256m kwildb/postgres:latest
+    --shm-size 512m kwildb/postgres:latest
 ```
 
 Be sure to disable any OS unattended upgrades to prevent `"docker"`, `"containerd"`, and
@@ -33,11 +34,13 @@ settings, roles, and databases pre-configured for ease of deployment and evaluat
 
 The recommended options are:
 
-* System installation of `postgres`. This requires some manual configuration.
+* System installation of `postgres`. This requires some manual configuration,
+  but is more flexible and avoids overhead and constraints of the Docker engine.
 * The [`kwildb/postgres`](https://hub.docker.com/r/kwildb/postgres) Docker image
   on Docker Hub. It is pre-configured for `kwild` and is convenient for quick
   setup, but may be less reliable or secure than a manually configured
-  `postgres` instance.
+  `postgres` instance. The default memory settings are also fairly low, and may
+  not be sufficient for all use cases. 
 
 :::info
 If a user-provided installation of PostgreSQL, such as an operating system
@@ -79,7 +82,7 @@ but is less configurable than a system service. The following command will pull
 and start a new container:
 
 ```bash
-docker run -p 5432:5432 -v kwil-pgdata:/var/lib/postgresql/data --shm-size 256m \
+docker run -p 5432:5432 -v kwil-pgdata:/var/lib/postgresql/data --shm-size 512m \
     -e "POSTGRES_HOST_AUTH_METHOD=trust" kwildb/postgres:latest
 ```
 
@@ -143,12 +146,14 @@ new database and "role" to match `kwild`'s configuration.
 
 #### PostgreSQL Settings
 
+##### Required Settings
+
 `kwild` requires some changes to the default `postgres` configuration:
 
 - `wal_level` set to `"logical"` to enable logical replication functionality
 - `max_wal_senders` at least `10`
 - `max_replication_slots` at least `10`
-- `max_prepared_transactions` at least 2 for two-phase commit capability
+- `max_prepared_transactions` at least `2` for two-phase commit capability
 
 In addition to the above non-default settings, `kwild` will also verify the
 following settings, which are satisfied by `postgres` defaults:
@@ -161,6 +166,22 @@ following settings, which are satisfied by `postgres` defaults:
 It is recommended to enable data checksums on the database cluster.
 See the [documentation](https://www.postgresql.org/docs/current/checksums.html) for more information.
 The provided Docker Compose services do this automatically.
+:::
+
+##### Deployment-Specific Settings
+
+Depending on your database schema and the defined actions, it may be necessary
+to increase the `max_locks_per_transaction` setting.  If your actions have the
+potential to acquire many concurrent locks, such as a large number of row
+modifications in a single transaction, it is recommended to increase this
+setting. If you encounter errors related to "shared memory", it is a strong
+identification that this setting is too low. A setting of `4096` is likely
+sufficient for any use case, but this increases the memory requirements of the
+`postgres` process.
+
+:::tip
+Evaluate your Kwil schema in a test environment to determine the appropriate
+memory requirements and `postgres` configuration for your application.
 :::
 
 #### PostgreSQL Initialization
