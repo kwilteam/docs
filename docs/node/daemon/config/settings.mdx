@@ -53,3 +53,226 @@ Extension configs must be specified after all others, and must be delimited from
 ```bash
 kwild start --autogen --log.level=debug -- --extensions.<extension-name>.<config-key> <config-value>
 ```
+
+## Kwil Configurations
+
+The following sections describe the available configuration options for the Kwil node.
+
+<div className="cmd-desc-table">
+
+| Configuration                   | Description                                                           |
+|---------------------------------|-----------------------------------------------------------------------|
+| [logging](#logging)             | Logging related configuration                                         |
+| [p2p](#p2p)                     | P2P related configuration                                             |
+| [consensus](#consensus)         | Consensus related configuration                                       |
+| [mempool](#mempool)             | Mempool related configuration                                         |
+| [db](#db)                       | DB (PostgreSQL) related configuration                                 |
+| [store](#store)                 | Block store configuration                                             |
+| [rpc](#rpc)                     | User RPC service configuration                                        |
+| [admin](#admin)                 | Admin RPC service configuration                                       |
+| [snapshots](#snapshots)         | Snapshot creation and provider configuration                          |
+| [statesync](#statesync)         | Statesync configuration (vs block sync)                               |
+| [genesis-state](#genesis-state) | Genesis snapshot configuration                                        |
+| [migrations](#migrations)       | Zero downtime migration configuration                                 |
+| [checkpoint](#checkpoint)       | Checkpoint configuration for the leader blocksync                     |
+| [erc20_bridge](#erc20-bridge)   | ERC20 bridge configuration                                            |
+| [telemetry](#telemetry)         | Telemetry configuration                                               |
+| [Profiling](#profiling)         | Profiling related configuration                                       |
+| [Dependencies](#dependencies)   | Runtime dependency checks                                             |
+
+</div>
+
+### Logging
+
+The Logging configuration section is used to configure the logging settings.
+
+- `logging.level`: Log level. Possible values: 'debug', 'info', 'warn', and 'error'.
+- `logging.format`: Log format. Possible values: 'json', 'text' (kv), and 'plain' (fmt-style).
+- `logging.output`: Output paths for the log.
+- `logging.file_roll_size`: Threshold in KB at which the log file rolls over and archives the current one.
+- `logging.retain_max_rolls`: Retention limit on the number of archived log files to keep (0 meaning retain all).
+
+### P2P
+
+The P2P configuration section affects how the node connects to and interact with the peers in the network.
+
+- `p2p.listen`: The address to listen on for P2P connections. The listen address should be in the format `host:port`. If set to `0.0.0.0:port`, the node will accept connections on all network interfaces.
+
+- `p2p.external_address`: The external address to advertise to peers for P2P connections. If not set, the node will advertise the `p2p.listen` address instead. The external address should be in the format `host:port`. This setting is useful when the node is running behind a NAT (Network Address Translation) or in a cloud environment. In such cases, the public or external address should be specified as `p2p.external_address` to ensure proper peer connectivity.
+
+- `p2p.pex`: Enables peer exchange (PEX) to discover new peers in the network. If disabled, the node will only connect to peers specified as bootnodes.
+
+- `p2p.bootnodes`: A comma-separated list of bootnodes to connect to at startup for initial peer discovery. Bootnodes help bootstrap the node and discover other peers. Each bootnode should be specified in the format `pubkey#keytype@host:port`.
+
+- `p2p.private`: Operate in private mode using a node ID whitelist to restrict connections. If enabled, the node will only connect to peers whose node IDs are in the whitelist. By default, all the validators, bootnodes and trusted snapshot providers are added to the whitelist.
+
+- `p2p.whitelist`: A list of allowed node IDs when operating in private mode. The node will only connect to peers whose node IDs are in the whitelist. This whitelist can be updated using the [kwild whitelist](/docs/ref/kwild/whitelist) commands.
+
+- `p2p.target_connections`: The target number of connections to maintain with peers. The node will attempt to maintain this number of connections by connecting to new peers or disconnecting from existing peers.
+
+### Consensus
+
+The Consensus configuration allows fine-tuning of the Roadrunner consensus protocol for the Kwil node. Adjusting these settings impacts block production rates, network usage, and catch-up times.
+
+#### Block Production Settings
+
+The following settings apply only to the leader node and control the rate of block production:
+
+- `consensus.propose_timeout`: This specifies the minimum duration leader must wait before proposing a new block containing transactions. Default value is 500ms. If the leader has enough transactions in the mempool to fill the block, it will propose the block immediately, bypassing this timeout. This timeout helps for the slow validators helps to catchup with the leader and participate in the consensus round. This is applicable only for the leader node.
+
+- `consensus.empty_block_timeout`: Specifies the timeout for proposing an empty block when no transactions are available. This value should be significantly higher than propose_timeout to avoid excessive empty block creation. The default value is 1 minute.
+    - If set to 0, disables empty block production, leader will wait indefinitely until transactions are available to produce a block.
+    - If set to value > 0, the leader will propose an empty block once this timeout is reached if no transactions are available during this period. However if transactions are available before this timeout, the leader will propose a block with transactions.
+
+Followers will enter catchup mode if they do not receive any consensus messages that trigger a state change within a period equal to `consensus.propose_timeout + consensus.empty_block_timeout.` To minimize unnecessary catchup mode activations on followers, it is recommended to set these values as set by the leader or even higher.
+
+#### Consensus Messages Reannouncements
+
+The following settings are used to control the rate at which the consensus messages are reannounced by the leader and validators. This affects the time it takes for out-of-sync nodes to catch up with the latest consensus round.
+
+- `consensus.block_proposal_interval`: Defines the interval between block proposal reannouncements by the leader. This setting affects how quickly an out-of-sync validator receives the current block proposal and participates in the voting process of the current consensus round. A lower value results in faster synchronization but may increase network overhead. Default value is 1 second.
+
+- `consensus.block_ann_interval`: Specifies the frequency of reannouncing block commit messages by the leader and vote reannouncements by validators. Default: 3 seconds.
+
+Proper tuning of these parameters ensures optimal block times, efficient consensus participation, and minimal network resource usage.
+
+### Mempool
+
+- `mempool.max_size`: Specifies the maximum size of the mempool in bytes. The default value is 200 MB. This setting limits the total size of all transactions that can be held in the mempool at any given time. If the mempool reaches its maximum size, new incoming transactions will be rejected until space becomes available.
+
+### RPC
+
+The RPC configuration section is used to configure the RPC server settings.
+
+- `rpc.listen`: The address in `host:port` format on which the RPC server listens for on the incoming requests.
+
+- `rpc.broadcast_tx_timeout`: The duration to wait for a transaction to be committed when transactions are authored with the `--sync` flag.
+
+- `rpc.private`: Enables [private mode](/docs/node/private-rpc), which requires challenge authentication for each call request.
+
+- `rpc.timeout`: The maximum duration for a user request before it is cancelled.
+
+- `rpc.max_req_size`: The largest permissible user request size in bytes.
+
+- `rpc.compression`: Enables compression in RPC responses. This reduces overall bandwidth at the cost of additional server-side CPU utilization. This is transparent to the http and go clients. 
+
+- `rpc.challenge_expiry`: The lifetime of a server-generated challenge.
+
+- `rpc.challenge_rate_limit`: The maximum number of challenges per second that a user can request.
+
+
+### DB
+
+The DB configuration section is used to configure the PostgreSQL database settings which stores the application state. 
+
+- `db.host`: The host address of the PostgreSQL database.
+- `db.port`: The port of the PostgreSQL database.
+- `db.user`: The username to connect to the PostgreSQL database.
+- `db.pass`: The password to connect to the PostgreSQL database. The password should be set if authentication is required to connect to the database. 
+- `db.dbname`: The name of the PostgreSQL database to connect to. This is the database where all the application state is stored. This database should be created before starting the Kwil node by the db user.
+- `db.read_timeout`: Timeout on read transactions from user RPC calls and queries.
+- `db.max_connections`: Maximum number of DB connections to permit.
+
+### Store
+
+The Store configuration section is used to configure options related to the Block Store. 
+
+- `store.compression`: Enables or disables compression when writing new block data to the block store. Compression helps reduce the disk space usage at the cost of additional CPU overhead during write operations.
+
+### Admin
+
+The Admin configuration section is used to configure the admin RPC service on the Kwil node.
+
+- `admin.enable`: Enables the admin RPC service.
+- `admin.listen`: The listening address in `host:port` format or UNIX socket path on which the admin RPC server will listen. By default it is configured to listen on `/tmp/kwild.socket`
+- `admin.pass`: Optional password for the admin service.
+- `admin.notls`: Disable TLS when the listen address is not a loopback IP or UNIX socket.
+
+### Snapshots
+
+The Snapshots section manages the configuration for snapshot creation, allowing nodes to generate and manage state snapshots required for the statesync.
+
+- `snapshots.enable`: Enables or disables snapshot creation.
+
+- `snapshots.recurring_height`: Specifies the block height intervals (multiples) at which snapshots are created. The default value is 14400, which corresponds to one snapshot every 10 hours, assuming a 1-second block time. For example, if set to 1000, the node will generate snapshots at block heights that are multiples of 1000 (e.g., 1000, 2000, 3000, ...).
+
+- `snapshots.max_snapshots`: Max number of snapshots to retain on the node. If the number of snapshots exceeds this value, the oldest snapshot is deleted.
+
+### StateSync
+
+State sync allows a new node to bootstrap from a state snapshot instead of replaying all blocks from genesis, significantly reducing catchup time. However, this method results in a truncated block history on the node, starting from the snapshot height.
+
+- `statesync.enable`: Enables [state sync](/docs/node/statesync) mode. When disabled, the node defaults to block sync to catch up with the network. State sync is only used for node bootstrapping, subsequent syncs such as after node restarts are done using block sync.
+
+- `statesync.trusted_providers`: List of the trusted snapshot providers in the node ID format (see [bootnodes](#p2p)). The node will validate received snapshots against these providers before using them. It is recommended for nodes that are producing snapshots to create them at similar heights as that of the trusted providers, so that these snapshots can be validated by the trusted providers during statesync.
+
+- `statesync.max_retries`: Specifies max number of times the node attempts to discover a valid snapshot before falling back to block sync. Default: 3 retries.
+
+- `statesync.discovery_time`: Specifies the duration the node spends discovering snapshots before selecting the one to apply. Default: 15 seconds.
+
+- `statesync.psql_path`: Specifies the path to the PSQL binary used for applying snapshots to the PostgreSQL database. If not set, the system’s default psql binary is used.
+
+### Genesis State
+
+The `genesis-state` field defines the genesis snapshot file used to bootstrap the node. If this field is not set, the node starts with an empty genesis state. 
+
+This is used during [offline migrations](/docs/node/migrations/offline-migrations), where a new network is bootstrapped using the final state of a previous network.
+:::note 
+    This field must be set if the `state_hash` field is set in the `genesis.json` file.
+:::
+
+### Migrations
+
+The Migrations section is used to setup the new Kwil network using zero-downtime migrations.
+
+- `migrations.enable`: This enables the zero-downtime migrations on the Kwil node.
+- `migrations.migrate_from`: JSON-RPC listening address of the node from the old network to replicate the state from.
+
+### Checkpoint
+
+:::note
+    The Checkpoint configuration is only applicable to the leader node.
+::: 
+
+In the event that the leader needs to resync or has fallen behind the network due to a crash, restoration from an old backup, or other disruptions, a checkpoint ensures it resumes from the correct state. This prevents the leader from proposing blocks at an earlier height, which could otherwise cause network forks, data loss, and might require other nodes to rollback and/or resync from genesis.
+
+The below settings should be configured based on the best block on the network.
+
+- `checkpoint.height`: Checkpoint height for the leader. If the leader is behind this height, it will sync to this height before attempting to propose a new block.
+
+- `checkpoint.hash`: Block hash corresponding to the checkpoint height.
+
+### ERC20 Bridge
+
+The ERC20 Bridge configuration section is used to configure the ERC20 bridge.
+
+- `erc20_bridge.rpc`: The Ethereum RPC endpoint to read events from. It must be a websocket endpoint.
+
+- `erc20_bridge.block_sync_chunk_size`: The number of blocks to sync in each chunk. To allow fast syncing between the Kwil node and the target chain, Kwil nodes will sync blocks in chunks, where all events for a single chunk are retrieved in one request to the Ethereum RPC. The default value is 1000000. For bridges with a high volume of transfers, it may be necessary to decrease this value as to not overload the Ethereum RPC. This is an `Optional` field.
+
+- `erc20_bridge.signer`: Signer service's private key file path. 
+
+### Telemetry
+
+The Telemetry section allows you to set up OpenTelemetry for gathering various metrics from the node.
+
+- `telemetry.enable`: Enable telemetry on the Kwil node.
+- `telemetry.otlp_endpoint`: Open Telemetry Protocol collector endpoint.The default address is `127.0.0.1:4318`.
+
+### Profiling
+
+Kwil node supports profiling for various modes like CPU, memory, mutex, block, and HTTP. Profiling can be enabled by setting the following configurations: 
+- `profile_mode`: Specifies the profiling mode to be enabled. Available options:
+    - `http`: Enables HTTP profiling for runtime performance monitoring.
+    - `cpu`: Captures CPU usage patterns to analyze processing efficiency.
+    - `mem`: Records memory allocation and usage for detecting leaks or excessive consumption.
+    - `mutex`: Tracks mutex contention to identify synchronization bottlenecks.
+    - `block`: Monitors blocking operations in goroutines for debugging execution stalls.
+- `profile_file`: Defines the output file path where profiling data will be stored (e.g., cpu.pprof). This file can later be analyzed using Go’s pprof tool.
+
+### Dependencies
+
+Kwil node performs runtime dependency checks on the PostgreSQL client binaries such as `pg_dump` and `psql` to ensure that the required tools are available for snapshot creation and restoration. Below configurations are used to manage these dependency checks and the corresponding binary paths.
+
+- `skip_dependency_verification`: Skip the runtime dependency checks for PostgreSQL client binaries.
+- `pg_dump_path`: Path to the `pg_dump` binary. If not set, the system’s default `pg_dump` binary is used.
