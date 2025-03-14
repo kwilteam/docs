@@ -1,0 +1,110 @@
+---
+sidebar_position: 4
+sidebar_label: "Leader Replacement"
+id: "Leader Replacement"
+title: "Leader Replacement"
+description: "Leader Replacement"
+slug: /node/consensus/leader-replacement
+---
+
+Kwil's consensus algorithm relies on a centralized leader responsible for proposing new blocks. However, in certain scenarios, the leader may need to be replaced, such as:
+- The leader goes offline, causing the network to stall.
+- The leader becomes malicious or fails to operate correctly.
+
+To address this, the network can initiate a leader replacement using one of the following methods:
+1. Resolution-Based Leader Replacement (Preferred)
+2. replace-leader Command (preferred to use when the leader is offline)
+
+Each method ensures that the network transitions to a new leader without compromising consensus integrity.
+
+## Resolution-Based Leader Replacement (Preferred Method)
+
+This method leverages the param_updates resolution process, where validators vote on a leader change. It is the preferred method but requires the current leader to be online to propose the resolution.
+
+### Process Flow
+
+1. **Leader Update Proposal**:
+The new leader candidate submits a resolution proposing the leader update
+```sh
+kwild consensus propose --updates '{"leader":{"type":"secp256k1","key":"<new-leader-public-key>"}}' --description "Leader update"
+```
+
+The command will prompt for confirmation before submitting the resolution.
+
+2. **Verify Submission**:
+The resolution should be visible in the list of consensus proposals:
+
+```sh
+kwild consensus list-proposals
+```
+
+3. **Validator Approval**:
+Validators vote on the resolution using the resolutionID from the list-proposals command:
+
+```sh
+kwild consensus approve <resolutionID>
+```
+
+4. **Resolution Status**:
+Check the number of approvals and the current status of the resolution:
+
+```sh
+kwild consensus update-status <resolutionID>
+```
+
+5. **Leader Transition**:
+Upon receiving a majority of approvals, all nodes update their leader to the new candidate. The `CommitInfo` also reflects the leader update.
+The new leader will begin proposing blocks, and the network will continue to operate with the new leader.
+
+```go
+// ParamUpdates would include leader update
+type CommitInfo struct {
+	ParamUpdates     ParamUpdates `json:"param_updates,omitempty"`
+}
+```
+
+## Leader Replacement Using the replace-leader Command
+
+If the leader is offline or the network decides to forcefully replace the leader, the `replace-leader` command can be used.
+This method requires both the new leader candidate and a majority of validators to issue the command and provide a future height for the transition to take effect.
+
+```shell
+kwild replace-leader <new-leader-public-key> <height>
+```
+
+### Process Flow
+- The new leader candidate issues the replace-leader command with the new leader’s public key and the future height for the transition.
+- A majority of validators also issue the replace-leader command with the same parameters.
+- At the specified height h, the new leader begins proposing blocks.
+- Validators who participated in the replacement will start accepting the new leader’s blocks and voting for them.
+- Once the new leader’s block gains majority approval, it is committed, and a block announcement (blkAnn) message is broadcasted to the network.
+- Non-participating nodes (including the old leader) receive the blkAnn message, verify the CommitInfo signatures, and update to the new leader if the majority has signed.
+
+### Possible States During Leader Replacement
+
+At height h, both the old leader and new leader candidate may propose blocks. The network can end up in one of three possible states:
+
+1. Majority Agrees to Replace the Leader (x > n/2)
+    - The new leader’s block is committed, including validator signatures in CommitInfo.
+    - The blkAnn message is sent, informing all nodes of the new leader.
+    - The previous leader processes the blkAnn message, demotes itself to a validator, and stops proposing blocks.
+    - The network continues operating under the new leader.
+2. Majority Rejects the New Leader (x < n/2)
+    - Validators process and vote for the old leader’s block, which gets committed at height h.
+    - The new leader candidate and validators who supported the change receive the blkAnn message from the old leader and revert to the old leader.
+    - The old leader remains in control unless another leader replacement attempt is made in the future.
+3. No Clear Majority (x ≈ n/2) → Network Stall
+    - If neither leader has majority support (due to some validators being offline or unsynchronized), no block can be committed.
+    - The network remains stalled at height h until one of the leaders secures a majority vote.
+
+### Leader Update in Block Headers
+
+As this approach is not-transaction based, for block replayability and leader update verification, the block header includes a `NewLeader` field whenever the leader changes.
+
+```
+type BlockHeader struct {
+    // New leader for this block if changed through some kind of election.
+    NewLeader crypto.PublicKey
+}
+```
+Nodes replaying blocks can choose to accept the blocks from the different leader if the header includes the `NewLeader` field and the `CommitInfo` has the majority of validator signatures indicating that majority of the validators approved to this leader change.

@@ -1,0 +1,43 @@
+---
+sidebar_position: 2
+sidebar_label: "Motivation"
+id: "Overview"
+title: "Motivation"
+description: "Motivation"
+slug: /node/consensus/motivation
+---
+
+Developed by Kwil, the [Roadrunner consensus](/docs/node/consensus/roadrunner) algorithm is designed to optimize throughput, latency, and network efficiency while maintaining a reasonable level of security. The following are the key design choices and assumptions made during its development.
+
+## Design choices
+
+### Leader-Based Consensus
+
+Roadrunner consensus follows a single leader-based consensus model, where a single leader is responsible for proposing and finalizing new blocks. 
+- **Low Overhead:** This simplifies the consensus model drastically and reduces the performance overhead required for reaching consensus on the proposer for each block. 
+- **Federated Network:**  Unlike in public blockchains, where anyone can join as validators if they meet entry conditions, Kwil operates as a federated network with known and trusted validators who have reputations to uphold. Since validators are permissioned, the network assumes a lower risk of byzantine actors.
+- **No Financial Incentives:** Kwil does not depend on financial incentives like mining rewards or transaction fees that could encourage censorship or transaction manipulation. Therefore, a leader-based consensus is well-suited for Kwil.
+- **Accountability:** Validators can hold the leader accountable if they propose an invalid block or commit block that is not agreed by the majority of the validators. Refer to the [block verification](/docs/node/consensus/roadrunner#block-commit-verification) process for more details.
+- **Leader Replacement:** If the leader is offline or faulty, it can be replaced via the [leader replacement](/docs/node/consensus/leader-replacement)  process if the majority of validators agree, ensuring the network's continued operation.
+
+### Threshold Requirements
+
+The Roadrunner consensus algorithm requires more than half of the validators to agree on the block and its state changes, unlike PBFT which requires more than two-thirds. This lower threshold speeds up network bootstrapping and block finalization, albeit with a slight reduction in security. However, this trade-off is acceptable for a federated network with permissioned validators.
+
+### Low Communication Overhead
+
+Unlike PBFT consensus algorithms, which require multiple rounds of communication to reach consensus, the Roadrunner consensus algorithm is designed to minimize communication overhead and improve block finalization times. 
+
+Each consensus round in traditional BFT algorithms involves `Prevote`, `Precommit`, and `Commit` phases, each requiring validators to vote and also track and verify votes from others validators and proceeed to the next phase only if super-majority of nodes agreement is achieved in that phase. This ensures the majority agree on the block and helps detect byzantine actors.
+
+In contrast, Roadrunner has only two phases: `Propose` and `Commit`. During the `Propose` phase, the leader handles block proposals and vote collection. In the `Commit` phase, the leader commits the block if majority agrees. Validators only accept the committed block if the leader provides sufficient votes signed by validators agreeing on the next state. This reduces the number of roundtrips needed to reach consensus, thereby improving block finalization times and reducing communication overhead, which enhances overall network performance.
+
+## Security Guarantees
+Roadrunner consensus algorithm ensures the following:
+- **State Verifiability:** The database state can be cryptographically verified and replicated on any node.
+- **Finality:** Once a block is committed, it is final and cannot be undone.
+- **Safety:** Nodes with diverged states are excluded from the consensus process.
+- **Liveness:** The network remains operational as long as the majority of validators are online and agree on the block and state changes.
+- **Accountability:** Validators can hold the leader accountable for invalid blocks or votes, and replace the leader if necessary.
+- **State Verification:** Validators verify the application state before committing a block to prevent faulty states and irreversible errors.
+

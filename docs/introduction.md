@@ -37,4 +37,4 @@ Smart contract platforms enable developers to code with programmable money.  In 
 
 ### Consensus
 
-The Kwil network uses CometBFT, the underlying consensus engine of the Cosmos SDK, for Practical Byzantine Fault Tolerant (pBFT) consensus. CometBFT is the most mature BFT consensus engine in existence. For more information, check out the [CometBFT docs](https://docs.cometbft.com/v0.38/)
+The Kwil network uses an in-house consensus algorithm called Roadrunner. This leader-based algorithm is designed for high throughput and faster block finality. For more details on the motivation, trade-offs, and workings of Roadrunner, refer to the [Roadrunner Consensus](/docs/node/consensus) section.
