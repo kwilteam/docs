@@ -28,7 +28,7 @@ The Roadrunner consensus algorithm requires more than half of the validators to 
 
 Unlike PBFT consensus algorithms, which require multiple rounds of communication to reach consensus, the Roadrunner consensus algorithm is designed to minimize communication overhead and improve block finalization times. 
 
-Each consensus round in a traditional BFT algorithms involves `Prevote`, `Precommit`, and `Commit` phases, each requiring validators to vote and also track and verify votes from others validators and proceeed to the next phase only if super-majority of nodes agreement is achieved in that phase. This ensures the majority agree on the block and helps detect byzantine actors.
+Each consensus round in traditional BFT algorithms involves `Prevote`, `Precommit`, and `Commit` phases, each requiring validators to vote and also track and verify votes from others validators and proceeed to the next phase only if super-majority of nodes agreement is achieved in that phase. This ensures the majority agree on the block and helps detect byzantine actors.
 
 In contrast, Roadrunner has only two phases: `Propose` and `Commit`. During the `Propose` phase, the leader handles block proposals and vote collection. In the `Commit` phase, the leader commits the block if majority agrees. Validators only accept the committed block if the leader provides sufficient votes signed by validators agreeing on the next state. This reduces the number of roundtrips needed to reach consensus, thereby improving block finalization times and reducing communication overhead, which enhances overall network performance.
 

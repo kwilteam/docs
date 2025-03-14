@@ -80,7 +80,7 @@ kwild replace-leader <new-leader-public-key> <height>
 - Once the new leader’s block gains majority approval, it is committed, and a block announcement (blkAnn) message is broadcasted to the network.
 - Non-participating nodes (including the old leader) receive the blkAnn message, verify the CommitInfo signatures, and update to the new leader if the majority has signed.
 
-### Handling Leader Disputes at Height h
+### Possible States During Leader Replacement
 
 At height h, both the old leader and new leader candidate may propose blocks. The network can end up in one of three possible states:
 

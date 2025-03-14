@@ -54,7 +54,7 @@ Validators upon receiving the committed block:
 
 ## Consensus Messages
 
-Below are the detailed info on what is being exchanged between the nodes to facilitates the consensus process during a consensus round or that triggers state transitions on different nodes of the Kwil network.
+Below are the detailed info on what is being exchanged between the nodes to facilitates the consensus process during a consensus round or that triggers state transitions on different nodes of the Kwil network. All these consensus messages are cryptographically signed by the sender to ensure authenticity and integrity.
 
 ### BlockProposal
 Block proposal messages are issued and signed by the leaders indicating that a new block has been proposed. The block proposal contains the new block, block id and the signature of the leader.
@@ -73,8 +73,7 @@ A vote issued by a validator includes the following:
 - `Ack`: A Boolean value indicating whether the validator accepts (True) or rejects (False) the block.
 - `AppHash`: This is optional and provided only if the validator is submitting an ACK. It represents the hash of the application state after applying the block.
 
-Validators include their signatures with the vote allowing the leader and other validators to verify the vote's authenticity and integrity.
-The signed message format for validator votes depending on the Ack status is as follows:
+Validators include their signatures with the vote allowing the leader and other validators to verify the vote's authenticity and integrity. The message signed by the Validators depends on whether they are issuing a NACK or ACK vote.
 - NACK: `BlockID + NACK`
 - ACK:  `BlockID + ACK + AppHash`
 
@@ -90,4 +89,8 @@ Commit verification must confirm that the following conditions are satisfied:
 
 Only if the above conditions are met, the validator should commit the block and update the state.
 
-## Block Times
+## Creating Block Proposal
+Two main configurations influence how quickly the leader can create a block proposal:
+1. `consensus.propose_timeout`: This is the minimum duration the leader waits before proposing a block with transactions. This ensures the leader has sufficient time for mempool to have transactions and create a block proposal, while also allowing the slow validators time to catch up. The leader will only propose a block at the end of this timeout if there is at least one transaction in the mempool. However, if the mempool has enough transactions to fill the block size at anypoint during this propose_timeout duration, the leader will bypass this timeout and propose a block immediately.
+
+2. `consensus.empty_block_timeout`: This is the duration the leader waits before proposing an empty block. If set to 0, the leader will not propose empty blocks and will wait for transactions to appear in the mempool. If set to a non-zero value, the leader will propose an empty block if the mempool remains empty and the timeout is reached. Set this to a value significantly greater than the `consensus.propose_timeout` to avoid proposing empty blocks too frequently and fill up the block store with empty blocks.

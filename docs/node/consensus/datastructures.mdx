@@ -7,7 +7,7 @@ description: "Reference"
 slug: /node/consensus/reference
 ---
 
-This document provides an overview of the core data structures used in Kwil's consensus algorithm and how to interpret them.
+This document provides an overview of the core data structures used in Kwil's consensus algorithm.
 
 ## Block
 
@@ -36,23 +36,16 @@ A BlockHeader contains metadata about the block, including its position in the b
 | NetworkParamsHash | Hash        | Hash of the network parameters for the block                                |
 | NewLeader         | crypto.PublicKey | Public key of the new leader if changed using non-transaction based approaches      |
 
-### Block Header Validation Rules
-
-
-
-
-
-
-
 
 ## CommitInfo
 
-The CommitInfo includes the information about the commit of the block, such as the signatures of the validators agreeing to the block.
+The CommitInfo contains details about the block's commit, including signed validators votes for the block. Before applying the block, nodes verify the CommitInfo to ensure the block and application state are valid and that a majority of validators agree with the leader on the block.
+
 
 | Field            | Type          | Description                                                                 |
 |------------------|---------------|-----------------------------------------------------------------------------|
 | AppHash          | Hash          | Application state hash from the execution of the block                      |
-| Votes            | []*[VoteInfo](#voteinfo)   | List of votes from validators                                               |
+| Votes            | []*[VoteInfo](#voteinfo)   | List of signed votes from validators                                               |
 | ParamUpdates     | ParamUpdates  | Updates to the network parameters, if any                                   |
 | ValidatorUpdates | []*Validator  | Updates to the validator set, if any                                        |
 
