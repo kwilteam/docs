@@ -15,20 +15,20 @@ will have a * next to them.
 All parameters with a `?` are optional.
 :::
 
-## Mathematical Functions
+## Scalar Functions
 
 `abs(INT|DECIMAL) -> INT|DECIMAL`
 
 Returns the absolute value of the given integer.
 
-## UUID Functions
+---
 
 `uuid_generate_v5(UUID, TEXT) -> UUID`
 
 Generates a deterministic UUID from the given namespace and text value. Namespaces guarantee uniqueness of the generated
 UUID, even if the same input value is used elsewhere. Namespaces should be hardcoded as follows: `uuid_generate_v5('455f60aa-0569-4aaa-8469-63be2ec4dd96'::uuid, 'hello')`
 
-## Encoding Functions
+---
 
 `encode(BLOB, TEXT) -> TEXT`
 
@@ -40,12 +40,36 @@ Encodes a binary string into a text string. Supported formats are `base64`, `hex
 
 Decodes a text string into a binary string. Supported formats are `base64`, `hex`, and `escape`.
 
-## Digest Functions
+---
 
 `digest(TEXT|BLOB, TEXT) -> BLOB`
 
 Computes a hash of the given input string using the specified algorithm. Supported algorithms are
 `md5`, `sha1`, `sha224`, `sha256`, `sha384`, and `sha512`.
+
+---
+
+`coalesce(any, any, ...) -> any`
+
+Returns the first non-null value in the given list of arguments.
+
+---
+
+`greatest(any, any, ...) -> any`
+
+Returns the greatest value in the given list of arguments.
+
+---
+
+`least(any, any, ...) -> any`
+
+Returns the least value in the given list of arguments.
+
+---
+
+`nullif(any, any) -> any`
+
+Returns null if the two arguments are equal, otherwise returns the first argument.
 
 ## Array Functions
 
