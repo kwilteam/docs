@@ -44,7 +44,7 @@ can now be called within an action. Let's assume that the `hashing` extension ha
 
 ```sql
 CREATE ACTION use_hashing() public {
-    $hash = sha256.hash("hello world");
+    $hash := sha256.hash("hello world");
 }
 ```
 
@@ -62,7 +62,7 @@ Instead, you must call the extension method within an action:
 
 ```sql
 CREATE ACTION use_hashing() public {
-    $hash = sha256.hash("hello world");
+    $hash := sha256.hash("hello world");
     SELECT * FROM table WHERE column = $hash;
 }
 ```
