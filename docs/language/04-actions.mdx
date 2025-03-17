@@ -351,7 +351,7 @@ CREATE ACTION do_something() PUBLIC returns (TEXT, INT) {
 };
 
 CREATE ACTION call_other_action() PUBLIC {
-    $TEXT_result, $INT_result := do_something();
+    $text_result, $int_result := do_something();
 }
 ```
 
@@ -388,6 +388,6 @@ CREATE ACTION call_other_action() PUBLIC {
 };
 
 CREATE ACTION call_other_action() PUBLIC {
-    $test_result, $INT_result := other_namespace.do_something();
+    $text_result, $int_result := other_namespace.do_something();
 }
 ```
