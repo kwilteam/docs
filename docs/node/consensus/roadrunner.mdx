@@ -77,6 +77,10 @@ Validators include their signatures with the vote allowing the leader and other 
 - NACK: `BlockID + NACK`
 - ACK:  `BlockID + ACK + AppHash`
 
+If a validator notices that the leader is proposing a block that has already been finalized, it will issue a NACK vote along with an OutOfSync proof. This proof contains the latest block header with the leader's signature for verification. The OutOfSync proof informs the leader that it is behind the latest block and needs to catch up with the block in the OutOfSync proof before proposing a new block.
+
+The current consensus mechanism does not detect duplicate votes; however, only the first valid vote is taken into account, and any subsequent votes are disregarded. These votes are not persisted, so if leader is reset for some reason, the validators will continue to reannounce their votes, until the block commit announcement is received.
+
 ## Block Commit Verification
 
 Upon receiving the block commit message, the nodes must validate the leader’s commit decision before applying the block changes to the database. The commit verification process ensures that the block is valid and that the majority of the validators have agreed on the block and the state changes made by the block.
