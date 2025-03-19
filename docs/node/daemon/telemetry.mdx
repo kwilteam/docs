@@ -1,0 +1,120 @@
+---
+sidebar_position: 5
+sidebar_label: "Telemetry"
+id: daemon-kwild
+title: Telemetry and Metrics
+description: Using Telemetry with kwild to Collect Metrics
+slug: /daemon/telemetry
+---
+
+`kwild` has the ability to record various package-level metrics and push the
+recorded data to a remote OpenTelemetry Protocol (OTLP) collector.
+This page describes how to enable and configure this capability in `kwild`,
+and how to run a basic telemetry pipeline.
+
+## Enabling Telemetry in `kwild`
+
+To use telemetry with `kwild`, it must be enabled and configured with the
+following settings:
+
+```toml
+# telemetry (metrics and traces) configuration
+[telemetry]
+
+# enable telemetry
+enable = true
+
+# open telemetry protocol collector endpoint
+otlp_endpoint = '127.0.0.1:4318'
+```
+
+First, set `enable` to true in the above section of `config.toml`, or use the
+`--telemetry.enable` command line flag.
+
+Next, set the `otlp_endpoint` setting to the address (in host:port format) of a
+process that supports the OpenTelemetry Protocol (OTLP), such as the official
+OpenTelemetry Collector, which is described in the next section.
+
+`kwild` will *push* metrics data to this OTLP process at runtime. As such, the
+collector should be running whenever `kwild` is running
+
+## Running the OpenTelemetry Collector
+
+The [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) can receive
+metrics from `kwild`, and export them to many possible observability backends.
+
+The `kwil-db` repository provides a basic configuration file at `contrib/otel/otel-config.yaml`.
+This file configures the collector to listen on port 4318 for OTLP
+connections *from* `kwild`, and to export metrics to both a Prometheus instance on port 9464
+and to standard output for debugging.
+
+:::tip
+`contrib/otel/otel-config.yaml` also contains an exporter definition for InfluxDB
+that may be enabled by including it in the `service.pipelines.metrics.exporters` array.
+:::
+
+Start the collector with the `otel/opentelemetry-collector-contrib` Docker image
+from the root of the `kwil-db` repository as follows:
+
+```shell
+docker run --rm -p 4318:4318 -p 9464:9464 --name otel-col \
+  -v $(pwd)/contrib/otel/otel-config.yaml:/etc/otel-config.yaml \
+  otel/opentelemetry-collector-contrib  --config /etc/otel-config.yaml
+```
+
+This creates and runs a new Docker container using the referenced `yaml` config
+file mounted inside the image as `/etc/otel-config.yaml`, with port 4318
+exposed to accept incoming OTLP connections from `kwild`, and port 9496 exposed
+to accept incoming connections from a Prometheus instance that will scrape and
+persist the metrics data.
+
+See [Collector Quick start](https://opentelemetry.io/docs/collector/quick-start/)
+for more information.
+
+## Running a Prometheus Metrics Scraper
+
+A Prometheus service may be installed in different ways, including operating
+system packages, building from source, or using a Docker Image.
+We will start the `prom/prometheus` Docker image as follows:
+
+```shell
+docker run --rm -p 9090:9090 --name prom \
+  -v $(pwd)/contrib/otel/prom.yaml:/etc/prometheus/prometheus.yml \
+  prom/prometheus
+```
+
+This will start a Prometheus service exposed on port 9090 of the host machine.
+It will periodically scape and store metrics from the OpenTelemetry Collector.
+The `kwil-db` repository provides a basic Prometheus configuration file at
+`contrib/otel/prom.yaml`:
+
+```yaml
+global:
+  scrape_interval: 10s  # How often to scrape targets
+
+scrape_configs:
+  - job_name: "otel-collector"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["host.docker.internal:9464"]  # Scrape the OTEL Collector's metrics
+```
+
+This config is defined to connect with the OpenTelemetry Collector we started
+listening on port 9464 in the other Docker container. The `host.docker.internal`
+host name works for the internal Docker Desktop network; when using Docker Daemon alone,
+it may be necessary to change this to the collector's docker container name
+(`otel-col` in the previous `docker run` command) *and* to create and use a
+named Docker network with both containers.
+
+See the [Prometheus installation guide](https://prometheus.io/docs/prometheus/latest/installation/)
+for more information.
+
+## Viewing the Metrics
+
+There are a variety of user interfaces that can display the metrics collected
+on a Prometheus service. A common solution for exploring metrics and creating
+dashboards is Grafana. Simply install and point it to `http://127.0.0.1:9090`.
+It is recommended to use the "Explore" page to discover the available metrics.
+
+See [Grafana documentation](https://grafana.com/docs/grafana/latest/explore/)
+for more information.
