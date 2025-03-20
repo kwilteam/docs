@@ -7,11 +7,6 @@ description: Setup the ERC20 Bridge
 slug: /erc20-bridge/setup
 ---
 
-:::info
-Right now, the Kwil team still manually deploys each bridge contract. We are working on automation to make this process easier.
-In the meantime, please [reach out to us](<mailto:brennan@kwil.com>) if you would like us to deploy a bridge contract for you.
-:::
-
 This page will guide you through setting up an ERC20 bridge to a Kwil database. There are a few prerequisites you will need:
 - An ERC20 token contract that is already deployed. **The token cannot be a [Rebase Token](<https://unchainedcrypto.com/what-is-a-rebase-token/>)**
 - A list of Ethereum addresses (1-10) which will make up the multisig that controls tokens held in escrow, and the threshold for the multisig. Alternatively,
@@ -19,11 +14,13 @@ you can provide an already-deployed Safe multisig address.
 
 ### Step 1: Deploy the Escrow Contract and Relayer
 
-_While the system is still manual, the Kwil team will perform this step on your behalf. This is simply here to illustrate the full deployment scenario._
-
-The first step is to deploy the escrow contract and the relayer. The escrow contract is responsible for holding tokens, and releasing them in batch
+The first step is to deploy the escrow contract and run the relayer. The escrow contract is responsible for holding tokens, and releasing them in batch
 when the multisig approves a release. The relayer is responsible for submitting transactions to the escrow contract on behalf of the multisig. **The
 relayer itself is not part of the multisig, and is merely responsible for expending ETH gas to submit transactions.**
+
+Check the step-by-step guide [deploy contracts](https://github.com/kwilteam/rewards_contracts/blob/main/docs/tasks.md#deploy) to deploy the Escrow Contract.
+
+To run the Relayer service, check [run relayer](https://github.com/kwilteam/rewards_contracts/blob/main/docs/poster.md) for instructions.
 
 ### Step 2: Deploy Kwil Validators with Bridge Oracles
 
