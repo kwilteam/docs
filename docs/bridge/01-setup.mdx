@@ -16,7 +16,8 @@ you can provide an already-deployed Safe multisig address.
 
 The first step is to deploy the escrow contract and run the relayer. The escrow contract is responsible for holding tokens, and releasing them in batch
 when the multisig approves a release. The relayer is responsible for submitting transactions to the escrow contract on behalf of the multisig. **The
-relayer itself is not part of the multisig, and is merely responsible for expending ETH gas to submit transactions.**
+relayer itself is not part of the multisig and cannot unilaterally release funds, and is merely responsible for expending ETH gas to submit transactions.** Therefore,
+the relayer can be run by anyone, and does not need to be a trusted party.
 
 To deploy the bridge Solidity contracts, see the [guide in the source repo](https://github.com/kwilteam/rewards_contracts/blob/main/docs/tasks.md#deploy).
 
@@ -72,20 +73,14 @@ Below are example configurations showing how a multisig can configure Kwil nodes
 to Sepolia, and that the bridge is targeting USDC on Sepolia, and we have an escrow contract for the USDC
 at `0x1234567890abcdef1234567890abcdef12345678`:
 
-**initializing the bridge**
-```sql
-USE erc20_bridge {
-    chain: 'sepolia',
-    escrow: '0x1234567890abcdef1234567890abcdef12345678',
-} AS my_bridged_usdc;
-```
+
+**config.toml**
+
 :::tip
 This step can be performed _after_ the Kwil nodes have been set up. Your node's configuration can reference an
 extension that does not yet exist.
 More information on the erc20_bridge `USE` statement can be found in the [Usage](/docs/erc20-bridge/usage) docs.
 :::
-
-**config.toml**
 
 ```toml title="config.toml"
 # ...
@@ -107,3 +102,21 @@ my_bridged_usdc = "/path/to/your/signer/key"
 kwild start <...> --erc20-bridge.rpc 'sepolia=wss://YOUR_ETHEREUM_SEPOLIA_PROVIDER' \
     --erc20-bridge.signer 'my_bridged_usdc=/path/to/your/signer/key'
 ```
+
+Once our Kwil node is properly configured, we can initialize the bridge extension. The name we give the extension
+(referenced using the AS keyword) must be the same as the name we give the signer in the configuration. For example,
+if we have a signer configuration `my_bridged_usdc`, we must initialize the bridge with the same name:
+
+**Initializing the Bridge**
+```sql
+USE erc20_bridge {
+    chain: 'sepolia',
+    escrow: '0x1234567890abcdef1234567890abcdef12345678',
+} AS my_bridged_usdc;
+```
+
+:::tip
+There is no required order for setting up the bridge. You can execute the USE statement without having the signer configuration
+in place, and vice versa. If you execute USE before enough nodes have signers and bridges configured, it simply will wait until
+enough nodes are configured.
+:::
